@@ -4,7 +4,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>System Design Fundamentals - Complete Reference</title>
+  <meta name="description"
+    content="Complete system design reference covering 169 topics: scalability, CAP theorem, databases, caching, messaging, microservices, and more.">
+  <title>System Design Fundamentals — Complete Reference</title>
+  <link rel="stylesheet" href="styles.css">
   <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
   <style>
     *,
@@ -478,6 +481,9 @@
     <!-- ===== SIDEBAR ===== -->
     <nav class="sidebar">
       <div class="sidebar-header">
+        <div style="margin-bottom:14px">
+          <a href="index.html" class="back-link">&#8592; Back to Home</a>
+        </div>
         <h1>System Design Fundamentals</h1>
         <p>169 topics &nbsp;|&nbsp; Complete Reference</p>
       </div>
@@ -850,7 +856,8 @@
         <div class="callout warn">
           <div class="callout-title">Common Misconception</div>
           <p>High availability does not mean zero downtime forever. It means <em>designed</em> downtime is minimized and
-            <em>unplanned</em> downtime is rare and short. Even five-nines systems have maintenance windows.</p>
+            <em>unplanned</em> downtime is rare and short. Even five-nines systems have maintenance windows.
+          </p>
         </div>
 
         <h3>SLA, SLO, and SLI</h3>
@@ -1635,7 +1642,8 @@ Result: 150ms reads, strongly consistent
           <p>You have 4 cache servers. Key "user:alice" hashes to server 2. You add a 5th server. Now
             <code>hash("user:alice") % 5</code> maps to a completely different server. Nearly every key needs to be
             remapped — in practice, <strong>approximately (N-1)/N of all keys change their assignment</strong>, meaning
-            roughly 75–80% of cache entries are invalid after adding just one server.</p>
+            roughly 75–80% of cache entries are invalid after adding just one server.
+          </p>
         </div>
 
         <h2>Consistent Hashing</h2>
@@ -1841,9 +1849,11 @@ flowchart TD
         <h3>IPv4 vs IPv6</h3>
         <ul>
           <li><strong>IPv4:</strong> 32-bit address space (~4.3 billion addresses). Written as four octets:
-            <code>192.168.1.1</code>. Exhausted; most new allocations use NAT.</li>
+            <code>192.168.1.1</code>. Exhausted; most new allocations use NAT.
+          </li>
           <li><strong>IPv6:</strong> 128-bit address space (~3.4 × 10^38 addresses). Written as eight groups of hex:
-            <code>2001:0db8:85a3::8a2e:0370:7334</code>. Eliminates NAT requirement.</li>
+            <code>2001:0db8:85a3::8a2e:0370:7334</code>. Eliminates NAT requirement.
+          </li>
         </ul>
 
         <h3>Public vs Private Addresses</h3>
@@ -2029,7 +2039,8 @@ sequenceDiagram
         <h2>Domain Name System (DNS)</h2>
         <p>DNS is the hierarchical distributed naming system that translates human-readable domain names (e.g.,
           <code>www.example.com</code>) into IP addresses that computers use to route traffic. It is often called "the
-          phonebook of the internet."</p>
+          phonebook of the internet."
+        </p>
 
         <h3>DNS Resolution Process</h3>
 
@@ -2071,7 +2082,8 @@ sequenceDiagram
           <li><strong>OS cache and hosts file:</strong> Check <code>/etc/hosts</code> and OS DNS cache.</li>
           <li><strong>Recursive resolver:</strong> Query the ISP's or configured recursive resolver.</li>
           <li><strong>Root nameserver:</strong> Resolver asks root for the TLD nameserver (e.g., who handles
-            <code>.com</code>?).</li>
+            <code>.com</code>?).
+          </li>
           <li><strong>TLD nameserver:</strong> Returns the authoritative nameserver for the domain.</li>
           <li><strong>Authoritative nameserver:</strong> Returns the actual IP record for the hostname.</li>
           <li>Response is cached at each layer according to TTL values.</li>
@@ -2209,7 +2221,8 @@ sequenceDiagram
           <li><strong>Security:</strong> Hide server IP addresses. Absorb DDoS attacks. Block malicious requests with
             WAF rules.</li>
           <li><strong>Request routing:</strong> Route <code>/api/*</code> requests to API servers and
-            <code>/static/*</code> to CDN, all under the same domain.</li>
+            <code>/static/*</code> to CDN, all under the same domain.
+          </li>
         </ul>
 
         <div class="diagram">
@@ -2411,7 +2424,8 @@ graph LR
             the process is running and accepting connections. Does not verify application logic.</li>
           <li><strong>HTTP health check:</strong> Send an HTTP GET request to a health endpoint (e.g.,
             <code>/health</code> or <code>/ping</code>) and expect an HTTP 200 response within a timeout. More
-            meaningful than TCP.</li>
+            meaningful than TCP.
+          </li>
           <li><strong>Deep health check:</strong> The health endpoint itself checks its critical dependencies (database
             connection, cache connectivity, disk space). Returns a degraded status if any dependency is unhealthy.</li>
         </ul>
@@ -3512,7 +3526,8 @@ GROUP BY time(5m)
         <h3>Types of Indexes</h3>
         <ul>
           <li><strong>B+ tree index (default):</strong> Good for equality (<code>=</code>), range (<code>&gt;</code>,
-            <code>&lt;</code>, <code>BETWEEN</code>), prefix (<code>LIKE 'abc%'</code>), and ORDER BY queries.</li>
+            <code>&lt;</code>, <code>BETWEEN</code>), prefix (<code>LIKE 'abc%'</code>), and ORDER BY queries.
+          </li>
           <li><strong>Hash index:</strong> O(1) equality lookups. Cannot support range queries. Useful for exact-match
             lookups like session ID lookups.</li>
           <li><strong>Composite index:</strong> Index on multiple columns <code>(a, b, c)</code>. Can satisfy queries on
@@ -4084,7 +4099,8 @@ GET  /search?q=term        — Query parameters for filtering/searching
         <h3>Core Problems GraphQL Solves</h3>
         <ul>
           <li><strong>Over-fetching:</strong> REST endpoints return a fixed data shape. Fetching
-            <code>GET /users/123</code> returns all user fields even if you only need name and email.</li>
+            <code>GET /users/123</code> returns all user fields even if you only need name and email.
+          </li>
           <li><strong>Under-fetching (N+1 requests):</strong> Getting a list of posts with each author's name requires
             one request for posts, then one per post for author details.</li>
           <li><strong>Client-specific data requirements:</strong> Mobile and web clients may need different subsets of
@@ -4390,7 +4406,8 @@ class TokenBucket:
         <p>Divide time into fixed windows (e.g., 1-minute slots). Count requests in each window. If count exceeds limit,
           reject until the next window.</p>
         <p><strong>Problem:</strong> A client can make <code>limit</code> requests at the end of one window and
-          <code>limit</code> more at the start of the next — effectively 2x the limit in a 2-second span.</p>
+          <code>limit</code> more at the start of the next — effectively 2x the limit in a 2-second span.
+        </p>
 
         <h4>Sliding Window Log</h4>
         <p>Store a timestamp for each request in a sorted list. On each new request, remove timestamps older than the
@@ -4536,7 +4553,8 @@ header.payload.signature
         <ol>
           <li>User clicks "Login with Google" on your app.</li>
           <li>Your app redirects user to Google's authorization endpoint with <code>client_id</code>,
-            <code>redirect_uri</code>, <code>scope</code>, and a <code>state</code> parameter (CSRF protection).</li>
+            <code>redirect_uri</code>, <code>scope</code>, and a <code>state</code> parameter (CSRF protection).
+          </li>
           <li>User logs into Google and grants permission to your app.</li>
           <li>Google redirects back to your <code>redirect_uri</code> with a short-lived authorization code.</li>
           <li>Your backend exchanges the authorization code for an access token and optionally a refresh token, using
@@ -5793,7 +5811,8 @@ event_B = { "action": "set x=2", "ts": "09:59:59.500" }
           <li>Before executing any event, the process increments its counter: <code>counter++</code></li>
           <li>When a process sends a message, it includes its current counter value.</li>
           <li>When a process receives a message with timestamp T, it updates its counter:
-            <code>counter = max(counter, T) + 1</code></li>
+            <code>counter = max(counter, T) + 1</code>
+          </li>
         </ol>
 
         <h3>Happens-Before Relationship</h3>
@@ -9351,4 +9370,27 @@ roleRef:
           const el = document.querySelector('.section.active');
           if (!el) return;
           const scrolled = window.scrollY + window.innerHeight;
-          const total = document.
+          const total = document.body.scrollHeight;
+          if (total > 0) {
+            const pct = Math.min(100, Math.max(0, Math.round((scrolled / total) * 100)));
+            pb.style.width = pct + '%';
+          }
+        });
+      </script>
+      </main>
+    </div>
+
+    <!-- Back to top -->
+    <button id="back-to-top" title="Back to top" aria-label="Back to top">&#8593;</button>
+
+    <script>
+      // Back-to-top button
+      const bttBtn = document.getElementById('back-to-top');
+      window.addEventListener('scroll', () => {
+        bttBtn.classList.toggle('visible', window.scrollY > 500);
+      });
+      bttBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+    </script>
+</body>
+
+</html>
