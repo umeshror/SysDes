@@ -489,16 +489,20 @@
       </div>
 
       <div class="nav-module">
-        <div class="nav-module-title">Getting Started</div>
-        <div class="nav-item" data-sec="intro">Introduction to System Design</div>
+        <div class="nav-module-title">1. Introduction to SDI</div>
+        <div class="nav-item" data-sec="intro">The SDI Process</div>
       </div>
 
       <div class="nav-module">
-        <div class="nav-module-title">Core Concepts</div>
-        <div class="nav-item" data-sec="core">Scalability, Availability, Reliability</div>
-        <div class="nav-item" data-sec="cap">CAP Theorem &amp; Consistency</div>
-        <div class="nav-item" data-sec="pacelc">PACELC Theorem</div>
+        <div class="nav-module-title">2. Glossary of Basics</div>
+        <div class="nav-item" data-sec="core">Core Characteristics</div>
+        <div class="nav-item" data-sec="cap">CAP &amp; PACELC Theorems</div>
         <div class="nav-item" data-sec="hashing">Consistent Hashing</div>
+        <div class="nav-item" data-sec="lb">Load Balancing &amp; Algorithms</div>
+        <div class="nav-item" data-sec="caching">Caching Strategies</div>
+        <div class="nav-item" data-sec="db-types">SQL vs NoSQL</div>
+        <div class="nav-item" data-sec="realtime">Real-time (WebSockets, SSE)</div>
+        <div class="nav-item" data-sec="dist-fundamentals">Quorum, Leader/Follower, Heartbeats</div>
       </div>
 
       <div class="nav-module">
@@ -541,11 +545,8 @@
       </div>
 
       <div class="nav-module">
-        <div class="nav-module-title">Architecture</div>
-        <div class="nav-item" data-sec="arch-patterns">Architectural Patterns</div>
-        <div class="nav-item" data-sec="microservices">Microservices Patterns</div>
-        <div class="nav-item" data-sec="containers">VMs vs Containers</div>
-        <div class="nav-item" data-sec="tradeoffs">System Tradeoffs</div>
+        <div class="nav-module-title">3. System Design Trade-offs</div>
+        <div class="nav-item" data-sec="tradeoffs">Topic-by-Topic Trade-offs</div>
       </div>
 
       <div class="nav-module">
@@ -602,6 +603,70 @@
           <li><strong>Identify bottlenecks</strong> — single points of failure, hotspots, scaling walls.</li>
           <li><strong>Tradeoff discussion</strong> — no design is perfect; articulate what was sacrificed.</li>
         </ol>
+
+        <h2>What is a System Design Interview?</h2>
+        <p>A System Design Interview (SDI) is a technical conversation about how to build a large-scale system. Unlike
+          coding interviews, there is no single "correct" answer. The interviewer is assessing your ability to handle
+          ambiguity, make informed trade-offs, and design for scalability and reliability.</p>
+        <div class="callout info">
+          <div class="callout-title">Focus Areas</div>
+          <ul>
+            <li><strong>Scalability:</strong> Can the system handle 10x or 100x more traffic?</li>
+            <li><strong>Architecture:</strong> How are components organized and how do they interact?</li>
+            <li><strong>Trade-offs:</strong> Why choose X over Y? (e.g., SQL vs NoSQL)</li>
+            <li><strong>Problem Solving:</strong> How do you handle edge cases and failures?</li>
+          </ul>
+        </div>
+
+        <h2>Functional vs. Non-functional Requirements</h2>
+        <p>Before designing anything, you must define the scope. This is split into two categories:</p>
+
+        <div class="compare">
+          <div class="compare-card neutral">
+            <h4>Functional Requirements</h4>
+            <p>What the system <strong>must do</strong>. Features and behaviors.</p>
+            <ul>
+              <li>"Users can upload photos."</li>
+              <li>"Users can follow each other."</li>
+              <li>"The system generates a news feed."</li>
+            </ul>
+          </div>
+          <div class="compare-card neutral">
+            <h4>Non-functional Requirements</h4>
+            <p>How the system <strong>performs</strong>. Constraints and qualities.</p>
+            <ul>
+              <li><strong>Scalability:</strong> Handle 10M daily active users.</li>
+              <li><strong>Availability:</strong> 99.9% uptime (Highly available).</li>
+              <li><strong>Latency:</strong> Feed generation under 200ms.</li>
+              <li><strong>Consistency:</strong> Eventual vs strong consistency.</li>
+            </ul>
+          </div>
+        </div>
+
+        <h2>What are Back-of-the-Envelope Estimations?</h2>
+        <p>These are quick, approximate calculations used to assess if a design is feasible within given constraints.
+          They help determine the scale of the system (e.g., "Do we need 1 server or 1000?").</p>
+        <div class="example">
+          <div class="example-label">Common Units to Know</div>
+          <ul>
+            <li><strong>1 Trillion requests/day</strong> ≈ 12 Million requests/sec</li>
+            <li><strong>1 GB</strong> = 10<sup>9</sup> bytes</li>
+            <li><strong>Latency:</strong> Memory (100ns) vs SSD (100µs) vs Disk (10ms) vs Network (150ms).</li>
+          </ul>
+        </div>
+
+        <h2>Things to Avoid During System Design Interview</h2>
+        <ul>
+          <li><strong>Skipping Requirements:</strong> Never start designing without clarifying the goal.</li>
+          <li><strong>Ignoring Trade-offs:</strong> Don't just pick a technology because it's popular; explain
+            <em>why</em>.
+          </li>
+          <li><strong>Poor Communication:</strong> Don't go silent. Think out loud and engage the interviewer.</li>
+          <li><strong>Rigid Thinking:</strong> If the interviewer suggests a flaw, be open to adjusting your design.
+          </li>
+          <li><strong>Diving Too Deep Early:</strong> Don't design the database schema before the high-level
+            architecture.</li>
+        </ul>
 
         <h2>Top 30 System Design Concepts</h2>
         <p>The field converges on a set of recurring building blocks. Mastering these gives you the vocabulary to
@@ -721,8 +786,22 @@
       <!-- ==================== SECTION: CORE CONCEPTS ==================== -->
       <div class="section" id="core">
         <h1 class="section-title">Core Concepts</h1>
-        <p class="section-subtitle">Module 3 &nbsp;|&nbsp; Scalability · Availability · Reliability · SPOF · Latency ·
-          Throughput · Bandwidth</p>
+        <p class="section-subtitle">Module 3 &nbsp;|&nbsp; Scalability · Availability · Reliability · Distributed
+          Characteristics</p>
+
+        <h2>Key Characteristics of Distributed Systems</h2>
+        <p>A distributed system is a collection of independent computers that appears to its users as a single coherent
+          system. To build such systems at scale, we must prioritize specific characteristics:</p>
+        <ul>
+          <li><strong>Scalability:</strong> The ability to handle more load by adding resources (CPU, RAM, nodes).</li>
+          <li><strong>Reliability:</strong> The probability the system performs correctly over time, even with failures.
+          </li>
+          <li><strong>Availability:</strong> The percentage of time the system is operational and accessible.</li>
+          <li><strong>Efficiency:</strong> How effectively the system uses resources (latency and throughput).</li>
+          <li><strong>Fault Tolerance:</strong> The ability to continue operating despite one or more component
+            failures.</li>
+          <li><strong>Manageability:</strong> How easy it is to operate, monitor, and maintain the system.</li>
+        </ul>
 
         <h2>Scalability</h2>
         <p>Scalability is the ability of a system to handle an increasing amount of work by adding resources. A scalable
@@ -5724,6 +5803,36 @@ This gives you both:
           distributed systems, heartbeats are the primary mechanism for failure detection — if a node stops sending
           heartbeats, other nodes suspect it has failed.</p>
 
+        <h2>Leader and Follower (Master-Slave)</h2>
+        <p>Leader-follower replication is a fundamental pattern for maintaining data consistency across multiple nodes.
+          One node is designated as the <strong>Leader</strong> (Master), while the others are
+          <strong>Followers</strong>
+          (Replicas/Slaves).
+        </p>
+        <div class="callout info">
+          <div class="callout-title">Responsibilities</div>
+          <ul>
+            <li><strong>Leader:</strong> Handles all write requests, updates its local state, and propagates changes to
+              followers.</li>
+            <li><strong>Followers:</strong> Receive updates from the leader and apply them to their local state. Usually
+              handle read-only requests.</li>
+          </ul>
+        </div>
+        <p>If the leader fails, a new leader is elected from the available followers using a consensus algorithm like
+          Raft or Paxos.</p>
+
+        <h2>Quorum</h2>
+        <p>Quorum-based consistency is used to ensure that a distributed system makes progress even when some nodes are
+          down or the network is partitioned. A quorum is the minimum number of nodes that must agree on an operation.
+        </p>
+        <div class="example">
+          <p><strong>Common Formula:</strong> In a system of <em>N</em> nodes, a write quorum <em>W</em> and a read
+            quorum
+            <em>R</em> must satisfy <strong>W + R > N</strong>. This ensures that every read operation sees at least one
+            copy of the most recent write.
+          </p>
+        </div>
+
         <h3>Design Considerations</h3>
         <ul>
           <li><strong>Frequency vs overhead:</strong> More frequent heartbeats reduce failure detection time but consume
@@ -7326,268 +7435,136 @@ Savings: $20,000/month (66% cheaper)
 
 
       <div class="section" id="tradeoffs">
-        <h1 class="section-title">System Design Tradeoffs</h1>
-        <p class="section-subtitle">Module 16 &nbsp;|&nbsp; Consistency vs Availability · Latency vs Throughput ·
-          Normalization vs Denormalization · Concurrency vs Parallelism · Stateful vs Stateless · Push vs Pull ·
-          Monolith vs Microservices · Synchronous vs Asynchronous</p>
+        <h1 class="section-title">System Design Trade-offs</h1>
+        <p class="section-subtitle">Module 3 &nbsp;|&nbsp; 22 Key Comparisons for Scalable Systems</p>
 
-        <h2>Consistency vs Availability</h2>
-        <p>As established by the CAP theorem, during a network partition you must choose between strong consistency
-          (every read reflects the latest write) and high availability (every request gets a response, even if
-          potentially stale). Beyond partitions, this tradeoff appears in every replicated system's normal operation.
-        </p>
+        <h2>Importance of Discussing Trade-offs</h2>
+        <p>In system design, there are no perfect solutions, only trade-offs. Demonstrating that you understand the
+          consequences of your choices shows maturity, critical thinking, and real-world experience. Every design
+          decision should be justified by the requirements of the specific problem.</p>
 
-        <div class="table-wrap">
-          <table>
-            <tr>
-              <th>Scenario</th>
-              <th>Prefer Consistency</th>
-              <th>Prefer Availability</th>
-            </tr>
-            <tr>
-              <td>Bank balance</td>
-              <td>Yes — wrong balance is unacceptable</td>
-              <td>No — a stale balance could cause overdraft</td>
-            </tr>
-            <tr>
-              <td>Social media like count</td>
-              <td>No</td>
-              <td>Yes — 1-second stale count is fine</td>
-            </tr>
-            <tr>
-              <td>Seat inventory (booking)</td>
-              <td>Yes — overbooking is catastrophic</td>
-              <td>No</td>
-            </tr>
-            <tr>
-              <td>Shopping cart contents</td>
-              <td>Debatable — depends on business requirements</td>
-              <td>Often yes — availability matters more</td>
-            </tr>
-            <tr>
-              <td>DNS record</td>
-              <td>No</td>
-              <td>Yes — TTL-based staleness is expected</td>
-            </tr>
-            <tr>
-              <td>Distributed lock</td>
-              <td>Yes — must be mutually exclusive</td>
-              <td>No</td>
-            </tr>
-          </table>
-        </div>
+        <h2>1. Strong vs. Eventual Consistency</h2>
+        <p>Strong consistency ensures all nodes see the same data at the same time, but increases latency and reduces
+          availability during partitions. Eventual consistency allows temporary divergence for lower latency and higher
+          availability.</p>
 
-        <h2>Latency vs Throughput</h2>
-        <p>Latency is the time to complete a single operation. Throughput is the number of operations completed per unit
-          time. These two goals are often in tension, and the right balance depends on the workload and user
-          expectations.</p>
+        <h2>2. Latency vs. Throughput</h2>
+        <p>Latency is the time for a single request (optimize with caching, bypassing queues). Throughput is requests
+          per second (optimize with batching, parallelism). They are often at odds.</p>
 
+        <h2>3. ACID vs. BASE Properties in Databases</h2>
         <div class="compare">
           <div class="compare-card neutral">
-            <h4>Optimizing for Latency</h4>
+            <h4>ACID (Traditional SQL)</h4>
             <ul>
-              <li>Process requests immediately, do not batch</li>
-              <li>Keep hot data in memory (caching)</li>
-              <li>Use fast, synchronous paths</li>
-              <li>Minimize network round trips</li>
-              <li>Accept that throughput may be lower due to overhead per request</li>
-              <li>Example: real-time user queries, payment processing</li>
+              <li><strong>A</strong>tomicity, <strong>C</strong>onsistency, <strong>I</strong>solation,
+                <strong>D</strong>urability</li>
+              <li>Focus on data integrity and strong consistency.</li>
             </ul>
           </div>
           <div class="compare-card neutral">
-            <h4>Optimizing for Throughput</h4>
+            <h4>BASE (Modern NoSQL)</h4>
             <ul>
-              <li>Batch multiple operations together</li>
-              <li>Amortize per-request overhead across many items</li>
-              <li>Parallelize work across many workers</li>
-              <li>Accept higher per-operation latency</li>
-              <li>Example: ETL pipelines, bulk email, analytics aggregations</li>
+              <li><strong>B</strong>asically <strong>A</strong>vailable, <strong>S</strong>oft state,
+                <strong>E</strong>ventual consistency</li>
+              <li>Focus on scalability and high availability.</li>
             </ul>
           </div>
         </div>
 
-        <h2>Normalization vs Denormalization</h2>
-        <p>Normalization organizes data to reduce redundancy. Denormalization introduces controlled redundancy to
-          improve read performance by reducing joins.</p>
+        <h2>4. Read-Through vs. Write-Through Cache</h2>
+        <ul>
+          <li><strong>Read-Through:</strong> Cache loads missing data from DB. Simplifies application logic.</li>
+          <li><strong>Write-Through:</strong> Data written to cache and DB simultaneously. Ensures consistency but adds
+            write latency.</li>
+        </ul>
 
-        <div class="compare">
-          <div class="compare-card neutral">
-            <h4>Normalized</h4>
-            <ul>
-              <li>Data stored once — no update anomalies</li>
-              <li>Smaller storage footprint</li>
-              <li>Reads require joins — slower for complex queries</li>
-              <li>Best for: write-heavy workloads, data that changes frequently</li>
-            </ul>
-          </div>
-          <div class="compare-card neutral">
-            <h4>Denormalized</h4>
-            <ul>
-              <li>Data duplicated across tables or documents</li>
-              <li>Larger storage footprint</li>
-              <li>Reads are fast — no joins needed</li>
-              <li>Updates are expensive — must maintain all copies</li>
-              <li>Best for: read-heavy workloads, data that rarely changes</li>
-            </ul>
-          </div>
-        </div>
+        <h2>5. Batch Processing vs. Stream Processing</h2>
+        <ul>
+          <li><strong>Batch:</strong> Process large volumes of data at once (e.g., nightly). High throughput, high
+            latency.</li>
+          <li><strong>Stream:</strong> Process data as it arrives (e.g., real-time). Low latency, complex to manage.
+          </li>
+        </ul>
 
-        <h2>Concurrency vs Parallelism</h2>
-        <p>These terms are often used interchangeably but describe different things. Concurrency is a program structure
-          that enables multiple tasks to be in progress simultaneously. Parallelism is executing multiple tasks
-          physically at the same time on multiple processors.</p>
+        <h2>6. Load Balancer vs. API Gateway</h2>
+        <ul>
+          <li><strong>Load Balancer:</strong> Distributes traffic at L4/L7. Simple and fast.</li>
+          <li><strong>API Gateway:</strong> Orchestrates requests, handles auth, rate limiting, and protocol
+            translation. More powerful but adds a bottleneck.</li>
+        </ul>
 
-        <dl class="def">
-          <dt>Concurrency</dt>
-          <dd>Dealing with multiple things at once. A single-core CPU can run multiple threads concurrently by
-            context-switching. The threads make progress over time, but only one is executing at any given instant.
-            Concurrency is about program structure: how to organize code to handle multiple tasks and make progress on
-            each.</dd>
-          <dt>Parallelism</dt>
-          <dd>Doing multiple things at once. Multiple cores executing different threads simultaneously. Parallelism is
-            about execution: physically running multiple computations in the same instant. Parallelism requires
-            concurrency — you must first structure a problem as concurrent tasks before you can execute them in
-            parallel.</dd>
-        </dl>
+        <h2>7. API Gateway vs. Direct Service Exposure</h2>
+        <p>Direct exposure reduces latency but forces clients to manage service locations and multiple security
+          handshakes. API Gateway abstracts services for a cleaner client interface.</p>
 
-        <div class="example">
-          <div class="example-label">Database scenario</div>
-          <p>A web server handles 1000 concurrent HTTP connections on a single-core machine — this is concurrency. The
-            server context-switches between connections but only one executes at a time. On a 64-core machine, 64
-            requests can execute simultaneously — this is parallelism. The web server still has concurrency (1000
-            connections) but additionally has parallelism (64 at once).</p>
-        </div>
+        <h2>8. Proxy vs. Reverse Proxy</h2>
+        <ul>
+          <li><strong>Forward Proxy:</strong> Sits in front of clients (hides client identity).</li>
+          <li><strong>Reverse Proxy:</strong> Sits in front of servers (load balancing, caching, security).</li>
+        </ul>
 
-        <h2>Stateful vs Stateless Design</h2>
-        <p>Stateless services do not retain any per-client state between requests. All information needed to process a
-          request is contained within the request itself (via a token, query parameter, or request body). Stateful
-          services maintain per-client session data on the server.</p>
+        <h2>9. API Gateway vs. Reverse Proxy</h2>
+        <p>An API Gateway is a specialized reverse proxy that also handles application-level concerns like request
+          composition, authentication, and monitoring.</p>
 
-        <div class="compare">
-          <div class="compare-card neutral">
-            <h4>Stateless</h4>
-            <ul>
-              <li>Any server can handle any request — true horizontal scaling</li>
-              <li>No session affinity needed</li>
-              <li>Fault tolerant — a server failure loses no per-user state</li>
-              <li>JWT authentication fits naturally</li>
-              <li>Requires client to send context on every request (larger payloads)</li>
-            </ul>
-          </div>
-          <div class="compare-card neutral">
-            <h4>Stateful</h4>
-            <ul>
-              <li>Server maintains context — smaller requests</li>
-              <li>Requires sticky sessions or shared state store</li>
-              <li>Session data lost on server failure (unless replicated)</li>
-              <li>More natural for some protocols (WebSockets, multiplayer game state)</li>
-              <li>Externalize state to Redis to get benefits of stateless app servers</li>
-            </ul>
-          </div>
-        </div>
+        <h2>10. SQL vs. NoSQL</h2>
+        <p>SQL for relational data, complex joins, and ACID. NoSQL for massive scale, flexible schemas, and high
+          availability.</p>
 
-        <h2>Push vs Pull (Fan-out on Write vs Fan-out on Read)</h2>
-        <p>In social feed systems, when a user creates a post, the system must ensure the post appears in all followers'
-          feeds. There are two fundamental approaches:</p>
+        <h2>11. Primary-Replica vs. Peer-to-Peer Replication</h2>
+        <ul>
+          <li><strong>Primary-Replica:</strong> Single leader for writes, many followers for reads. Simple but leader
+            is a SPOF for writes.</li>
+          <li><strong>Peer-to-Peer:</strong> Any node can accept writes. No single SPOF, but conflict resolution
+            (conflict-free replicated data types or last-write-wins) is mandatory.</li>
+        </ul>
 
-        <dl class="def">
-          <dt>Fan-out on Write (Push)</dt>
-          <dd>When Alice posts, immediately write a copy of the post to every follower's feed. Reads are fast — the feed
-            is pre-built. But writes are expensive for high-follower accounts: a celebrity with 50 million followers
-            generates 50 million writes per post.</dd>
-          <dt>Fan-out on Read (Pull)</dt>
-          <dd>When Bob requests his feed, the system fetches recent posts from all accounts Bob follows and merges them.
-            Writes are cheap (one write per post). But reads are expensive — must query and merge N feeds per request.
-          </dd>
-        </dl>
+        <h2>12. Data Compression vs. Data Deduplication</h2>
+        <ul>
+          <li><strong>Compression:</strong> Reduces data size within a file/packet.</li>
+          <li><strong>Deduplication:</strong> Removes redundant copies of the same data across a system.</li>
+        </ul>
 
-        <div class="example">
-          <div class="example-label">Twitter hybrid approach</div>
-          <p>Twitter uses a hybrid strategy: regular users (&lt;10K followers) use fan-out on write — their posts are
-            pushed to followers' pre-built feed cache. Celebrities (&gt;1M followers) use fan-out on read — their posts
-            are not pushed but fetched at read time and merged with the pre-built feed. This balances write load from
-            celebrities against read latency for regular users.</p>
-        </div>
+        <h2>13. Server-Side Caching vs. Client-Side Caching</h2>
+        <p>Server-side (Redis) reduces DB load. Client-side (Browser cache) reduces network requests and server load
+          entirely.</p>
 
-        <h2>Monolith vs Microservices</h2>
-        <p>This is one of the most consequential architectural decisions. The wrong choice leads to either a system too
-          rigid to evolve or a system so complex that development slows to a crawl.</p>
+        <h2>14. REST vs. RPC (gRPC)</h2>
+        <p>REST uses HTTP verbs and is great for public APIs. RPC is faster, uses binary (Protobuf), and is ideal for
+          internal microservice communication.</p>
 
-        <div class="table-wrap">
-          <table>
-            <tr>
-              <th>Factor</th>
-              <th>Monolith</th>
-              <th>Microservices</th>
-            </tr>
-            <tr>
-              <td>Team size</td>
-              <td>Works well up to ~50 engineers</td>
-              <td>Scales to hundreds of teams</td>
-            </tr>
-            <tr>
-              <td>Development speed</td>
-              <td>Faster initially</td>
-              <td>Faster at large scale (independent teams)</td>
-            </tr>
-            <tr>
-              <td>Deployment</td>
-              <td>One unit — deploy all or nothing</td>
-              <td>Each service deploys independently</td>
-            </tr>
-            <tr>
-              <td>Technology flexibility</td>
-              <td>Single stack per codebase</td>
-              <td>Different stack per service</td>
-            </tr>
-            <tr>
-              <td>Operational complexity</td>
-              <td>Low — one thing to monitor and deploy</td>
-              <td>High — dozens of services to operate</td>
-            </tr>
-            <tr>
-              <td>Data consistency</td>
-              <td>Easy — single DB, full ACID</td>
-              <td>Hard — distributed transactions, eventual consistency</td>
-            </tr>
-            <tr>
-              <td>Testing</td>
-              <td>Easier — test in process</td>
-              <td>Harder — integration tests across service boundaries</td>
-            </tr>
-            <tr>
-              <td>Performance</td>
-              <td>In-process calls are fast</td>
-              <td>Network overhead between services</td>
-            </tr>
-          </table>
-        </div>
+        <h2>15. Polling vs. Long-Polling vs. WebSockets vs. Webhooks</h2>
+        <p>Comparing real-time delivery strategies from simple (Polling) to persistent stateful connections
+          (WebSockets) and server-to-server callbacks (Webhooks).</p>
 
-        <h2>Synchronous vs Asynchronous Processing</h2>
-        <p>Every operation in a system must be classified as either part of the critical path (user waits for the
-          result) or a side effect (can happen later). Using synchronous processing for side effects couples
-          non-essential work to the user's request latency.</p>
+        <h2>16. CDN Usage vs. Direct Server Serving</h2>
+        <p>CDNs reduce latency by serving content from edge locations. Direct serving is simpler for small-scale or
+          frequently changing dynamic content.</p>
 
-        <div class="example">
-          <div class="example-label">Order Placement Tradeoffs</div>
-          <pre>
-# Synchronous critical path — user waits for all of this:
-1. Validate order
-2. Check inventory
-3. Charge payment card        ← Must be synchronous
-4. Reserve inventory          ← Should be synchronous
-5. Create order record        ← Should be synchronous
-6. Send confirmation email    ← Does NOT need to be synchronous
-7. Update analytics dashboards← Does NOT need to be synchronous
-8. Notify warehouse system    ← Does NOT need to be synchronous
+        <h2>17. Serverless Architecture vs. Traditional Server-based</h2>
+        <p>Serverless offers auto-scaling and pay-per-use but suffers from cold starts. Traditional servers offer
+          consistent performance and lower cost for high-utilization workloads.</p>
 
-# Async processing — move steps 6-8 to queue:
-POST /orders → validates, charges, reserves, records → 200ms
-Email service processes queue → sends email (2 seconds, but user doesn't wait)
-Analytics service processes queue → updates dashboard (5 seconds, user doesn't care)
-  </pre>
-          <p>Moving non-essential work off the critical path reduces user-facing latency from ~3 seconds to ~200ms.</p>
-        </div>
+        <h2>18. Stateful vs. Stateless Architecture</h2>
+        <p>Stateless is easier to scale and manage. Stateful is necessary for some real-time apps (multiplayer games)
+          but requires sticky sessions or shared state stores.</p>
+
+        <h2>19. Hybrid Cloud Storage vs. All-Cloud Storage</h2>
+        <p>Hybrid combines on-premise control with cloud scalability. All-cloud is simpler but subject to vendor lock-in
+          and potential egress costs.</p>
+
+        <h2>20. Token Bucket vs. Leaky Bucket (Rate Limiting)</h2>
+        <p>Token Bucket allows bursts. Leaky Bucket enforces a constant output rate, smoothing traffic.</p>
+
+        <h2>21. Read Heavy vs. Write Heavy System</h2>
+        <p>Read heavy systems use aggressive caching and read replicas. Write heavy systems use LSM trees, message
+          queues, and batching.</p>
+
+        <h2>22. Recap: The Trade-off Mindset</h2>
+        <p>Always ask: <strong>"What am I giving up?"</strong> If you add a cache, you give up simple consistency. If
+          you shard, you give up simple joins. If you use an API Gateway, you give up a few milliseconds of latency for
+          security and manageability.</p>
       </div>
 
 
