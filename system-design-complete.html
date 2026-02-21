@@ -506,13 +506,18 @@
       </div>
 
       <div class="nav-module">
-        <div class="nav-module-title">Networking</div>
+        <div class="nav-module-title">3. System Design Trade-offs</div>
+        <div class="nav-item" data-sec="tradeoffs">Topic-by-Topic Trade-offs</div>
+      </div>
+
+      <div class="nav-module">
+        <div class="nav-module-title">4. Networking</div>
         <div class="nav-item" data-sec="networking">OSI, TCP/UDP, HTTP, DNS</div>
         <div class="nav-item" data-sec="proxy">Proxy &amp; Reverse Proxy</div>
       </div>
 
       <div class="nav-module">
-        <div class="nav-module-title">Infrastructure</div>
+        <div class="nav-module-title">5. Infrastructure</div>
         <div class="nav-item" data-sec="lb">Load Balancing</div>
         <div class="nav-item" data-sec="caching">Caching</div>
         <div class="nav-item" data-sec="cdn">CDN &amp; Distributed Cache</div>
@@ -520,7 +525,7 @@
       </div>
 
       <div class="nav-module">
-        <div class="nav-module-title">API &amp; Communication</div>
+        <div class="nav-module-title">6. API &amp; Communication</div>
         <div class="nav-item" data-sec="api-design">API Design (REST, GraphQL, gRPC)</div>
         <div class="nav-item" data-sec="api-infra">API Gateway &amp; Rate Limiting</div>
         <div class="nav-item" data-sec="api-auth">Authentication &amp; Authorization</div>
@@ -529,14 +534,21 @@
       </div>
 
       <div class="nav-module">
-        <div class="nav-module-title">Data Layer</div>
+        <div class="nav-module-title">7. Architecture</div>
+        <div class="nav-item" data-sec="arch-patterns">Architectural Patterns</div>
+        <div class="nav-item" data-sec="microservices">Microservices &amp; Service Mesh</div>
+        <div class="nav-item" data-sec="containers">Containers &amp; Orchestration</div>
+      </div>
+
+      <div class="nav-module">
+        <div class="nav-module-title">8. Data Layer</div>
         <div class="nav-item" data-sec="db-types">Database Types</div>
         <div class="nav-item" data-sec="db-internals">Database Internals</div>
         <div class="nav-item" data-sec="db-scaling">Database Scaling</div>
       </div>
 
       <div class="nav-module">
-        <div class="nav-module-title">Distributed Systems</div>
+        <div class="nav-module-title">9. Distributed Systems</div>
         <div class="nav-item" data-sec="db-federation">Database Federation</div>
         <div class="nav-item" data-sec="dist-fundamentals">Challenges &amp; Failures</div>
         <div class="nav-item" data-sec="time-ordering">Time, Ordering &amp; Clocks</div>
@@ -545,18 +557,13 @@
       </div>
 
       <div class="nav-module">
-        <div class="nav-module-title">3. System Design Trade-offs</div>
-        <div class="nav-item" data-sec="tradeoffs">Topic-by-Topic Trade-offs</div>
-      </div>
-
-      <div class="nav-module">
-        <div class="nav-module-title">Data Engineering</div>
+        <div class="nav-module-title">10. Data Engineering</div>
         <div class="nav-item" data-sec="data-structures">Data Structures for Scale</div>
         <div class="nav-item" data-sec="big-data">Big Data Processing</div>
       </div>
 
       <div class="nav-module">
-        <div class="nav-module-title">Operations &amp; Security</div>
+        <div class="nav-module-title">11. Operations &amp; Security</div>
         <div class="nav-item" data-sec="disaster-recovery">Disaster Recovery</div>
         <div class="nav-item" data-sec="observability">Observability</div>
         <div class="nav-item" data-sec="security">Advanced Security</div>
@@ -572,7 +579,7 @@
       <!-- ==================== SECTION: INTRO ==================== -->
       <div class="section active" id="intro">
         <h1 class="section-title">Introduction to System Design</h1>
-        <p class="section-subtitle">Modules 1–2 &nbsp;|&nbsp; 5 topics</p>
+        <p class="section-subtitle">Module 1 &nbsp;|&nbsp; 5 topics</p>
 
         <h2>What is System Design?</h2>
         <p>System design is the process of defining the architecture, components, modules, interfaces, and data flow of
@@ -786,7 +793,7 @@
       <!-- ==================== SECTION: CORE CONCEPTS ==================== -->
       <div class="section" id="core">
         <h1 class="section-title">Core Concepts</h1>
-        <p class="section-subtitle">Module 3 &nbsp;|&nbsp; Scalability · Availability · Reliability · Distributed
+        <p class="section-subtitle">Module 2 &nbsp;|&nbsp; Scalability · Availability · Reliability · Distributed
           Characteristics</p>
 
         <h2>Key Characteristics of Distributed Systems</h2>
@@ -1108,7 +1115,7 @@ graph TD
       <!-- ==================== SECTION: CAP ==================== -->
       <div class="section" id="cap">
         <h1 class="section-title">CAP Theorem and Consistency Models</h1>
-        <p class="section-subtitle">Module 3 &nbsp;|&nbsp; CAP Theorem · Consistency Models</p>
+        <p class="section-subtitle">Module 2 &nbsp;|&nbsp; CAP Theorem · Consistency Models</p>
 
         <h2>CAP Theorem</h2>
         <span class="tag tag-interview">Interview Classic</span>
@@ -1710,7 +1717,7 @@ Result: 150ms reads, strongly consistent
 
       <div class="section" id="hashing">
         <h1 class="section-title">Consistent Hashing</h1>
-        <p class="section-subtitle">Module 3 &nbsp;|&nbsp; Distribution without disruption</p>
+        <p class="section-subtitle">Module 2 &nbsp;|&nbsp; Distribution without disruption</p>
 
         <h2>The Problem with Naive Hashing</h2>
         <p>The simplest way to distribute data across N servers is: <code>server = hash(key) % N</code>. This works well
@@ -1812,6 +1819,143 @@ graph LR
 
 
       <!-- ==================== NETWORKING ==================== -->
+      <div class="section" id="tradeoffs">
+        <h1 class="section-title">System Design Trade-offs</h1>
+        <p class="section-subtitle">Module 3 &nbsp;|&nbsp; 22 Key Comparisons for Scalable Systems</p>
+
+        <h2>Importance of Discussing Trade-offs</h2>
+        <p>In system design, there are no perfect solutions, only trade-offs. Demonstrating that you understand the
+          consequences of your choices shows maturity, critical thinking, and real-world experience. Every design
+          decision should be justified by the requirements of the specific problem.</p>
+
+        <h2>1. Strong vs. Eventual Consistency</h2>
+        <p>Strong consistency ensures all nodes see the same data at the same time, but increases latency and reduces
+          availability during partitions. Eventual consistency allows temporary divergence for lower latency and higher
+          availability.</p>
+
+        <h2>2. Latency vs. Throughput</h2>
+        <p>Latency is the time for a single request (optimize with caching, bypassing queues). Throughput is requests
+          per second (optimize with batching, parallelism). They are often at odds.</p>
+
+        <h2>3. ACID vs. BASE Properties in Databases</h2>
+        <div class="compare">
+          <div class="compare-card neutral">
+            <h4>ACID (Traditional SQL)</h4>
+            <ul>
+              <li><strong>A</strong>tomicity, <strong>C</strong>onsistency, <strong>I</strong>solation,
+                <strong>D</strong>urability
+              </li>
+              <li>Focus on data integrity and strong consistency.</li>
+            </ul>
+          </div>
+          <div class="compare-card neutral">
+            <h4>BASE (Modern NoSQL)</h4>
+            <ul>
+              <li><strong>B</strong>asically <strong>A</strong>vailable, <strong>S</strong>oft state,
+                <strong>E</strong>ventual consistency
+              </li>
+              <li>Focus on scalability and high availability.</li>
+            </ul>
+          </div>
+        </div>
+
+        <h2>4. Read-Through vs. Write-Through Cache</h2>
+        <ul>
+          <li><strong>Read-Through:</strong> Cache loads missing data from DB. Simplifies application logic.</li>
+          <li><strong>Write-Through:</strong> Data written to cache and DB simultaneously. Ensures consistency but adds
+            write latency.</li>
+        </ul>
+
+        <h2>5. Batch Processing vs. Stream Processing</h2>
+        <ul>
+          <li><strong>Batch:</strong> Process large volumes of data at once (e.g., nightly). High throughput, high
+            latency.</li>
+          <li><strong>Stream:</strong> Process data as it arrives (e.g., real-time). Low latency, complex to manage.
+          </li>
+        </ul>
+
+        <h2>6. Load Balancer vs. API Gateway</h2>
+        <ul>
+          <li><strong>Load Balancer:</strong> Distributes traffic at L4/L7. Simple and fast.</li>
+          <li><strong>API Gateway:</strong> Orchestrates requests, handles auth, rate limiting, and protocol
+            translation. More powerful but adds a bottleneck.</li>
+        </ul>
+
+        <h2>7. API Gateway vs. Direct Service Exposure</h2>
+        <p>Direct exposure reduces latency but forces clients to manage service locations and multiple security
+          handshakes. API Gateway abstracts services for a cleaner client interface.</p>
+
+        <h2>8. Proxy vs. Reverse Proxy</h2>
+        <ul>
+          <li><strong>Forward Proxy:</strong> Sits in front of clients (hides client identity).</li>
+          <li><strong>Reverse Proxy:</strong> Sits in front of servers (load balancing, caching, security).</li>
+        </ul>
+
+        <h2>9. API Gateway vs. Reverse Proxy</h2>
+        <p>An API Gateway is a specialized reverse proxy that also handles application-level concerns like request
+          composition, authentication, and monitoring.</p>
+
+        <h2>10. SQL vs. NoSQL</h2>
+        <p>SQL for relational data, complex joins, and ACID. NoSQL for massive scale, flexible schemas, and high
+          availability.</p>
+
+        <h2>11. Primary-Replica vs. Peer-to-Peer Replication</h2>
+        <ul>
+          <li><strong>Primary-Replica:</strong> Single leader for writes, many followers for reads. Simple but leader
+            is a SPOF for writes.</li>
+          <li><strong>Peer-to-Peer:</strong> Any node can accept writes. No single SPOF, but conflict resolution
+            (conflict-free replicated data types or last-write-wins) is mandatory.</li>
+        </ul>
+
+        <h2>12. Data Compression vs. Data Deduplication</h2>
+        <ul>
+          <li><strong>Compression:</strong> Reduces data size within a file/packet.</li>
+          <li><strong>Deduplication:</strong> Removes redundant copies of the same data across a system.</li>
+        </ul>
+
+        <h2>13. Server-Side Caching vs. Client-Side Caching</h2>
+        <p>Server-side (Redis) reduces DB load. Client-side (Browser cache) reduces network requests and server load
+          entirely.</p>
+
+        <h2>14. REST vs. RPC (gRPC)</h2>
+        <p>REST uses HTTP verbs and is great for public APIs. RPC is faster, uses binary (Protobuf), and is ideal for
+          internal microservice communication.</p>
+
+        <h2>15. Polling vs. Long-Polling vs. WebSockets vs. Webhooks</h2>
+        <p>Comparing real-time delivery strategies from simple (Polling) to persistent stateful connections
+          (WebSockets) and server-to-server callbacks (Webhooks).</p>
+
+        <h2>16. CDN Usage vs. Direct Server Serving</h2>
+        <p>CDNs reduce latency by serving content from edge locations. Direct serving is simpler for small-scale or
+          frequently changing dynamic content.</p>
+
+        <h2>17. Serverless Architecture vs. Traditional Server-based</h2>
+        <p>Serverless offers auto-scaling and pay-per-use but suffers from cold starts. Traditional servers offer
+          consistent performance and lower cost for high-utilization workloads.</p>
+
+        <h2>18. Stateful vs. Stateless Architecture</h2>
+        <p>Stateless is easier to scale and manage. Stateful is necessary for some real-time apps (multiplayer games)
+          but requires sticky sessions or shared state stores.</p>
+
+        <h2>19. Hybrid Cloud Storage vs. All-Cloud Storage</h2>
+        <p>Hybrid combines on-premise control with cloud scalability. All-cloud is simpler but subject to vendor lock-in
+          and potential egress costs.</p>
+
+        <h2>20. Token Bucket vs. Leaky Bucket (Rate Limiting)</h2>
+        <p>Token Bucket allows bursts. Leaky Bucket enforces a constant output rate, smoothing traffic.</p>
+
+        <h2>21. Read Heavy vs. Write Heavy System</h2>
+        <p>Read heavy systems use aggressive caching and read replicas. Write heavy systems use LSM trees, message
+          queues, and batching.</p>
+
+        <h2>22. Recap: The Trade-off Mindset</h2>
+        <p>Always ask: <strong>"What am I giving up?"</strong> If you add a cache, you give up simple consistency. If
+          you shard, you give up simple joins. If you use an API Gateway, you give up a few milliseconds of latency for
+          security and manageability.</p>
+      </div>
+
+
+      <!-- ==================== DATA STRUCTURES ==================== -->
       <div class="section" id="networking">
         <h1 class="section-title">Networking Fundamentals</h1>
         <p class="section-subtitle">Module 4 &nbsp;|&nbsp; OSI Model · IP · TCP · UDP · HTTP/HTTPS · DNS · Checksums</p>
@@ -2616,7 +2760,7 @@ GET /health HTTP/1.1
       <!-- ==================== CACHING ==================== -->
       <div class="section" id="caching">
         <h1 class="section-title">Caching Fundamentals</h1>
-        <p class="section-subtitle">Module 8 &nbsp;|&nbsp; What is Caching · Cache-Aside · Read-Through · Write-Through
+        <p class="section-subtitle">Module 5 &nbsp;|&nbsp; What is Caching · Cache-Aside · Read-Through · Write-Through
           · Write-Behind · Eviction Policies</p>
 
         <h2>What is Caching?</h2>
@@ -2928,7 +3072,7 @@ def update_user(user_id, data):
       <!-- ==================== CDN ==================== -->
       <div class="section" id="cdn">
         <h1 class="section-title">CDN and Distributed Cache Architecture</h1>
-        <p class="section-subtitle">Module 8 &nbsp;|&nbsp; CDN · Distributed Cache · Cache Invalidation · Cache Stampede
+        <p class="section-subtitle">Module 5 &nbsp;|&nbsp; CDN · Distributed Cache · Cache Invalidation · Cache Stampede
           · Cache Warming</p>
 
         <h2>Content Delivery Network (CDN)</h2>
@@ -3060,9 +3204,169 @@ def update_product(product_id, data):
 
 
       <!-- ==================== DATABASES ==================== -->
+      <div class="section" id="storage">
+        <h1 class="section-title">Storage Systems</h1>
+        <p class="section-subtitle">Module 5 &nbsp;|&nbsp; Block vs File vs Object Storage · Object Storage ·
+          Distributed File Systems · Erasure Coding</p>
+
+        <h2>Block vs File vs Object Storage</h2>
+        <div class="table-wrap">
+          <table>
+            <tr>
+              <th>Aspect</th>
+              <th>Block Storage</th>
+              <th>File Storage</th>
+              <th>Object Storage</th>
+            </tr>
+            <tr>
+              <td>Abstraction</td>
+              <td>Raw fixed-size blocks</td>
+              <td>Hierarchical file system</td>
+              <td>Flat namespace, key-value</td>
+            </tr>
+            <tr>
+              <td>Access method</td>
+              <td>Block device protocol (iSCSI, NVMe)</td>
+              <td>File system protocols (NFS, SMB)</td>
+              <td>HTTP REST API</td>
+            </tr>
+            <tr>
+              <td>Typical latency</td>
+              <td>Sub-millisecond to 1ms</td>
+              <td>1–10ms</td>
+              <td>10–100ms</td>
+            </tr>
+            <tr>
+              <td>Max scale</td>
+              <td>Terabytes per volume</td>
+              <td>Petabytes</td>
+              <td>Exabytes (unlimited in practice)</td>
+            </tr>
+            <tr>
+              <td>Random read/write</td>
+              <td>Yes, byte-level</td>
+              <td>Yes</td>
+              <td>No — must replace entire object</td>
+            </tr>
+            <tr>
+              <td>Cost</td>
+              <td>High ($$$$)</td>
+              <td>Medium ($$$)</td>
+              <td>Very low ($)</td>
+            </tr>
+            <tr>
+              <td>Shareable</td>
+              <td>No (usually single-attach)</td>
+              <td>Yes (NFS/SMB)</td>
+              <td>Yes (HTTP)</td>
+            </tr>
+            <tr>
+              <td>Examples</td>
+              <td>AWS EBS, Azure Disk, SAN</td>
+              <td>AWS EFS, Azure Files, NFS</td>
+              <td>AWS S3, GCS, Azure Blob</td>
+            </tr>
+            <tr>
+              <td>Best for</td>
+              <td>Databases, VM boot volumes</td>
+              <td>Shared configuration, home directories</td>
+              <td>Backups, media, data lakes, static assets</td>
+            </tr>
+          </table>
+        </div>
+
+        <h2>Object Storage Deep Dive</h2>
+        <p>Object storage stores data as discrete objects in a flat namespace. Each object consists of the data itself,
+          metadata (key-value pairs describing the object), and a globally unique identifier (key). There is no file
+          hierarchy — all objects live in buckets (namespaces) with flat keys.</p>
+
+        <h3>Key Properties</h3>
+        <ul>
+          <li><strong>Immutability:</strong> Objects cannot be partially modified. To update, you replace the entire
+            object. This simplifies consistency and enables versioning.</li>
+          <li><strong>Eventual consistency:</strong> After a write or delete, a brief window may exist where reads from
+            different endpoints see different versions. AWS S3 now offers strong read-after-write consistency.</li>
+          <li><strong>Durability:</strong> Object stores like S3 guarantee 11 nines (99.999999999%) durability by
+            replicating data across multiple availability zones and running continuous data integrity checks.</li>
+          <li><strong>Lifecycle policies:</strong> Automatically transition objects to cheaper storage tiers (S3
+            Standard → S3 Glacier) or delete them after a set period.</li>
+        </ul>
+
+        <h2>Distributed File Systems</h2>
+        <p>A distributed file system presents the abstraction of a single file system to clients while transparently
+          storing data across many nodes in a cluster. Large files are split into blocks; each block is replicated
+          across multiple nodes for fault tolerance.</p>
+
+        <h3>HDFS Architecture</h3>
+        <ul>
+          <li><strong>NameNode:</strong> Stores file system metadata (directory tree, file-to-block mapping, block
+            locations). Single active NameNode — high availability configurations use a Standby NameNode.</li>
+          <li><strong>DataNodes:</strong> Store actual data blocks. Report block inventories to NameNode. Handle
+            read/write requests from clients.</li>
+          <li><strong>Block size:</strong> 128 MB by default (configurable). Larger than local file systems because HDFS
+            is optimized for sequential access to large files, not random access to small files.</li>
+          <li><strong>Replication factor:</strong> Default 3. Each block is replicated to 3 DataNodes, typically one per
+            rack for fault tolerance (rack awareness).</li>
+        </ul>
+
+        <h2>Erasure Coding</h2>
+        <p>Erasure coding is a data protection method that splits data into fragments, expands and encodes it with
+          redundant data pieces using mathematical algorithms, such that the original data can be reconstructed from a
+          subset of the pieces — even if some are lost or corrupted.</p>
+
+        <h3>How It Works</h3>
+        <p>For a standard <strong>k+m erasure code</strong>: data is divided into k data chunks and m parity chunks are
+          computed. The original data can be reconstructed from any k of the k+m total chunks. Up to m chunks can be
+          lost without data loss.</p>
+
+        <div class="example">
+          <div class="example-label">Example: 10+4 Reed-Solomon (used by Facebook)</div>
+          <p>A 10 MB file is split into 10 x 1 MB data chunks. 4 parity chunks (1 MB each) are computed. Total storage:
+            14 MB = 1.4x the original size.</p>
+          <p>Any 4 of the 14 chunks can be lost (whether data or parity) and the original file can be fully
+            reconstructed. To lose data, 5 or more chunks must be simultaneously unavailable.</p>
+        </div>
+
+        <h3>Comparison with Replication</h3>
+        <div class="compare">
+          <div class="compare-card neutral">
+            <h4>3x Replication</h4>
+            <ul>
+              <li>Storage overhead: 3x</li>
+              <li>Tolerates: 2 full node failures</li>
+              <li>Read performance: any replica can serve</li>
+              <li>Write performance: must write 3 copies synchronously</li>
+              <li>CPU overhead: None</li>
+              <li>Best for: hot data requiring low-latency reads</li>
+            </ul>
+          </div>
+          <div class="compare-card neutral">
+            <h4>10+4 Erasure Coding</h4>
+            <ul>
+              <li>Storage overhead: 1.4x</li>
+              <li>Tolerates: 4 chunk failures</li>
+              <li>Read performance: must read 10 chunks and decode</li>
+              <li>Write performance: compute parity, write 14 chunks</li>
+              <li>CPU overhead: Encoding/decoding CPU cost</li>
+              <li>Best for: cold archival data where storage cost matters</li>
+            </ul>
+          </div>
+        </div>
+
+        <p><strong>Real-world tiered strategy:</strong> Facebook's Haystack stores photos on:</p>
+        <ul>
+          <li>Recently uploaded (hot): 3x replication for low-latency access</li>
+          <li>Months old (warm): 2x replication</li>
+          <li>Years old (cold): 10+4 erasure coding — 2.1x storage savings vs 3x replication</li>
+        </ul>
+      </div>
+
+
+      <!-- ==================== DISTRIBUTED SYSTEMS FUNDAMENTALS ==================== -->
+
       <div class="section" id="db-types">
         <h1 class="section-title">Database Types</h1>
-        <p class="section-subtitle">Module 9 &nbsp;|&nbsp; Database Types · SQL vs NoSQL · ACID · Relational · Document
+        <p class="section-subtitle">Module 8 &nbsp;|&nbsp; Database Types · SQL vs NoSQL · ACID · Relational · Document
           · Key-Value · Wide Column · Graph · Time Series · Search · Vector</p>
 
         <h2>SQL vs NoSQL</h2>
@@ -3437,7 +3741,7 @@ GROUP BY time(5m)
       <!-- ==================== DB INTERNALS ==================== -->
       <div class="section" id="db-internals">
         <h1 class="section-title">Database Internals</h1>
-        <p class="section-subtitle">Module 9 &nbsp;|&nbsp; Bloom Filters · B-Trees · B+ Trees · LSM Trees · Durability
+        <p class="section-subtitle">Module 8 &nbsp;|&nbsp; Bloom Filters · B-Trees · B+ Trees · LSM Trees · Durability
         </p>
 
         <h2>Bloom Filters</h2>
@@ -3589,7 +3893,7 @@ GROUP BY time(5m)
       <!-- ==================== DB SCALING ==================== -->
       <div class="section" id="db-scaling">
         <h1 class="section-title">Database Scaling Techniques</h1>
-        <p class="section-subtitle">Module 10 &nbsp;|&nbsp; Indexing · Query Optimization · Read Replicas ·
+        <p class="section-subtitle">Module 8 &nbsp;|&nbsp; Indexing · Query Optimization · Read Replicas ·
           Denormalization · Materialized Views · Connection Pooling · Vertical Partitioning · Sharding · Sharding vs
           Partitioning · Data Compression</p>
 
@@ -4719,7 +5023,7 @@ header.payload.signature
       <!-- ==================== REAL-TIME COMM ==================== -->
       <div class="section" id="realtime">
         <h1 class="section-title">Real-Time Communication</h1>
-        <p class="section-subtitle">Module 7 &nbsp;|&nbsp; Long Polling · WebSockets · SSE · Webhooks · WebRTC</p>
+        <p class="section-subtitle">Module 6 &nbsp;|&nbsp; Long Polling · WebSockets · SSE · Webhooks · WebRTC</p>
 
         <h2>Long Polling</h2>
         <p>Long polling is a technique that simulates server-initiated communication using standard HTTP requests. The
@@ -4937,7 +5241,7 @@ def stripe_webhook():
       <!-- ==================== ASYNC MESSAGING ==================== -->
       <div class="section" id="async">
         <h1 class="section-title">Asynchronous Communication</h1>
-        <p class="section-subtitle">Module 7 &nbsp;|&nbsp; Sync vs Async · Message Queues · Pub/Sub · Dead Letter Queues
+        <p class="section-subtitle">Module 6 &nbsp;|&nbsp; Sync vs Async · Message Queues · Pub/Sub · Dead Letter Queues
           · CDC · Delivery Semantics</p>
 
         <h2>Synchronous vs Asynchronous Communication</h2>
@@ -5209,1213 +5513,9 @@ graph LR
       </div>
 
       <!-- ==================== STORAGE ==================== -->
-      <div class="section" id="storage">
-        <h1 class="section-title">Storage Systems</h1>
-        <p class="section-subtitle">Module 11 &nbsp;|&nbsp; Block vs File vs Object Storage · Object Storage ·
-          Distributed File Systems · Erasure Coding</p>
-
-        <h2>Block vs File vs Object Storage</h2>
-        <div class="table-wrap">
-          <table>
-            <tr>
-              <th>Aspect</th>
-              <th>Block Storage</th>
-              <th>File Storage</th>
-              <th>Object Storage</th>
-            </tr>
-            <tr>
-              <td>Abstraction</td>
-              <td>Raw fixed-size blocks</td>
-              <td>Hierarchical file system</td>
-              <td>Flat namespace, key-value</td>
-            </tr>
-            <tr>
-              <td>Access method</td>
-              <td>Block device protocol (iSCSI, NVMe)</td>
-              <td>File system protocols (NFS, SMB)</td>
-              <td>HTTP REST API</td>
-            </tr>
-            <tr>
-              <td>Typical latency</td>
-              <td>Sub-millisecond to 1ms</td>
-              <td>1–10ms</td>
-              <td>10–100ms</td>
-            </tr>
-            <tr>
-              <td>Max scale</td>
-              <td>Terabytes per volume</td>
-              <td>Petabytes</td>
-              <td>Exabytes (unlimited in practice)</td>
-            </tr>
-            <tr>
-              <td>Random read/write</td>
-              <td>Yes, byte-level</td>
-              <td>Yes</td>
-              <td>No — must replace entire object</td>
-            </tr>
-            <tr>
-              <td>Cost</td>
-              <td>High ($$$$)</td>
-              <td>Medium ($$$)</td>
-              <td>Very low ($)</td>
-            </tr>
-            <tr>
-              <td>Shareable</td>
-              <td>No (usually single-attach)</td>
-              <td>Yes (NFS/SMB)</td>
-              <td>Yes (HTTP)</td>
-            </tr>
-            <tr>
-              <td>Examples</td>
-              <td>AWS EBS, Azure Disk, SAN</td>
-              <td>AWS EFS, Azure Files, NFS</td>
-              <td>AWS S3, GCS, Azure Blob</td>
-            </tr>
-            <tr>
-              <td>Best for</td>
-              <td>Databases, VM boot volumes</td>
-              <td>Shared configuration, home directories</td>
-              <td>Backups, media, data lakes, static assets</td>
-            </tr>
-          </table>
-        </div>
-
-        <h2>Object Storage Deep Dive</h2>
-        <p>Object storage stores data as discrete objects in a flat namespace. Each object consists of the data itself,
-          metadata (key-value pairs describing the object), and a globally unique identifier (key). There is no file
-          hierarchy — all objects live in buckets (namespaces) with flat keys.</p>
-
-        <h3>Key Properties</h3>
-        <ul>
-          <li><strong>Immutability:</strong> Objects cannot be partially modified. To update, you replace the entire
-            object. This simplifies consistency and enables versioning.</li>
-          <li><strong>Eventual consistency:</strong> After a write or delete, a brief window may exist where reads from
-            different endpoints see different versions. AWS S3 now offers strong read-after-write consistency.</li>
-          <li><strong>Durability:</strong> Object stores like S3 guarantee 11 nines (99.999999999%) durability by
-            replicating data across multiple availability zones and running continuous data integrity checks.</li>
-          <li><strong>Lifecycle policies:</strong> Automatically transition objects to cheaper storage tiers (S3
-            Standard → S3 Glacier) or delete them after a set period.</li>
-        </ul>
-
-        <h2>Distributed File Systems</h2>
-        <p>A distributed file system presents the abstraction of a single file system to clients while transparently
-          storing data across many nodes in a cluster. Large files are split into blocks; each block is replicated
-          across multiple nodes for fault tolerance.</p>
-
-        <h3>HDFS Architecture</h3>
-        <ul>
-          <li><strong>NameNode:</strong> Stores file system metadata (directory tree, file-to-block mapping, block
-            locations). Single active NameNode — high availability configurations use a Standby NameNode.</li>
-          <li><strong>DataNodes:</strong> Store actual data blocks. Report block inventories to NameNode. Handle
-            read/write requests from clients.</li>
-          <li><strong>Block size:</strong> 128 MB by default (configurable). Larger than local file systems because HDFS
-            is optimized for sequential access to large files, not random access to small files.</li>
-          <li><strong>Replication factor:</strong> Default 3. Each block is replicated to 3 DataNodes, typically one per
-            rack for fault tolerance (rack awareness).</li>
-        </ul>
-
-        <h2>Erasure Coding</h2>
-        <p>Erasure coding is a data protection method that splits data into fragments, expands and encodes it with
-          redundant data pieces using mathematical algorithms, such that the original data can be reconstructed from a
-          subset of the pieces — even if some are lost or corrupted.</p>
-
-        <h3>How It Works</h3>
-        <p>For a standard <strong>k+m erasure code</strong>: data is divided into k data chunks and m parity chunks are
-          computed. The original data can be reconstructed from any k of the k+m total chunks. Up to m chunks can be
-          lost without data loss.</p>
-
-        <div class="example">
-          <div class="example-label">Example: 10+4 Reed-Solomon (used by Facebook)</div>
-          <p>A 10 MB file is split into 10 x 1 MB data chunks. 4 parity chunks (1 MB each) are computed. Total storage:
-            14 MB = 1.4x the original size.</p>
-          <p>Any 4 of the 14 chunks can be lost (whether data or parity) and the original file can be fully
-            reconstructed. To lose data, 5 or more chunks must be simultaneously unavailable.</p>
-        </div>
-
-        <h3>Comparison with Replication</h3>
-        <div class="compare">
-          <div class="compare-card neutral">
-            <h4>3x Replication</h4>
-            <ul>
-              <li>Storage overhead: 3x</li>
-              <li>Tolerates: 2 full node failures</li>
-              <li>Read performance: any replica can serve</li>
-              <li>Write performance: must write 3 copies synchronously</li>
-              <li>CPU overhead: None</li>
-              <li>Best for: hot data requiring low-latency reads</li>
-            </ul>
-          </div>
-          <div class="compare-card neutral">
-            <h4>10+4 Erasure Coding</h4>
-            <ul>
-              <li>Storage overhead: 1.4x</li>
-              <li>Tolerates: 4 chunk failures</li>
-              <li>Read performance: must read 10 chunks and decode</li>
-              <li>Write performance: compute parity, write 14 chunks</li>
-              <li>CPU overhead: Encoding/decoding CPU cost</li>
-              <li>Best for: cold archival data where storage cost matters</li>
-            </ul>
-          </div>
-        </div>
-
-        <p><strong>Real-world tiered strategy:</strong> Facebook's Haystack stores photos on:</p>
-        <ul>
-          <li>Recently uploaded (hot): 3x replication for low-latency access</li>
-          <li>Months old (warm): 2x replication</li>
-          <li>Years old (cold): 10+4 erasure coding — 2.1x storage savings vs 3x replication</li>
-        </ul>
-      </div>
-
-
-      <!-- ==================== DISTRIBUTED SYSTEMS FUNDAMENTALS ==================== -->
-
-      <div class="section" id="db-federation">
-        <h1 class="section-title">Database Federation</h1>
-        <p class="section-subtitle">Functional Partitioning - Splitting databases by business domain for independent
-          scaling</p>
-
-        <div class="callout info">
-          <div class="callout-title">Real Story: Amazon's Evolution</div>
-          <p>In early 2000s, Amazon ran on a giant Oracle database handling everything: users, products, orders,
-            inventory. As they scaled, this became a bottleneck. They pioneered database federation - splitting into
-            separate databases: Users DB, Products DB, Orders DB, each owned by different teams. This enabled Amazon to
-            scale to millions of transactions per day.</p>
-        </div>
-
-        <h2>What is Database Federation?</h2>
-
-        <p><strong>Database Federation</strong> (also called <em>functional partitioning</em> or <em>vertical
-            partitioning</em>) is an architectural pattern where you split your application's database by business
-          function or bounded context, creating multiple independent databases.</p>
-
-        <p>Instead of one monolithic database containing all tables, you create separate databases for different parts
-          of your application:</p>
-
-        <ul>
-          <li><strong>User Service DB:</strong> users, profiles, authentication</li>
-          <li><strong>Product Service DB:</strong> products, categories, reviews</li>
-          <li><strong>Order Service DB:</strong> orders, order_items, shipping</li>
-          <li><strong>Payment Service DB:</strong> transactions, payment_methods</li>
-          <li><strong>Inventory Service DB:</strong> stock, warehouses, suppliers</li>
-        </ul>
-
-        <h2>Federation vs Sharding - Critical Difference</h2>
-
-        <p>These are often confused but fundamentally different:</p>
-
-        <div class="compare">
-          <div class="compare-card neutral">
-            <h4>Sharding (Horizontal Partitioning)</h4>
-            <p><strong>What:</strong> Split the <em>same</em> table across multiple databases</p>
-            <p><strong>Example:</strong></p>
-            <pre>
-Database 1: users WHERE id 1-1,000,000
-Database 2: users WHERE id 1,000,001-2,000,000
-Database 3: users WHERE id 2,000,001-3,000,000
-    </pre>
-            <p><strong>Schema:</strong> Identical across all shards</p>
-            <p><strong>Split by:</strong> Data range (shard key like user_id)</p>
-            <p><strong>Goal:</strong> Scale a single large table</p>
-          </div>
-
-          <div class="compare-card neutral">
-            <h4>Federation (Vertical Partitioning)</h4>
-            <p><strong>What:</strong> Split <em>different</em> tables into separate databases</p>
-            <p><strong>Example:</strong></p>
-            <pre>
-Database 1: users, profiles, auth_tokens
-Database 2: products, categories, reviews
-Database 3: orders, order_items, shipping
-    </pre>
-            <p><strong>Schema:</strong> Different per database</p>
-            <p><strong>Split by:</strong> Business domain/function</p>
-            <p><strong>Goal:</strong> Scale entire application architecture</p>
-          </div>
-        </div>
-
-        <h2>Real-World Example: E-Commerce Platform</h2>
-
-        <div class="example">
-          <div class="example-label">Before Federation - Monolithic Database</div>
-          <pre>
-Single PostgreSQL Database: "ecommerce_db"
-├── Tables: 50+ tables
-├── Size: 10 TB total
-├── Load: Mixed (reads + writes)
-├── Bottleneck: Single database overwhelmed
-└── Problems:
-    • One team's query impacts everyone
-    • Can't scale components independently
-    • Schema changes require coordination
-    • Single point of failure
-  </pre>
-        </div>
-
-        <div class="example">
-          <div class="example-label">After Federation - Distributed by Function</div>
-          <pre>
-1. User Service Database (2 TB)
-   • Tables: users, profiles, sessions, auth_tokens
-   • Load: 70% reads, 30% writes
-   • Traffic: 10K req/sec
-   • Team: Identity team
-   • Optimization: Heavy caching, read replicas
-
-2. Product Catalog Database (5 TB)
-   • Tables: products, categories, reviews, ratings
-   • Load: 95% reads, 5% writes
-   • Traffic: 50K req/sec
-   • Team: Catalog team
-   • Optimization: CDN, aggressive caching
-
-3. Order Management Database (2 TB)
-   • Tables: orders, order_items, shipping, returns
-   • Load: 40% reads, 60% writes
-   • Traffic: 8K req/sec
-   • Team: Orders team
-   • Optimization: Write-optimized, sharded by order_id
-
-4. Payment Database (500 GB)
-   • Tables: transactions, payment_methods, invoices
-   • Load: 50% reads, 50% writes
-   • Traffic: 3K req/sec
-   • Team: Payments team
-   • Optimization: ACID guarantees, audit logs
-
-5. Inventory Database (500 GB)
-   • Tables: stock, warehouses, suppliers
-   • Load: 30% reads, 70% writes
-   • Traffic: 5K req/sec
-   • Team: Supply chain team
-   • Optimization: Real-time updates, strong consistency
-  </pre>
-        </div>
-
-        <h2>Advantages of Federation</h2>
-
-        <h3>1. Independent Scaling</h3>
-        <p>Each database can scale based on its specific needs:</p>
-        <ul>
-          <li><strong>Product Catalog:</strong> Add read replicas (read-heavy)</li>
-          <li><strong>Orders:</strong> Shard by order_id (write-heavy)</li>
-          <li><strong>Users:</strong> Aggressive caching (mostly reads)</li>
-          <li><strong>Payments:</strong> Keep small with strong ACID (critical data)</li>
-        </ul>
-
-        <h3>2. Team Autonomy & Velocity</h3>
-        <p>Different teams own different databases:</p>
-        <ul>
-          <li>Make schema changes independently</li>
-          <li>Choose optimal database technology per domain</li>
-          <li>Deploy updates without coordinating with other teams</li>
-          <li>Take ownership of performance and reliability</li>
-        </ul>
-
-        <h3>3. Technology Diversity</h3>
-        <p>Use the best database for each workload:</p>
-        <ul>
-          <li><strong>User profiles:</strong> PostgreSQL (relational data)</li>
-          <li><strong>Product catalog:</strong> Elasticsearch (full-text search)</li>
-          <li><strong>Session data:</strong> Redis (fast cache)</li>
-          <li><strong>Order history:</strong> MongoDB (flexible schema)</li>
-          <li><strong>Analytics:</strong> Snowflake (data warehouse)</li>
-        </ul>
-
-        <h3>4. Fault Isolation</h3>
-        <p>Failure in one database doesn't affect others:</p>
-        <ul>
-          <li>Payment DB goes down → orders can still be created (process payments later)</li>
-          <li>Product DB slow → users can still checkout (product data cached)</li>
-          <li>Blast radius is limited to one domain</li>
-        </ul>
-
-        <h3>5. Simpler Per-Database Operations</h3>
-        <p>Smaller databases are easier to manage:</p>
-        <ul>
-          <li>Faster backups (500 GB vs 10 TB)</li>
-          <li>Quicker restores</li>
-          <li>Easier schema migrations</li>
-          <li>Better query performance (fewer tables)</li>
-        </ul>
-
-        <h2>Challenges and Tradeoffs</h2>
-
-        <h3>1. Cross-Database Joins</h3>
-        <p><strong>Problem:</strong> Can't JOIN across databases</p>
-
-        <div class="example">
-          <div class="example-label">Problem Example</div>
-          <pre>
-// Before Federation (Easy):
-SELECT users.name, orders.total
-FROM users
-JOIN orders ON users.id = orders.user_id
-WHERE users.country = 'US';
-
-// After Federation (Hard):
-// Users in "users_db", Orders in "orders_db"
-// Can't JOIN across databases!
-  </pre>
-        </div>
-
-        <p><strong>Solutions:</strong></p>
-        <ul>
-          <li><strong>Application-level joins:</strong> Fetch from both DBs, join in code</li>
-          <li><strong>Data duplication:</strong> Store user_name in orders_db</li>
-          <li><strong>Separate analytics DB:</strong> ETL data to warehouse for reporting</li>
-          <li><strong>API composition:</strong> User Service API + Order Service API</li>
-        </ul>
-
-        <h3>2. Distributed Transactions</h3>
-        <p><strong>Problem:</strong> Transactions can't span databases atomically</p>
-
-        <div class="example">
-          <div class="example-label">Transaction Challenge</div>
-          <pre>
-// Need atomic operation across 3 databases:
-BEGIN TRANSACTION;
-  UPDATE inventory_db.stock SET quantity = quantity - 1;  // DB1
-  INSERT INTO orders_db.orders VALUES (...);               // DB2
-  INSERT INTO payments_db.transactions VALUES (...);       // DB3
-COMMIT;
-
-// This doesn't work with federation!
-  </pre>
-        </div>
-
-        <p><strong>Solutions:</strong></p>
-        <ul>
-          <li><strong>SAGA pattern:</strong> Chain of local transactions with compensation</li>
-          <li><strong>Eventual consistency:</strong> Accept that operations complete asynchronously</li>
-          <li><strong>Two-Phase Commit (2PC):</strong> Distributed transaction protocol (slow, avoid if possible)</li>
-          <li><strong>Event sourcing:</strong> Use event log to maintain consistency</li>
-        </ul>
-
-        <h3>3. Data Duplication</h3>
-        <p>You'll need to duplicate some reference data:</p>
-        <ul>
-          <li>Store user_name in orders_db (even though it's in users_db)</li>
-          <li>Store product_name in order_items (even though it's in products_db)</li>
-          <li>This is intentional denormalization for performance</li>
-        </ul>
-
-        <h3>4. Operational Complexity</h3>
-        <p>More databases = more to manage:</p>
-        <ul>
-          <li>Multiple backups to coordinate</li>
-          <li>Multiple monitoring dashboards</li>
-          <li>Multiple disaster recovery plans</li>
-          <li>Need more database expertise on team</li>
-        </ul>
-
-        <h2>When to Use Database Federation</h2>
-
-        <div class="callout tip">
-          <div class="callout-title">Federation is Right When</div>
-          <ul>
-            <li><strong>Clear Bounded Contexts:</strong> Your application has distinct business domains (users,
-              products, orders)</li>
-            <li><strong>Different Scaling Needs:</strong> Some parts need heavy reads, others heavy writes</li>
-            <li><strong>Team Organization:</strong> You have multiple teams that want autonomy</li>
-            <li><strong>Microservices Architecture:</strong> Each service owns its own database</li>
-            <li><strong>Monolith Bottleneck:</strong> Single database can't handle all load</li>
-            <li><strong>Technology Diversity Needed:</strong> Different workloads need different database types</li>
-          </ul>
-        </div>
-
-        <div class="callout warn">
-          <div class="callout-title">Don't Use Federation When</div>
-          <ul>
-            <li><strong>Small Application:</strong> One database works fine (don't over-engineer)</li>
-            <li><strong>Heavy Cross-Domain Queries:</strong> You frequently need to join across domains</li>
-            <li><strong>Strong Transactional Requirements:</strong> You need ACID across all data</li>
-            <li><strong>Limited Team:</strong> You don't have expertise to manage multiple databases</li>
-            <li><strong>Tight Coupling:</strong> Your domains aren't actually independent</li>
-          </ul>
-        </div>
-
-        <h2>Federation + Sharding Combined</h2>
-
-        <p>For maximum scale, combine both patterns:</p>
-
-        <div class="example">
-          <div class="example-label">Hybrid Approach at Scale</div>
-          <pre>
-1. Federation by Domain:
-   ├── Users Database
-   ├── Products Database  
-   └── Orders Database
-
-2. Then Shard Within Each:
-   
-   Orders Database (Federated)
-   ├── Orders Shard 1: order_id 1-1M
-   ├── Orders Shard 2: order_id 1M-2M
-   └── Orders Shard 3: order_id 2M-3M
-   
-   Users Database (Federated)
-   ├── Users Shard 1: user_id 1-10M
-   └── Users Shard 2: user_id 10M-20M
-
-This gives you both:
-• Domain isolation (federation)
-• Data distribution (sharding)
-  </pre>
-        </div>
-
-        <h2>Migration Strategy</h2>
-
-        <p>Moving from monolith to federation:</p>
-
-        <ol>
-          <li><strong>Identify Bounded Contexts:</strong> Map your domains (users, products, orders)</li>
-          <li><strong>Start with One Domain:</strong> Extract least coupled domain first</li>
-          <li><strong>Create New Database:</strong> Copy relevant tables to new DB</li>
-          <li><strong>Dual Write:</strong> Write to both old and new DB temporarily</li>
-          <li><strong>Migrate Reads:</strong> Point reads to new DB incrementally</li>
-          <li><strong>Remove from Monolith:</strong> Delete tables from old DB once fully migrated</li>
-          <li><strong>Repeat:</strong> Extract next domain</li>
-        </ol>
-
-        <div class="callout info">
-          <div class="callout-title">Key Takeaway</div>
-          <p>Database Federation splits your database by business function, enabling independent scaling, team autonomy,
-            and technology diversity. It's essential for microservices architectures but adds complexity in
-            cross-database operations. Use it when your application has clear domain boundaries and different scaling
-            needs per domain.</p>
-        </div>
-
-      </div>
-
-
-      <div class="section" id="dist-fundamentals">
-        <h1 class="section-title">Distributed Systems: Challenges and Failures</h1>
-        <p class="section-subtitle">Module 12 &nbsp;|&nbsp; Eight Fallacies · Network Failures · Cascading Failures ·
-          Heartbeats · Failure Detectors</p>
-
-        <h2>The Eight Fallacies of Distributed Computing</h2>
-        <p>First articulated by Peter Deutsch and extended by James Gosling, the Eight Fallacies describe incorrect
-          assumptions that engineers new to distributed systems commonly make. Each assumption leads to brittle systems
-          that fail in production in surprising ways.</p>
-
-        <dl class="def">
-          <dt>1. The network is reliable</dt>
-          <dd>Networks drop packets, experience latency spikes, and partition entirely. TCP provides reliability
-            guarantees within a connection, but connections drop. Hardware fails, routers misroute, and cables get cut.
-            Every remote call must be designed to handle failure.</dd>
-
-          <dt>2. Latency is zero</dt>
-          <dd>A function call on the same machine takes nanoseconds. A network call takes milliseconds — a factor of
-            1,000,000x slower. This difference in magnitude changes what is practical. Synchronous chains of network
-            calls accumulate latency. A page requiring 10 sequential service calls at 5ms each adds 50ms of pure network
-            overhead before any computation.</dd>
-
-          <dt>3. Bandwidth is infinite</dt>
-          <dd>Network links have finite capacity. Sending large objects, high-frequency polling, or broadcasting large
-            payloads to many receivers will saturate links. Design for compactness: binary serialization, pagination,
-            delta updates.</dd>
-
-          <dt>4. The network is secure</dt>
-          <dd>Traffic can be intercepted, forged, or replayed. Never assume that because a call comes from an internal
-            IP address it is legitimate. Encrypt all inter-service traffic (mTLS), authenticate all service-to-service
-            calls, and validate all inputs.</dd>
-
-          <dt>5. Topology does not change</dt>
-          <dd>Servers are added and removed. Containers are scheduled and rescheduled. IP addresses change.
-            Configurations drift. Systems must discover dependencies dynamically (service discovery) rather than
-            hardcoding addresses.</dd>
-
-          <dt>6. There is one administrator</dt>
-          <dd>Large systems are managed by multiple teams with conflicting priorities, change windows, and deployment
-            frequencies. A change made by one team can break another team's service. Explicit contracts (APIs, schemas),
-            independent deployability, and backward compatibility are essential.</dd>
-
-          <dt>7. Transport cost is zero</dt>
-          <dd>Network calls have real monetary cost (cloud egress fees), infrastructure cost (load balancers, transit),
-            and latency cost. Caching, batching, and co-locating frequently communicating services all have economic
-            justification.</dd>
-
-          <dt>8. The network is homogeneous</dt>
-          <dd>A distributed system spans heterogeneous hardware, operating systems, language runtimes, and protocol
-            versions. Content negotiation, version compatibility, and graceful handling of unexpected input are
-            necessary.</dd>
-        </dl>
-
-        <h2>Types of Failures in Distributed Systems</h2>
-
-        <h3>Fail-Stop Failures</h3>
-        <p>A node stops operating completely and other nodes can detect this. The simplest type — the node simply stops
-          sending responses, which can be detected via timeout and heartbeat absence. Most hardware failures are
-          eventually detected as fail-stop.</p>
-
-        <h3>Crash Failures</h3>
-        <p>A node stops suddenly without warning, potentially mid-operation. A database that crashes mid-write may leave
-          a page partially written. Write-Ahead Logging ensures the crashed node can recover to a consistent state on
-          restart, but other nodes must detect the crash and promote a replica.</p>
-
-        <h3>Omission Failures</h3>
-        <p>A node is running but fails to send or receive some messages. This is caused by buffer overflows, network
-          queue drops, or bugs in the send/receive path. Particularly dangerous because the node appears partially
-          healthy — it responds to some requests but not others.</p>
-
-        <h3>Byzantine Failures</h3>
-        <p>A node behaves arbitrarily — it may send incorrect data, contradict itself to different peers, or selectively
-          drop only certain messages. Byzantine failures can result from bugs, hardware corruption, or malicious
-          behavior. They are the hardest to tolerate and require Byzantine Fault Tolerant (BFT) consensus algorithms
-          (e.g., PBFT, Tendermint). Most enterprise distributed systems assume non-Byzantine failures and use simpler
-          algorithms like Raft.</p>
-
-        <h3>Network Partition</h3>
-        <p>A network partition splits nodes into two or more groups that cannot communicate with each other. Nodes
-          within each group continue operating but cannot reach nodes in other groups. This is the scenario the P in CAP
-          theorem refers to. Partitions can last seconds (network hiccup) or minutes/hours (major infrastructure
-          failure).</p>
-
-        <h2>Cascading Failures</h2>
-        <p>A cascading failure occurs when the failure of one component causes failures in dependent components, which
-          in turn cause more failures — amplifying rather than containing the original problem.</p>
-
-        <h3>Mechanism</h3>
-        <ol>
-          <li>Service A calls Service B. B becomes slow due to a database issue.</li>
-          <li>A's threads pile up waiting for B to respond, consuming A's thread pool.</li>
-          <li>A can no longer serve its own callers — Service C now finds A unresponsive.</li>
-          <li>The failure propagates backwards through the call chain, taking down healthy services.</li>
-        </ol>
-
-        <h3>Prevention Techniques</h3>
-        <ul>
-          <li><strong>Timeouts:</strong> Never wait indefinitely for a downstream call. Set aggressive timeouts (e.g.,
-            500ms for synchronous service calls). A stuck call that never times out is worse than a fast failure.</li>
-          <li><strong>Circuit breakers:</strong> After a threshold of failures, stop calling the downstream service and
-            return an error immediately. This prevents thread pool exhaustion and gives the downstream time to recover.
-          </li>
-          <li><strong>Bulkheads:</strong> Isolate resources (thread pools, connection pools) per downstream dependency.
-            A downstream service consuming all threads should not affect requests to other services.</li>
-          <li><strong>Load shedding:</strong> When a service is overwhelmed, explicitly reject excess requests with 503
-            rather than queueing them indefinitely. A fast rejection is better than a slow response.</li>
-          <li><strong>Backpressure:</strong> In stream processing, signal upstream producers to slow down when the
-            consumer cannot keep up.</li>
-        </ul>
-
-        <h2>Heartbeats</h2>
-        <p>A heartbeat is a periodic signal sent by a process to indicate that it is alive and functioning. In
-          distributed systems, heartbeats are the primary mechanism for failure detection — if a node stops sending
-          heartbeats, other nodes suspect it has failed.</p>
-
-        <h2>Leader and Follower (Master-Slave)</h2>
-        <p>Leader-follower replication is a fundamental pattern for maintaining data consistency across multiple nodes.
-          One node is designated as the <strong>Leader</strong> (Master), while the others are
-          <strong>Followers</strong>
-          (Replicas/Slaves).
-        </p>
-        <div class="callout info">
-          <div class="callout-title">Responsibilities</div>
-          <ul>
-            <li><strong>Leader:</strong> Handles all write requests, updates its local state, and propagates changes to
-              followers.</li>
-            <li><strong>Followers:</strong> Receive updates from the leader and apply them to their local state. Usually
-              handle read-only requests.</li>
-          </ul>
-        </div>
-        <p>If the leader fails, a new leader is elected from the available followers using a consensus algorithm like
-          Raft or Paxos.</p>
-
-        <h2>Quorum</h2>
-        <p>Quorum-based consistency is used to ensure that a distributed system makes progress even when some nodes are
-          down or the network is partitioned. A quorum is the minimum number of nodes that must agree on an operation.
-        </p>
-        <div class="example">
-          <p><strong>Common Formula:</strong> In a system of <em>N</em> nodes, a write quorum <em>W</em> and a read
-            quorum
-            <em>R</em> must satisfy <strong>W + R > N</strong>. This ensures that every read operation sees at least one
-            copy of the most recent write.
-          </p>
-        </div>
-
-        <h3>Design Considerations</h3>
-        <ul>
-          <li><strong>Frequency vs overhead:</strong> More frequent heartbeats reduce failure detection time but consume
-            network bandwidth and processing. Typical intervals: 500ms–5s depending on latency requirements.</li>
-          <li><strong>Threshold before declaring failure:</strong> Missing one heartbeat may be a transient network
-            blip. Most systems require multiple missed heartbeats (e.g., 3 consecutive) before declaring a node failed.
-            This reduces false positives.</li>
-          <li><strong>Piggybacking:</strong> Include heartbeat information in regular messages rather than sending
-            separate heartbeat packets. Reduces overhead without sacrificing detection speed.</li>
-          <li><strong>Phi Accrual Failure Detector:</strong> Used by Cassandra and Akka. Rather than a binary alive/dead
-            decision, it computes a suspicion level (phi) based on inter-arrival times of heartbeats. Higher phi = more
-            suspicious. Threshold for declaring failure is configurable.</li>
-        </ul>
-
-        <pre>
-# Simplified heartbeat monitor
-class HeartbeatMonitor:
-    TIMEOUT_SECONDS = 5
-
-    def __init__(self):
-        self.last_seen = {}     # node_id -> timestamp
-
-    def receive_heartbeat(self, node_id):
-        self.last_seen[node_id] = time.time()
-
-    def is_alive(self, node_id):
-        last = self.last_seen.get(node_id)
-        if last is None:
-            return False
-        return time.time() - last < self.TIMEOUT_SECONDS
-
-    def get_dead_nodes(self):
-        now = time.time()
-        return [
-            node_id for node_id, ts in self.last_seen.items()
-            if now - ts >= self.TIMEOUT_SECONDS
-        ]
-</pre>
-      </div>
-
-      <!-- ==================== TIME, ORDERING, CLOCKS ==================== -->
-      <div class="section" id="time-ordering">
-        <h1 class="section-title">Time, Ordering, and Logical Clocks</h1>
-        <p class="section-subtitle">Module 12 &nbsp;|&nbsp; Clock Synchronization · Lamport Clocks · Vector Clocks ·
-          Gossip Protocol</p>
-
-        <h2>The Clock Synchronization Problem</h2>
-        <p>Physical clocks on different machines are never perfectly synchronized. They drift at different rates
-          (typically within milliseconds per hour) and are periodically adjusted by NTP (Network Time Protocol), which
-          can cause time to jump forward or backward. This makes physical timestamps unreliable for establishing event
-          ordering across distributed systems.</p>
-
-        <h3>NTP Accuracy</h3>
-        <p>NTP over the public internet typically achieves accuracy of 10–100ms. Within a datacenter, 1–5ms. Google's
-          TrueTime (used in Spanner) achieves microsecond-level precision using GPS receivers and atomic clocks, and
-          explicitly represents uncertainty as a time interval [earliest, latest].</p>
-
-        <h3>Why This Matters</h3>
-        <div class="example">
-          <div class="example-label">Bug: Using wall-clock for ordering</div>
-          <pre>
-# Machine A (clock: 10:00:00.000)
-event_A = { "action": "set x=1", "ts": "10:00:00.000" }
-
-# Machine B (clock: 09:59:59.500 — 500ms behind)
-event_B = { "action": "set x=2", "ts": "09:59:59.500" }
-
-# Sorted by timestamp, event_B appears first:
-# x = 2 then x = 1 — final value x=1
-# But event_A actually happened first:
-# x = 1 then x = 2 — final value should be x=2
-  </pre>
-          <p>A 500ms clock skew between two machines causes incorrect ordering. This cannot be fixed with NTP alone —
-            you need logical clocks.</p>
-        </div>
-
-        <h2>Lamport Timestamps</h2>
-        <p>Lamport timestamps are a logical clock scheme proposed by Leslie Lamport in 1978. They assign a counter to
-          each event to capture the "happens-before" relationship between events, without relying on physical clock
-          synchronization.</p>
-
-        <h3>Rules</h3>
-        <ol>
-          <li>Each process maintains an integer counter, initially 0.</li>
-          <li>Before executing any event, the process increments its counter: <code>counter++</code></li>
-          <li>When a process sends a message, it includes its current counter value.</li>
-          <li>When a process receives a message with timestamp T, it updates its counter:
-            <code>counter = max(counter, T) + 1</code>
-          </li>
-        </ol>
-
-        <h3>Happens-Before Relationship</h3>
-        <p>If event A happens-before event B (denoted A → B), then Lamport(A) &lt; Lamport(B). However, the converse is
-          not always true — Lamport(A) &lt; Lamport(B) does not necessarily mean A happens-before B (they might be
-          concurrent). Lamport timestamps provide a partial order, not a total order of causality.</p>
-
-        <div class="example">
-          <div class="example-label">Lamport Clock Trace</div>
-          <pre>
-Process P1:  event(counter=1) → send(msg, counter=1)
-Process P2:  receives msg from P1 (ts=1)
-             counter = max(0, 1) + 1 = 2
-             event(counter=2) → send(msg, counter=2)
-Process P3:  receives msg from P2 (ts=2)
-             counter = max(0, 2) + 1 = 3
-             event(counter=3)
-
-Order by Lamport: P1.e1 (1) < P2.e1 (2) < P3.e1 (3)
-This correctly captures the causal chain.
-  </pre>
-        </div>
-
-        <h2>Vector Clocks</h2>
-        <p>Vector clocks extend Lamport timestamps to capture not just ordering but also concurrency — whether two
-          events are causally related or happened independently without knowledge of each other.</p>
-
-        <h3>Structure</h3>
-        <p>Each process maintains a vector of counters, one per process in the system. For N processes, each clock is a
-          vector of N integers: <code>[P1_counter, P2_counter, ..., PN_counter]</code>.</p>
-
-        <h3>Rules</h3>
-        <ol>
-          <li>Initialize: all counters to 0.</li>
-          <li>On internal event at Pi: increment Pi's own counter: <code>V[i]++</code></li>
-          <li>On send from Pi: increment Pi's counter, then attach the full vector.</li>
-          <li>On receive at Pi of a message with vector W: merge by taking component-wise maximum, then increment own
-            counter: <code>V[j] = max(V[j], W[j]) for all j; V[i]++</code></li>
-        </ol>
-
-        <h3>Comparing Vector Clocks</h3>
-        <ul>
-          <li><strong>A happens-before B:</strong> A[i] &le; B[i] for all i, and A[j] &lt; B[j] for at least one j.</li>
-          <li><strong>A and B are concurrent:</strong> Neither A happens-before B nor B happens-before A. Some
-            components of A are larger, some of B are larger.</li>
-        </ul>
-
-        <div class="example">
-          <div class="example-label">Amazon DynamoDB conflict detection</div>
-          <p>DynamoDB uses a form of vector clocks to detect when concurrent writes have occurred to the same item. If
-            two clients write concurrently without seeing each other's updates, their vector clocks will be incomparable
-            (concurrent). DynamoDB surfaces this as a conflict and lets the application or user resolve it — either by
-            choosing one version, merging them, or using "last write wins" semantics.</p>
-        </div>
-
-        <h2>Gossip Protocol</h2>
-        <p>Gossip protocols (also called epidemic protocols) spread information through a distributed system in a way
-          that is decentralized, robust to failures, and eventually consistent. Each node periodically selects one or
-          more random peers and exchanges state. Information propagates through the system like an epidemic —
-          exponentially fast, achieving full propagation in O(log N) rounds.</p>
-
-        <h3>How It Works</h3>
-        <ol>
-          <li>Node A has new information (e.g., "Node X just failed").</li>
-          <li>Every T milliseconds, A selects 3 random peers (B, C, D) and sends them the update.</li>
-          <li>B, C, D merge the information with their own state and will gossip it to random peers in their next round.
-          </li>
-          <li>After O(log N) rounds, all N nodes have the information with high probability.</li>
-        </ol>
-
-        <h3>Properties</h3>
-        <ul>
-          <li><strong>Fault tolerant:</strong> Nodes fail, messages drop — gossip continues via other paths. No single
-            point of failure.</li>
-          <li><strong>Scalable:</strong> Each node sends to a fixed number of peers. Total network traffic is O(N log N)
-            per round — scales gracefully.</li>
-          <li><strong>Eventually consistent:</strong> No guarantee of when all nodes receive information, only that they
-            eventually will.</li>
-          <li><strong>Simple:</strong> No complex coordination, no leader, no global state.</li>
-        </ul>
-
-        <h3>Gossip in Practice</h3>
-        <ul>
-          <li><strong>Cassandra:</strong> Uses gossip for cluster membership, node failure detection, and schema
-            propagation. Each node gossips with up to 3 random peers every second.</li>
-          <li><strong>Consul:</strong> Uses SWIM (Scalable Weakly-consistent Infection-style Process Group Membership) —
-            an enhanced gossip protocol for service discovery and health checking.</li>
-          <li><strong>AWS DynamoDB:</strong> Uses gossip for failure detection across its storage nodes.</li>
-          <li><strong>Redis Cluster:</strong> Gossips cluster state — which nodes own which hash slots, which nodes are
-            failing.</li>
-        </ul>
-      </div>
-
-      <!-- ==================== CONSENSUS ==================== -->
-      <div class="section" id="consensus">
-        <h1 class="section-title">Consensus and Coordination</h1>
-        <p class="section-subtitle">Module 12 &nbsp;|&nbsp; The Consensus Problem · Raft · Paxos · Split Brain · Leader
-          Election · Quorum</p>
-
-        <h2>The Consensus Problem</h2>
-        <p>Consensus is the problem of getting a set of distributed nodes to agree on a single value or decision, even
-          when some nodes fail or messages are delayed. This is fundamental to implementing replicated state machines,
-          distributed databases, distributed locks, and any system requiring coordination.</p>
-
-        <h3>Requirements for a Consensus Algorithm</h3>
-        <ul>
-          <li><strong>Agreement:</strong> All non-faulty nodes decide on the same value.</li>
-          <li><strong>Validity:</strong> The decided value must have been proposed by some node (not invented).</li>
-          <li><strong>Termination:</strong> All non-faulty nodes eventually decide (liveness).</li>
-          <li><strong>Fault tolerance:</strong> The algorithm continues to work despite some nodes failing.</li>
-        </ul>
-
-        <h3>FLP Impossibility</h3>
-        <p>The Fischer-Lynch-Paterson (FLP) theorem proves that in an asynchronous system where even one node can fail,
-          it is impossible to guarantee that a consensus algorithm will always terminate. In practice, systems work
-          around this by using timeouts and probabilistic liveness guarantees — they may not terminate in theory but do
-          in practice under realistic conditions.</p>
-
-        <h2>Raft Consensus Algorithm</h2>
-        <p>Raft is a consensus algorithm designed to be more understandable than Paxos while providing the same
-          guarantees. It decomposes consensus into three relatively independent subproblems: leader election, log
-          replication, and safety.</p>
-
-        <h3>Node States</h3>
-        <ul>
-          <li><strong>Leader:</strong> Exactly one leader at a time (per term). Handles all client requests. Sends log
-            entries and heartbeats to followers.</li>
-          <li><strong>Follower:</strong> Passive — responds to RPCs from leaders and candidates. If no heartbeat
-            received within election timeout, converts to candidate.</li>
-          <li><strong>Candidate:</strong> Attempting to become leader. Sends RequestVote RPCs to all other nodes.</li>
-        </ul>
-
-        <h3>Leader Election</h3>
-        <ol>
-          <li>All nodes start as followers with a randomized election timeout (150–300ms).</li>
-          <li>A follower that times out without receiving a heartbeat becomes a candidate and increments its term
-            number.</li>
-          <li>The candidate votes for itself and sends RequestVote RPCs to all other nodes.</li>
-          <li>A node grants its vote if: it has not voted in this term, and the candidate's log is at least as
-            up-to-date as the voter's log.</li>
-          <li>If the candidate receives votes from a majority (N/2 + 1), it becomes the leader.</li>
-          <li>If multiple candidates split the vote, the election times out and a new election begins. Randomized
-            timeouts reduce split vote probability.</li>
-        </ol>
-
-        <h3>Log Replication</h3>
-        <ol>
-          <li>Client sends command to the leader.</li>
-          <li>Leader appends the command to its log as a new entry (with the current term).</li>
-          <li>Leader sends AppendEntries RPCs to all followers in parallel.</li>
-          <li>When a majority has written the entry to their logs, the leader commits the entry.</li>
-          <li>Leader applies the committed entry to its state machine and responds to the client.</li>
-          <li>Leader notifies followers of the commit in subsequent AppendEntries. Followers apply committed entries.
-          </li>
-        </ol>
-
-        <h3>Safety Guarantee</h3>
-        <p>Raft guarantees that if a log entry is committed at index i with term T, any future leader's log will contain
-          that entry at index i. This is enforced by the election restriction: a candidate cannot win an election unless
-          its log is at least as up-to-date as a majority of nodes' logs.</p>
-
-        <div class="diagram">
-          <pre class="mermaid">
-stateDiagram-v2
-  [*] --> Follower : start
-
-  Follower --> Candidate : election timeout\nno heartbeat received
-  Candidate --> Leader : receives majority votes
-  Candidate --> Follower : discovers current leader\nor higher term
-  Leader --> Follower : discovers higher term
-  Candidate --> Candidate : election timeout\n(split vote)
-</pre>
-          <p class="diagram-caption">Raft node state transitions</p>
-        </div>
-
-        <p><strong>Used by:</strong> etcd (Kubernetes control plane), CockroachDB, TiKV, Consul, Kafka (KRaft mode
-          replacing ZooKeeper), MongoDB (replication)</p>
-
-        <h2>Paxos Algorithm</h2>
-        <p>Paxos is the original consensus algorithm, proposed by Leslie Lamport in 1989. It is provably correct but
-          notoriously difficult to understand and implement correctly. Most practical consensus systems either implement
-          Multi-Paxos (an optimized variant) or Raft (which was designed as a more understandable alternative).</p>
-
-        <h3>Roles</h3>
-        <ul>
-          <li><strong>Proposer:</strong> Proposes values to be agreed upon.</li>
-          <li><strong>Acceptor:</strong> Votes on proposals. A quorum of acceptors must accept a value for consensus.
-          </li>
-          <li><strong>Learner:</strong> Learns which value was chosen after a quorum of acceptors has accepted it.</li>
-        </ul>
-
-        <h3>Phase 1: Prepare</h3>
-        <ol>
-          <li>Proposer chooses a unique proposal number N and sends Prepare(N) to a quorum of acceptors.</li>
-          <li>Each acceptor that has not responded to a Prepare with a higher number responds with: a promise not to
-            accept any proposal numbered less than N, and the highest-numbered proposal it has already accepted (if
-            any).</li>
-        </ol>
-
-        <h3>Phase 2: Accept</h3>
-        <ol>
-          <li>If the proposer receives responses from a quorum, it sends Accept(N, V) where V is either the value from
-            the highest-numbered prior accepted proposal (if any), or the proposer's own chosen value.</li>
-          <li>Each acceptor accepts the proposal unless it has already responded to a Prepare with a higher number.</li>
-          <li>If a quorum of acceptors accepts the proposal, the value V is chosen.</li>
-        </ol>
-
-        <h3>Paxos vs Raft</h3>
-        <div class="table-wrap">
-          <table>
-            <tr>
-              <th>Aspect</th>
-              <th>Paxos (Multi-Paxos)</th>
-              <th>Raft</th>
-            </tr>
-            <tr>
-              <td>Understandability</td>
-              <td>Very difficult — underspecified in original paper</td>
-              <td>Designed for understandability; clear algorithm specification</td>
-            </tr>
-            <tr>
-              <td>Leader election</td>
-              <td>Not fully specified — left to implementation</td>
-              <td>Fully specified with randomized timeouts</td>
-            </tr>
-            <tr>
-              <td>Log replication</td>
-              <td>Not directly addressed — requires Multi-Paxos extension</td>
-              <td>Core part of the algorithm</td>
-            </tr>
-            <tr>
-              <td>Implementation complexity</td>
-              <td>High — many edge cases</td>
-              <td>Lower — more complete specification</td>
-            </tr>
-            <tr>
-              <td>Known uses</td>
-              <td>Google Chubby, Spanner, Cosmos DB, Zookeeper (ZAB variant)</td>
-              <td>etcd, CockroachDB, Consul, Kafka KRaft</td>
-            </tr>
-          </table>
-        </div>
-
-        <h2>Split Brain Problem</h2>
-        <p>Split brain occurs when a network partition causes multiple nodes to independently believe they are the
-          leader (or the authoritative node), leading to conflicting decisions and data divergence. After the partition
-          heals, the system has two incompatible versions of the truth.</p>
-
-        <h3>Example Scenario</h3>
-        <p>A 5-node cluster is partitioned into two groups: {A, B} and {C, D, E}. Both groups elect their own leader.
-          Both leaders accept writes. When the partition heals, the cluster has two conflicting sets of writes that must
-          be reconciled or one discarded.</p>
-
-        <h3>Prevention via Quorum</h3>
-        <p>Quorum-based systems prevent split brain by requiring that any decision must be acknowledged by a majority
-          (N/2 + 1) of nodes. In a 5-node cluster, quorum is 3. During a {2} vs {3} partition, only the group of 3 can
-          form a quorum and continue operating. The group of 2 stops accepting writes, preventing split brain.</p>
-
-        <h2>Leader Election</h2>
-        <p>Leader election is the process by which a group of distributed nodes selects one node to act as the
-          coordinator or primary. Common algorithms:</p>
-
-        <ul>
-          <li><strong>Bully algorithm:</strong> Each node has a unique priority. When a node notices the leader is gone,
-            it sends election messages to all nodes with higher priority. If no higher-priority node responds, it
-            becomes the leader. Simple but generates O(N^2) messages.</li>
-          <li><strong>Ring algorithm:</strong> Nodes are arranged logically in a ring. Each node forwards election
-            messages around the ring. The node with the highest ID that the message passes through becomes the leader.
-            O(N) messages.</li>
-          <li><strong>Raft election:</strong> As described above — randomized timeouts with term numbers. Used in modern
-            systems.</li>
-          <li><strong>External coordination:</strong> Use ZooKeeper, etcd, or Consul to run an election and store the
-            result. Services watch the stored key; whoever wins the distributed lock becomes leader.</li>
-        </ul>
-
-        <h2>Quorum</h2>
-        <p>A quorum is the minimum number of nodes that must agree for an operation to proceed. For a cluster of N
-          nodes, the standard quorum is N/2 + 1 (strict majority). Using a quorum ensures that any two quorums overlap
-          by at least one node — meaning any decision made by one quorum is visible to any subsequent quorum.</p>
-
-        <h3>Quorum in Read/Write Operations</h3>
-        <p>In a replicated system with N replicas:</p>
-        <ul>
-          <li><strong>Write quorum (W):</strong> Write must be acknowledged by at least W replicas before confirming
-            success.</li>
-          <li><strong>Read quorum (R):</strong> Read must consult at least R replicas and return the most recent value.
-          </li>
-          <li><strong>Strong consistency guarantee:</strong> W + R > N ensures that every read quorum overlaps with
-            every write quorum by at least one node, so reads always see the latest write.</li>
-        </ul>
-
-        <div class="example">
-          <div class="example-label">Cassandra tunable consistency</div>
-          <pre>
-N = 3 replicas per key
-
-# Strong consistency: W=2, R=2 (W+R=4 > N=3)
-# Every read sees the latest write (overlap guaranteed)
-session.execute(query, consistency_level=QUORUM)  # W=2, R=2
-
-# High availability: W=1, R=1 (W+R=2, not > N=3)
-# Fast, but reads may see stale data
-session.execute(query, consistency_level=ONE)     # W=1, R=1
-
-# Write durability: W=3, R=1
-# Every replica must acknowledge write
-session.execute(query, consistency_level=ALL)
-  </pre>
-        </div>
-      </div>
-
-
-      <!-- ==================== DISTRIBUTED TRANSACTIONS ==================== -->
-      <div class="section" id="dist-tx">
-        <h1 class="section-title">Distributed Transactions</h1>
-        <p class="section-subtitle">Module 13 &nbsp;|&nbsp; Two-Phase Commit · SAGA Pattern · Outbox Pattern</p>
-
-        <h2>The Distributed Transaction Problem</h2>
-        <p>A distributed transaction spans multiple independent resources (databases, services) and must either commit
-          or roll back atomically across all of them. This is fundamentally harder than a local transaction because any
-          participant can fail independently at any point — including after some participants have committed but before
-          others have.</p>
-
-        <h2>Two-Phase Commit (2PC)</h2>
-        <p>Two-Phase Commit is a distributed protocol that coordinates atomic commits across multiple participants. A
-          coordinator node orchestrates two phases to ensure all participants either commit or roll back.</p>
-
-        <h3>Phase 1: Prepare</h3>
-        <ol>
-          <li>Coordinator sends Prepare message to all participants (P1, P2, P3).</li>
-          <li>Each participant writes the transaction to its log (durably), acquires all necessary locks, and verifies
-            it can commit.</li>
-          <li>Participants respond with Vote-Commit (if ready) or Vote-Abort (if they cannot commit).</li>
-        </ol>
-
-        <h3>Phase 2: Commit or Abort</h3>
-        <ol>
-          <li>If all participants voted Commit: coordinator writes "commit" to its log, then sends Commit to all
-            participants.</li>
-          <li>If any participant voted Abort: coordinator sends Abort to all participants.</li>
-          <li>Participants apply the decision and release their locks.</li>
-          <li>Participants acknowledge the commit/abort.</li>
-        </ol>
-
-        <h3>Problems with 2PC</h3>
-        <ul>
-          <li><strong>Blocking protocol:</strong> If the coordinator crashes after Phase 1 but before Phase 2,
-            participants are stuck holding locks indefinitely — they cannot proceed without the coordinator's decision.
-            This is the most severe limitation.</li>
-          <li><strong>Single point of failure:</strong> The coordinator is essential. If it fails at the wrong moment,
-            the system is blocked until recovery.</li>
-          <li><strong>Latency:</strong> Two round-trips plus logging overhead add significant latency compared to a
-            single-participant transaction. Locks held during both phases reduce concurrency.</li>
-          <li><strong>No partition tolerance:</strong> If a network partition isolates some participants from the
-            coordinator, those participants are blocked.</li>
-        </ul>
-
-        <div class="diagram">
-          <pre class="mermaid">
-sequenceDiagram
-  participant C as Coordinator
-  participant P1 as Participant 1\nOrder DB
-  participant P2 as Participant 2\nInventory DB
-
-  C->>P1: Prepare
-  C->>P2: Prepare
-  P1->>C: Vote-Commit
-  P2->>C: Vote-Commit
-
-  Note over C: Writes "commit" to log
-  C->>P1: Commit
-  C->>P2: Commit
-  P1->>C: Ack
-  P2->>C: Ack
-</pre>
-          <p class="diagram-caption">2PC happy path with two participants</p>
-        </div>
-
-        <h2>SAGA Pattern</h2>
-        <p>The SAGA pattern is an alternative to 2PC for long-running, multi-step transactions in microservices. Instead
-          of a single atomic transaction, a SAGA decomposes a business process into a sequence of local transactions.
-          Each local transaction updates a single service and publishes an event or message to trigger the next step. If
-          any step fails, compensating transactions are executed in reverse order to undo the completed steps.</p>
-
-        <h3>Key Concepts</h3>
-        <ul>
-          <li><strong>Local transaction:</strong> Each step is an ACID transaction within a single service's database.
-          </li>
-          <li><strong>Compensating transaction:</strong> A transaction that semantically undoes a previously completed
-            step. Note: compensation is not always a technical rollback — it may create new records (e.g., a refund
-            record rather than deleting the payment record) to preserve audit trail.</li>
-          <li><strong>Idempotency:</strong> Steps and compensations must be idempotent — they may be retried on failure.
-          </li>
-        </ul>
-
-        <h3>Choreography-Based SAGA</h3>
-        <p>Services react to events from other services without a central coordinator. Each service publishes events
-          when a step completes; other services subscribe and react.</p>
-
-        <pre>
-# Step 1: Order Service
-order_created → publishes OrderCreated event
-
-# Step 2: Inventory Service (subscribes to OrderCreated)
-reserves stock → publishes InventoryReserved event
-  OR fails → publishes InventoryReservationFailed event
-
-# Step 3: Payment Service (subscribes to InventoryReserved)
-processes payment → publishes PaymentProcessed event
-  OR fails → publishes PaymentFailed event
-
-# On failure: compensating events flow backwards
-PaymentFailed → Inventory Service releases reservation
-              → Order Service cancels order
-</pre>
-
-        <div class="compare">
-          <div class="compare-card neutral">
-            <h4>Choreography</h4>
-            <ul>
-              <li>No central orchestrator — each service is autonomous</li>
-              <li>Loosely coupled — services only know about events</li>
-              <li>Hard to visualize the complete transaction flow</li>
-              <li>Debugging is difficult — must trace events across many services</li>
-              <li>Risk of circular dependencies if not carefully designed</li>
-            </ul>
-          </div>
-          <div class="compare-card neutral">
-            <h4>Orchestration</h4>
-            <ul>
-              <li>Central orchestrator (saga orchestrator service) directs each step</li>
-              <li>Business logic is centralized and visible in one place</li>
-              <li>Easier to understand, test, and monitor the transaction flow</li>
-              <li>Orchestrator becomes a dependency of all participant services</li>
-              <li>Technology examples: AWS Step Functions, Temporal, Conductor</li>
-            </ul>
-          </div>
-        </div>
-
-        <h2>The Outbox Pattern</h2>
-        <p>The outbox pattern solves the dual-write problem: how to atomically update a database record AND publish an
-          event to a message broker, when these are two separate systems with no shared transaction.</p>
-
-        <h3>The Dual-Write Problem</h3>
-        <pre>
-# Naive approach — NOT atomic:
-db.update("UPDATE orders SET status='paid' WHERE id=123")
-# Process crashes here — order is paid but event not published
-kafka.publish("payment.completed", { order_id: 123 })
-# OR:
-kafka.publish(...)
-# Process crashes here — event published but DB not updated
-db.update(...)
-</pre>
-
-        <h3>Outbox Solution</h3>
-        <ol>
-          <li>In the same database transaction that updates business data, also insert a row into an "outbox" table
-            describing the event to be published.</li>
-          <li>A separate message relay process (or Debezium CDC) reads the outbox table and publishes messages to the
-            broker.</li>
-          <li>After publishing, the relay marks the outbox row as processed (or deletes it).</li>
-        </ol>
-
-        <pre>
-# Atomic: both happen in one database transaction
-BEGIN;
-  UPDATE orders SET status = 'paid' WHERE id = 123;
-  INSERT INTO outbox (event_type, payload, created_at)
-  VALUES ('payment.completed', '{"order_id":123}', NOW());
-COMMIT;
-
-# Separate relay process (eventually)
-SELECT * FROM outbox WHERE processed = false ORDER BY created_at;
-FOR row IN unprocessed_rows:
-    kafka.publish(row.event_type, row.payload)
-    UPDATE outbox SET processed = true WHERE id = row.id
-</pre>
-
-        <h3>Guarantees</h3>
-        <ul>
-          <li>The business state update and the event intent are always consistent — they commit together or roll back
-            together.</li>
-          <li>At-least-once delivery: if the relay crashes after publishing but before marking processed, the message
-            will be republished on retry. Consumers must be idempotent.</li>
-          <li>Ordering: events in the outbox are ordered by insertion time, which preserves causal ordering within a
-            service.</li>
-        </ul>
-      </div>
-
-      <!-- ==================== ARCHITECTURAL PATTERNS ==================== -->
       <div class="section" id="arch-patterns">
         <h1 class="section-title">Architectural Patterns</h1>
-        <p class="section-subtitle">Module 14 &nbsp;|&nbsp; Client-Server · Monolith · Microservices · Event-Driven ·
+        <p class="section-subtitle">Module 7 &nbsp;|&nbsp; Client-Server · Monolith · Microservices · Event-Driven ·
           CQRS · Event Sourcing · Serverless · Peer-to-Peer</p>
 
         <h2>Client-Server Architecture</h2>
@@ -6658,7 +5758,7 @@ events: [
       <!-- ==================== MICROSERVICES PATTERNS ==================== -->
       <div class="section" id="microservices">
         <h1 class="section-title">Microservices Patterns</h1>
-        <p class="section-subtitle">Module 15 &nbsp;|&nbsp; Service Discovery · Circuit Breaker · Bulkhead · Sidecar ·
+        <p class="section-subtitle">Module 7 &nbsp;|&nbsp; Service Discovery · Circuit Breaker · Bulkhead · Sidecar ·
           API Gateway · BFF · Service Mesh · Strangler Fig</p>
 
         <h2>Service Discovery</h2>
@@ -7434,144 +6534,1053 @@ Savings: $20,000/month (66% cheaper)
       </div>
 
 
-      <div class="section" id="tradeoffs">
-        <h1 class="section-title">System Design Trade-offs</h1>
-        <p class="section-subtitle">Module 3 &nbsp;|&nbsp; 22 Key Comparisons for Scalable Systems</p>
+      <div class="section" id="db-federation">
+        <h1 class="section-title">Database Federation</h1>
+        <p class="section-subtitle">Functional Partitioning - Splitting databases by business domain for independent
+          scaling</p>
 
-        <h2>Importance of Discussing Trade-offs</h2>
-        <p>In system design, there are no perfect solutions, only trade-offs. Demonstrating that you understand the
-          consequences of your choices shows maturity, critical thinking, and real-world experience. Every design
-          decision should be justified by the requirements of the specific problem.</p>
+        <div class="callout info">
+          <div class="callout-title">Real Story: Amazon's Evolution</div>
+          <p>In early 2000s, Amazon ran on a giant Oracle database handling everything: users, products, orders,
+            inventory. As they scaled, this became a bottleneck. They pioneered database federation - splitting into
+            separate databases: Users DB, Products DB, Orders DB, each owned by different teams. This enabled Amazon to
+            scale to millions of transactions per day.</p>
+        </div>
 
-        <h2>1. Strong vs. Eventual Consistency</h2>
-        <p>Strong consistency ensures all nodes see the same data at the same time, but increases latency and reduces
-          availability during partitions. Eventual consistency allows temporary divergence for lower latency and higher
-          availability.</p>
+        <h2>What is Database Federation?</h2>
 
-        <h2>2. Latency vs. Throughput</h2>
-        <p>Latency is the time for a single request (optimize with caching, bypassing queues). Throughput is requests
-          per second (optimize with batching, parallelism). They are often at odds.</p>
+        <p><strong>Database Federation</strong> (also called <em>functional partitioning</em> or <em>vertical
+            partitioning</em>) is an architectural pattern where you split your application's database by business
+          function or bounded context, creating multiple independent databases.</p>
 
-        <h2>3. ACID vs. BASE Properties in Databases</h2>
+        <p>Instead of one monolithic database containing all tables, you create separate databases for different parts
+          of your application:</p>
+
+        <ul>
+          <li><strong>User Service DB:</strong> users, profiles, authentication</li>
+          <li><strong>Product Service DB:</strong> products, categories, reviews</li>
+          <li><strong>Order Service DB:</strong> orders, order_items, shipping</li>
+          <li><strong>Payment Service DB:</strong> transactions, payment_methods</li>
+          <li><strong>Inventory Service DB:</strong> stock, warehouses, suppliers</li>
+        </ul>
+
+        <h2>Federation vs Sharding - Critical Difference</h2>
+
+        <p>These are often confused but fundamentally different:</p>
+
         <div class="compare">
           <div class="compare-card neutral">
-            <h4>ACID (Traditional SQL)</h4>
+            <h4>Sharding (Horizontal Partitioning)</h4>
+            <p><strong>What:</strong> Split the <em>same</em> table across multiple databases</p>
+            <p><strong>Example:</strong></p>
+            <pre>
+Database 1: users WHERE id 1-1,000,000
+Database 2: users WHERE id 1,000,001-2,000,000
+Database 3: users WHERE id 2,000,001-3,000,000
+    </pre>
+            <p><strong>Schema:</strong> Identical across all shards</p>
+            <p><strong>Split by:</strong> Data range (shard key like user_id)</p>
+            <p><strong>Goal:</strong> Scale a single large table</p>
+          </div>
+
+          <div class="compare-card neutral">
+            <h4>Federation (Vertical Partitioning)</h4>
+            <p><strong>What:</strong> Split <em>different</em> tables into separate databases</p>
+            <p><strong>Example:</strong></p>
+            <pre>
+Database 1: users, profiles, auth_tokens
+Database 2: products, categories, reviews
+Database 3: orders, order_items, shipping
+    </pre>
+            <p><strong>Schema:</strong> Different per database</p>
+            <p><strong>Split by:</strong> Business domain/function</p>
+            <p><strong>Goal:</strong> Scale entire application architecture</p>
+          </div>
+        </div>
+
+        <h2>Real-World Example: E-Commerce Platform</h2>
+
+        <div class="example">
+          <div class="example-label">Before Federation - Monolithic Database</div>
+          <pre>
+Single PostgreSQL Database: "ecommerce_db"
+├── Tables: 50+ tables
+├── Size: 10 TB total
+├── Load: Mixed (reads + writes)
+├── Bottleneck: Single database overwhelmed
+└── Problems:
+    • One team's query impacts everyone
+    • Can't scale components independently
+    • Schema changes require coordination
+    • Single point of failure
+  </pre>
+        </div>
+
+        <div class="example">
+          <div class="example-label">After Federation - Distributed by Function</div>
+          <pre>
+1. User Service Database (2 TB)
+   • Tables: users, profiles, sessions, auth_tokens
+   • Load: 70% reads, 30% writes
+   • Traffic: 10K req/sec
+   • Team: Identity team
+   • Optimization: Heavy caching, read replicas
+
+2. Product Catalog Database (5 TB)
+   • Tables: products, categories, reviews, ratings
+   • Load: 95% reads, 5% writes
+   • Traffic: 50K req/sec
+   • Team: Catalog team
+   • Optimization: CDN, aggressive caching
+
+3. Order Management Database (2 TB)
+   • Tables: orders, order_items, shipping, returns
+   • Load: 40% reads, 60% writes
+   • Traffic: 8K req/sec
+   • Team: Orders team
+   • Optimization: Write-optimized, sharded by order_id
+
+4. Payment Database (500 GB)
+   • Tables: transactions, payment_methods, invoices
+   • Load: 50% reads, 50% writes
+   • Traffic: 3K req/sec
+   • Team: Payments team
+   • Optimization: ACID guarantees, audit logs
+
+5. Inventory Database (500 GB)
+   • Tables: stock, warehouses, suppliers
+   • Load: 30% reads, 70% writes
+   • Traffic: 5K req/sec
+   • Team: Supply chain team
+   • Optimization: Real-time updates, strong consistency
+  </pre>
+        </div>
+
+        <h2>Advantages of Federation</h2>
+
+        <h3>1. Independent Scaling</h3>
+        <p>Each database can scale based on its specific needs:</p>
+        <ul>
+          <li><strong>Product Catalog:</strong> Add read replicas (read-heavy)</li>
+          <li><strong>Orders:</strong> Shard by order_id (write-heavy)</li>
+          <li><strong>Users:</strong> Aggressive caching (mostly reads)</li>
+          <li><strong>Payments:</strong> Keep small with strong ACID (critical data)</li>
+        </ul>
+
+        <h3>2. Team Autonomy & Velocity</h3>
+        <p>Different teams own different databases:</p>
+        <ul>
+          <li>Make schema changes independently</li>
+          <li>Choose optimal database technology per domain</li>
+          <li>Deploy updates without coordinating with other teams</li>
+          <li>Take ownership of performance and reliability</li>
+        </ul>
+
+        <h3>3. Technology Diversity</h3>
+        <p>Use the best database for each workload:</p>
+        <ul>
+          <li><strong>User profiles:</strong> PostgreSQL (relational data)</li>
+          <li><strong>Product catalog:</strong> Elasticsearch (full-text search)</li>
+          <li><strong>Session data:</strong> Redis (fast cache)</li>
+          <li><strong>Order history:</strong> MongoDB (flexible schema)</li>
+          <li><strong>Analytics:</strong> Snowflake (data warehouse)</li>
+        </ul>
+
+        <h3>4. Fault Isolation</h3>
+        <p>Failure in one database doesn't affect others:</p>
+        <ul>
+          <li>Payment DB goes down → orders can still be created (process payments later)</li>
+          <li>Product DB slow → users can still checkout (product data cached)</li>
+          <li>Blast radius is limited to one domain</li>
+        </ul>
+
+        <h3>5. Simpler Per-Database Operations</h3>
+        <p>Smaller databases are easier to manage:</p>
+        <ul>
+          <li>Faster backups (500 GB vs 10 TB)</li>
+          <li>Quicker restores</li>
+          <li>Easier schema migrations</li>
+          <li>Better query performance (fewer tables)</li>
+        </ul>
+
+        <h2>Challenges and Tradeoffs</h2>
+
+        <h3>1. Cross-Database Joins</h3>
+        <p><strong>Problem:</strong> Can't JOIN across databases</p>
+
+        <div class="example">
+          <div class="example-label">Problem Example</div>
+          <pre>
+// Before Federation (Easy):
+SELECT users.name, orders.total
+FROM users
+JOIN orders ON users.id = orders.user_id
+WHERE users.country = 'US';
+
+// After Federation (Hard):
+// Users in "users_db", Orders in "orders_db"
+// Can't JOIN across databases!
+  </pre>
+        </div>
+
+        <p><strong>Solutions:</strong></p>
+        <ul>
+          <li><strong>Application-level joins:</strong> Fetch from both DBs, join in code</li>
+          <li><strong>Data duplication:</strong> Store user_name in orders_db</li>
+          <li><strong>Separate analytics DB:</strong> ETL data to warehouse for reporting</li>
+          <li><strong>API composition:</strong> User Service API + Order Service API</li>
+        </ul>
+
+        <h3>2. Distributed Transactions</h3>
+        <p><strong>Problem:</strong> Transactions can't span databases atomically</p>
+
+        <div class="example">
+          <div class="example-label">Transaction Challenge</div>
+          <pre>
+// Need atomic operation across 3 databases:
+BEGIN TRANSACTION;
+  UPDATE inventory_db.stock SET quantity = quantity - 1;  // DB1
+  INSERT INTO orders_db.orders VALUES (...);               // DB2
+  INSERT INTO payments_db.transactions VALUES (...);       // DB3
+COMMIT;
+
+// This doesn't work with federation!
+  </pre>
+        </div>
+
+        <p><strong>Solutions:</strong></p>
+        <ul>
+          <li><strong>SAGA pattern:</strong> Chain of local transactions with compensation</li>
+          <li><strong>Eventual consistency:</strong> Accept that operations complete asynchronously</li>
+          <li><strong>Two-Phase Commit (2PC):</strong> Distributed transaction protocol (slow, avoid if possible)</li>
+          <li><strong>Event sourcing:</strong> Use event log to maintain consistency</li>
+        </ul>
+
+        <h3>3. Data Duplication</h3>
+        <p>You'll need to duplicate some reference data:</p>
+        <ul>
+          <li>Store user_name in orders_db (even though it's in users_db)</li>
+          <li>Store product_name in order_items (even though it's in products_db)</li>
+          <li>This is intentional denormalization for performance</li>
+        </ul>
+
+        <h3>4. Operational Complexity</h3>
+        <p>More databases = more to manage:</p>
+        <ul>
+          <li>Multiple backups to coordinate</li>
+          <li>Multiple monitoring dashboards</li>
+          <li>Multiple disaster recovery plans</li>
+          <li>Need more database expertise on team</li>
+        </ul>
+
+        <h2>When to Use Database Federation</h2>
+
+        <div class="callout tip">
+          <div class="callout-title">Federation is Right When</div>
+          <ul>
+            <li><strong>Clear Bounded Contexts:</strong> Your application has distinct business domains (users,
+              products, orders)</li>
+            <li><strong>Different Scaling Needs:</strong> Some parts need heavy reads, others heavy writes</li>
+            <li><strong>Team Organization:</strong> You have multiple teams that want autonomy</li>
+            <li><strong>Microservices Architecture:</strong> Each service owns its own database</li>
+            <li><strong>Monolith Bottleneck:</strong> Single database can't handle all load</li>
+            <li><strong>Technology Diversity Needed:</strong> Different workloads need different database types</li>
+          </ul>
+        </div>
+
+        <div class="callout warn">
+          <div class="callout-title">Don't Use Federation When</div>
+          <ul>
+            <li><strong>Small Application:</strong> One database works fine (don't over-engineer)</li>
+            <li><strong>Heavy Cross-Domain Queries:</strong> You frequently need to join across domains</li>
+            <li><strong>Strong Transactional Requirements:</strong> You need ACID across all data</li>
+            <li><strong>Limited Team:</strong> You don't have expertise to manage multiple databases</li>
+            <li><strong>Tight Coupling:</strong> Your domains aren't actually independent</li>
+          </ul>
+        </div>
+
+        <h2>Federation + Sharding Combined</h2>
+
+        <p>For maximum scale, combine both patterns:</p>
+
+        <div class="example">
+          <div class="example-label">Hybrid Approach at Scale</div>
+          <pre>
+1. Federation by Domain:
+   ├── Users Database
+   ├── Products Database  
+   └── Orders Database
+
+2. Then Shard Within Each:
+   
+   Orders Database (Federated)
+   ├── Orders Shard 1: order_id 1-1M
+   ├── Orders Shard 2: order_id 1M-2M
+   └── Orders Shard 3: order_id 2M-3M
+   
+   Users Database (Federated)
+   ├── Users Shard 1: user_id 1-10M
+   └── Users Shard 2: user_id 10M-20M
+
+This gives you both:
+• Domain isolation (federation)
+• Data distribution (sharding)
+  </pre>
+        </div>
+
+        <h2>Migration Strategy</h2>
+
+        <p>Moving from monolith to federation:</p>
+
+        <ol>
+          <li><strong>Identify Bounded Contexts:</strong> Map your domains (users, products, orders)</li>
+          <li><strong>Start with One Domain:</strong> Extract least coupled domain first</li>
+          <li><strong>Create New Database:</strong> Copy relevant tables to new DB</li>
+          <li><strong>Dual Write:</strong> Write to both old and new DB temporarily</li>
+          <li><strong>Migrate Reads:</strong> Point reads to new DB incrementally</li>
+          <li><strong>Remove from Monolith:</strong> Delete tables from old DB once fully migrated</li>
+          <li><strong>Repeat:</strong> Extract next domain</li>
+        </ol>
+
+        <div class="callout info">
+          <div class="callout-title">Key Takeaway</div>
+          <p>Database Federation splits your database by business function, enabling independent scaling, team autonomy,
+            and technology diversity. It's essential for microservices architectures but adds complexity in
+            cross-database operations. Use it when your application has clear domain boundaries and different scaling
+            needs per domain.</p>
+        </div>
+
+      </div>
+
+
+      <div class="section" id="dist-fundamentals">
+        <h1 class="section-title">Distributed Systems: Challenges and Failures</h1>
+        <p class="section-subtitle">Module 9 &nbsp;|&nbsp; Eight Fallacies · Network Failures · Cascading Failures ·
+          Heartbeats · Failure Detectors</p>
+
+        <h2>The Eight Fallacies of Distributed Computing</h2>
+        <p>First articulated by Peter Deutsch and extended by James Gosling, the Eight Fallacies describe incorrect
+          assumptions that engineers new to distributed systems commonly make. Each assumption leads to brittle systems
+          that fail in production in surprising ways.</p>
+
+        <dl class="def">
+          <dt>1. The network is reliable</dt>
+          <dd>Networks drop packets, experience latency spikes, and partition entirely. TCP provides reliability
+            guarantees within a connection, but connections drop. Hardware fails, routers misroute, and cables get cut.
+            Every remote call must be designed to handle failure.</dd>
+
+          <dt>2. Latency is zero</dt>
+          <dd>A function call on the same machine takes nanoseconds. A network call takes milliseconds — a factor of
+            1,000,000x slower. This difference in magnitude changes what is practical. Synchronous chains of network
+            calls accumulate latency. A page requiring 10 sequential service calls at 5ms each adds 50ms of pure network
+            overhead before any computation.</dd>
+
+          <dt>3. Bandwidth is infinite</dt>
+          <dd>Network links have finite capacity. Sending large objects, high-frequency polling, or broadcasting large
+            payloads to many receivers will saturate links. Design for compactness: binary serialization, pagination,
+            delta updates.</dd>
+
+          <dt>4. The network is secure</dt>
+          <dd>Traffic can be intercepted, forged, or replayed. Never assume that because a call comes from an internal
+            IP address it is legitimate. Encrypt all inter-service traffic (mTLS), authenticate all service-to-service
+            calls, and validate all inputs.</dd>
+
+          <dt>5. Topology does not change</dt>
+          <dd>Servers are added and removed. Containers are scheduled and rescheduled. IP addresses change.
+            Configurations drift. Systems must discover dependencies dynamically (service discovery) rather than
+            hardcoding addresses.</dd>
+
+          <dt>6. There is one administrator</dt>
+          <dd>Large systems are managed by multiple teams with conflicting priorities, change windows, and deployment
+            frequencies. A change made by one team can break another team's service. Explicit contracts (APIs, schemas),
+            independent deployability, and backward compatibility are essential.</dd>
+
+          <dt>7. Transport cost is zero</dt>
+          <dd>Network calls have real monetary cost (cloud egress fees), infrastructure cost (load balancers, transit),
+            and latency cost. Caching, batching, and co-locating frequently communicating services all have economic
+            justification.</dd>
+
+          <dt>8. The network is homogeneous</dt>
+          <dd>A distributed system spans heterogeneous hardware, operating systems, language runtimes, and protocol
+            versions. Content negotiation, version compatibility, and graceful handling of unexpected input are
+            necessary.</dd>
+        </dl>
+
+        <h2>Types of Failures in Distributed Systems</h2>
+
+        <h3>Fail-Stop Failures</h3>
+        <p>A node stops operating completely and other nodes can detect this. The simplest type — the node simply stops
+          sending responses, which can be detected via timeout and heartbeat absence. Most hardware failures are
+          eventually detected as fail-stop.</p>
+
+        <h3>Crash Failures</h3>
+        <p>A node stops suddenly without warning, potentially mid-operation. A database that crashes mid-write may leave
+          a page partially written. Write-Ahead Logging ensures the crashed node can recover to a consistent state on
+          restart, but other nodes must detect the crash and promote a replica.</p>
+
+        <h3>Omission Failures</h3>
+        <p>A node is running but fails to send or receive some messages. This is caused by buffer overflows, network
+          queue drops, or bugs in the send/receive path. Particularly dangerous because the node appears partially
+          healthy — it responds to some requests but not others.</p>
+
+        <h3>Byzantine Failures</h3>
+        <p>A node behaves arbitrarily — it may send incorrect data, contradict itself to different peers, or selectively
+          drop only certain messages. Byzantine failures can result from bugs, hardware corruption, or malicious
+          behavior. They are the hardest to tolerate and require Byzantine Fault Tolerant (BFT) consensus algorithms
+          (e.g., PBFT, Tendermint). Most enterprise distributed systems assume non-Byzantine failures and use simpler
+          algorithms like Raft.</p>
+
+        <h3>Network Partition</h3>
+        <p>A network partition splits nodes into two or more groups that cannot communicate with each other. Nodes
+          within each group continue operating but cannot reach nodes in other groups. This is the scenario the P in CAP
+          theorem refers to. Partitions can last seconds (network hiccup) or minutes/hours (major infrastructure
+          failure).</p>
+
+        <h2>Cascading Failures</h2>
+        <p>A cascading failure occurs when the failure of one component causes failures in dependent components, which
+          in turn cause more failures — amplifying rather than containing the original problem.</p>
+
+        <h3>Mechanism</h3>
+        <ol>
+          <li>Service A calls Service B. B becomes slow due to a database issue.</li>
+          <li>A's threads pile up waiting for B to respond, consuming A's thread pool.</li>
+          <li>A can no longer serve its own callers — Service C now finds A unresponsive.</li>
+          <li>The failure propagates backwards through the call chain, taking down healthy services.</li>
+        </ol>
+
+        <h3>Prevention Techniques</h3>
+        <ul>
+          <li><strong>Timeouts:</strong> Never wait indefinitely for a downstream call. Set aggressive timeouts (e.g.,
+            500ms for synchronous service calls). A stuck call that never times out is worse than a fast failure.</li>
+          <li><strong>Circuit breakers:</strong> After a threshold of failures, stop calling the downstream service and
+            return an error immediately. This prevents thread pool exhaustion and gives the downstream time to recover.
+          </li>
+          <li><strong>Bulkheads:</strong> Isolate resources (thread pools, connection pools) per downstream dependency.
+            A downstream service consuming all threads should not affect requests to other services.</li>
+          <li><strong>Load shedding:</strong> When a service is overwhelmed, explicitly reject excess requests with 503
+            rather than queueing them indefinitely. A fast rejection is better than a slow response.</li>
+          <li><strong>Backpressure:</strong> In stream processing, signal upstream producers to slow down when the
+            consumer cannot keep up.</li>
+        </ul>
+
+        <h2>Heartbeats</h2>
+        <p>A heartbeat is a periodic signal sent by a process to indicate that it is alive and functioning. In
+          distributed systems, heartbeats are the primary mechanism for failure detection — if a node stops sending
+          heartbeats, other nodes suspect it has failed.</p>
+
+        <h2>Leader and Follower (Master-Slave)</h2>
+        <p>Leader-follower replication is a fundamental pattern for maintaining data consistency across multiple nodes.
+          One node is designated as the <strong>Leader</strong> (Master), while the others are
+          <strong>Followers</strong>
+          (Replicas/Slaves).
+        </p>
+        <div class="callout info">
+          <div class="callout-title">Responsibilities</div>
+          <ul>
+            <li><strong>Leader:</strong> Handles all write requests, updates its local state, and propagates changes to
+              followers.</li>
+            <li><strong>Followers:</strong> Receive updates from the leader and apply them to their local state. Usually
+              handle read-only requests.</li>
+          </ul>
+        </div>
+        <p>If the leader fails, a new leader is elected from the available followers using a consensus algorithm like
+          Raft or Paxos.</p>
+
+        <h2>Quorum</h2>
+        <p>Quorum-based consistency is used to ensure that a distributed system makes progress even when some nodes are
+          down or the network is partitioned. A quorum is the minimum number of nodes that must agree on an operation.
+        </p>
+        <div class="example">
+          <p><strong>Common Formula:</strong> In a system of <em>N</em> nodes, a write quorum <em>W</em> and a read
+            quorum
+            <em>R</em> must satisfy <strong>W + R > N</strong>. This ensures that every read operation sees at least one
+            copy of the most recent write.
+          </p>
+        </div>
+
+        <h3>Design Considerations</h3>
+        <ul>
+          <li><strong>Frequency vs overhead:</strong> More frequent heartbeats reduce failure detection time but consume
+            network bandwidth and processing. Typical intervals: 500ms–5s depending on latency requirements.</li>
+          <li><strong>Threshold before declaring failure:</strong> Missing one heartbeat may be a transient network
+            blip. Most systems require multiple missed heartbeats (e.g., 3 consecutive) before declaring a node failed.
+            This reduces false positives.</li>
+          <li><strong>Piggybacking:</strong> Include heartbeat information in regular messages rather than sending
+            separate heartbeat packets. Reduces overhead without sacrificing detection speed.</li>
+          <li><strong>Phi Accrual Failure Detector:</strong> Used by Cassandra and Akka. Rather than a binary alive/dead
+            decision, it computes a suspicion level (phi) based on inter-arrival times of heartbeats. Higher phi = more
+            suspicious. Threshold for declaring failure is configurable.</li>
+        </ul>
+
+        <pre>
+# Simplified heartbeat monitor
+class HeartbeatMonitor:
+    TIMEOUT_SECONDS = 5
+
+    def __init__(self):
+        self.last_seen = {}     # node_id -> timestamp
+
+    def receive_heartbeat(self, node_id):
+        self.last_seen[node_id] = time.time()
+
+    def is_alive(self, node_id):
+        last = self.last_seen.get(node_id)
+        if last is None:
+            return False
+        return time.time() - last < self.TIMEOUT_SECONDS
+
+    def get_dead_nodes(self):
+        now = time.time()
+        return [
+            node_id for node_id, ts in self.last_seen.items()
+            if now - ts >= self.TIMEOUT_SECONDS
+        ]
+</pre>
+      </div>
+
+      <!-- ==================== TIME, ORDERING, CLOCKS ==================== -->
+      <div class="section" id="time-ordering">
+        <h1 class="section-title">Time, Ordering, and Logical Clocks</h1>
+        <p class="section-subtitle">Module 9 &nbsp;|&nbsp; Clock Synchronization · Lamport Clocks · Vector Clocks ·
+          Gossip Protocol</p>
+
+        <h2>The Clock Synchronization Problem</h2>
+        <p>Physical clocks on different machines are never perfectly synchronized. They drift at different rates
+          (typically within milliseconds per hour) and are periodically adjusted by NTP (Network Time Protocol), which
+          can cause time to jump forward or backward. This makes physical timestamps unreliable for establishing event
+          ordering across distributed systems.</p>
+
+        <h3>NTP Accuracy</h3>
+        <p>NTP over the public internet typically achieves accuracy of 10–100ms. Within a datacenter, 1–5ms. Google's
+          TrueTime (used in Spanner) achieves microsecond-level precision using GPS receivers and atomic clocks, and
+          explicitly represents uncertainty as a time interval [earliest, latest].</p>
+
+        <h3>Why This Matters</h3>
+        <div class="example">
+          <div class="example-label">Bug: Using wall-clock for ordering</div>
+          <pre>
+# Machine A (clock: 10:00:00.000)
+event_A = { "action": "set x=1", "ts": "10:00:00.000" }
+
+# Machine B (clock: 09:59:59.500 — 500ms behind)
+event_B = { "action": "set x=2", "ts": "09:59:59.500" }
+
+# Sorted by timestamp, event_B appears first:
+# x = 2 then x = 1 — final value x=1
+# But event_A actually happened first:
+# x = 1 then x = 2 — final value should be x=2
+  </pre>
+          <p>A 500ms clock skew between two machines causes incorrect ordering. This cannot be fixed with NTP alone —
+            you need logical clocks.</p>
+        </div>
+
+        <h2>Lamport Timestamps</h2>
+        <p>Lamport timestamps are a logical clock scheme proposed by Leslie Lamport in 1978. They assign a counter to
+          each event to capture the "happens-before" relationship between events, without relying on physical clock
+          synchronization.</p>
+
+        <h3>Rules</h3>
+        <ol>
+          <li>Each process maintains an integer counter, initially 0.</li>
+          <li>Before executing any event, the process increments its counter: <code>counter++</code></li>
+          <li>When a process sends a message, it includes its current counter value.</li>
+          <li>When a process receives a message with timestamp T, it updates its counter:
+            <code>counter = max(counter, T) + 1</code>
+          </li>
+        </ol>
+
+        <h3>Happens-Before Relationship</h3>
+        <p>If event A happens-before event B (denoted A → B), then Lamport(A) &lt; Lamport(B). However, the converse is
+          not always true — Lamport(A) &lt; Lamport(B) does not necessarily mean A happens-before B (they might be
+          concurrent). Lamport timestamps provide a partial order, not a total order of causality.</p>
+
+        <div class="example">
+          <div class="example-label">Lamport Clock Trace</div>
+          <pre>
+Process P1:  event(counter=1) → send(msg, counter=1)
+Process P2:  receives msg from P1 (ts=1)
+             counter = max(0, 1) + 1 = 2
+             event(counter=2) → send(msg, counter=2)
+Process P3:  receives msg from P2 (ts=2)
+             counter = max(0, 2) + 1 = 3
+             event(counter=3)
+
+Order by Lamport: P1.e1 (1) < P2.e1 (2) < P3.e1 (3)
+This correctly captures the causal chain.
+  </pre>
+        </div>
+
+        <h2>Vector Clocks</h2>
+        <p>Vector clocks extend Lamport timestamps to capture not just ordering but also concurrency — whether two
+          events are causally related or happened independently without knowledge of each other.</p>
+
+        <h3>Structure</h3>
+        <p>Each process maintains a vector of counters, one per process in the system. For N processes, each clock is a
+          vector of N integers: <code>[P1_counter, P2_counter, ..., PN_counter]</code>.</p>
+
+        <h3>Rules</h3>
+        <ol>
+          <li>Initialize: all counters to 0.</li>
+          <li>On internal event at Pi: increment Pi's own counter: <code>V[i]++</code></li>
+          <li>On send from Pi: increment Pi's counter, then attach the full vector.</li>
+          <li>On receive at Pi of a message with vector W: merge by taking component-wise maximum, then increment own
+            counter: <code>V[j] = max(V[j], W[j]) for all j; V[i]++</code></li>
+        </ol>
+
+        <h3>Comparing Vector Clocks</h3>
+        <ul>
+          <li><strong>A happens-before B:</strong> A[i] &le; B[i] for all i, and A[j] &lt; B[j] for at least one j.</li>
+          <li><strong>A and B are concurrent:</strong> Neither A happens-before B nor B happens-before A. Some
+            components of A are larger, some of B are larger.</li>
+        </ul>
+
+        <div class="example">
+          <div class="example-label">Amazon DynamoDB conflict detection</div>
+          <p>DynamoDB uses a form of vector clocks to detect when concurrent writes have occurred to the same item. If
+            two clients write concurrently without seeing each other's updates, their vector clocks will be incomparable
+            (concurrent). DynamoDB surfaces this as a conflict and lets the application or user resolve it — either by
+            choosing one version, merging them, or using "last write wins" semantics.</p>
+        </div>
+
+        <h2>Gossip Protocol</h2>
+        <p>Gossip protocols (also called epidemic protocols) spread information through a distributed system in a way
+          that is decentralized, robust to failures, and eventually consistent. Each node periodically selects one or
+          more random peers and exchanges state. Information propagates through the system like an epidemic —
+          exponentially fast, achieving full propagation in O(log N) rounds.</p>
+
+        <h3>How It Works</h3>
+        <ol>
+          <li>Node A has new information (e.g., "Node X just failed").</li>
+          <li>Every T milliseconds, A selects 3 random peers (B, C, D) and sends them the update.</li>
+          <li>B, C, D merge the information with their own state and will gossip it to random peers in their next round.
+          </li>
+          <li>After O(log N) rounds, all N nodes have the information with high probability.</li>
+        </ol>
+
+        <h3>Properties</h3>
+        <ul>
+          <li><strong>Fault tolerant:</strong> Nodes fail, messages drop — gossip continues via other paths. No single
+            point of failure.</li>
+          <li><strong>Scalable:</strong> Each node sends to a fixed number of peers. Total network traffic is O(N log N)
+            per round — scales gracefully.</li>
+          <li><strong>Eventually consistent:</strong> No guarantee of when all nodes receive information, only that they
+            eventually will.</li>
+          <li><strong>Simple:</strong> No complex coordination, no leader, no global state.</li>
+        </ul>
+
+        <h3>Gossip in Practice</h3>
+        <ul>
+          <li><strong>Cassandra:</strong> Uses gossip for cluster membership, node failure detection, and schema
+            propagation. Each node gossips with up to 3 random peers every second.</li>
+          <li><strong>Consul:</strong> Uses SWIM (Scalable Weakly-consistent Infection-style Process Group Membership) —
+            an enhanced gossip protocol for service discovery and health checking.</li>
+          <li><strong>AWS DynamoDB:</strong> Uses gossip for failure detection across its storage nodes.</li>
+          <li><strong>Redis Cluster:</strong> Gossips cluster state — which nodes own which hash slots, which nodes are
+            failing.</li>
+        </ul>
+      </div>
+
+      <!-- ==================== CONSENSUS ==================== -->
+      <div class="section" id="consensus">
+        <h1 class="section-title">Consensus and Coordination</h1>
+        <p class="section-subtitle">Module 9 &nbsp;|&nbsp; The Consensus Problem · Raft · Paxos · Split Brain · Leader
+          Election · Quorum</p>
+
+        <h2>The Consensus Problem</h2>
+        <p>Consensus is the problem of getting a set of distributed nodes to agree on a single value or decision, even
+          when some nodes fail or messages are delayed. This is fundamental to implementing replicated state machines,
+          distributed databases, distributed locks, and any system requiring coordination.</p>
+
+        <h3>Requirements for a Consensus Algorithm</h3>
+        <ul>
+          <li><strong>Agreement:</strong> All non-faulty nodes decide on the same value.</li>
+          <li><strong>Validity:</strong> The decided value must have been proposed by some node (not invented).</li>
+          <li><strong>Termination:</strong> All non-faulty nodes eventually decide (liveness).</li>
+          <li><strong>Fault tolerance:</strong> The algorithm continues to work despite some nodes failing.</li>
+        </ul>
+
+        <h3>FLP Impossibility</h3>
+        <p>The Fischer-Lynch-Paterson (FLP) theorem proves that in an asynchronous system where even one node can fail,
+          it is impossible to guarantee that a consensus algorithm will always terminate. In practice, systems work
+          around this by using timeouts and probabilistic liveness guarantees — they may not terminate in theory but do
+          in practice under realistic conditions.</p>
+
+        <h2>Raft Consensus Algorithm</h2>
+        <p>Raft is a consensus algorithm designed to be more understandable than Paxos while providing the same
+          guarantees. It decomposes consensus into three relatively independent subproblems: leader election, log
+          replication, and safety.</p>
+
+        <h3>Node States</h3>
+        <ul>
+          <li><strong>Leader:</strong> Exactly one leader at a time (per term). Handles all client requests. Sends log
+            entries and heartbeats to followers.</li>
+          <li><strong>Follower:</strong> Passive — responds to RPCs from leaders and candidates. If no heartbeat
+            received within election timeout, converts to candidate.</li>
+          <li><strong>Candidate:</strong> Attempting to become leader. Sends RequestVote RPCs to all other nodes.</li>
+        </ul>
+
+        <h3>Leader Election</h3>
+        <ol>
+          <li>All nodes start as followers with a randomized election timeout (150–300ms).</li>
+          <li>A follower that times out without receiving a heartbeat becomes a candidate and increments its term
+            number.</li>
+          <li>The candidate votes for itself and sends RequestVote RPCs to all other nodes.</li>
+          <li>A node grants its vote if: it has not voted in this term, and the candidate's log is at least as
+            up-to-date as the voter's log.</li>
+          <li>If the candidate receives votes from a majority (N/2 + 1), it becomes the leader.</li>
+          <li>If multiple candidates split the vote, the election times out and a new election begins. Randomized
+            timeouts reduce split vote probability.</li>
+        </ol>
+
+        <h3>Log Replication</h3>
+        <ol>
+          <li>Client sends command to the leader.</li>
+          <li>Leader appends the command to its log as a new entry (with the current term).</li>
+          <li>Leader sends AppendEntries RPCs to all followers in parallel.</li>
+          <li>When a majority has written the entry to their logs, the leader commits the entry.</li>
+          <li>Leader applies the committed entry to its state machine and responds to the client.</li>
+          <li>Leader notifies followers of the commit in subsequent AppendEntries. Followers apply committed entries.
+          </li>
+        </ol>
+
+        <h3>Safety Guarantee</h3>
+        <p>Raft guarantees that if a log entry is committed at index i with term T, any future leader's log will contain
+          that entry at index i. This is enforced by the election restriction: a candidate cannot win an election unless
+          its log is at least as up-to-date as a majority of nodes' logs.</p>
+
+        <div class="diagram">
+          <pre class="mermaid">
+stateDiagram-v2
+  [*] --> Follower : start
+
+  Follower --> Candidate : election timeout\nno heartbeat received
+  Candidate --> Leader : receives majority votes
+  Candidate --> Follower : discovers current leader\nor higher term
+  Leader --> Follower : discovers higher term
+  Candidate --> Candidate : election timeout\n(split vote)
+</pre>
+          <p class="diagram-caption">Raft node state transitions</p>
+        </div>
+
+        <p><strong>Used by:</strong> etcd (Kubernetes control plane), CockroachDB, TiKV, Consul, Kafka (KRaft mode
+          replacing ZooKeeper), MongoDB (replication)</p>
+
+        <h2>Paxos Algorithm</h2>
+        <p>Paxos is the original consensus algorithm, proposed by Leslie Lamport in 1989. It is provably correct but
+          notoriously difficult to understand and implement correctly. Most practical consensus systems either implement
+          Multi-Paxos (an optimized variant) or Raft (which was designed as a more understandable alternative).</p>
+
+        <h3>Roles</h3>
+        <ul>
+          <li><strong>Proposer:</strong> Proposes values to be agreed upon.</li>
+          <li><strong>Acceptor:</strong> Votes on proposals. A quorum of acceptors must accept a value for consensus.
+          </li>
+          <li><strong>Learner:</strong> Learns which value was chosen after a quorum of acceptors has accepted it.</li>
+        </ul>
+
+        <h3>Phase 1: Prepare</h3>
+        <ol>
+          <li>Proposer chooses a unique proposal number N and sends Prepare(N) to a quorum of acceptors.</li>
+          <li>Each acceptor that has not responded to a Prepare with a higher number responds with: a promise not to
+            accept any proposal numbered less than N, and the highest-numbered proposal it has already accepted (if
+            any).</li>
+        </ol>
+
+        <h3>Phase 2: Accept</h3>
+        <ol>
+          <li>If the proposer receives responses from a quorum, it sends Accept(N, V) where V is either the value from
+            the highest-numbered prior accepted proposal (if any), or the proposer's own chosen value.</li>
+          <li>Each acceptor accepts the proposal unless it has already responded to a Prepare with a higher number.</li>
+          <li>If a quorum of acceptors accepts the proposal, the value V is chosen.</li>
+        </ol>
+
+        <h3>Paxos vs Raft</h3>
+        <div class="table-wrap">
+          <table>
+            <tr>
+              <th>Aspect</th>
+              <th>Paxos (Multi-Paxos)</th>
+              <th>Raft</th>
+            </tr>
+            <tr>
+              <td>Understandability</td>
+              <td>Very difficult — underspecified in original paper</td>
+              <td>Designed for understandability; clear algorithm specification</td>
+            </tr>
+            <tr>
+              <td>Leader election</td>
+              <td>Not fully specified — left to implementation</td>
+              <td>Fully specified with randomized timeouts</td>
+            </tr>
+            <tr>
+              <td>Log replication</td>
+              <td>Not directly addressed — requires Multi-Paxos extension</td>
+              <td>Core part of the algorithm</td>
+            </tr>
+            <tr>
+              <td>Implementation complexity</td>
+              <td>High — many edge cases</td>
+              <td>Lower — more complete specification</td>
+            </tr>
+            <tr>
+              <td>Known uses</td>
+              <td>Google Chubby, Spanner, Cosmos DB, Zookeeper (ZAB variant)</td>
+              <td>etcd, CockroachDB, Consul, Kafka KRaft</td>
+            </tr>
+          </table>
+        </div>
+
+        <h2>Split Brain Problem</h2>
+        <p>Split brain occurs when a network partition causes multiple nodes to independently believe they are the
+          leader (or the authoritative node), leading to conflicting decisions and data divergence. After the partition
+          heals, the system has two incompatible versions of the truth.</p>
+
+        <h3>Example Scenario</h3>
+        <p>A 5-node cluster is partitioned into two groups: {A, B} and {C, D, E}. Both groups elect their own leader.
+          Both leaders accept writes. When the partition heals, the cluster has two conflicting sets of writes that must
+          be reconciled or one discarded.</p>
+
+        <h3>Prevention via Quorum</h3>
+        <p>Quorum-based systems prevent split brain by requiring that any decision must be acknowledged by a majority
+          (N/2 + 1) of nodes. In a 5-node cluster, quorum is 3. During a {2} vs {3} partition, only the group of 3 can
+          form a quorum and continue operating. The group of 2 stops accepting writes, preventing split brain.</p>
+
+        <h2>Leader Election</h2>
+        <p>Leader election is the process by which a group of distributed nodes selects one node to act as the
+          coordinator or primary. Common algorithms:</p>
+
+        <ul>
+          <li><strong>Bully algorithm:</strong> Each node has a unique priority. When a node notices the leader is gone,
+            it sends election messages to all nodes with higher priority. If no higher-priority node responds, it
+            becomes the leader. Simple but generates O(N^2) messages.</li>
+          <li><strong>Ring algorithm:</strong> Nodes are arranged logically in a ring. Each node forwards election
+            messages around the ring. The node with the highest ID that the message passes through becomes the leader.
+            O(N) messages.</li>
+          <li><strong>Raft election:</strong> As described above — randomized timeouts with term numbers. Used in modern
+            systems.</li>
+          <li><strong>External coordination:</strong> Use ZooKeeper, etcd, or Consul to run an election and store the
+            result. Services watch the stored key; whoever wins the distributed lock becomes leader.</li>
+        </ul>
+
+        <h2>Quorum</h2>
+        <p>A quorum is the minimum number of nodes that must agree for an operation to proceed. For a cluster of N
+          nodes, the standard quorum is N/2 + 1 (strict majority). Using a quorum ensures that any two quorums overlap
+          by at least one node — meaning any decision made by one quorum is visible to any subsequent quorum.</p>
+
+        <h3>Quorum in Read/Write Operations</h3>
+        <p>In a replicated system with N replicas:</p>
+        <ul>
+          <li><strong>Write quorum (W):</strong> Write must be acknowledged by at least W replicas before confirming
+            success.</li>
+          <li><strong>Read quorum (R):</strong> Read must consult at least R replicas and return the most recent value.
+          </li>
+          <li><strong>Strong consistency guarantee:</strong> W + R > N ensures that every read quorum overlaps with
+            every write quorum by at least one node, so reads always see the latest write.</li>
+        </ul>
+
+        <div class="example">
+          <div class="example-label">Cassandra tunable consistency</div>
+          <pre>
+N = 3 replicas per key
+
+# Strong consistency: W=2, R=2 (W+R=4 > N=3)
+# Every read sees the latest write (overlap guaranteed)
+session.execute(query, consistency_level=QUORUM)  # W=2, R=2
+
+# High availability: W=1, R=1 (W+R=2, not > N=3)
+# Fast, but reads may see stale data
+session.execute(query, consistency_level=ONE)     # W=1, R=1
+
+# Write durability: W=3, R=1
+# Every replica must acknowledge write
+session.execute(query, consistency_level=ALL)
+  </pre>
+        </div>
+      </div>
+
+
+      <!-- ==================== DISTRIBUTED TRANSACTIONS ==================== -->
+      <div class="section" id="dist-tx">
+        <h1 class="section-title">Distributed Transactions</h1>
+        <p class="section-subtitle">Module 9 &nbsp;|&nbsp; Two-Phase Commit · SAGA Pattern · Outbox Pattern</p>
+
+        <h2>The Distributed Transaction Problem</h2>
+        <p>A distributed transaction spans multiple independent resources (databases, services) and must either commit
+          or roll back atomically across all of them. This is fundamentally harder than a local transaction because any
+          participant can fail independently at any point — including after some participants have committed but before
+          others have.</p>
+
+        <h2>Two-Phase Commit (2PC)</h2>
+        <p>Two-Phase Commit is a distributed protocol that coordinates atomic commits across multiple participants. A
+          coordinator node orchestrates two phases to ensure all participants either commit or roll back.</p>
+
+        <h3>Phase 1: Prepare</h3>
+        <ol>
+          <li>Coordinator sends Prepare message to all participants (P1, P2, P3).</li>
+          <li>Each participant writes the transaction to its log (durably), acquires all necessary locks, and verifies
+            it can commit.</li>
+          <li>Participants respond with Vote-Commit (if ready) or Vote-Abort (if they cannot commit).</li>
+        </ol>
+
+        <h3>Phase 2: Commit or Abort</h3>
+        <ol>
+          <li>If all participants voted Commit: coordinator writes "commit" to its log, then sends Commit to all
+            participants.</li>
+          <li>If any participant voted Abort: coordinator sends Abort to all participants.</li>
+          <li>Participants apply the decision and release their locks.</li>
+          <li>Participants acknowledge the commit/abort.</li>
+        </ol>
+
+        <h3>Problems with 2PC</h3>
+        <ul>
+          <li><strong>Blocking protocol:</strong> If the coordinator crashes after Phase 1 but before Phase 2,
+            participants are stuck holding locks indefinitely — they cannot proceed without the coordinator's decision.
+            This is the most severe limitation.</li>
+          <li><strong>Single point of failure:</strong> The coordinator is essential. If it fails at the wrong moment,
+            the system is blocked until recovery.</li>
+          <li><strong>Latency:</strong> Two round-trips plus logging overhead add significant latency compared to a
+            single-participant transaction. Locks held during both phases reduce concurrency.</li>
+          <li><strong>No partition tolerance:</strong> If a network partition isolates some participants from the
+            coordinator, those participants are blocked.</li>
+        </ul>
+
+        <div class="diagram">
+          <pre class="mermaid">
+sequenceDiagram
+  participant C as Coordinator
+  participant P1 as Participant 1\nOrder DB
+  participant P2 as Participant 2\nInventory DB
+
+  C->>P1: Prepare
+  C->>P2: Prepare
+  P1->>C: Vote-Commit
+  P2->>C: Vote-Commit
+
+  Note over C: Writes "commit" to log
+  C->>P1: Commit
+  C->>P2: Commit
+  P1->>C: Ack
+  P2->>C: Ack
+</pre>
+          <p class="diagram-caption">2PC happy path with two participants</p>
+        </div>
+
+        <h2>SAGA Pattern</h2>
+        <p>The SAGA pattern is an alternative to 2PC for long-running, multi-step transactions in microservices. Instead
+          of a single atomic transaction, a SAGA decomposes a business process into a sequence of local transactions.
+          Each local transaction updates a single service and publishes an event or message to trigger the next step. If
+          any step fails, compensating transactions are executed in reverse order to undo the completed steps.</p>
+
+        <h3>Key Concepts</h3>
+        <ul>
+          <li><strong>Local transaction:</strong> Each step is an ACID transaction within a single service's database.
+          </li>
+          <li><strong>Compensating transaction:</strong> A transaction that semantically undoes a previously completed
+            step. Note: compensation is not always a technical rollback — it may create new records (e.g., a refund
+            record rather than deleting the payment record) to preserve audit trail.</li>
+          <li><strong>Idempotency:</strong> Steps and compensations must be idempotent — they may be retried on failure.
+          </li>
+        </ul>
+
+        <h3>Choreography-Based SAGA</h3>
+        <p>Services react to events from other services without a central coordinator. Each service publishes events
+          when a step completes; other services subscribe and react.</p>
+
+        <pre>
+# Step 1: Order Service
+order_created → publishes OrderCreated event
+
+# Step 2: Inventory Service (subscribes to OrderCreated)
+reserves stock → publishes InventoryReserved event
+  OR fails → publishes InventoryReservationFailed event
+
+# Step 3: Payment Service (subscribes to InventoryReserved)
+processes payment → publishes PaymentProcessed event
+  OR fails → publishes PaymentFailed event
+
+# On failure: compensating events flow backwards
+PaymentFailed → Inventory Service releases reservation
+              → Order Service cancels order
+</pre>
+
+        <div class="compare">
+          <div class="compare-card neutral">
+            <h4>Choreography</h4>
             <ul>
-              <li><strong>A</strong>tomicity, <strong>C</strong>onsistency, <strong>I</strong>solation,
-                <strong>D</strong>urability</li>
-              <li>Focus on data integrity and strong consistency.</li>
+              <li>No central orchestrator — each service is autonomous</li>
+              <li>Loosely coupled — services only know about events</li>
+              <li>Hard to visualize the complete transaction flow</li>
+              <li>Debugging is difficult — must trace events across many services</li>
+              <li>Risk of circular dependencies if not carefully designed</li>
             </ul>
           </div>
           <div class="compare-card neutral">
-            <h4>BASE (Modern NoSQL)</h4>
+            <h4>Orchestration</h4>
             <ul>
-              <li><strong>B</strong>asically <strong>A</strong>vailable, <strong>S</strong>oft state,
-                <strong>E</strong>ventual consistency</li>
-              <li>Focus on scalability and high availability.</li>
+              <li>Central orchestrator (saga orchestrator service) directs each step</li>
+              <li>Business logic is centralized and visible in one place</li>
+              <li>Easier to understand, test, and monitor the transaction flow</li>
+              <li>Orchestrator becomes a dependency of all participant services</li>
+              <li>Technology examples: AWS Step Functions, Temporal, Conductor</li>
             </ul>
           </div>
         </div>
 
-        <h2>4. Read-Through vs. Write-Through Cache</h2>
+        <h2>The Outbox Pattern</h2>
+        <p>The outbox pattern solves the dual-write problem: how to atomically update a database record AND publish an
+          event to a message broker, when these are two separate systems with no shared transaction.</p>
+
+        <h3>The Dual-Write Problem</h3>
+        <pre>
+# Naive approach — NOT atomic:
+db.update("UPDATE orders SET status='paid' WHERE id=123")
+# Process crashes here — order is paid but event not published
+kafka.publish("payment.completed", { order_id: 123 })
+# OR:
+kafka.publish(...)
+# Process crashes here — event published but DB not updated
+db.update(...)
+</pre>
+
+        <h3>Outbox Solution</h3>
+        <ol>
+          <li>In the same database transaction that updates business data, also insert a row into an "outbox" table
+            describing the event to be published.</li>
+          <li>A separate message relay process (or Debezium CDC) reads the outbox table and publishes messages to the
+            broker.</li>
+          <li>After publishing, the relay marks the outbox row as processed (or deletes it).</li>
+        </ol>
+
+        <pre>
+# Atomic: both happen in one database transaction
+BEGIN;
+  UPDATE orders SET status = 'paid' WHERE id = 123;
+  INSERT INTO outbox (event_type, payload, created_at)
+  VALUES ('payment.completed', '{"order_id":123}', NOW());
+COMMIT;
+
+# Separate relay process (eventually)
+SELECT * FROM outbox WHERE processed = false ORDER BY created_at;
+FOR row IN unprocessed_rows:
+    kafka.publish(row.event_type, row.payload)
+    UPDATE outbox SET processed = true WHERE id = row.id
+</pre>
+
+        <h3>Guarantees</h3>
         <ul>
-          <li><strong>Read-Through:</strong> Cache loads missing data from DB. Simplifies application logic.</li>
-          <li><strong>Write-Through:</strong> Data written to cache and DB simultaneously. Ensures consistency but adds
-            write latency.</li>
+          <li>The business state update and the event intent are always consistent — they commit together or roll back
+            together.</li>
+          <li>At-least-once delivery: if the relay crashes after publishing but before marking processed, the message
+            will be republished on retry. Consumers must be idempotent.</li>
+          <li>Ordering: events in the outbox are ordered by insertion time, which preserves causal ordering within a
+            service.</li>
         </ul>
-
-        <h2>5. Batch Processing vs. Stream Processing</h2>
-        <ul>
-          <li><strong>Batch:</strong> Process large volumes of data at once (e.g., nightly). High throughput, high
-            latency.</li>
-          <li><strong>Stream:</strong> Process data as it arrives (e.g., real-time). Low latency, complex to manage.
-          </li>
-        </ul>
-
-        <h2>6. Load Balancer vs. API Gateway</h2>
-        <ul>
-          <li><strong>Load Balancer:</strong> Distributes traffic at L4/L7. Simple and fast.</li>
-          <li><strong>API Gateway:</strong> Orchestrates requests, handles auth, rate limiting, and protocol
-            translation. More powerful but adds a bottleneck.</li>
-        </ul>
-
-        <h2>7. API Gateway vs. Direct Service Exposure</h2>
-        <p>Direct exposure reduces latency but forces clients to manage service locations and multiple security
-          handshakes. API Gateway abstracts services for a cleaner client interface.</p>
-
-        <h2>8. Proxy vs. Reverse Proxy</h2>
-        <ul>
-          <li><strong>Forward Proxy:</strong> Sits in front of clients (hides client identity).</li>
-          <li><strong>Reverse Proxy:</strong> Sits in front of servers (load balancing, caching, security).</li>
-        </ul>
-
-        <h2>9. API Gateway vs. Reverse Proxy</h2>
-        <p>An API Gateway is a specialized reverse proxy that also handles application-level concerns like request
-          composition, authentication, and monitoring.</p>
-
-        <h2>10. SQL vs. NoSQL</h2>
-        <p>SQL for relational data, complex joins, and ACID. NoSQL for massive scale, flexible schemas, and high
-          availability.</p>
-
-        <h2>11. Primary-Replica vs. Peer-to-Peer Replication</h2>
-        <ul>
-          <li><strong>Primary-Replica:</strong> Single leader for writes, many followers for reads. Simple but leader
-            is a SPOF for writes.</li>
-          <li><strong>Peer-to-Peer:</strong> Any node can accept writes. No single SPOF, but conflict resolution
-            (conflict-free replicated data types or last-write-wins) is mandatory.</li>
-        </ul>
-
-        <h2>12. Data Compression vs. Data Deduplication</h2>
-        <ul>
-          <li><strong>Compression:</strong> Reduces data size within a file/packet.</li>
-          <li><strong>Deduplication:</strong> Removes redundant copies of the same data across a system.</li>
-        </ul>
-
-        <h2>13. Server-Side Caching vs. Client-Side Caching</h2>
-        <p>Server-side (Redis) reduces DB load. Client-side (Browser cache) reduces network requests and server load
-          entirely.</p>
-
-        <h2>14. REST vs. RPC (gRPC)</h2>
-        <p>REST uses HTTP verbs and is great for public APIs. RPC is faster, uses binary (Protobuf), and is ideal for
-          internal microservice communication.</p>
-
-        <h2>15. Polling vs. Long-Polling vs. WebSockets vs. Webhooks</h2>
-        <p>Comparing real-time delivery strategies from simple (Polling) to persistent stateful connections
-          (WebSockets) and server-to-server callbacks (Webhooks).</p>
-
-        <h2>16. CDN Usage vs. Direct Server Serving</h2>
-        <p>CDNs reduce latency by serving content from edge locations. Direct serving is simpler for small-scale or
-          frequently changing dynamic content.</p>
-
-        <h2>17. Serverless Architecture vs. Traditional Server-based</h2>
-        <p>Serverless offers auto-scaling and pay-per-use but suffers from cold starts. Traditional servers offer
-          consistent performance and lower cost for high-utilization workloads.</p>
-
-        <h2>18. Stateful vs. Stateless Architecture</h2>
-        <p>Stateless is easier to scale and manage. Stateful is necessary for some real-time apps (multiplayer games)
-          but requires sticky sessions or shared state stores.</p>
-
-        <h2>19. Hybrid Cloud Storage vs. All-Cloud Storage</h2>
-        <p>Hybrid combines on-premise control with cloud scalability. All-cloud is simpler but subject to vendor lock-in
-          and potential egress costs.</p>
-
-        <h2>20. Token Bucket vs. Leaky Bucket (Rate Limiting)</h2>
-        <p>Token Bucket allows bursts. Leaky Bucket enforces a constant output rate, smoothing traffic.</p>
-
-        <h2>21. Read Heavy vs. Write Heavy System</h2>
-        <p>Read heavy systems use aggressive caching and read replicas. Write heavy systems use LSM trees, message
-          queues, and batching.</p>
-
-        <h2>22. Recap: The Trade-off Mindset</h2>
-        <p>Always ask: <strong>"What am I giving up?"</strong> If you add a cache, you give up simple consistency. If
-          you shard, you give up simple joins. If you use an API Gateway, you give up a few milliseconds of latency for
-          security and manageability.</p>
       </div>
 
-
-      <!-- ==================== DATA STRUCTURES ==================== -->
+      <!-- ==================== ARCHITECTURAL PATTERNS ==================== -->
       <div class="section" id="data-structures">
         <h1 class="section-title">Data Structures for Scale</h1>
-        <p class="section-subtitle">Module 17 &nbsp;|&nbsp; Geohash · Quad Trees · R-Trees · Skip Lists · HyperLogLog ·
+        <p class="section-subtitle">Module 10 &nbsp;|&nbsp; Geohash · Quad Trees · R-Trees · Skip Lists · HyperLogLog ·
           Count-Min Sketch · Merkle Trees · Bloom Filters</p>
 
         <h2>Geohash</h2>
@@ -7867,7 +7876,7 @@ estimated_count = cms.query("#AI")
       <!-- ==================== BIG DATA ==================== -->
       <div class="section" id="big-data">
         <h1 class="section-title">Big Data Processing</h1>
-        <p class="section-subtitle">Module 18 &nbsp;|&nbsp; Batch vs Stream · MapReduce · ETL · Data Lakes · Data
+        <p class="section-subtitle">Module 10 &nbsp;|&nbsp; Batch vs Stream · MapReduce · ETL · Data Lakes · Data
           Warehousing · Lakehouse · Lambda Architecture · Kappa Architecture · Streaming Engines</p>
 
         <h2>Batch vs Stream Processing</h2>
@@ -8815,7 +8824,7 @@ Result: Safe from any single point of failure
 
       <div class="section" id="observability">
         <h1 class="section-title">Observability</h1>
-        <p class="section-subtitle">Module 19 &nbsp;|&nbsp; Three Pillars · Logging · Metrics · Distributed Tracing ·
+        <p class="section-subtitle">Module 11 &nbsp;|&nbsp; Three Pillars · Logging · Metrics · Distributed Tracing ·
           Log Aggregation · Correlation IDs · Alerting · Dashboards · Runbooks</p>
 
         <h2>What is Observability?</h2>
@@ -9101,7 +9110,7 @@ groups:
       <!-- ==================== SECURITY ==================== -->
       <div class="section" id="security">
         <h1 class="section-title">Advanced Security</h1>
-        <p class="section-subtitle">Module 20 &nbsp;|&nbsp; TLS/SSL · HTTPS · RBAC · Encryption · Secrets Management ·
+        <p class="section-subtitle">Module 11 &nbsp;|&nbsp; TLS/SSL · HTTPS · RBAC · Encryption · Secrets Management ·
           Zero Trust</p>
 
         <h2>TLS and SSL</h2>
