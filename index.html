@@ -14,153 +14,102 @@
             color: var(--dk-text);
         }
 
+        
         /* ─── Hero ─────────────────────── */
         .hero {
-            padding: 8rem 0 6rem;
+            padding: 7rem 0 5.5rem;
             border-bottom: 1px solid var(--dk-border);
             position: relative;
             overflow: hidden;
-            background: var(--dk-bg);
         }
 
-        .system-grid {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-image:
-                linear-gradient(rgba(58, 134, 255, 0.05) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(58, 134, 255, 0.05) 1px, transparent 1px);
-            background-size: 40px 40px;
-            pointer-events: none;
-            z-index: 0;
-        }
-
-        .system-grid::after {
+        .hero::before {
             content: '';
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(circle at 70% 30%, rgba(58, 134, 255, 0.08) 0%, transparent 60%);
+            top: -120px;
+            right: -200px;
+            width: 700px;
+            height: 700px;
+            background: radial-gradient(ellipse, rgba(58, 134, 255, .06) 0%, transparent 68%);
             pointer-events: none;
-        }
-
-        .network-bg {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 0;
-            opacity: 0.4;
-            pointer-events: none;
-        }
-
-        .hero .container {
-            position: relative;
-            z-index: 1;
         }
 
         .role-tag {
             display: inline-block;
-            font-size: 0.72rem;
+            font-size: 0.75rem;
             font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: 0.15em;
+            letter-spacing: 0.12em;
             color: var(--dk-accent);
-            margin-bottom: 2rem;
-            padding: 6px 14px;
-            border-radius: 4px;
-            background: rgba(58, 134, 255, 0.12);
-            border: 1px solid rgba(58, 134, 255, 0.25);
-            backdrop-filter: blur(4px);
+            margin-bottom: 1.75rem;
+            padding: 5px 14px;
+            border-radius: 3px;
+            background: rgba(58, 134, 255, .09);
+            border: 1px solid rgba(58, 134, 255, .22);
         }
 
         .hero h1 {
-            font-size: 3.5rem;
+            font-size: 3rem;
             font-weight: 800;
-            line-height: 1.1;
-            letter-spacing: -0.035em;
+            line-height: 1.15;
+            letter-spacing: -0.028em;
             color: var(--dk-text);
-            max-width: 900px;
-            margin-bottom: 2rem;
+            max-width: 820px;
+            margin-bottom: 1.75rem;
         }
 
         .hero h1 span {
-            background: linear-gradient(135deg, var(--dk-accent), #a78bfa);
+            background: linear-gradient(120deg, var(--dk-accent), #818cf8);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
         }
 
         .hero p {
-            font-size: 1.1rem;
-            line-height: 1.7;
+            font-size: 1.05rem;
+            line-height: 1.8;
             color: var(--dk-muted);
-            max-width: 780px;
-            margin-bottom: 3.5rem;
+            max-width: 740px;
+            margin-bottom: 2.75rem;
         }
 
-        /* ─── Systems Dashboard Metrics ─── */
+        /* ─── Metrics ───────────────────── */
         .metrics {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-            gap: 1.25rem;
-            margin-bottom: 3.5rem;
+            display: flex;
+            gap: 0;
+            flex-wrap: wrap;
+            margin-bottom: 3rem;
+            border: 1px solid var(--dk-border);
+            border-radius: var(--radius-md);
+            overflow: hidden;
         }
 
         .metric {
-            background: rgba(255, 255, 255, 0.02);
-            border: 1px solid var(--dk-border);
-            padding: 1.5rem;
-            border-radius: var(--radius-md);
-            position: relative;
-            overflow: hidden;
-            transition: border-color 0.3s ease;
+            flex: 1;
+            min-width: 120px;
+            padding: 1.5rem 1.75rem;
+            border-right: 1px solid var(--dk-border);
         }
 
-        .metric:hover {
-            border-color: rgba(58, 134, 255, 0.4);
-        }
-
-        .metric-status {
-            position: absolute;
-            top: 1rem;
-            right: 1.25rem;
-            width: 6px;
-            height: 6px;
-            border-radius: 50%;
-            background: #10b981;
-            box-shadow: 0 0 8px rgba(16, 185, 129, 0.6);
+        .metric:last-child {
+            border-right: none;
         }
 
         .metric-value {
-            font-family: 'Fira Code', monospace;
-            font-size: 2.2rem;
-            font-weight: 700;
+            font-size: 1.9rem;
+            font-weight: 800;
             color: var(--dk-text);
-            margin-bottom: 0.5rem;
-            display: block;
+            letter-spacing: -0.03em;
+            margin-bottom: 0.3rem;
+            line-height: 1;
         }
 
         .metric-label {
-            font-size: 0.65rem;
+            font-size: 0.72rem;
             color: var(--dk-muted);
             text-transform: uppercase;
-            letter-spacing: 0.12em;
+            letter-spacing: 0.1em;
             font-weight: 600;
-        }
-
-        .metrics-meta {
-            font-family: 'Fira Code', monospace;
-            font-size: 0.65rem;
-            color: var(--dk-accent);
-            opacity: 0.6;
-            margin-top: 0.5rem;
-            display: block;
         }
 
         .cta-group {
@@ -451,11 +400,11 @@
         <div class="nav-inner">
             <a href="index.html" class="logo">Umesh Saruk</a>
             <ul>
-                <li><a href="index.html" class="nav-active">Home</a></li>
-                <li><a href="about.html">About</a></li>
                 <li><a href="#experience">Work</a></li>
                 <li><a href="#approach">Approach</a></li>
-                <li><a href="system-design-complete.html">System Design →</a></li>
+                <li><a href="#interests">Interests</a></li>
+                <li><a href="system-design-complete.html" class="nav-active">System Design →</a></li>
+                <li><a href="#contact">Contact</a></li>
             </ul>
         </div>
     </nav>
@@ -464,15 +413,6 @@
 
         <!-- HERO -->
         <section class="hero">
-            <div class="system-grid"></div>
-            <svg class="network-bg" viewBox="0 0 1000 500" xmlns="http://www.w3.org/2000/svg">
-                <circle cx="150" cy="100" r="2" fill="currentColor" opacity="0.5" />
-                <circle cx="400" cy="300" r="2" fill="currentColor" opacity="0.5" />
-                <circle cx="800" cy="150" r="2" fill="currentColor" opacity="0.5" />
-                <circle cx="600" cy="400" r="2" fill="currentColor" opacity="0.5" />
-                <path d="M150 100 L400 300 M400 300 L800 150 M400 300 L600 400" stroke="currentColor" stroke-width="0.5"
-                    fill="none" opacity="0.2" />
-            </svg>
             <div class="container">
                 <div class="role-tag">Principal Software Engineer</div>
 
@@ -485,33 +425,40 @@
                     Eleven years designing, building, and operating large-scale backend infrastructure
                     across FinTech, IoT, and cloud-native SaaS. I own end-to-end architecture for
                     revenue-critical platforms — payments processing, IoT device fleets, event-driven
-                    data pipelines.
+                    data pipelines — running on AWS and GCP with verified production outcomes.
                 </p>
+
+                <div class="domain-bar">
+                    <span class="domain-tag">Distributed Systems</span>
+                    <span class="domain-tag">IoT Backends</span>
+                    <span class="domain-tag">Payments Infrastructure</span>
+                    <span class="domain-tag">Event-Driven Architecture</span>
+                    <span class="domain-tag">Cloud-Native SaaS</span>
+                    <span class="domain-tag">AWS · GCP</span>
+                    <span class="domain-tag">Reliability Engineering</span>
+                    <span class="domain-tag">Microservices</span>
+                </div>
 
                 <div class="metrics">
                     <div class="metric">
-                        <span class="metric-status"></span>
-                        <span class="metric-value">11+</span>
-                        <span class="metric-label">Years Experience</span>
-                        <span class="metrics-meta">uptime_record: ok</span>
+                        <div class="metric-value">11+</div>
+                        <div class="metric-label">Years Engineering</div>
                     </div>
                     <div class="metric">
-                        <span class="metric-status"></span>
-                        <span class="metric-value">50×</span>
-                        <span class="metric-label">Traffic Scaled</span>
-                        <span class="metrics-meta">request_vol: high</span>
+                        <div class="metric-value">50×</div>
+                        <div class="metric-label">Traffic Scaled</div>
                     </div>
                     <div class="metric">
-                        <span class="metric-status"></span>
-                        <span class="metric-value">99.9%</span>
-                        <span class="metric-label">Availability</span>
-                        <span class="metrics-meta">sla_status: met</span>
+                        <div class="metric-value">99.9%+</div>
+                        <div class="metric-label">Availability</div>
                     </div>
                     <div class="metric">
-                        <span class="metric-status"></span>
-                        <span class="metric-value">~20%</span>
-                        <span class="metric-label">Cost Optimization</span>
-                        <span class="metrics-meta">compute_efficiency: peak</span>
+                        <div class="metric-value">~50%</div>
+                        <div class="metric-label">Latency Reduction</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value">~20%</div>
+                        <div class="metric-label">Cloud Cost Savings</div>
                     </div>
                 </div>
 
@@ -741,9 +688,9 @@
                     <h4>Navigation</h4>
                     <ul>
                         <li><a href="index.html">Home</a></li>
-                        <li><a href="about.html">About Me</a></li>
                         <li><a href="#experience">Production Work</a></li>
                         <li><a href="#approach">Engineering Approach</a></li>
+                        <li><a href="#interests">Research &amp; Interests</a></li>
                         <li><a href="system-design-complete.html">System Design Playbook</a></li>
                     </ul>
                 </div>
