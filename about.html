@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About | Umesh Saruk — Technical Leadership & Architecture</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            background: var(--dk-bg);
+            color: var(--dk-text);
+        }
+
+        /* ─── Hero ─────────────────────── */
+        .hero {
+            padding: 8rem 0 5rem;
+            border-bottom: 1px solid var(--dk-border);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .system-grid {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image:
+                linear-gradient(rgba(58, 134, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(58, 134, 255, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            font-weight: 800;
+            line-height: 1.2;
+            letter-spacing: -0.02em;
+            margin-bottom: 1.5rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero p {
+            font-size: 1.15rem;
+            color: var(--dk-muted);
+            max-width: 700px;
+            line-height: 1.8;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ─── Timeline ─────────────────── */
+        .timeline {
+            position: relative;
+            max-width: 800px;
+            margin: 4rem auto;
+            padding-left: 2.5rem;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 2px;
+            height: 100%;
+            background: linear-gradient(to bottom, var(--dk-accent), var(--dk-border));
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 4rem;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -2.5rem;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--dk-bg);
+            border: 2px solid var(--dk-accent);
+            transform: translateX(-50%);
+            z-index: 2;
+        }
+
+        .timeline-date {
+            font-family: 'Fira Code', monospace;
+            font-size: 0.8rem;
+            color: var(--dk-accent);
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        .timeline-content h3 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .timeline-content .company {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--dk-text);
+            opacity: 0.9;
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        .timeline-content p {
+            font-size: 0.95rem;
+            color: var(--dk-muted);
+            line-height: 1.7;
+        }
+
+        /* ─── Philosophy ───────────────── */
+        .philosophy-section {
+            padding: 6rem 0;
+            background: rgba(255, 255, 255, 0.01);
+            border-top: 1px solid var(--dk-border);
+        }
+
+        .philosophy-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 3rem;
+        }
+
+        .philosophy-item h4 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--dk-accent);
+        }
+
+        .philosophy-item p {
+            font-size: 0.95rem;
+            color: var(--dk-muted);
+            line-height: 1.75;
+        }
+
+        /* ─── Responsive ────────────────── */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.25rem;
+            }
+
+            .timeline {
+                margin: 3rem 0;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav class="topnav dark">
+        <div class="nav-inner">
+            <a href="index.html" class="logo">Umesh Saruk</a>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="about.html" class="nav-active">About</a></li>
+                <li><a href="index.html#experience">Work</a></li>
+                <li><a href="index.html#approach">Approach</a></li>
+                <li><a href="system-design-complete.html">System Design →</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main>
+        <section class="hero">
+            <div class="system-grid"></div>
+            <div class="container">
+                <div class="role-tag">The Human Element</div>
+                <h1>Architecting with <br><span>Precision & Purpose</span>.</h1>
+                <p>
+                    I am a Principal Software Engineer based in India, specializing in the design of high-availability
+                    distributed systems. My journey spans over a decade of navigating the complexities of
+                    FinTech, IoT, and cloud-native infrastructure.
+                </p>
+            </div>
+        </section>
+
+        <section class="container" style="padding: 6rem 0;">
+            <div class="section-label">My Journey</div>
+            <h2>Career Milestones</h2>
+
+            <div class="timeline">
+                <div class="timeline-item">
+                    <span class="timeline-date">2021 — PRESENT</span>
+                    <div class="timeline-content">
+                        <h3>Principal Software Engineer</h3>
+                        <span class="company">Technical Leadership & Architecture</span>
+                        <p>
+                            Leading the architectural vision for large-scale platforms. Focused on driving engineering
+                            excellence, mentoring senior staff, and owning multi-year technical roadmaps for
+                            distributed IoT and Payment systems.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="timeline-item">
+                    <span class="timeline-date">2018 — 2021</span>
+                    <div class="timeline-content">
+                        <h3>Technical Architect</h3>
+                        <span class="company">FinTech & Payments Focus</span>
+                        <p>
+                            Architected mission-critical payment gateways and reconciliation engines. Implemented
+                            exactly-once processing guarantees and reduced system latency by 50% through
+                            aggressive optimization of data paths.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="timeline-item">
+                    <span class="timeline-date">2015 — 2018</span>
+                    <div class="timeline-content">
+                        <h3>Senior Backend Engineer</h3>
+                        <span class="company">IoT & Cloud Infrastructure</span>
+                        <p>
+                            Early-stage work on IoT device fleets and real-time telemetry pipelines. Developed
+                            robust sync protocols for edge devices operating in low-connectivity environments.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="timeline-item">
+                    <span class="timeline-date">2015</span>
+                    <div class="timeline-content">
+                        <h3>Graduated B.Tech (E&TC)</h3>
+                        <span class="company">VJTI, Mumbai</span>
+                        <p>
+                            Foundation in Electronics and Telecommunications, providing a hardware-aware perspective
+                            on software engineering that remains a core strength in my IoT work.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="philosophy-section">
+            <div class="container">
+                <div class="section-label">Engineering Philosophy</div>
+                <h2>The Values I Code By</h2>
+
+                <div class="philosophy-grid" style="margin-top: 3rem;">
+                    <div class="philosophy-item">
+                        <h4>Reliability as a Product Feature</h4>
+                        <p>
+                            Systems shouldn't just "work"—they should be resilient. I believe that 99.9% availability
+                            is a business requirement first and a technical challenge second. My designs prioritize
+                            self-healing and graceful degradation.
+                        </p>
+                    </div>
+                    <div class="philosophy-item">
+                        <h4>Simplicity Is Earned</h4>
+                        <p>
+                            The hardest systems to build are the ones that are simple to operate. I strive to
+                            remove unnecessary moving parts and focus on clear, documented architectural
+                            boundaries that teams can scale without friction.
+                        </p>
+                    </div>
+                    <div class="philosophy-item">
+                        <h4>Mentorship Through Design</h4>
+                        <p>
+                            Technical leadership isn't just about making decisions; it's about enabling others to
+                            make good ones. I use RFCs, design docs, and ADRs as tools for teaching and
+                            aligning the engineering organization.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <h3>Umesh Saruk</h3>
+                    <p>Principal Software Engineer focused on end-to-end architecture ownership for revenue-critical
+                        platforms.</p>
+                </div>
+                <div class="footer-col">
+                    <h4>Navigation</h4>
+                    <ul>
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="about.html">About</a></li>
+                        <li><a href="system-design-complete.html">System Design Playbook</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Contact</h4>
+                    <ul>
+                        <li><a href="https://linkedin.com/in/yourprofile" target="_blank">LinkedIn</a></li>
+                        <li><a href="mailto:your.email@example.com">Email</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 Umesh Saruk</p>
+            </div>
+        </div>
+    </footer>
+
+    <button id="back-to-top" title="Back to top">&#8593;</button>
+
+    <script>
+        const btt = document.getElementById('back-to-top');
+        window.addEventListener('scroll', () => btt.classList.toggle('visible', window.scrollY > 400));
+        btt.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+    </script>
+</body>
+
+</html>
