@@ -1,0 +1,1538 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="System Design Reference — Networking Fundamentals">
+  <title>🌐 Networking Fundamentals — System Design Fundamentals</title>
+  <link rel="stylesheet" href="../styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+  <style>
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      font-size: 15px;
+      line-height: 1.7;
+      color: #1a1a2e;
+      background: #f4f6f9;
+    }
+
+    /* ---- Layout ---- */
+    .layout {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    .sidebar {
+      width: 300px;
+      min-width: 300px;
+      background: #1a1a2e;
+      color: #cdd6f4;
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 100vh;
+      overflow-y: auto;
+      z-index: 100;
+      padding-bottom: 40px;
+    }
+
+    .sidebar-header {
+      padding: 24px 20px 16px;
+      border-bottom: 1px solid #2d2d4e;
+      position: sticky;
+      top: 0;
+      background: #1a1a2e;
+      z-index: 1;
+    }
+
+    .sidebar-header h1 {
+      font-size: 1rem;
+      font-weight: 700;
+      color: #89b4fa;
+      letter-spacing: 0.3px;
+      margin-bottom: 4px;
+    }
+
+    .sidebar-header p {
+      font-size: 0.75rem;
+      color: #6c7086;
+    }
+
+    .nav-module {
+      margin: 6px 0;
+    }
+
+    .nav-module-title {
+      padding: 10px 20px 6px;
+      font-size: 0.68rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #585b70;
+    }
+
+    .nav-item {
+      display: block;
+      padding: 7px 20px 7px 28px;
+      font-size: 0.82rem;
+      color: #a6adc8;
+      cursor: pointer;
+      border-left: 3px solid transparent;
+      transition: all 0.15s;
+    }
+
+    .nav-item:hover {
+      background: #252540;
+      color: #cdd6f4;
+    }
+
+    .nav-item.active {
+      background: #1e2050;
+      border-left-color: #89b4fa;
+      color: #89b4fa;
+      font-weight: 600;
+    }
+
+    /* ---- Main content ---- */
+    .main {
+      margin-left: 300px;
+      flex: 1;
+      padding: 0;
+    }
+
+    .progress-bar-wrap {
+      position: fixed;
+      top: 0;
+      left: 300px;
+      right: 0;
+      height: 3px;
+      background: #2d2d4e;
+      z-index: 200;
+    }
+
+    .progress-bar {
+      height: 100%;
+      background: linear-gradient(90deg, #89b4fa, #b4befe);
+      transition: width 0.3s;
+      width: 0%;
+    }
+
+    .section {
+      display: none;
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 48px 48px 80px;
+    }
+
+    .section.active {
+      display: block;
+      animation: fadein 0.25s ease;
+    }
+
+    @keyframes fadein {
+      from {
+        opacity: 0;
+        transform: translateY(8px);
+      }
+
+      to {
+        opacity: 1;
+        transform: none;
+      }
+    }
+
+    /* ---- Typography ---- */
+    .section-title {
+      font-size: 1.9rem;
+      font-weight: 800;
+      color: #1a1a2e;
+      margin-bottom: 6px;
+      padding-bottom: 14px;
+      border-bottom: 3px solid #89b4fa;
+    }
+
+    .section-subtitle {
+      font-size: 0.85rem;
+      color: #6c7086;
+      margin-bottom: 36px;
+    }
+
+    h2 {
+      font-size: 1.45rem;
+      font-weight: 700;
+      color: #1a1a2e;
+      margin: 44px 0 14px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid #e0e4f0;
+    }
+
+    h3 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #2d2d4e;
+      margin: 30px 0 10px;
+    }
+
+    h4 {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #3d3d6e;
+      margin: 22px 0 8px;
+    }
+
+    p {
+      margin-bottom: 12px;
+      color: #333355;
+    }
+
+    ul,
+    ol {
+      margin: 8px 0 14px 22px;
+    }
+
+    li {
+      margin-bottom: 5px;
+      color: #333355;
+    }
+
+    li strong {
+      color: #1a1a2e;
+    }
+
+    /* ---- Callout boxes ---- */
+    .callout {
+      border-radius: 6px;
+      padding: 18px 22px;
+      margin: 20px 0;
+      font-size: 0.9rem;
+    }
+
+    .callout-title {
+      font-weight: 700;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 6px;
+    }
+
+    .callout.info {
+      background: #eff6ff;
+      border-left: 4px solid #3b82f6;
+    }
+
+    .callout.info .callout-title {
+      color: #1d4ed8;
+    }
+
+    .callout.warn {
+      background: #fffbeb;
+      border-left: 4px solid #f59e0b;
+    }
+
+    .callout.warn .callout-title {
+      color: #b45309;
+    }
+
+    .callout.tip {
+      background: #f0fdf4;
+      border-left: 4px solid #22c55e;
+    }
+
+    .callout.tip .callout-title {
+      color: #15803d;
+    }
+
+    .callout.danger {
+      background: #fff1f2;
+      border-left: 4px solid #f43f5e;
+    }
+
+    .callout.danger .callout-title {
+      color: #be123c;
+    }
+
+    /* ---- Example / Real World ---- */
+    .example {
+      background: #f8faff;
+      border: 1px solid #dde3f5;
+      border-radius: 8px;
+      padding: 20px 24px;
+      margin: 20px 0;
+    }
+
+    .example-label {
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: #6c7086;
+      margin-bottom: 8px;
+    }
+
+    .example h4 {
+      margin-top: 0;
+    }
+
+    /* ---- Code blocks ---- */
+    pre,
+    code {
+      font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
+    }
+
+    pre {
+      background: #1e1e2e;
+      color: #cdd6f4;
+      padding: 20px 24px;
+      border-radius: 8px;
+      overflow-x: auto;
+      margin: 16px 0;
+      font-size: 0.84rem;
+      line-height: 1.6;
+    }
+
+    code {
+      background: #eef0f8;
+      color: #1a1a2e;
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-size: 0.85em;
+    }
+
+    pre code {
+      background: transparent;
+      color: inherit;
+      padding: 0;
+      border-radius: 0;
+      font-size: inherit;
+    }
+
+    /* ---- Tables ---- */
+    .table-wrap {
+      overflow-x: auto;
+      margin: 20px 0;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.88rem;
+    }
+
+    th {
+      background: #1a1a2e;
+      color: #cdd6f4;
+      padding: 10px 14px;
+      text-align: left;
+      font-weight: 600;
+      font-size: 0.82rem;
+      letter-spacing: 0.3px;
+    }
+
+    td {
+      padding: 9px 14px;
+      border-bottom: 1px solid #e8ebf5;
+      vertical-align: top;
+    }
+
+    tr:nth-child(even) td {
+      background: #f8f9fe;
+    }
+
+    /* ---- Comparison grid ---- */
+    .compare {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin: 20px 0;
+    }
+
+    .compare.three {
+      grid-template-columns: 1fr 1fr 1fr;
+    }
+
+    .compare.four {
+      grid-template-columns: 1fr 1fr 1fr 1fr;
+    }
+
+    .compare-card {
+      background: white;
+      border: 1px solid #e0e4f0;
+      border-radius: 8px;
+      padding: 18px 20px;
+    }
+
+    .compare-card h4 {
+      margin-top: 0;
+    }
+
+    .compare-card.pro {
+      border-top: 3px solid #22c55e;
+    }
+
+    .compare-card.con {
+      border-top: 3px solid #f43f5e;
+    }
+
+    .compare-card.neutral {
+      border-top: 3px solid #3b82f6;
+    }
+
+    /* ---- Diagram wrapper ---- */
+    .diagram {
+      background: white;
+      border: 1px solid #e0e4f0;
+      border-radius: 8px;
+      padding: 20px;
+      margin: 20px 0;
+      overflow-x: auto;
+      text-align: center;
+    }
+
+    .diagram-caption {
+      font-size: 0.78rem;
+      color: #6c7086;
+      text-align: center;
+      margin-top: 8px;
+    }
+
+    /* ---- Tags ---- */
+    .tag {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.4px;
+      margin: 0 4px 4px 0;
+    }
+
+    .tag-interview {
+      background: #fef3c7;
+      color: #92400e;
+    }
+
+    .tag-critical {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    .tag-concept {
+      background: #ede9fe;
+      color: #5b21b6;
+    }
+
+    .tag-realworld {
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    /* ---- Definition list ---- */
+    .def {
+      margin: 12px 0 16px 0;
+    }
+
+    .def dt {
+      font-weight: 700;
+      color: #1a1a2e;
+      margin-bottom: 3px;
+    }
+
+    .def dd {
+      margin-left: 20px;
+      color: #333355;
+      margin-bottom: 10px;
+    }
+
+    /* ---- Subsection separator ---- */
+    .subsection {
+      margin-top: 48px;
+    }
+
+    @media (max-width: 768px) {
+      .sidebar {
+        width: 100%;
+        height: auto;
+        position: relative;
+      }
+
+      .main {
+        margin-left: 0;
+      }
+
+      .section {
+        padding: 24px 20px;
+      }
+
+      .compare,
+      .compare.three,
+      .compare.four {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+
+  <style id="sidebar-improvements">
+    .sidebar { width: 280px; }
+    .main    { margin-left: 280px; }
+
+    /* Header */
+    .sidebar-header {
+      background: linear-gradient(160deg,#1e1e3f 0%,#12122a 100%);
+      border-bottom: 1px solid rgba(137,180,250,0.12);
+    }
+    .sidebar-header h1 { font-size:.9rem; color:#e2e8f9; letter-spacing:.3px; }
+    .sidebar-header p  { font-size:.72rem; color:#6272a4; }
+
+    .back-link {
+      display:inline-flex; align-items:center; gap:6px;
+      font-size:.75rem; color:#89b4fa; text-decoration:none;
+      padding:4px 12px; border:1px solid rgba(137,180,250,.25);
+      border-radius:20px; transition:all .2s;
+    }
+    .back-link:hover { background:rgba(137,180,250,.1); border-color:#89b4fa; }
+
+    /* Accordion wrapper */
+    .sidebar-accordion {
+      overflow-y: auto;
+      flex: 1;
+      padding: 8px 0 24px;
+    }
+
+    /* Accordion chapter */
+    .acc-chapter {
+      border-bottom: 1px solid rgba(137,180,250,0.07);
+    }
+    .acc-chapter[open] { background: rgba(137,180,250,0.04); }
+
+    /* Summary row = clickable chapter header */
+    .acc-summary {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      cursor: pointer;
+      list-style: none;
+      user-select: none;
+      transition: background 0.15s;
+    }
+    .acc-summary::-webkit-details-marker { display: none; }
+    .acc-summary:hover { background: rgba(137,180,250,0.08); }
+    .acc-chapter[open] > .acc-summary { background: rgba(137,180,250,0.1); }
+
+    .chap-icon {
+      font-size: 1rem;
+      flex-shrink: 0;
+      width: 24px;
+      text-align: center;
+    }
+    .chap-text {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+      flex: 1;
+      min-width: 0;
+    }
+    .chap-num {
+      font-size: .58rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .8px;
+      color: #585b70;
+    }
+    .chap-label {
+      font-size: .8rem;
+      color: #a6adc8;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .acc-chapter[open] .chap-num   { color: #89b4fa; }
+    .acc-chapter[open] .chap-label { color: #cdd6f4; font-weight: 600; }
+
+    .chap-curr {
+      font-size: .45rem;
+      color: #89b4fa;
+      flex-shrink: 0;
+      animation: blink 2s infinite;
+    }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.2} }
+
+    .acc-arrow {
+      font-size: .85rem;
+      color: #585b70;
+      flex-shrink: 0;
+      transition: transform 0.2s;
+    }
+    .acc-chapter[open] .acc-arrow { transform: rotate(90deg); color:#89b4fa; }
+
+    /* Sub-items panel */
+    .acc-sub {
+      padding: 2px 0 6px 0;
+      animation: slideDown .18s ease;
+    }
+    @keyframes slideDown {
+      from { opacity:0; transform:translateY(-6px); }
+      to   { opacity:1; transform:translateY(0); }
+    }
+
+    .acc-sub-item {
+      display: block;
+      padding: 7px 14px 7px 48px;
+      font-size: .78rem;
+      color: #7f849c;
+      cursor: pointer;
+      border-left: 2px solid transparent;
+      text-decoration: none;
+      transition: all 0.14s;
+      line-height: 1.35;
+    }
+    .acc-sub-item:hover {
+      color: #cdd6f4;
+      background: rgba(137,180,250,0.07);
+      border-left-color: rgba(137,180,250,.4);
+    }
+    .acc-sub-item.active {
+      color: #cdd6f4;
+      background: rgba(137,180,250,0.12);
+      border-left-color: #89b4fa;
+      font-weight: 600;
+    }
+
+    /* Page nav */
+    .page-nav {
+      display:flex; justify-content:space-between; align-items:center;
+      padding:28px 40px 48px; border-top:1px solid #e0e4f0;
+      margin-top:24px; gap:12px;
+    }
+    .page-nav-btn {
+      display:inline-flex; align-items:center; gap:8px;
+      padding:10px 22px; background:#1a1a2e; color:#cdd6f4;
+      border-radius:8px; text-decoration:none; font-size:.84rem;
+      font-weight:600; transition:all .18s;
+      border:1px solid rgba(137,180,250,.15);
+    }
+    .page-nav-btn:hover {
+      background:#313244; border-color:rgba(137,180,250,.35);
+      transform:translateY(-1px); box-shadow:0 4px 12px rgba(0,0,0,.2);
+    }
+    .page-nav-btn.home { background:linear-gradient(135deg,#1e3a5f,#162d48); }
+    .page-nav-btn.home:hover { background:linear-gradient(135deg,#264a78,#1e3a5f); }
+
+    @media (max-width:768px) { .sidebar{width:100%} .main{margin-left:0} }
+
+    /* ── Mermaid diagram consistency ── */
+    .mermaid {
+      background: transparent !important;
+      padding: 0 !important;
+    }
+    .mermaid svg {
+      background: transparent !important;
+      max-width: 100%;
+    }
+    /* Override Mermaid's internal background rect (dark in state/sequence diagrams) */
+    .mermaid svg > rect:first-child,
+    .mermaid svg > g:first-child > rect:first-child {
+      fill: transparent !important;
+      stroke: none !important;
+    }
+    /* State diagram node styling */
+    .mermaid .state-note rect,
+    .mermaid .note rect { fill: #fffbdd !important; stroke: #e6d87a !important; }
+    /* Ensure subgraph labels are readable */
+    .mermaid .cluster rect { fill: #f1f5f9 !important; stroke: #cbd5e1 !important; }
+    .mermaid .cluster text { fill: #475569 !important; }
+    /* Entity / node labels */
+    .mermaid .label { color: #1e293b !important; }
+    .mermaid .nodeLabel { color: #1e293b !important; }
+    .mermaid .edgeLabel { background: #fff !important; color: #475569 !important; }
+  </style>
+
+</head>
+<body>
+  <div class="layout">
+
+    <nav class="sidebar" style="display:flex;flex-direction:column">
+      <div class="sidebar-header">
+        <div style="margin-bottom:14px">
+          <a href="../index.html" class="back-link">&#8592; Back to Home</a>
+        </div>
+        <h1>System Design Fundamentals</h1>
+        <p>180+ topics &nbsp;|&nbsp; Complete Reference</p>
+      </div>
+
+      <div class="sidebar-accordion">
+        <details class="acc-chapter">
+          <summary class="acc-summary">
+            <span class="chap-icon">🚀</span>
+            <span class="chap-text">
+              <span class="chap-num">Chapter 01</span>
+              <span class="chap-label">Introduction to SDI</span>
+            </span>
+            
+            <span class="acc-arrow">›</span>
+          </summary>
+          <div class="acc-sub">
+              <a class="acc-sub-item" href="01-introduction.html#intro">The SDI Process</a>
+          </div>
+        </details>
+        <details class="acc-chapter">
+          <summary class="acc-summary">
+            <span class="chap-icon">📖</span>
+            <span class="chap-text">
+              <span class="chap-num">Chapter 02</span>
+              <span class="chap-label">Glossary of Basics</span>
+            </span>
+            
+            <span class="acc-arrow">›</span>
+          </summary>
+          <div class="acc-sub">
+              <a class="acc-sub-item" href="02-core-concepts.html#core">Core Characteristics</a>
+              <a class="acc-sub-item" href="02-core-concepts.html#cap">CAP & PACELC Theorems</a>
+              <a class="acc-sub-item" href="02-core-concepts.html#pacelc">PACELC In Depth</a>
+              <a class="acc-sub-item" href="02-core-concepts.html#hashing">Consistent Hashing</a>
+          </div>
+        </details>
+        <details class="acc-chapter">
+          <summary class="acc-summary">
+            <span class="chap-icon">⚖️</span>
+            <span class="chap-text">
+              <span class="chap-num">Chapter 03</span>
+              <span class="chap-label">Trade-offs</span>
+            </span>
+            
+            <span class="acc-arrow">›</span>
+          </summary>
+          <div class="acc-sub">
+              <a class="acc-sub-item" href="03-tradeoffs.html#tradeoffs">Topic-by-Topic Trade-offs</a>
+          </div>
+        </details>
+        <details class="acc-chapter" open>
+          <summary class="acc-summary">
+            <span class="chap-icon">🌐</span>
+            <span class="chap-text">
+              <span class="chap-num">Chapter 04</span>
+              <span class="chap-label">Networking</span>
+            </span>
+            <span class="chap-curr">●</span>
+            <span class="acc-arrow">›</span>
+          </summary>
+          <div class="acc-sub">
+              <div class="acc-sub-item active" data-sec="networking">OSI, TCP/UDP, HTTP, DNS</div>
+              <div class="acc-sub-item" data-sec="proxy">Proxy & Reverse Proxy</div>
+          </div>
+        </details>
+        <details class="acc-chapter">
+          <summary class="acc-summary">
+            <span class="chap-icon">🏗️</span>
+            <span class="chap-text">
+              <span class="chap-num">Chapter 05</span>
+              <span class="chap-label">Infrastructure</span>
+            </span>
+            
+            <span class="acc-arrow">›</span>
+          </summary>
+          <div class="acc-sub">
+              <a class="acc-sub-item" href="05-infrastructure.html#lb">Load Balancing & Algorithms</a>
+              <a class="acc-sub-item" href="05-infrastructure.html#caching">Caching Strategies</a>
+              <a class="acc-sub-item" href="05-infrastructure.html#cdn">CDN & Distributed Cache</a>
+              <a class="acc-sub-item" href="05-infrastructure.html#storage">Storage Systems</a>
+          </div>
+        </details>
+        <details class="acc-chapter">
+          <summary class="acc-summary">
+            <span class="chap-icon">🔌</span>
+            <span class="chap-text">
+              <span class="chap-num">Chapter 06</span>
+              <span class="chap-label">API & Communication</span>
+            </span>
+            
+            <span class="acc-arrow">›</span>
+          </summary>
+          <div class="acc-sub">
+              <a class="acc-sub-item" href="06-api-communication.html#api-design">API Design (REST, GraphQL, gRPC)</a>
+              <a class="acc-sub-item" href="06-api-communication.html#api-infra">API Gateway & Rate Limiting</a>
+              <a class="acc-sub-item" href="06-api-communication.html#api-auth">Authentication & Authorization</a>
+              <a class="acc-sub-item" href="06-api-communication.html#realtime">Real-Time Communication</a>
+              <a class="acc-sub-item" href="06-api-communication.html#async">Async Messaging (Queues, Pub/Sub)</a>
+          </div>
+        </details>
+        <details class="acc-chapter">
+          <summary class="acc-summary">
+            <span class="chap-icon">🏛️</span>
+            <span class="chap-text">
+              <span class="chap-num">Chapter 07</span>
+              <span class="chap-label">Architecture</span>
+            </span>
+            
+            <span class="acc-arrow">›</span>
+          </summary>
+          <div class="acc-sub">
+              <a class="acc-sub-item" href="07-architecture.html#arch-patterns">Architectural Patterns</a>
+              <a class="acc-sub-item" href="07-architecture.html#microservices">Microservices & Service Mesh</a>
+              <a class="acc-sub-item" href="07-architecture.html#containers">Containers & Orchestration</a>
+          </div>
+        </details>
+        <details class="acc-chapter">
+          <summary class="acc-summary">
+            <span class="chap-icon">🗄️</span>
+            <span class="chap-text">
+              <span class="chap-num">Chapter 08</span>
+              <span class="chap-label">Data Layer</span>
+            </span>
+            
+            <span class="acc-arrow">›</span>
+          </summary>
+          <div class="acc-sub">
+              <a class="acc-sub-item" href="08-data-layer.html#db-types">Database Types</a>
+              <a class="acc-sub-item" href="08-data-layer.html#db-internals">Database Internals</a>
+              <a class="acc-sub-item" href="08-data-layer.html#db-scaling">Database Scaling</a>
+          </div>
+        </details>
+        <details class="acc-chapter">
+          <summary class="acc-summary">
+            <span class="chap-icon">🕸️</span>
+            <span class="chap-text">
+              <span class="chap-num">Chapter 09</span>
+              <span class="chap-label">Distributed Systems</span>
+            </span>
+            
+            <span class="acc-arrow">›</span>
+          </summary>
+          <div class="acc-sub">
+              <a class="acc-sub-item" href="09-distributed-systems.html#db-federation">Database Federation</a>
+              <a class="acc-sub-item" href="09-distributed-systems.html#dist-fundamentals">Challenges & Failures</a>
+              <a class="acc-sub-item" href="09-distributed-systems.html#time-ordering">Time, Ordering & Clocks</a>
+              <a class="acc-sub-item" href="09-distributed-systems.html#consensus">Consensus & Coordination</a>
+              <a class="acc-sub-item" href="09-distributed-systems.html#dist-tx">Distributed Transactions</a>
+              <a class="acc-sub-item" href="09-distributed-systems.html#data-structures">Design Data Structures</a>
+              <a class="acc-sub-item" href="09-distributed-systems.html#big-data">Big Data & Stream Processing</a>
+          </div>
+        </details>
+        <details class="acc-chapter">
+          <summary class="acc-summary">
+            <span class="chap-icon">🔍</span>
+            <span class="chap-text">
+              <span class="chap-num">Chapter 10</span>
+              <span class="chap-label">Search, Ops & Security</span>
+            </span>
+            
+            <span class="acc-arrow">›</span>
+          </summary>
+          <div class="acc-sub">
+              <a class="acc-sub-item" href="10-search-operations.html#search">FTS, Inverted Index, Ranking</a>
+              <a class="acc-sub-item" href="10-search-operations.html#disaster-recovery">Disaster Recovery & Deployments</a>
+              <a class="acc-sub-item" href="10-search-operations.html#observability">Logs, Metrics, Tracing</a>
+              <a class="acc-sub-item" href="10-search-operations.html#security">Encryption, IAM, Zero Trust</a>
+          </div>
+        </details>
+        <details class="acc-chapter">
+          <summary class="acc-summary">
+            <span class="chap-icon">🎯</span>
+            <span class="chap-text">
+              <span class="chap-num">Chapter 11</span>
+              <span class="chap-label">Interview Framework</span>
+            </span>
+            
+            <span class="acc-arrow">›</span>
+          </summary>
+          <div class="acc-sub">
+              <a class="acc-sub-item" href="11-interview-framework.html#framework">The 4-Step SDI Framework</a>
+          </div>
+        </details>
+      </div>
+    </nav>
+
+    <div class="main">
+      <div class="progress-bar-wrap"><div class="progress-bar" id="pb"></div></div>
+
+<div class="section active" id="networking">
+    <h1 class="section-title">Networking Fundamentals</h1>
+    <p class="section-subtitle">Module 4 &nbsp;|&nbsp; OSI Model · IP · TCP · UDP · HTTP/HTTPS · DNS · Checksums</p>
+
+    <h2>The OSI Model</h2>
+    <p>The Open Systems Interconnection (OSI) model provides a conceptual framework for how network communication
+      works by dividing responsibilities into seven abstraction layers. Each layer serves the layer above it and is
+      served by the layer below.</p>
+
+    <div class="diagram">
+      <pre class="mermaid">
+flowchart TD
+  subgraph Host Layers
+    L7[7. Application<br/>HTTP, FTP, DNS]
+    L6[6. Presentation<br/>SSL/TLS, JPEG]
+    L5[5. Session<br/>Sockets, RPC]
+    L4[4. Transport<br/>TCP, UDP]
+  end
+  subgraph Media Layers
+    L3[3. Network<br/>IP, ICMP, Routing]
+    L2[2. Data Link<br/>MAC, Switches, ARP]
+    L1[1. Physical<br/>Cables, RF, Hubs]
+  end
+
+  L7 --> L6
+  L6 --> L5
+  L5 --> L4
+  L4 --> L3
+  L3 --> L2
+  L2 --> L1
+  
+  style L7 fill:#dbeafe,stroke:#3b82f6
+  style L6 fill:#d1fae5,stroke:#10b981
+  style L5 fill:#fef3c7,stroke:#f59e0b
+  style L4 fill:#fee2e2,stroke:#ef4444
+  style L3 fill:#e0e7ff,stroke:#6366f1
+  style L2 fill:#fae8ff,stroke:#d946ef
+  style L1 fill:#ffe4e6,stroke:#f43f5e
+</pre>
+      <p class="diagram-caption">The 7 Layers of the OSI Model</p>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <tr>
+          <th>#</th>
+          <th>Layer</th>
+          <th>Function</th>
+          <th>Protocols / Technologies</th>
+          <th>Common failure symptoms</th>
+        </tr>
+        <tr>
+          <td>7</td>
+          <td>Application</td>
+          <td>User-facing services, application data</td>
+          <td>HTTP, HTTPS, DNS, SMTP, FTP, SSH</td>
+          <td>404 Not Found, API errors, timeout</td>
+        </tr>
+        <tr>
+          <td>6</td>
+          <td>Presentation</td>
+          <td>Data encoding, encryption, compression</td>
+          <td>SSL/TLS, JPEG, JSON, XML</td>
+          <td>SSL handshake errors, encoding issues</td>
+        </tr>
+        <tr>
+          <td>5</td>
+          <td>Session</td>
+          <td>Manage connections, synchronization</td>
+          <td>NetBIOS, RPC, sockets</td>
+          <td>Session hijacking, disconnect recovery</td>
+        </tr>
+        <tr>
+          <td>4</td>
+          <td>Transport</td>
+          <td>End-to-end delivery, ports, flow control</td>
+          <td>TCP, UDP, SCTP</td>
+          <td>Port unreachable, connection refused, packet loss</td>
+        </tr>
+        <tr>
+          <td>3</td>
+          <td>Network</td>
+          <td>Logical addressing, routing between networks</td>
+          <td>IP, ICMP, BGP, OSPF</td>
+          <td>Host unreachable, TTL expired, wrong route</td>
+        </tr>
+        <tr>
+          <td>2</td>
+          <td>Data Link</td>
+          <td>Node-to-node transfer, MAC addressing</td>
+          <td>Ethernet, Wi-Fi (802.11), ARP</td>
+          <td>ARP failures, VLAN issues</td>
+        </tr>
+        <tr>
+          <td>1</td>
+          <td>Physical</td>
+          <td>Bits on the wire (electrical, optical signals)</td>
+          <td>Cables, switches, fiber, radio</td>
+          <td>Cable unplugged, signal noise</td>
+        </tr>
+      </table>
+    </div>
+
+    <div class="callout tip">
+      <div class="callout-title">Why This Matters for System Design</div>
+      <p>When debugging network issues, the OSI model helps localize problems. An "HTTP 500" is layer 7. A
+        "Connection refused" is layer 4. A route being unreachable is layer 3. Load balancers operate at layers 4 or
+        7, and the choice has significant performance implications.</p>
+    </div>
+
+    <h2>IP Address</h2>
+    <p>An IP address is a numerical label assigned to every device on a network for identification and routing.</p>
+
+    <h3>IPv4 vs IPv6</h3>
+    <ul>
+      <li><strong>IPv4:</strong> 32-bit address space (~4.3 billion addresses). Written as four octets:
+        <code>192.168.1.1</code>. Exhausted; most new allocations use NAT.
+      </li>
+      <li><strong>IPv6:</strong> 128-bit address space (~3.4 × 10^38 addresses). Written as eight groups of hex:
+        <code>2001:0db8:85a3::8a2e:0370:7334</code>. Eliminates NAT requirement.
+      </li>
+    </ul>
+
+    <h3>Public vs Private Addresses</h3>
+    <p>Private address ranges (10.x.x.x, 172.16-31.x.x, 192.168.x.x) are used within private networks and are not
+      routable on the internet. Network Address Translation (NAT) maps private addresses to a shared public IP when
+      communicating externally.</p>
+
+    <h2>TCP vs UDP</h2>
+    <p>TCP and UDP are the two primary transport-layer protocols. They represent fundamentally different tradeoffs
+      between reliability and speed.</p>
+
+    <h3>TCP — Transmission Control Protocol</h3>
+    <p>TCP provides a reliable, ordered, error-checked byte stream between two endpoints. It achieves this through a
+      three-way handshake, acknowledgments, retransmission of lost packets, flow control (preventing sender from
+      overwhelming receiver), and congestion control (preventing sender from overwhelming the network).</p>
+
+    <h4>TCP Three-Way Handshake</h4>
+
+    <div class="diagram">
+      <pre class="mermaid">
+sequenceDiagram
+    participant Client
+    participant Server
+
+    note over Client,Server: Connection Establishment
+    Client->>Server: SYN (seq=X)
+    note right of Server: Server allocates<br/>buffers/vars
+    Server-->>Client: SYN-ACK (seq=Y, ack=X+1)
+    note left of Client: Client allocates<br/>buffers/vars
+    Client->>Server: ACK (ack=Y+1)
+    
+    note over Client,Server: Connection Established - Data Transfer Begins
+</pre>
+      <p class="diagram-caption">TCP Three-Way Handshake</p>
+    </div>
+
+    <ol>
+      <li><strong>SYN:</strong> Client sends a segment with the SYN flag and an initial sequence number.</li>
+      <li><strong>SYN-ACK:</strong> Server acknowledges with its own sequence number and the SYN-ACK flags.</li>
+      <li><strong>ACK:</strong> Client acknowledges. Connection is established.</li>
+    </ol>
+    <p>This handshake adds 1 RTT (round-trip time) of latency before any data can be sent. TLS on top of TCP adds
+      another 1–2 RTTs for the TLS handshake.</p>
+
+    <h3>UDP — User Datagram Protocol</h3>
+    <p>UDP sends discrete datagrams without connection setup, acknowledgment, ordering, or retransmission. There is
+      no guarantee of delivery, order, or that packets won't be duplicated. However, UDP has no handshake overhead,
+      no head-of-line blocking, and minimal protocol overhead (8-byte header vs TCP's 20+ bytes).</p>
+
+    <div class="compare">
+      <div class="compare-card neutral">
+        <h4>TCP — Use When</h4>
+        <ul>
+          <li>Data must arrive complete and in order</li>
+          <li>HTTP/1.1, HTTP/2 web requests</li>
+          <li>Database connections (PostgreSQL, MySQL)</li>
+          <li>Email (SMTP, IMAP)</li>
+          <li>File transfers (FTP, SCP)</li>
+          <li>SSH sessions</li>
+        </ul>
+      </div>
+      <div class="compare-card neutral">
+        <h4>UDP — Use When</h4>
+        <ul>
+          <li>Speed matters more than reliability</li>
+          <li>Video and audio streaming (Zoom, YouTube)</li>
+          <li>Online gaming (position updates)</li>
+          <li>DNS queries (single request/response)</li>
+          <li>DHCP, NTP</li>
+          <li>HTTP/3 (QUIC protocol is UDP-based)</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="example">
+      <div class="example-label">Real World: Online Gaming</div>
+      <p>A player's position update is sent 60 times per second. If one packet is lost, waiting for TCP
+        retransmission means the game would wait ~100–300ms before progressing — causing visible stutter. Instead,
+        UDP is used: if a position packet is lost, the game simply uses the next one. The latency is acceptable and
+        the loss is invisible.</p>
+      <p>However, in the same game, chat messages use TCP — a chat message that disappears would be a much worse
+        user experience than brief movement lag.</p>
+    </div>
+
+    <h2>HTTP / HTTPS</h2>
+    <p>HTTP (Hypertext Transfer Protocol) is the foundation of data communication on the web. HTTPS is HTTP with TLS
+      encryption layered on top.</p>
+
+    <h3>HTTP/1.1</h3>
+    <p>Introduced persistent connections (keep-alive) to reuse TCP connections across multiple requests. However,
+      each connection can only serve one request at a time — a later request must wait for the earlier one to
+      complete. Workaround: browsers open 6–8 parallel TCP connections per host, which creates overhead.</p>
+
+    <h3>HTTP/2</h3>
+    <p>HTTP/2 introduced request multiplexing over a single TCP connection. Multiple requests and responses can be
+      in-flight simultaneously, interleaved in binary frames. It also includes header compression (HPACK) and
+      optional server push. This significantly reduces the number of TCP connections and eliminates head-of-line
+      blocking at the HTTP layer.</p>
+
+    <h3>HTTP/3 (QUIC)</h3>
+    <p>HTTP/3 replaces TCP with QUIC, a transport protocol built on UDP. QUIC integrates TLS 1.3, provides
+      multiplexing without TCP's head-of-line blocking (a single lost packet blocks all streams in HTTP/2 over TCP,
+      but not in QUIC), and supports 0-RTT connection resumption for repeat clients.</p>
+
+    <div class="table-wrap">
+      <table>
+        <tr>
+          <th>Feature</th>
+          <th>HTTP/1.1</th>
+          <th>HTTP/2</th>
+          <th>HTTP/3 (QUIC)</th>
+        </tr>
+        <tr>
+          <td>Transport</td>
+          <td>TCP</td>
+          <td>TCP</td>
+          <td>UDP (QUIC)</td>
+        </tr>
+        <tr>
+          <td>Multiplexing</td>
+          <td>No (one req/conn)</td>
+          <td>Yes (single conn)</td>
+          <td>Yes (single conn)</td>
+        </tr>
+        <tr>
+          <td>Header format</td>
+          <td>Plain text</td>
+          <td>Binary + HPACK compression</td>
+          <td>Binary + QPACK compression</td>
+        </tr>
+        <tr>
+          <td>Head-of-line blocking</td>
+          <td>At HTTP level</td>
+          <td>At TCP level</td>
+          <td>Eliminated</td>
+        </tr>
+        <tr>
+          <td>Connection setup</td>
+          <td>1 RTT (TCP)</td>
+          <td>1 RTT (TCP) + TLS</td>
+          <td>0–1 RTT</td>
+        </tr>
+        <tr>
+          <td>Server push</td>
+          <td>No</td>
+          <td>Yes</td>
+          <td>Yes</td>
+        </tr>
+      </table>
+    </div>
+
+    <h3>HTTP Status Codes</h3>
+    <div class="table-wrap">
+      <table>
+        <tr>
+          <th>Range</th>
+          <th>Category</th>
+          <th>Common codes</th>
+        </tr>
+        <tr>
+          <td>2xx</td>
+          <td>Success</td>
+          <td>200 OK, 201 Created, 204 No Content</td>
+        </tr>
+        <tr>
+          <td>3xx</td>
+          <td>Redirection</td>
+          <td>301 Moved Permanently, 302 Found, 304 Not Modified</td>
+        </tr>
+        <tr>
+          <td>4xx</td>
+          <td>Client error</td>
+          <td>400 Bad Request, 401 Unauthorized, 403 Forbidden, 404 Not Found, 429 Too Many Requests</td>
+        </tr>
+        <tr>
+          <td>5xx</td>
+          <td>Server error</td>
+          <td>500 Internal Server Error, 502 Bad Gateway, 503 Service Unavailable, 504 Gateway Timeout</td>
+        </tr>
+      </table>
+    </div>
+
+    <h2>Domain Name System (DNS)</h2>
+    <p>DNS is the hierarchical distributed naming system that translates human-readable domain names (e.g.,
+      <code>www.example.com</code>) into IP addresses that computers use to route traffic. It is often called "the
+      phonebook of the internet."
+    </p>
+
+    <h3>DNS Resolution Process</h3>
+
+    <div class="diagram">
+      <pre class="mermaid">
+sequenceDiagram
+    actor User
+    participant Browser
+    participant OS as OS Cache
+    participant Resolver as ISP Resolver
+    participant Root as Root Server (.)
+    participant TLD as TLD Server (.com)
+    participant Auth as Auth Server (example.com)
+
+    User->>Browser: Types example.com
+    Browser->>OS: Query example.com
+    OS-->>Browser: (Miss)
+    OS->>Resolver: Recursive Query for example.com
+    
+    Resolver->>Root: 1. Where is .com?
+    Root-->>Resolver: 2. Ask TLD Nameserver IP
+    
+    Resolver->>TLD: 3. Where is example.com?
+    TLD-->>Resolver: 4. Ask Auth Nameserver IP
+    
+    Resolver->>Auth: 5. What is the A record for example.com?
+    Auth-->>Resolver: 6. A Record = 93.184.216.34
+    
+    Resolver-->>OS: 7. example.com is 93.184.216.34 (Cached)
+    OS-->>Browser: 8. IP is 93.184.216.34 (Cached)
+    
+    Browser->>User: Renders Webpage Using IP
+</pre>
+      <p class="diagram-caption">DNS Recursive Resolution Process</p>
+    </div>
+
+    <ol>
+      <li><strong>Browser cache:</strong> Check local cache (TTL-based).</li>
+      <li><strong>OS cache and hosts file:</strong> Check <code>/etc/hosts</code> and OS DNS cache.</li>
+      <li><strong>Recursive resolver:</strong> Query the ISP's or configured recursive resolver.</li>
+      <li><strong>Root nameserver:</strong> Resolver asks root for the TLD nameserver (e.g., who handles
+        <code>.com</code>?).
+      </li>
+      <li><strong>TLD nameserver:</strong> Returns the authoritative nameserver for the domain.</li>
+      <li><strong>Authoritative nameserver:</strong> Returns the actual IP record for the hostname.</li>
+      <li>Response is cached at each layer according to TTL values.</li>
+    </ol>
+
+    <h3>DNS Record Types</h3>
+    <div class="table-wrap">
+      <table>
+        <tr>
+          <th>Record</th>
+          <th>Purpose</th>
+          <th>Example</th>
+        </tr>
+        <tr>
+          <td>A</td>
+          <td>Maps hostname to IPv4 address</td>
+          <td><code>example.com → 93.184.216.34</code></td>
+        </tr>
+        <tr>
+          <td>AAAA</td>
+          <td>Maps hostname to IPv6 address</td>
+          <td><code>example.com → 2606:2800:21f::34</code></td>
+        </tr>
+        <tr>
+          <td>CNAME</td>
+          <td>Alias for another domain</td>
+          <td><code>www.example.com → example.com</code></td>
+        </tr>
+        <tr>
+          <td>MX</td>
+          <td>Mail server for domain</td>
+          <td><code>example.com → mail.example.com</code></td>
+        </tr>
+        <tr>
+          <td>NS</td>
+          <td>Nameservers for domain</td>
+          <td><code>example.com → ns1.example.com</code></td>
+        </tr>
+        <tr>
+          <td>TXT</td>
+          <td>Arbitrary text (SPF, DKIM, verification)</td>
+          <td><code>v=spf1 include:example.com ~all</code></td>
+        </tr>
+        <tr>
+          <td>SRV</td>
+          <td>Service location records</td>
+          <td><code>_https._tcp.example.com → server:443</code></td>
+        </tr>
+        <tr>
+          <td>PTR</td>
+          <td>Reverse DNS (IP to hostname)</td>
+          <td><code>34.216.184.93.in-addr.arpa → example.com</code></td>
+        </tr>
+      </table>
+    </div>
+
+    <h3>TTL and Its Tradeoffs</h3>
+    <p>TTL (Time To Live) controls how long DNS resolvers cache a record. It is measured in seconds.</p>
+    <ul>
+      <li><strong>Long TTL (e.g., 86400s = 1 day):</strong> Fewer DNS queries, lower latency for repeat visitors.
+        However, changes take up to 1 day to propagate globally. Not suitable for failover scenarios.</li>
+      <li><strong>Short TTL (e.g., 60s):</strong> Changes propagate quickly. Good for failover. But high DNS query
+        volume, higher cost, and slightly higher latency for cold clients.</li>
+    </ul>
+    <p>Best practice: Use high TTL normally. 24–48 hours before a planned migration or failover, lower the TTL to
+      60–300 seconds so clients pick up the change quickly.</p>
+
+    <h3>DNS Load Balancing</h3>
+    <p>DNS can distribute load by returning multiple A records for the same domain. The DNS resolver or client
+      typically uses one, but over time traffic is distributed. However, DNS load balancing is coarse — it cannot
+      account for server health in real time, and cached records may point to a downed server for the TTL duration.
+    </p>
+    <p><strong>Geolocation DNS</strong> (used by AWS Route 53, Cloudflare) returns different IP addresses based on
+      the geographic location of the requester, routing users to the nearest datacenter.</p>
+
+    <h2>Checksums</h2>
+    <p>A checksum is a small fixed-size value computed from data that is used to detect errors in transmission or
+      storage. When data is sent or stored, the checksum is computed and included. On receipt or retrieval, the
+      checksum is recomputed and compared.</p>
+    <ul>
+      <li><strong>Simple checksums (parity bits):</strong> Detect single-bit errors, not suitable for data integrity
+        in storage.</li>
+      <li><strong>CRC (Cyclic Redundancy Check):</strong> Detects burst errors. Used in Ethernet, ZIP, and storage.
+      </li>
+      <li><strong>MD5, SHA-256:</strong> Cryptographic hash functions. Used for file integrity verification, digital
+        signatures, and content-addressable storage. MD5 is broken for security but still used for non-security
+        checksums.</li>
+    </ul>
+
+    <div class="example">
+      <div class="example-label">Real World: Amazon S3 ETags</div>
+      <p>When uploading a file to S3, AWS computes and stores an ETag (typically an MD5 hash for small files). When
+        you download the file, you can verify the ETag to detect any corruption that occurred during transfer or
+        storage. This is called end-to-end integrity checking.</p>
+    </div>
+  </div>
+
+<div class="section" id="proxy">
+    <h1 class="section-title">Proxy &amp; Reverse Proxy</h1>
+    <p class="section-subtitle">Module 4 &nbsp;|&nbsp; Traffic Intermediaries: Forward Proxies, Reverse Proxies, and
+      Service Meshes</p>
+
+    <h2>Forward Proxy vs. Reverse Proxy</h2>
+    <div class="mermaid">
+      flowchart LR
+      subgraph Forward Proxy
+      C1[Client] --> FP[Forward Proxy\ne.g. Squid, VPN]
+      FP --> I[Internet / Server]
+      end
+      subgraph Reverse Proxy
+      C2[Client] --> RP[Reverse Proxy\ne.g. Nginx, Cloudflare]
+      RP --> S1[Server A]
+      RP --> S2[Server B]
+      end
+    </div>
+
+    <div class="compare">
+      <div class="compare-card neutral">
+        <h4>Forward Proxy</h4>
+        <ul>
+          <li>Client-side intermediary — client is aware of it</li>
+          <li><strong>Hides the client's identity</strong> from the destination server</li>
+          <li>Enforces outbound access policies (egress filtering)</li>
+          <li>Caches outbound responses for bandwidth savings</li>
+          <li>Used in: corporate networks, schools, VPNs, Tor</li>
+        </ul>
+        <p><strong>Real-world:</strong> Squid Proxy, Charles Proxy (debug mobile traffic), Privoxy</p>
+      </div>
+      <div class="compare-card neutral">
+        <h4>Reverse Proxy</h4>
+        <ul>
+          <li>Server-side intermediary — client doesn't know backend topology</li>
+          <li><strong>Hides server identity</strong> — clients see one IP/domain</li>
+          <li>SSL/TLS termination (offload crypto from app servers)</li>
+          <li>Load balancing, health checks, failover</li>
+          <li>Static asset caching, compression, DDoS mitigation</li>
+        </ul>
+        <p><strong>Real-world:</strong> Nginx, Cloudflare, AWS ALB, Traefik, HAProxy, Varnish</p>
+      </div>
+    </div>
+
+    <h2>Nginx as a Reverse Proxy: What It Actually Does</h2>
+    <div class="def">
+      <dt>SSL/TLS Termination</dt>
+      <dd>Nginx handles the expensive HTTPS handshake and decryption. Requests flow internally as
+        plain HTTP. This keeps TLS certificates centralized and removes crypto load from app servers.
+        A single Nginx instance can handle ~10,000 TLS connections/sec on commodity hardware.</dd>
+      <dt>Connection Pooling (Keepalive)</dt>
+      <dd>Nginx maintains a pool of persistent connections to upstream app servers (upstream keepalive).
+        Without this, each proxied request requires a new TCP handshake to the backend — 3-way handshake
+        adds ~0.5–2ms per request. With keepalive, the connection is reused: ~0.05ms overhead.</dd>
+      <dt>Request Buffering</dt>
+      <dd>Nginx fully buffers slow client uploads before forwarding to the app server. This prevents
+        "slow client" attacks from tying up app server threads. The app server sees a fast, complete
+        request — not a slow trickle.</dd>
+      <dt>Static File Serving</dt>
+      <dd>Nginx serves static files at ~50–100K RPS from disk with sendfile() syscall (zero-copy, kernel-level).
+        App servers (Node.js, Python) max out at ~5K RPS for static files. Always offload statics to Nginx or CDN.
+      </dd>
+    </div>
+
+    <h2>Service Mesh: The Sidecar Proxy Pattern</h2>
+    <p>In a microservices architecture, a <strong>service mesh</strong> deploys a lightweight reverse proxy
+      (sidecar) beside every service instance. The sidecar handles all network traffic — the app doesn't
+      need to implement retries, mTLS, circuit breaking, or observability itself.</p>
+
+    <div class="mermaid">
+      flowchart LR
+      subgraph Pod A
+      A[Service A] <--> SA[Sidecar\nEnvoy]
+        end
+        subgraph Pod B
+        B[Service B] <--> SB[Sidecar\nEnvoy]
+          end
+          SA <-->|mTLS\nretry\ntracing| SB
+            CP[Control Plane\nIstion / Linkerd] -.->|config| SA
+            CP -.->|config| SB
+    </div>
+
+    <div class="def">
+      <dt>What the sidecar (Envoy) provides:</dt>
+      <dd>
+        <ul>
+          <li><strong>mTLS</strong> — automatic mutual TLS between services (zero trust)</li>
+          <li><strong>Circuit breaking</strong> — stop sending to failing upstreams</li>
+          <li><strong>Retries with jitter</strong> — configurable retry policies</li>
+          <li><strong>Distributed tracing</strong> — propagates trace headers automatically</li>
+          <li><strong>Traffic splitting</strong> — canary/blue-green at the network layer</li>
+        </ul>
+      </dd>
+      <dt>Performance cost of a sidecar:</dt>
+      <dd>Envoy adds ~0.2–0.5ms per hop and ~10–15MB RAM per instance. At Lyft scale (Envoy's origin),
+        this overhead is worth the security and observability gains. At small scale (&lt;20 services),
+        a service mesh may be overkill.</dd>
+      <dt>Real-world: Lyft, Airbnb, Google</dt>
+      <dd>Lyft created Envoy in 2015 because their service-to-service communication had no visibility.
+        Airbnb runs SmartStack (their own service mesh). Google invented gRPC and builds products with
+        their own internal mesh (Traffic Director). Netflix uses Zuul as an edge proxy and Eureka for
+        service discovery — a form of mesh without a dedicated sidecar.</dd>
+    </div>
+
+    <h2>Proxy Use Cases in FAANG System Design Interviews</h2>
+    <div class="callout tip">
+      <div class="callout-title">When to mention proxy in your design</div>
+      <ul>
+        <li><strong>Any public-facing API:</strong> mention reverse proxy for TLS termination, rate limiting, and
+          DDoS protection at the edge (Cloudflare/CDN)</li>
+        <li><strong>Microservices:</strong> mention service mesh (Istio/Envoy) for mTLS, circuit breaking, and
+          distributed tracing without app code changes</li>
+        <li><strong>Database connections:</strong> mention a connection proxy (PgBouncer for PostgreSQL, ProxySQL
+          for MySQL) to pool thousands of app connections into tens of DB connections</li>
+        <li><strong>Multi-cloud / egress:</strong> forward proxy for controlling which external APIs services can
+          call</li>
+      </ul>
+    </div>
+
+    <div class="def">
+      <dt>PgBouncer — The Database Connection Proxy</dt>
+      <dd>PostgreSQL creates a new OS process per connection (~5–10MB RAM each). A Node.js app with
+        100 instances × 10 connection pool = 1,000 connections = 10GB RAM just for idle connections.
+        PgBouncer sits in front of Postgres and multiplexes thousands of app connections onto ~20–50
+        actual DB connections. Transactions are serialized through the real connections.
+        Shopify runs PgBouncer in front of all their PostgreSQL clusters.
+        <strong>Result:</strong> DB can scale to 10K+ app instances without adding more DB connections.
+      </dd>
+    </div>
+  </div>
+
+
+      <div class="page-nav">
+        <a class="page-nav-btn" href="03-tradeoffs.html">&#8592; Trade-offs</a>
+        <a class="page-nav-btn home" href="../system-design-complete.html">&#9776; All Topics</a>
+        <a class="page-nav-btn" href="05-infrastructure.html">Infrastructure &#8594;</a>
+      </div>
+    </div>
+  </div>
+
+  <button id="back-to-top" title="Back to top" aria-label="Back to top">&#8593;</button>
+
+  <script>
+    mermaid.initialize({
+      startOnLoad: false,
+      theme: 'default',
+      themeVariables: {
+        primaryColor: '#e8f4fd',
+        primaryTextColor: '#1e293b',
+        primaryBorderColor: '#93c5fd',
+        lineColor: '#64748b',
+        secondaryColor: '#f0fdf4',
+        tertiaryColor: '#faf5ff',
+        background: '#ffffff',
+        mainBkg: '#f8fafc',
+        nodeBorder: '#cbd5e1',
+        clusterBkg: '#f1f5f9',
+        titleColor: '#1e293b',
+        edgeLabelBackground: '#ffffff',
+        attributeBackgroundColorEven: '#f8fafc',
+        attributeBackgroundColorOdd: '#f1f5f9'
+      },
+      flowchart: { useMaxWidth: true, htmlLabels: true, curve: 'basis' },
+      sequence: { useMaxWidth: true },
+      stateDiagram: { useMaxWidth: true },
+      securityLevel: 'loose'
+    });
+
+    // ── Section switching (same-page nav items only) ──
+    const pageSections = document.querySelectorAll('.section');
+    const subItems     = document.querySelectorAll('.acc-sub-item[data-sec]');
+    const pb           = document.getElementById('pb');
+
+    function showSection(id) {
+      pageSections.forEach(s => s.classList.remove('active'));
+      subItems.forEach(n => n.classList.remove('active'));
+      const target = document.getElementById(id);
+      if (target) {
+        target.classList.add('active');
+        const diags = target.querySelectorAll('.mermaid:not([data-processed])');
+        if (diags.length) mermaid.run({ nodes: diags });
+        // Scroll content area to top, NOT the whole window
+        const main = document.querySelector('.main');
+        if (main) main.scrollTo(0, 0);
+      }
+      const item = document.querySelector(`.acc-sub-item[data-sec="${id}"]`);
+      if (item) item.classList.add('active');
+      updateProgress(id);
+    }
+
+    function updateProgress(activeId) {
+      const ids = Array.from(subItems).map(n => n.dataset.sec);
+      const idx = ids.indexOf(activeId);
+      const pct = idx >= 0 ? Math.round(((idx + 1) / ids.length) * 100) : 0;
+      pb.style.width = pct + '%';
+    }
+
+    subItems.forEach(item => {
+      item.addEventListener('click', () => {
+        if (item.dataset.sec) showSection(item.dataset.sec);
+      });
+    });
+
+    // On load: check URL hash for deep link from another page
+    const hash = window.location.hash.slice(1);
+    if (hash && document.getElementById(hash)) {
+      showSection(hash);
+    } else if (subItems.length) {
+      showSection(subItems[0].dataset.sec);
+    }
+
+    // Scroll progress
+    const mainEl = document.querySelector('.main');
+    if (mainEl) {
+      mainEl.style.overflowY = 'auto';
+      mainEl.style.height = '100vh';
+      mainEl.addEventListener('scroll', () => {
+        const scrolled = mainEl.scrollTop + mainEl.clientHeight;
+        const total = mainEl.scrollHeight;
+        if (total > 0) pb.style.width = Math.min(100, Math.round((scrolled / total) * 100)) + '%';
+      });
+    }
+
+    const bttBtn = document.getElementById('back-to-top');
+    (mainEl || window).addEventListener('scroll', () => {
+      const top = mainEl ? mainEl.scrollTop : window.scrollY;
+      bttBtn.classList.toggle('visible', top > 500);
+    });
+    bttBtn.addEventListener('click', () => {
+      if (mainEl) mainEl.scrollTo({top:0,behavior:'smooth'});
+      else window.scrollTo({top:0,behavior:'smooth'});
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,123 @@
+<div class="section" id="storage">
+    <h1 class="section-title">Storage Systems</h1>
+    <p class="section-subtitle">Module 5 &nbsp;|&nbsp; Object Storage, Block Storage, File Systems, and Choosing the
+        Right Store</p>
+
+    <h2>Storage Types at a Glance</h2>
+    <div class="table-wrap">
+        <table>
+            <tr>
+                <th>Type</th>
+                <th>Interface</th>
+                <th>Best For</th>
+                <th>Latency</th>
+                <th>Cost/GB</th>
+                <th>Examples</th>
+            </tr>
+            <tr>
+                <td><strong>Block Storage</strong></td>
+                <td>Raw disk blocks (mount as drive)</td>
+                <td>Databases, VMs, low-latency I/O</td>
+                <td>0.1–1ms (NVMe SSD)</td>
+                <td>High ($0.10–0.25/GB)</td>
+                <td>AWS EBS, GCP Persistent Disk, NetApp</td>
+            </tr>
+            <tr>
+                <td><strong>File Storage (NAS)</strong></td>
+                <td>POSIX filesystem (NFS/SMB)</td>
+                <td>Shared home dirs, content repos, legacy apps</td>
+                <td>1–10ms</td>
+                <td>Medium ($0.05–0.15/GB)</td>
+                <td>AWS EFS, Azure Files, NFS</td>
+            </tr>
+            <tr>
+                <td><strong>Object Storage</strong></td>
+                <td>HTTP REST (PUT/GET/DELETE key)</td>
+                <td>Blobs, images, video, backups, data lake</td>
+                <td>10–200ms (first byte)</td>
+                <td>Low ($0.02–0.05/GB)</td>
+                <td>AWS S3, GCS, Azure Blob, Cloudflare R2</td>
+            </tr>
+            <tr>
+                <td><strong>In-Memory</strong></td>
+                <td>Key-value API</td>
+                <td>Session cache, real-time leaderboards</td>
+                <td>&lt;1ms</td>
+                <td>Very High ($5–20/GB)</td>
+                <td>Redis, Memcached, Apache Ignite</td>
+            </tr>
+        </table>
+    </div>
+
+    <h2>Object Storage: S3 Architecture &amp; Design Decisions</h2>
+    <p>Amazon S3 is one of the most studied distributed systems. Understanding how it works reveals
+        fundamental distributed storage patterns.</p>
+
+    <div class="def">
+        <dt>Key-Value Namespace</dt>
+        <dd>S3 objects are stored by a flat key (e.g., <code>photos/user42/profile.jpg</code>). There are
+            no real directories — the "/" is just part of the key name. S3 partitions the keyspace by prefix
+            hash, so keys with the same prefix go to the same partition. <strong>Implication:</strong> If you
+            name all keys with a date prefix (<code>2024-01-15-image.jpg</code>), all January keys hit the same
+            partition → hot partition. Add a random prefix hash to distribute: <code>a7f3/2024-01-15-image.jpg</code>.
+        </dd>
+        <dt>Durability: 11 Nines (99.999999999%)</dt>
+        <dd>S3 achieves this by storing data in multiple AZs using erasure coding. An object is split into
+            chunks and encoded with parity such that it can be reconstructed even if multiple chunks are lost.
+            This is far cheaper than 3× full replication while providing stronger durability.</dd>
+        <dt>Eventual Consistency (Historically) → Strong Now</dt>
+        <dd>Until 2020, S3 offered only eventual consistency for LIST operations — a PUT followed immediately
+            by GET/LIST might not return the new object. AWS moved S3 to strong read-after-write consistency
+            in December 2020, at no performance cost. A key lesson: eventual consistency can sometimes be
+            eliminated without sacrificing performance if the architecture allows it.</dd>
+        <dt>S3 Pricing Levers</dt>
+        <dd>S3 Standard ($0.023/GB) → S3-IA ($0.0125/GB) → S3 Glacier ($0.004/GB) → S3 Glacier Deep Archive
+            ($0.00099/GB).
+            Lifecycle policies auto-tier objects. Netflix saves ~$20M/year by tiering old content to Glacier.</dd>
+    </div>
+
+    <h2>Block Storage Internals (EBS)</h2>
+    <div class="mermaid">
+        flowchart LR
+        EC2[EC2 Instance] -->|NVMe over\ntransport| EBS[EBS Volume\nSSD-backed]
+        EBS --> R1[Replica 1\nSame AZ]
+        EBS --> R2[Replica 2\nSame AZ]
+        EBS -.->|Snapshot| S3[(S3 Object Store\nCross-AZ durability)]
+    </div>
+
+    <div class="def">
+        <dt>EBS vs. Instance Store</dt>
+        <dd><strong>EBS:</strong> Network-attached, persistent. Volume survives instance termination. Max: 64TB, 256K
+            IOPS (io2 Block Express). Costs money.
+            <br><strong>Instance Store (ephemeral):</strong> Physically attached NVMe — millions of IOPS with &lt;100μs
+            latency. Wiped on instance stop/terminate. Used for: Kafka broker local logs, database temp files, cache
+            warmer. Free (included in instance price).
+        </dd>
+        <dt>IOPS vs. Throughput on EBS</dt>
+        <dd>IOPS (I/O operations/second) matters for random I/O (OLTP databases — many small reads/writes).
+            Throughput (MB/s) matters for sequential I/O (Kafka, video encoding, log tailing). A gp3 EBS allows
+            you to independently configure both: up to 16,000 IOPS and 1,000 MB/s on the same volume.</dd>
+    </div>
+
+    <h2>Choosing the Right Storage</h2>
+    <div class="mermaid">
+        flowchart TD
+        Q1{What type of data?} --> D[Database rows\nindexes]
+        Q1 --> B[Binary blobs\nimages video files]
+        Q1 --> C[Structured logs\napp state]
+        D --> DB[Block Storage\nEBS / local SSD\nMount as DB data dir]
+        B --> OBJ[Object Storage\nS3 / GCS\nHTTP GET by key]
+        C --> MIX{Access pattern?}
+        MIX -->|Sequential read| OBJ2[Object Storage\nor append log]
+        MIX -->|Random access| DB2[Block Storage\nor KV store]
+    </div>
+
+    <div class="callout tip">
+        <div class="callout-title">FAANG Design Principle: Separate Compute and Storage</div>
+        <p>Modern cloud-native systems separate compute (stateless, ephemeral) from storage (persistent, separate tier).
+            This enables independent scaling — add more compute without adding more storage, and vice versa.
+            Databricks, Snowflake, and BigQuery all run compute in one layer and store data in S3/GCS — this is
+            the "lakehouse" architecture and is how FAANG handles exabyte-scale analytics without buying dedicated
+            storage hardware.</p>
+    </div>
+</div>

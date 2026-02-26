@@ -14,7 +14,7 @@
             color: var(--dk-text);
         }
 
-        
+
         /* ─── Hero ─────────────────────── */
         .hero {
             padding: 7rem 0 5.5rem;
@@ -75,24 +75,22 @@
 
         /* ─── Metrics ───────────────────── */
         .metrics {
-            display: flex;
-            gap: 0;
-            flex-wrap: wrap;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 1px;
             margin-bottom: 3rem;
             border: 1px solid var(--dk-border);
             border-radius: var(--radius-md);
             overflow: hidden;
+            background: var(--dk-border);
         }
 
         .metric {
-            flex: 1;
-            min-width: 120px;
+            background: var(--dk-surface);
             padding: 1.5rem 1.75rem;
-            border-right: 1px solid var(--dk-border);
-        }
-
-        .metric:last-child {
-            border-right: none;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
         }
 
         .metric-value {
@@ -207,17 +205,17 @@
         .diff-list {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-            gap: 0;
+            gap: 1px;
             margin-top: 2.5rem;
             border: 1px solid var(--dk-border);
             border-radius: var(--radius-md);
             overflow: hidden;
+            background: var(--dk-border);
         }
 
         .diff-item {
+            background: var(--dk-surface);
             padding: 1.1rem 1.4rem;
-            border-right: 1px solid var(--dk-border);
-            border-bottom: 1px solid var(--dk-border);
             font-size: 0.85rem;
             color: var(--dk-muted);
             font-weight: 500;

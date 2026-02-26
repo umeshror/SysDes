@@ -1,0 +1,170 @@
+<div class="section" id="dist-fundamentals">
+    <h1 class="section-title">Distributed Systems Fundamentals</h1>
+    <p class="section-subtitle">Module 9 &nbsp;|&nbsp; Fallacies, Failure Modes, Replication, and the FLP Impossibility
+    </p>
+
+    <h2>The 8 Fallacies of Distributed Computing</h2>
+    <p>Originally enumerated by L. Peter Deutsch and James Gosling at Sun Microsystems. Every distributed
+        system that ignores these eventually breaks in production.</p>
+
+    <div class="table-wrap">
+        <table>
+            <tr>
+                <th>#</th>
+                <th>Fallacy</th>
+                <th>The Real-World Pain</th>
+                <th>Mitigation</th>
+            </tr>
+            <tr>
+                <td>1</td>
+                <td><strong>"The network is reliable"</strong></td>
+                <td>Packets are dropped, NIC crashes, cables are unplugged. 1 in every 10M TCP packets retransmits.</td>
+                <td>Retries, idempotency, circuit breakers</td>
+            </tr>
+            <tr>
+                <td>2</td>
+                <td><strong>"Latency is zero"</strong></td>
+                <td>Cross-AZ: 0.5–2ms. Cross-region (US <-> EU): 80–100ms. Cross-continent: 150–300ms.</td>
+                <td>Async communication, minimize hops, co-locate</td>
+            </tr>
+            <tr>
+                <td>3</td>
+                <td><strong>"Bandwidth is infinite"</strong></td>
+                <td>Chatty microservices generate 10GB/day of internal traffic. N+1 query fan-outs saturate links.</td>
+                <td>Data compression, pagination, projection</td>
+            </tr>
+            <tr>
+                <td>4</td>
+                <td><strong>"The network is secure"</strong></td>
+                <td>ARP spoofing, MITM inside "trusted" VPCs, supply-chain attacks.</td>
+                <td>mTLS, zero trust, end-to-end encryption</td>
+            </tr>
+            <tr>
+                <td>5</td>
+                <td><strong>"Topology doesn't change"</strong></td>
+                <td>Pods are deleted and recreated. IP addresses change. DNS TTL caches stale IPs.</td>
+                <td>Service discovery (Consul, etcd, k8s svc)</td>
+            </tr>
+            <tr>
+                <td>6</td>
+                <td><strong>"There is one administrator"</strong></td>
+                <td>Infra team, DB team, app team, SRE team, security team all have different constraints</td>
+                <td>Clear ownership, runbooks, IaC</td>
+            </tr>
+            <tr>
+                <td>7</td>
+                <td><strong>"Transport cost is zero"</strong></td>
+                <td>AWS cross-region data transfer: $0.09/GB. 10TB/month = $900/month just for data movement.</td>
+                <td>Data locality, compression, CDN</td>
+            </tr>
+            <tr>
+                <td>8</td>
+                <td><strong>"The network is homogeneous"</strong></td>
+                <td>Mobile clients have 200ms latency + 2% packet loss. Corporate proxies strip headers.</td>
+                <td>Adaptive protocols, fallback mechanisms</td>
+            </tr>
+        </table>
+    </div>
+
+    <h2>Failure in Distributed Systems: The Spectrum</h2>
+    <div class="mermaid">
+        flowchart LR
+        subgraph Failure Types
+        C[Crash Failure\nNode stops\ncompletely] --> O[Omission Failure\nMessages dropped\nbut node responds]
+        O --> T[Timing Failure\nSlow response\nbeyond expected]
+        T --> B[Byzantine Failure\nNode responds\nincorrectly or maliciously]
+        end
+        B --> Worst[Hardest to detect\nand handle]
+        C --> Easiest[Easiest to handle\ndetect via heartbeat]
+    </div>
+
+    <div class="def">
+        <dt>Byzantine Fault Tolerance (BFT)</dt>
+        <dd>A Byzantine fault is when a node sends arbitrary, incorrect, or conflicting messages — possibly
+            maliciously. Tolerating F Byzantine faults requires 3F+1 nodes (vs. just 2F+1 for crash faults).
+            BFT is used in: blockchain consensus (Tendermint, BFT-SMaRt), aircraft flight control systems,
+            and some financial infrastructure. Most distributed databases only handle crash faults (much simpler).</dd>
+        <dt>The Two Generals Problem</dt>
+        <dd>Two generals must coordinate an attack via messenger — but messengers can be captured. The problem
+            proves that it is <strong>impossible to achieve guaranteed consensus</strong> over an unreliable channel.
+            Real-world: TCP's 3-way handshake is the practical "good enough" solution — it doesn't guarantee perfect
+            agreement but makes the probability of desynchronization negligible.</dd>
+    </div>
+
+    <h2>Exactly-Once Semantics: Theory vs. Reality</h2>
+    <div class="compare">
+        <div class="compare-card con">
+            <h4>At-Most-Once</h4>
+            <ul>
+                <li>Fire and forget — no retry</li>
+                <li>May lose messages</li>
+                <li>UDP, StatsD metrics</li>
+            </ul>
+        </div>
+        <div class="compare-card neutral">
+            <h4>At-Least-Once</h4>
+            <ul>
+                <li>Retry until acknowledged</li>
+                <li>May deliver duplicates</li>
+                <li>Most queues: Kafka (default), SQS</li>
+            </ul>
+        </div>
+        <div class="compare-card pro">
+            <h4>Exactly-Once</h4>
+            <ul>
+                <li>No loss, no duplicates</li>
+                <li>Requires idempotency keys + transactional state</li>
+                <li>Kafka exactly-once (transactions API, ~2019)</li>
+                <li>Payment processing, financial ledgers</li>
+            </ul>
+        </div>
+    </div>
+    <div class="callout warn">
+        <div class="callout-title">Exactly-Once is an Illusion — Idempotency is the Reality</div>
+        <p>True exactly-once delivery across systems is extremely expensive (2PC, distributed transactions).
+            Most engineering teams implement <strong>at-least-once delivery + idempotent consumers</strong>.
+            An idempotent consumer stores a processed-message-id set. If a message is re-delivered (duplicate),
+            the consumer detects it and skips. Stripe generates an idempotency key per payment — if the request
+            is retried, the same charge is not double-applied.</p>
+    </div>
+
+    <h2>FLP Impossibility: Why Consensus is Hard</h2>
+    <div class="def">
+        <dt>Fischer, Lynch, Patterson (1985) — Nobel Prize level insight</dt>
+        <dd>It is <strong>impossible</strong> to design a deterministic consensus algorithm that guarantees
+            both <em>safety</em> (all nodes agree on the same value) and <em>liveness</em> (the algorithm always
+            terminates) in a purely asynchronous system where even one node can fail by crashing.
+            <br><br>
+            <strong>Practical interpretation:</strong> Raft and Paxos work around FLP by using timeouts and leader
+            election. They may fail to make progress during extreme network partitions (sacrificing liveness), but
+            they never make incorrect decisions (maintaining safety). This is the "bias toward safety" principle:
+            it's better to stop (be unavailable) than to make a wrong decision.
+        </dd>
+    </div>
+
+    <h2>Replication Topologies</h2>
+    <div class="mermaid">
+        flowchart TD
+        subgraph Primary-Replica
+        M1[Primary] -->|async| R1[Replica 1]
+        M1 -->|async| R2[Replica 2]
+        end
+        subgraph Multi-Primary
+        L1[Leader 1] <-->|sync| L2[Leader 2]
+            L1 <-->|sync| L3[Leader 3]
+                end
+                subgraph Leaderless
+                N1[Node 1] <-->|quorum| N2[Node 2]
+                    N2 <-->|quorum| N3[Node 3]
+                        N1 <-->|quorum| N3
+                            end
+    </div>
+
+    <div class="def">
+        <dt>Leaderless replication (Dynamo-style)</dt>
+        <dd>No single leader. Any node accepts reads/writes. Uses quorum: write to W of N nodes; read from R of N nodes.
+            Set W + R &gt; N to guarantee reading at least one node with the latest write.
+            Common setting: N=3, W=2, R=2. Cassandra, Riak, and Voldemort use this model.
+            Trade-off: no strict ordering, conflicts possible — resolved by last-write-wins or CRDTs.</dd>
+    </div>
+</div>

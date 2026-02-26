@@ -1,0 +1,1078 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="System Design Reference — Interview Framework">
+  <title>🎯 Interview Framework — System Design Fundamentals</title>
+  <link rel="stylesheet" href="../styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+  <style>
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      font-size: 15px;
+      line-height: 1.7;
+      color: #1a1a2e;
+      background: #f4f6f9;
+    }
+
+    /* ---- Layout ---- */
+    .layout {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    .sidebar {
+      width: 300px;
+      min-width: 300px;
+      background: #1a1a2e;
+      color: #cdd6f4;
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 100vh;
+      overflow-y: auto;
+      z-index: 100;
+      padding-bottom: 40px;
+    }
+
+    .sidebar-header {
+      padding: 24px 20px 16px;
+      border-bottom: 1px solid #2d2d4e;
+      position: sticky;
+      top: 0;
+      background: #1a1a2e;
+      z-index: 1;
+    }
+
+    .sidebar-header h1 {
+      font-size: 1rem;
+      font-weight: 700;
+      color: #89b4fa;
+      letter-spacing: 0.3px;
+      margin-bottom: 4px;
+    }
+
+    .sidebar-header p {
+      font-size: 0.75rem;
+      color: #6c7086;
+    }
+
+    .nav-module {
+      margin: 6px 0;
+    }
+
+    .nav-module-title {
+      padding: 10px 20px 6px;
+      font-size: 0.68rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #585b70;
+    }
+
+    .nav-item {
+      display: block;
+      padding: 7px 20px 7px 28px;
+      font-size: 0.82rem;
+      color: #a6adc8;
+      cursor: pointer;
+      border-left: 3px solid transparent;
+      transition: all 0.15s;
+    }
+
+    .nav-item:hover {
+      background: #252540;
+      color: #cdd6f4;
+    }
+
+    .nav-item.active {
+      background: #1e2050;
+      border-left-color: #89b4fa;
+      color: #89b4fa;
+      font-weight: 600;
+    }
+
+    /* ---- Main content ---- */
+    .main {
+      margin-left: 300px;
+      flex: 1;
+      padding: 0;
+    }
+
+    .progress-bar-wrap {
+      position: fixed;
+      top: 0;
+      left: 300px;
+      right: 0;
+      height: 3px;
+      background: #2d2d4e;
+      z-index: 200;
+    }
+
+    .progress-bar {
+      height: 100%;
+      background: linear-gradient(90deg, #89b4fa, #b4befe);
+      transition: width 0.3s;
+      width: 0%;
+    }
+
+    .section {
+      display: none;
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 48px 48px 80px;
+    }
+
+    .section.active {
+      display: block;
+      animation: fadein 0.25s ease;
+    }
+
+    @keyframes fadein {
+      from {
+        opacity: 0;
+        transform: translateY(8px);
+      }
+
+      to {
+        opacity: 1;
+        transform: none;
+      }
+    }
+
+    /* ---- Typography ---- */
+    .section-title {
+      font-size: 1.9rem;
+      font-weight: 800;
+      color: #1a1a2e;
+      margin-bottom: 6px;
+      padding-bottom: 14px;
+      border-bottom: 3px solid #89b4fa;
+    }
+
+    .section-subtitle {
+      font-size: 0.85rem;
+      color: #6c7086;
+      margin-bottom: 36px;
+    }
+
+    h2 {
+      font-size: 1.45rem;
+      font-weight: 700;
+      color: #1a1a2e;
+      margin: 44px 0 14px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid #e0e4f0;
+    }
+
+    h3 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #2d2d4e;
+      margin: 30px 0 10px;
+    }
+
+    h4 {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #3d3d6e;
+      margin: 22px 0 8px;
+    }
+
+    p {
+      margin-bottom: 12px;
+      color: #333355;
+    }
+
+    ul,
+    ol {
+      margin: 8px 0 14px 22px;
+    }
+
+    li {
+      margin-bottom: 5px;
+      color: #333355;
+    }
+
+    li strong {
+      color: #1a1a2e;
+    }
+
+    /* ---- Callout boxes ---- */
+    .callout {
+      border-radius: 6px;
+      padding: 18px 22px;
+      margin: 20px 0;
+      font-size: 0.9rem;
+    }
+
+    .callout-title {
+      font-weight: 700;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 6px;
+    }
+
+    .callout.info {
+      background: #eff6ff;
+      border-left: 4px solid #3b82f6;
+    }
+
+    .callout.info .callout-title {
+      color: #1d4ed8;
+    }
+
+    .callout.warn {
+      background: #fffbeb;
+      border-left: 4px solid #f59e0b;
+    }
+
+    .callout.warn .callout-title {
+      color: #b45309;
+    }
+
+    .callout.tip {
+      background: #f0fdf4;
+      border-left: 4px solid #22c55e;
+    }
+
+    .callout.tip .callout-title {
+      color: #15803d;
+    }
+
+    .callout.danger {
+      background: #fff1f2;
+      border-left: 4px solid #f43f5e;
+    }
+
+    .callout.danger .callout-title {
+      color: #be123c;
+    }
+
+    /* ---- Example / Real World ---- */
+    .example {
+      background: #f8faff;
+      border: 1px solid #dde3f5;
+      border-radius: 8px;
+      padding: 20px 24px;
+      margin: 20px 0;
+    }
+
+    .example-label {
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: #6c7086;
+      margin-bottom: 8px;
+    }
+
+    .example h4 {
+      margin-top: 0;
+    }
+
+    /* ---- Code blocks ---- */
+    pre,
+    code {
+      font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
+    }
+
+    pre {
+      background: #1e1e2e;
+      color: #cdd6f4;
+      padding: 20px 24px;
+      border-radius: 8px;
+      overflow-x: auto;
+      margin: 16px 0;
+      font-size: 0.84rem;
+      line-height: 1.6;
+    }
+
+    code {
+      background: #eef0f8;
+      color: #1a1a2e;
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-size: 0.85em;
+    }
+
+    pre code {
+      background: transparent;
+      color: inherit;
+      padding: 0;
+      border-radius: 0;
+      font-size: inherit;
+    }
+
+    /* ---- Tables ---- */
+    .table-wrap {
+      overflow-x: auto;
+      margin: 20px 0;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.88rem;
+    }
+
+    th {
+      background: #1a1a2e;
+      color: #cdd6f4;
+      padding: 10px 14px;
+      text-align: left;
+      font-weight: 600;
+      font-size: 0.82rem;
+      letter-spacing: 0.3px;
+    }
+
+    td {
+      padding: 9px 14px;
+      border-bottom: 1px solid #e8ebf5;
+      vertical-align: top;
+    }
+
+    tr:nth-child(even) td {
+      background: #f8f9fe;
+    }
+
+    /* ---- Comparison grid ---- */
+    .compare {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin: 20px 0;
+    }
+
+    .compare.three {
+      grid-template-columns: 1fr 1fr 1fr;
+    }
+
+    .compare.four {
+      grid-template-columns: 1fr 1fr 1fr 1fr;
+    }
+
+    .compare-card {
+      background: white;
+      border: 1px solid #e0e4f0;
+      border-radius: 8px;
+      padding: 18px 20px;
+    }
+
+    .compare-card h4 {
+      margin-top: 0;
+    }
+
+    .compare-card.pro {
+      border-top: 3px solid #22c55e;
+    }
+
+    .compare-card.con {
+      border-top: 3px solid #f43f5e;
+    }
+
+    .compare-card.neutral {
+      border-top: 3px solid #3b82f6;
+    }
+
+    /* ---- Diagram wrapper ---- */
+    .diagram {
+      background: white;
+      border: 1px solid #e0e4f0;
+      border-radius: 8px;
+      padding: 20px;
+      margin: 20px 0;
+      overflow-x: auto;
+      text-align: center;
+    }
+
+    .diagram-caption {
+      font-size: 0.78rem;
+      color: #6c7086;
+      text-align: center;
+      margin-top: 8px;
+    }
+
+    /* ---- Tags ---- */
+    .tag {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.4px;
+      margin: 0 4px 4px 0;
+    }
+
+    .tag-interview {
+      background: #fef3c7;
+      color: #92400e;
+    }
+
+    .tag-critical {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    .tag-concept {
+      background: #ede9fe;
+      color: #5b21b6;
+    }
+
+    .tag-realworld {
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    /* ---- Definition list ---- */
+    .def {
+      margin: 12px 0 16px 0;
+    }
+
+    .def dt {
+      font-weight: 700;
+      color: #1a1a2e;
+      margin-bottom: 3px;
+    }
+
+    .def dd {
+      margin-left: 20px;
+      color: #333355;
+      margin-bottom: 10px;
+    }
+
+    /* ---- Subsection separator ---- */
+    .subsection {
+      margin-top: 48px;
+    }
+
+    @media (max-width: 768px) {
+      .sidebar {
+        width: 100%;
+        height: auto;
+        position: relative;
+      }
+
+      .main {
+        margin-left: 0;
+      }
+
+      .section {
+        padding: 24px 20px;
+      }
+
+      .compare,
+      .compare.three,
+      .compare.four {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+
+  <style id="sidebar-improvements">
+    .sidebar { width: 280px; }
+    .main    { margin-left: 280px; }
+
+    /* Header */
+    .sidebar-header {
+      background: linear-gradient(160deg,#1e1e3f 0%,#12122a 100%);
+      border-bottom: 1px solid rgba(137,180,250,0.12);
+    }
+    .sidebar-header h1 { font-size:.9rem; color:#e2e8f9; letter-spacing:.3px; }
+    .sidebar-header p  { font-size:.72rem; color:#6272a4; }
+
+    .back-link {
+      display:inline-flex; align-items:center; gap:6px;
+      font-size:.75rem; color:#89b4fa; text-decoration:none;
+      padding:4px 12px; border:1px solid rgba(137,180,250,.25);
+      border-radius:20px; transition:all .2s;
+    }
+    .back-link:hover { background:rgba(137,180,250,.1); border-color:#89b4fa; }
+
+    /* Accordion wrapper */
+    .sidebar-accordion {
+      overflow-y: auto;
+      flex: 1;
+      padding: 8px 0 24px;
+    }
+
+    /* Accordion chapter */
+    .acc-chapter {
+      border-bottom: 1px solid rgba(137,180,250,0.07);
+    }
+    .acc-chapter[open] { background: rgba(137,180,250,0.04); }
+
+    /* Summary row = clickable chapter header */
+    .acc-summary {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      cursor: pointer;
+      list-style: none;
+      user-select: none;
+      transition: background 0.15s;
+    }
+    .acc-summary::-webkit-details-marker { display: none; }
+    .acc-summary:hover { background: rgba(137,180,250,0.08); }
+    .acc-chapter[open] > .acc-summary { background: rgba(137,180,250,0.1); }
+
+    .chap-icon {
+      font-size: 1rem;
+      flex-shrink: 0;
+      width: 24px;
+      text-align: center;
+    }
+    .chap-text {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+      flex: 1;
+      min-width: 0;
+    }
+    .chap-num {
+      font-size: .58rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .8px;
+      color: #585b70;
+    }
+    .chap-label {
+      font-size: .8rem;
+      color: #a6adc8;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .acc-chapter[open] .chap-num   { color: #89b4fa; }
+    .acc-chapter[open] .chap-label { color: #cdd6f4; font-weight: 600; }
+
+    .chap-curr {
+      font-size: .45rem;
+      color: #89b4fa;
+      flex-shrink: 0;
+      animation: blink 2s infinite;
+    }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.2} }
+
+    .acc-arrow {
+      font-size: .85rem;
+      color: #585b70;
+      flex-shrink: 0;
+      transition: transform 0.2s;
+    }
+    .acc-chapter[open] .acc-arrow { transform: rotate(90deg); color:#89b4fa; }
+
+    /* Sub-items panel */
+    .acc-sub {
+      padding: 2px 0 6px 0;
+      animation: slideDown .18s ease;
+    }
+    @keyframes slideDown {
+      from { opacity:0; transform:translateY(-6px); }
+      to   { opacity:1; transform:translateY(0); }
+    }
+
+    .acc-sub-item {
+      display: block;
+      padding: 7px 14px 7px 48px;
+      font-size: .78rem;
+      color: #7f849c;
+      cursor: pointer;
+      border-left: 2px solid transparent;
+      text-decoration: none;
+      transition: all 0.14s;
+      line-height: 1.35;
+    }
+    .acc-sub-item:hover {
+      color: #cdd6f4;
+      background: rgba(137,180,250,0.07);
+      border-left-color: rgba(137,180,250,.4);
+    }
+    .acc-sub-item.active {
+      color: #cdd6f4;
+      background: rgba(137,180,250,0.12);
+      border-left-color: #89b4fa;
+      font-weight: 600;
+    }
+
+    /* Page nav */
+    .page-nav {
+      display:flex; justify-content:space-between; align-items:center;
+      padding:28px 40px 48px; border-top:1px solid #e0e4f0;
+      margin-top:24px; gap:12px;
+    }
+    .page-nav-btn {
+      display:inline-flex; align-items:center; gap:8px;
+      padding:10px 22px; background:#1a1a2e; color:#cdd6f4;
+      border-radius:8px; text-decoration:none; font-size:.84rem;
+      font-weight:600; transition:all .18s;
+      border:1px solid rgba(137,180,250,.15);
+    }
+    .page-nav-btn:hover {
+      background:#313244; border-color:rgba(137,180,250,.35);
+      transform:translateY(-1px); box-shadow:0 4px 12px rgba(0,0,0,.2);
+    }
+    .page-nav-btn.home { background:linear-gradient(135deg,#1e3a5f,#162d48); }
+    .page-nav-btn.home:hover { background:linear-gradient(135deg,#264a78,#1e3a5f); }
+
+    @media (max-width:768px) { .sidebar{width:100%} .main{margin-left:0} }
+
+    /* ── Mermaid diagram consistency ── */
+    .mermaid {
+      background: transparent !important;
+      padding: 0 !important;
+    }
+    .mermaid svg {
+      background: transparent !important;
+      max-width: 100%;
+    }
+    /* Override Mermaid's internal background rect (dark in state/sequence diagrams) */
+    .mermaid svg > rect:first-child,
+    .mermaid svg > g:first-child > rect:first-child {
+      fill: transparent !important;
+      stroke: none !important;
+    }
+    /* State diagram node styling */
+    .mermaid .state-note rect,
+    .mermaid .note rect { fill: #fffbdd !important; stroke: #e6d87a !important; }
+    /* Ensure subgraph labels are readable */
+    .mermaid .cluster rect { fill: #f1f5f9 !important; stroke: #cbd5e1 !important; }
+    .mermaid .cluster text { fill: #475569 !important; }
+    /* Entity / node labels */
+    .mermaid .label { color: #1e293b !important; }
+    .mermaid .nodeLabel { color: #1e293b !important; }
+    .mermaid .edgeLabel { background: #fff !important; color: #475569 !important; }
+  </style>
+
+</head>
+<body>
+  <div class="layout">
+
+    <nav class="sidebar" style="display:flex;flex-direction:column">
+      <div class="sidebar-header">
+        <div style="margin-bottom:14px">
+          <a href="../index.html" class="back-link">&#8592; Back to Home</a>
+        </div>
+        <h1>System Design Fundamentals</h1>
+        <p>180+ topics &nbsp;|&nbsp; Complete Reference</p>
+      </div>
+
+      <div class="sidebar-accordion">
+        <details class="acc-chapter">
+          <summary class="acc-summary">
+            <span class="chap-icon">🚀</span>
+            <span class="chap-text">
+              <span class="chap-num">Chapter 01</span>
+              <span class="chap-label">Introduction to SDI</span>
+            </span>
+            
+            <span class="acc-arrow">›</span>
+          </summary>
+          <div class="acc-sub">
+              <a class="acc-sub-item" href="01-introduction.html#intro">The SDI Process</a>
+          </div>
+        </details>
+        <details class="acc-chapter">
+          <summary class="acc-summary">
+            <span class="chap-icon">📖</span>
+            <span class="chap-text">
+              <span class="chap-num">Chapter 02</span>
+              <span class="chap-label">Glossary of Basics</span>
+            </span>
+            
+            <span class="acc-arrow">›</span>
+          </summary>
+          <div class="acc-sub">
+              <a class="acc-sub-item" href="02-core-concepts.html#core">Core Characteristics</a>
+              <a class="acc-sub-item" href="02-core-concepts.html#cap">CAP & PACELC Theorems</a>
+              <a class="acc-sub-item" href="02-core-concepts.html#pacelc">PACELC In Depth</a>
+              <a class="acc-sub-item" href="02-core-concepts.html#hashing">Consistent Hashing</a>
+          </div>
+        </details>
+        <details class="acc-chapter">
+          <summary class="acc-summary">
+            <span class="chap-icon">⚖️</span>
+            <span class="chap-text">
+              <span class="chap-num">Chapter 03</span>
+              <span class="chap-label">Trade-offs</span>
+            </span>
+            
+            <span class="acc-arrow">›</span>
+          </summary>
+          <div class="acc-sub">
+              <a class="acc-sub-item" href="03-tradeoffs.html#tradeoffs">Topic-by-Topic Trade-offs</a>
+          </div>
+        </details>
+        <details class="acc-chapter">
+          <summary class="acc-summary">
+            <span class="chap-icon">🌐</span>
+            <span class="chap-text">
+              <span class="chap-num">Chapter 04</span>
+              <span class="chap-label">Networking</span>
+            </span>
+            
+            <span class="acc-arrow">›</span>
+          </summary>
+          <div class="acc-sub">
+              <a class="acc-sub-item" href="04-networking.html#networking">OSI, TCP/UDP, HTTP, DNS</a>
+              <a class="acc-sub-item" href="04-networking.html#proxy">Proxy & Reverse Proxy</a>
+          </div>
+        </details>
+        <details class="acc-chapter">
+          <summary class="acc-summary">
+            <span class="chap-icon">🏗️</span>
+            <span class="chap-text">
+              <span class="chap-num">Chapter 05</span>
+              <span class="chap-label">Infrastructure</span>
+            </span>
+            
+            <span class="acc-arrow">›</span>
+          </summary>
+          <div class="acc-sub">
+              <a class="acc-sub-item" href="05-infrastructure.html#lb">Load Balancing & Algorithms</a>
+              <a class="acc-sub-item" href="05-infrastructure.html#caching">Caching Strategies</a>
+              <a class="acc-sub-item" href="05-infrastructure.html#cdn">CDN & Distributed Cache</a>
+              <a class="acc-sub-item" href="05-infrastructure.html#storage">Storage Systems</a>
+          </div>
+        </details>
+        <details class="acc-chapter">
+          <summary class="acc-summary">
+            <span class="chap-icon">🔌</span>
+            <span class="chap-text">
+              <span class="chap-num">Chapter 06</span>
+              <span class="chap-label">API & Communication</span>
+            </span>
+            
+            <span class="acc-arrow">›</span>
+          </summary>
+          <div class="acc-sub">
+              <a class="acc-sub-item" href="06-api-communication.html#api-design">API Design (REST, GraphQL, gRPC)</a>
+              <a class="acc-sub-item" href="06-api-communication.html#api-infra">API Gateway & Rate Limiting</a>
+              <a class="acc-sub-item" href="06-api-communication.html#api-auth">Authentication & Authorization</a>
+              <a class="acc-sub-item" href="06-api-communication.html#realtime">Real-Time Communication</a>
+              <a class="acc-sub-item" href="06-api-communication.html#async">Async Messaging (Queues, Pub/Sub)</a>
+          </div>
+        </details>
+        <details class="acc-chapter">
+          <summary class="acc-summary">
+            <span class="chap-icon">🏛️</span>
+            <span class="chap-text">
+              <span class="chap-num">Chapter 07</span>
+              <span class="chap-label">Architecture</span>
+            </span>
+            
+            <span class="acc-arrow">›</span>
+          </summary>
+          <div class="acc-sub">
+              <a class="acc-sub-item" href="07-architecture.html#arch-patterns">Architectural Patterns</a>
+              <a class="acc-sub-item" href="07-architecture.html#microservices">Microservices & Service Mesh</a>
+              <a class="acc-sub-item" href="07-architecture.html#containers">Containers & Orchestration</a>
+          </div>
+        </details>
+        <details class="acc-chapter">
+          <summary class="acc-summary">
+            <span class="chap-icon">🗄️</span>
+            <span class="chap-text">
+              <span class="chap-num">Chapter 08</span>
+              <span class="chap-label">Data Layer</span>
+            </span>
+            
+            <span class="acc-arrow">›</span>
+          </summary>
+          <div class="acc-sub">
+              <a class="acc-sub-item" href="08-data-layer.html#db-types">Database Types</a>
+              <a class="acc-sub-item" href="08-data-layer.html#db-internals">Database Internals</a>
+              <a class="acc-sub-item" href="08-data-layer.html#db-scaling">Database Scaling</a>
+          </div>
+        </details>
+        <details class="acc-chapter">
+          <summary class="acc-summary">
+            <span class="chap-icon">🕸️</span>
+            <span class="chap-text">
+              <span class="chap-num">Chapter 09</span>
+              <span class="chap-label">Distributed Systems</span>
+            </span>
+            
+            <span class="acc-arrow">›</span>
+          </summary>
+          <div class="acc-sub">
+              <a class="acc-sub-item" href="09-distributed-systems.html#db-federation">Database Federation</a>
+              <a class="acc-sub-item" href="09-distributed-systems.html#dist-fundamentals">Challenges & Failures</a>
+              <a class="acc-sub-item" href="09-distributed-systems.html#time-ordering">Time, Ordering & Clocks</a>
+              <a class="acc-sub-item" href="09-distributed-systems.html#consensus">Consensus & Coordination</a>
+              <a class="acc-sub-item" href="09-distributed-systems.html#dist-tx">Distributed Transactions</a>
+              <a class="acc-sub-item" href="09-distributed-systems.html#data-structures">Design Data Structures</a>
+              <a class="acc-sub-item" href="09-distributed-systems.html#big-data">Big Data & Stream Processing</a>
+          </div>
+        </details>
+        <details class="acc-chapter">
+          <summary class="acc-summary">
+            <span class="chap-icon">🔍</span>
+            <span class="chap-text">
+              <span class="chap-num">Chapter 10</span>
+              <span class="chap-label">Search, Ops & Security</span>
+            </span>
+            
+            <span class="acc-arrow">›</span>
+          </summary>
+          <div class="acc-sub">
+              <a class="acc-sub-item" href="10-search-operations.html#search">FTS, Inverted Index, Ranking</a>
+              <a class="acc-sub-item" href="10-search-operations.html#disaster-recovery">Disaster Recovery & Deployments</a>
+              <a class="acc-sub-item" href="10-search-operations.html#observability">Logs, Metrics, Tracing</a>
+              <a class="acc-sub-item" href="10-search-operations.html#security">Encryption, IAM, Zero Trust</a>
+          </div>
+        </details>
+        <details class="acc-chapter" open>
+          <summary class="acc-summary">
+            <span class="chap-icon">🎯</span>
+            <span class="chap-text">
+              <span class="chap-num">Chapter 11</span>
+              <span class="chap-label">Interview Framework</span>
+            </span>
+            <span class="chap-curr">●</span>
+            <span class="acc-arrow">›</span>
+          </summary>
+          <div class="acc-sub">
+              <div class="acc-sub-item active" data-sec="framework">The 4-Step SDI Framework</div>
+          </div>
+        </details>
+      </div>
+    </nav>
+
+    <div class="main">
+      <div class="progress-bar-wrap"><div class="progress-bar" id="pb"></div></div>
+
+<div class="section active" id="framework">
+    <h1 class="section-title">System Design Interview Framework</h1>
+    <p class="section-subtitle">Module 15 &nbsp;|&nbsp; 4-Step Framework · Clarification · High-Level Design · Deep
+      Dive · Wrap-up</p>
+
+    <h2>The 4-Step System Design Framework</h2>
+    <p>A structured approach is critical in a 45-60 minute interview to ensure you cover all necessary ground without
+      getting stuck in the weeds early on.</p>
+
+    <div class="compare four">
+      <div class="compare-card neutral">
+        <h4>1. Clarify & Scope</h4>
+        <p><strong>(5-10 mins)</strong></p>
+        <ul>
+          <li>Identify users and use cases</li>
+          <li>Functional vs. Non-functional requirements</li>
+          <li>Constraints (DAU, storage, latency)</li>
+          <li>"How many users?" / "What's the peak RPS?"</li>
+        </ul>
+      </div>
+      <div class="compare-card neutral">
+        <h4>2. High-Level Design</h4>
+        <p><strong>(10-15 mins)</strong></p>
+        <ul>
+          <li>Sketch core components (LB, API, DB)</li>
+          <li>Define data flow between components</li>
+          <li>Choose the database type (SQL vs. NoSQL)</li>
+          <li>Verify the design meets functional reqs</li>
+        </ul>
+      </div>
+      <div class="compare-card neutral">
+        <h4>3. Deep Dive</h4>
+        <p><strong>(15-25 mins)</strong></p>
+        <ul>
+          <li>Apply scaling patterns (Sharding, Caching)</li>
+          <li>Address failures (Replication, Multi-region)</li>
+          <li>Detail specific APIs or Data Schemas</li>
+          <li>Solve for performance bottlenecks</li>
+        </ul>
+      </div>
+      <div class="compare-card neutral">
+        <h4>4. Wrap Up</h4>
+        <p><strong>(5 mins)</strong></p>
+        <ul>
+          <li>Summarize the final architecture</li>
+          <li>Mention alternative approaches discussed</li>
+          <li>Identify remaining weak points/limitations</li>
+          <li>Suggest monitoring/observability metrics</li>
+        </ul>
+      </div>
+    </div>
+
+    <h2>Step 1: Clarification & Scoping</h2>
+    <p>Never start designing immediately. Spend the first 5-10 minutes asking questions to eliminate ambiguity.
+      Interviewer expectations vary, so you must define the world you are building.</p>
+
+    <div class="example">
+      <div class="example-label">Example Questions for "Design Twitter"</div>
+      <ul>
+        <li>"Can users follow each other?" (Focus: Social Graph)</li>
+        <li>"Do we need to support images and videos?" (Focus: Asset Storage, CDN)</li>
+        <li>"How many users are active daily?" (Focus: Scale, Throughput)</li>
+        <li>"Is the feed sorted by time or relevance?" (Focus: Ranking service)</li>
+      </ul>
+    </div>
+
+    <h2>Step 2: High-Level Design (Proposing a Skeleton)</h2>
+    <p>Your goal is to get a working end-to-end design on the board. Don't worry about optimization yet.</p>
+    <div class="diagram">
+      <pre class="mermaid">
+graph LR
+    User[Web/Mobile Client] --> LB[Load Balancer]
+    LB --> API[API Gateway]
+    API --> Auth[Auth Service]
+    API --> Core[Core Business Logic]
+    Core --> DB[(Primary Store)]
+    Core --> Cache([Read Cache])
+</pre>
+      <p class="diagram-caption">Generic high-level architecture skeleton</p>
+    </div>
+
+    <h2>Step 3: Design Deep Dive (The "Meat" of the Interview)</h2>
+    <p>This is where you show your expertise. The interviewer will usually guide you toward specific bottlenecks.</p>
+    <div class="table-wrap">
+      <table>
+        <tr>
+          <th>Problem</th>
+          <th>Deep Dive Pattern</th>
+        </tr>
+        <tr>
+          <td>Huge write volume</td>
+          <td>LSM-Trees, Sharding, Message Queues (Buffer)</td>
+        </tr>
+        <tr>
+          <td>Huge read volume</td>
+          <td>Caching (Redis), Read Replicas, CDN</td>
+        </tr>
+        <tr>
+          <td>Slow queries</td>
+          <td>Indexing, Denormalization, Materialized Views</td>
+        </tr>
+        <tr>
+          <td>Single point of failure</td>
+          <td>Multi-leader replication, Heartbeats, Failover</td>
+        </tr>
+      </table>
+    </div>
+
+    <h2>Step 4: Wrap-up & Trade-offs</h2>
+    <p>End on a strong note by identifying what your design *doesn't* do well. This shows maturity. No system is
+      perfect; every design choice is a trade-off.</p>
+    <div class="callout tip">
+      <div class="callout-title">Pro-Tip: "The Two-Option Approach"</div>
+      <p>When making a big decision (e.g., choosing a DB), present two options, explain the trade-offs of each, and
+        then make a recommendation based on the constraints you established in Step 1.</p>
+    </div>
+
+  </div>
+
+
+      <div class="page-nav">
+        <a class="page-nav-btn" href="10-search-operations.html">&#8592; Search, Ops & Security</a>
+        <a class="page-nav-btn home" href="../system-design-complete.html">&#9776; All Topics</a>
+        <span></span>
+      </div>
+    </div>
+  </div>
+
+  <button id="back-to-top" title="Back to top" aria-label="Back to top">&#8593;</button>
+
+  <script>
+    mermaid.initialize({
+      startOnLoad: false,
+      theme: 'default',
+      themeVariables: {
+        primaryColor: '#e8f4fd',
+        primaryTextColor: '#1e293b',
+        primaryBorderColor: '#93c5fd',
+        lineColor: '#64748b',
+        secondaryColor: '#f0fdf4',
+        tertiaryColor: '#faf5ff',
+        background: '#ffffff',
+        mainBkg: '#f8fafc',
+        nodeBorder: '#cbd5e1',
+        clusterBkg: '#f1f5f9',
+        titleColor: '#1e293b',
+        edgeLabelBackground: '#ffffff',
+        attributeBackgroundColorEven: '#f8fafc',
+        attributeBackgroundColorOdd: '#f1f5f9'
+      },
+      flowchart: { useMaxWidth: true, htmlLabels: true, curve: 'basis' },
+      sequence: { useMaxWidth: true },
+      stateDiagram: { useMaxWidth: true },
+      securityLevel: 'loose'
+    });
+
+    // ── Section switching (same-page nav items only) ──
+    const pageSections = document.querySelectorAll('.section');
+    const subItems     = document.querySelectorAll('.acc-sub-item[data-sec]');
+    const pb           = document.getElementById('pb');
+
+    function showSection(id) {
+      pageSections.forEach(s => s.classList.remove('active'));
+      subItems.forEach(n => n.classList.remove('active'));
+      const target = document.getElementById(id);
+      if (target) {
+        target.classList.add('active');
+        const diags = target.querySelectorAll('.mermaid:not([data-processed])');
+        if (diags.length) mermaid.run({ nodes: diags });
+        // Scroll content area to top, NOT the whole window
+        const main = document.querySelector('.main');
+        if (main) main.scrollTo(0, 0);
+      }
+      const item = document.querySelector(`.acc-sub-item[data-sec="${id}"]`);
+      if (item) item.classList.add('active');
+      updateProgress(id);
+    }
+
+    function updateProgress(activeId) {
+      const ids = Array.from(subItems).map(n => n.dataset.sec);
+      const idx = ids.indexOf(activeId);
+      const pct = idx >= 0 ? Math.round(((idx + 1) / ids.length) * 100) : 0;
+      pb.style.width = pct + '%';
+    }
+
+    subItems.forEach(item => {
+      item.addEventListener('click', () => {
+        if (item.dataset.sec) showSection(item.dataset.sec);
+      });
+    });
+
+    // On load: check URL hash for deep link from another page
+    const hash = window.location.hash.slice(1);
+    if (hash && document.getElementById(hash)) {
+      showSection(hash);
+    } else if (subItems.length) {
+      showSection(subItems[0].dataset.sec);
+    }
+
+    // Scroll progress
+    const mainEl = document.querySelector('.main');
+    if (mainEl) {
+      mainEl.style.overflowY = 'auto';
+      mainEl.style.height = '100vh';
+      mainEl.addEventListener('scroll', () => {
+        const scrolled = mainEl.scrollTop + mainEl.clientHeight;
+        const total = mainEl.scrollHeight;
+        if (total > 0) pb.style.width = Math.min(100, Math.round((scrolled / total) * 100)) + '%';
+      });
+    }
+
+    const bttBtn = document.getElementById('back-to-top');
+    (mainEl || window).addEventListener('scroll', () => {
+      const top = mainEl ? mainEl.scrollTop : window.scrollY;
+      bttBtn.classList.toggle('visible', top > 500);
+    });
+    bttBtn.addEventListener('click', () => {
+      if (mainEl) mainEl.scrollTo({top:0,behavior:'smooth'});
+      else window.scrollTo({top:0,behavior:'smooth'});
+    });
+  </script>
+</body>
+</html>

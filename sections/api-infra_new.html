@@ -1,0 +1,194 @@
+<div class="section" id="api-infra">
+    <h1 class="section-title">API Infrastructure</h1>
+    <p class="section-subtitle">Module 6 &nbsp;|&nbsp; Service Mesh, API Gateways, Circuit Breakers, and Resilience
+        Patterns</p>
+
+    <h2>Resilience Patterns: The Circuit Breaker</h2>
+    <p>Named after the electrical circuit breaker: when a downstream service is failing, stop sending
+        requests to it (open the circuit) to prevent cascading failures and allow it time to recover.</p>
+
+    <div class="mermaid">
+        stateDiagram-v2
+        [*] --> Closed
+        Closed --> Open: Failure threshold\nexceeded (e.g. 50% in 10s)
+        Open --> HalfOpen: After reset timeout\n(e.g. 30 seconds)
+        HalfOpen --> Closed: Test request succeeds
+        HalfOpen --> Open: Test request fails
+        note right of Closed: Normal operation\nAll requests pass
+        note right of Open: STOP sending requests\nFail fast, return fallback
+        note right of HalfOpen: Allow one trial request\nto test recovery
+    </div>
+
+    <div class="def">
+        <dt>Why Circuit Breakers Matter: Amazon's 2012 Outage</dt>
+        <dd>In 2012, an Amazon service experienced cascading failures because one upstream dependency slowed,
+            causing callers to queue requests, exhausting thread pools, causing more timeouts, causing more
+            requests to queue — a cascade. Circuit breakers prevent this: when the upstream is slow, fail fast
+            immediately rather than queuing indefinitely. Fail fast = bounded latency.</dd>
+        <dt>Netflix Hystrix → Resilience4j</dt>
+        <dd>Netflix invented Hystrix for circuit breaking in their Java services. It became the industry
+            standard. Hystrix is now in maintenance mode; <strong>Resilience4j</strong> is the successor.
+            Polly is the .NET equivalent. At Netflix, wrapping each external call in a circuit breaker
+            reduced cascading failures from seconds of outage to milliseconds of fallback responses.
+            Netflix's degraded experience (low-res video, no personalization, cached recommendations)
+            is graceful degradation via circuit breakers.</dd>
+        <dt>Parameters to tune</dt>
+        <dd><strong>Failure rate threshold:</strong> 50% of last N calls failed → open.
+            <strong>Slow call threshold:</strong> 50% of calls &gt;2s → also open.
+            <strong>Reset timeout:</strong> Try again after 30s in OPEN state.
+            These must be tuned per service — too sensitive and you'll open on transient blips; too loose and
+            the cascade happens before the breaker opens.
+        </dd>
+    </div>
+
+    <h2>Retry Strategies: When and How to Retry</h2>
+    <div class="compare">
+        <div class="compare-card con">
+            <h4>Naive Retry (DO NOT do this)</h4>
+            <ul>
+                <li>Retry immediately on failure, N times</li>
+                <li>If 100 clients all retry simultaneously → <strong>thundering herd</strong></li>
+                <li>Can amplify load on an already-failing service by 100×</li>
+                <li>Makes cascading failures worse, not better</li>
+            </ul>
+        </div>
+        <div class="compare-card pro">
+            <h4>Exponential Backoff + Jitter (correct approach)</h4>
+            <ul>
+                <li>Retry delay doubles each attempt: 100ms, 200ms, 400ms, 800ms…</li>
+                <li><strong>Add jitter:</strong> random ±25% to each delay to desynchronize clients</li>
+                <li>Cap at max delay (e.g., 30 seconds)</li>
+                <li>Use <strong>idempotent requests only</strong> — never retry non-idempotent (POST payments)</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="callout tip">
+        <div class="callout-title">AWS SDKs Use Exponential Backoff + Jitter by Default</div>
+        <p>AWS's "Retry Architecture" paper (2015) showed that adding jitter reduced retry-storm magnitude
+            by 50× compared to fixed backoff. All AWS SDKs implement this. When writing your own retry logic,
+            use: <code>sleep(pow(2, attempt) * 100ms + random(0, 100ms))</code>.</p>
+    </div>
+
+    <h2>Bulkhead Pattern: Isolating Failures</h2>
+    <p>Named after compartments in a ship's hull — if one compartment floods, the others stay dry.
+        In software: isolate resources (thread pools, connection pools) per downstream dependency.</p>
+
+    <div class="def">
+        <dt>Thread Pool Bulkhead</dt>
+        <dd>Give each downstream service its own thread pool. Service A: 20 threads. Service B: 20 threads.
+            If Service B starts hanging, only Service B's 20 threads fill up — not all 200 shared threads.
+            Service A continues operating normally. Without bulkheads, slow Service B fills all shared threads,
+            making the entire application unresponsive to all requests.</dd>
+        <dt>Semaphore Bulkhead</dt>
+        <dd>Limit concurrent requests to a service with a counting semaphore (N permits). Faster than thread
+            pool isolation, but doesn't protect against slow calls blocking the calling thread. Used for
+            non-blocking async calls where thread pool isolation is overkill.</dd>
+    </div>
+
+    <h2>Timeout Hierarchy</h2>
+    <div class="table-wrap">
+        <table>
+            <tr>
+                <th>Tier</th>
+                <th>Connect Timeout</th>
+                <th>Read Timeout</th>
+                <th>Total Timeout</th>
+                <th>Notes</th>
+            </tr>
+            <tr>
+                <td>Client → CDN</td>
+                <td>1–2s</td>
+                <td>10–30s</td>
+                <td>—</td>
+                <td>CDN has generous timeouts for slow mobile</td>
+            </tr>
+            <tr>
+                <td>CDN → API Gateway</td>
+                <td>100–500ms</td>
+                <td>5–15s</td>
+                <td>—</td>
+                <td>Behind CDN, latency is lower</td>
+            </tr>
+            <tr>
+                <td>API Gateway → Service</td>
+                <td>50–200ms</td>
+                <td>1–5s</td>
+                <td>600ms–5s</td>
+                <td>Service must complete before this</td>
+            </tr>
+            <tr>
+                <td>Service → DB</td>
+                <td>50–200ms</td>
+                <td>200ms–2s</td>
+                <td>500ms–3s</td>
+                <td>Short! DB calls should be &lt;100ms</td>
+            </tr>
+            <tr>
+                <td>Service → Cache</td>
+                <td>10–50ms</td>
+                <td>50–200ms</td>
+                <td>100ms</td>
+                <td>Very short — fall through to DB on timeout</td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="callout warn">
+        <div class="callout-title">Always Set Timeouts</div>
+        <p>A service with no timeout is a thread leak waiting to happen. Without timeouts, every slow
+            downstream call leaves a thread hanging indefinitely. With 50 API threads and a downstream
+            taking 60s (no timeout), you'll be fully "stuck" in 50 requests. Always: connect timeout
+            (quick failure) + read timeout (bounded wait). Also set <strong>overall request deadlines</strong>
+            (context cancellation in Go, CompletableFuture timeout in Java) that propagate through the entire
+            call chain.</p>
+    </div>
+
+    <h2>API Gateway Deep Dive: Kong vs. AWS API Gateway vs. Envoy</h2>
+    <div class="table-wrap">
+        <table>
+            <tr>
+                <th></th>
+                <th>Kong</th>
+                <th>AWS API Gateway</th>
+                <th>Envoy</th>
+            </tr>
+            <tr>
+                <td>Type</td>
+                <td>Self-hosted or SaaS</td>
+                <td>Managed SaaS</td>
+                <td>Self-hosted proxy</td>
+            </tr>
+            <tr>
+                <td>Performance</td>
+                <td>Very fast (Nginx+LuaJIT)</td>
+                <td>Variable (managed)</td>
+                <td>Fastest (~0.2ms overhead)</td>
+            </tr>
+            <tr>
+                <td>Auth</td>
+                <td>Plugin-based (JWT, OAuth, Basic)</td>
+                <td>IAM, Cognito, Lambda auth</td>
+                <td>via ext_authz filter</td>
+            </tr>
+            <tr>
+                <td>Rate limiting</td>
+                <td>Redis-backed plugin</td>
+                <td>Built-in, per-method</td>
+                <td>Local or global (Redis)</td>
+            </tr>
+            <tr>
+                <td>Protocol support</td>
+                <td>HTTP, gRPC, WebSocket</td>
+                <td>HTTP, WebSocket (gRPC via proxying)</td>
+                <td>HTTP, gRPC, TCP, WebSocket</td>
+            </tr>
+            <tr>
+                <td>Best for</td>
+                <td>Flexible self-hosted API management</td>
+                <td>Serverless / AWS-native architectures</td>
+                <td>Internal service mesh edge proxy</td>
+            </tr>
+        </table>
+    </div>
+</div>

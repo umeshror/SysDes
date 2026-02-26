@@ -1,0 +1,160 @@
+<div class="section" id="security">
+    <h1 class="section-title">Security: Encryption, IAM &amp; Zero Trust</h1>
+    <p class="section-subtitle">Module 10 &nbsp;|&nbsp; Securing Systems at Scale — Authentication, Encryption, and
+        Defense in Depth</p>
+
+    <h2>Encryption: In Transit vs. At Rest vs. In Use</h2>
+    <div class="table-wrap">
+        <table>
+            <tr>
+                <th>Type</th>
+                <th>What It Protects</th>
+                <th>How</th>
+                <th>Tools</th>
+            </tr>
+            <tr>
+                <td><strong>In Transit</strong></td>
+                <td>Data moving over network</td>
+                <td>TLS 1.2/1.3 (mandatory), mTLS for service-to-service</td>
+                <td>Let's Encrypt, AWS ACM, Istio mTLS</td>
+            </tr>
+            <tr>
+                <td><strong>At Rest</strong></td>
+                <td>Data stored on disk, in DB, in S3</td>
+                <td>AES-256 server-side encryption (SSE), full-disk encryption</td>
+                <td>AWS KMS, S3-SSE, db-level TDE (Transparent Data Encryption)</td>
+            </tr>
+            <tr>
+                <td><strong>In Use</strong></td>
+                <td>Data while being computed (cutting edge)</td>
+                <td>Homomorphic encryption, trusted execution environments (Intel SGX)</td>
+                <td>AWS Nitro Enclaves, Azure Confidential Computing</td>
+            </tr>
+            <tr>
+                <td><strong>End-to-End (E2E)</strong></td>
+                <td>Data from sender to recipient — not even servers can read</td>
+                <td>Client-side encryption with user-controlled keys</td>
+                <td>Signal Protocol, WhatsApp, iMessage</td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="def">
+        <dt>TLS 1.3 vs TLS 1.2</dt>
+        <dd>TLS 1.3 (2018) eliminates the round-trip in the handshake: <strong>1-RTT</strong> instead of
+            2-RTT for new connections, and <strong>0-RTT</strong> session resumption (at slight security cost).
+            It also removes weak ciphers (RC4, SHA-1, RSA key exchange). Google found TLS 1.3 reduced connection
+            setup latency by ~20ms on average. All new systems should require TLS 1.3 minimum.</dd>
+        <dt>Key Management: The Hard Part</dt>
+        <dd>Encrypting data is easy. Managing keys securely at scale is hard. Gold standard: use a
+            Hardware Security Module (HSM) — a tamper-resistant chip that stores root keys and never exposes
+            them. AWS CloudHSM and AWS KMS (backed by HSMs) handle this. Keys should be rotated regularly.
+            Never store encryption keys in the same system as the encrypted data.</dd>
+    </div>
+
+    <h2>Authentication: Passwords → Tokens → Certificates</h2>
+    <div class="mermaid">
+        flowchart LR
+        subgraph Modern Auth Flow
+        U[User] -->|username+password| A[Auth Service]
+        A -->|verify bcrypt hash| DB[(Users DB)]
+        A -->|issue JWT\nAccess + Refresh| U
+        U -->|JWT in Authorization header| API[API Server]
+        API -->|verify signature\nno DB call| Allow[Allow Request]
+        end
+    </div>
+
+    <div class="def">
+        <dt>Password Hashing: bcrypt vs. Argon2</dt>
+        <dd><strong>Never store plain-text passwords. Never use MD5 or SHA-256 alone</strong> (too fast — GPU can crack
+            billions/sec).
+            Use <strong>bcrypt</strong> (work factor 12–14), <strong>scrypt</strong>, or <strong>Argon2id</strong>
+            (winner of Password Hashing Competition 2015).
+            Argon2id is memory-hard — costs GB of RAM to compute, making GPU/ASIC attacks impractical.
+            bcrypt at work_factor=12 takes ~250ms per hash on a server — slow enough to prevent dictionary attacks,
+            fast enough for legitimate logins.</dd>
+        <dt>JWT (JSON Web Tokens) Trade-offs</dt>
+        <dd>JWTs are stateless — the server doesn't need a DB lookup to validate a request. The downside:
+            you can't invalidate a JWT before expiry without a blocklist (which adds a DB lookup back).
+            Mitigation: use short expiry (15 minutes) for access tokens + long-lived refresh tokens
+            (stored in DB, revocable). This is the standard OAuth 2.0 pattern.</dd>
+        <dt>mTLS for Service-to-Service Auth</dt>
+        <dd>In microservices, services must authenticate each other, not just users. mTLS (mutual TLS)
+            requires both client and server to present certificates. A service mesh (Istio) does this
+            automatically via short-lived SPIFFE certificates (rotated every 24 hours). No API keys in config files.
+            This is how Google's BeyondCorp zero-trust network works internally.</dd>
+    </div>
+
+    <h2>Authorization: RBAC vs. ABAC vs. ReBAC</h2>
+    <div class="table-wrap">
+        <table>
+            <tr>
+                <th>Model</th>
+                <th>Logic</th>
+                <th>Pros</th>
+                <th>Cons</th>
+                <th>Used By</th>
+            </tr>
+            <tr>
+                <td><strong>RBAC</strong> (Role-Based)</td>
+                <td>User has Role → Role has Permissions</td>
+                <td>Simple, auditable</td>
+                <td>Role explosion at scale (1000s of roles)</td>
+                <td>AWS IAM roles, most enterprise apps</td>
+            </tr>
+            <tr>
+                <td><strong>ABAC</strong> (Attribute-Based)</td>
+                <td>Access decided by user/resource/env attributes</td>
+                <td>Fine-grained, context-aware</td>
+                <td>Complex policies, hard to audit</td>
+                <td>AWS IAM policies, XACML systems</td>
+            </tr>
+            <tr>
+                <td><strong>ReBAC</strong> (Relationship-Based)</td>
+                <td>Access based on graph of relationships</td>
+                <td>Natural for social/sharing models</td>
+                <td>Complex graph queries</td>
+                <td>Google Zanzibar, GitHub, Notion</td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="def">
+        <dt>Google Zanzibar: The Authorization System Powering Gmail, Drive, Docs</dt>
+        <dd>Google's Zanzibar (published 2019) handles 10 million authorization checks per second globally,
+            with &lt;10ms p95 latency. It stores relationships as tuples: <code>(object, relation, user)</code>
+            — e.g., <code>(doc:42, viewer, user:alice)</code>. Arbitrary graph traversal lets you answer:
+            "Can Alice view Doc 42?" by following relationship chains. Open-source implementations:
+            OpenFGA, SpiceDB, Permify, Cerbos.</dd>
+    </div>
+
+    <h2>Zero Trust Architecture</h2>
+    <p>Traditional security: <em>"Trust everything inside the network perimeter."</em>
+        Zero Trust: <em>"Never trust; always verify."</em> The network perimeter is dead — endpoints are mobile,
+        services run in shared clouds, insiders can be attackers.</p>
+
+    <div class="mermaid">
+        flowchart LR
+        U[User] -->|1. Identity verification\nMFA + device trust| IDP[Identity Provider\nOkta / CyberArk]
+        IDP -->|2. Short-lived token\nbased on device + identity| PEP[Policy Enforcement\nPoint]
+        PEP -->|3. Check policy| PDP[Policy Decision\nPoint - OPA / Zanzibar]
+        PDP -->|4. Allow/Deny\nminimum privilege| S[Protected Service]
+    </div>
+
+    <div class="def">
+        <dt>Google BeyondCorp</dt>
+        <dd>Google implemented zero trust internally after the Aurora attacks (2010). All employee access
+            is granted based on device certificate (is this a managed Google laptop?) + user identity
+            (is this the right person?) + policy (does this person's role allow this resource?).
+            No VPN required — engineers access internal tools directly from any network. The model is
+            now the basis for Google Cloud's BeyondCorp Enterprise product.</dd>
+        <dt>OWASP Top 10 and System Design</dt>
+        <dd>When asked about security in a system design interview, cover:
+            (1) <strong>Injection:</strong> parameterized queries, not string concatenation;
+            (2) <strong>Broken Auth:</strong> short-lived tokens, MFA, rate limit login attempts;
+            (3) <strong>Sensitive Data Exposure:</strong> encrypt at rest and in transit, no PII in logs;
+            (4) <strong>SSRF:</strong> validate and whitelist outbound URLs in services that fetch URLs;
+            (5) <strong>Rate limiting + DDoS:</strong> CDN-level (Cloudflare) + application-level (token bucket per
+            IP/user).</dd>
+    </div>
+</div>

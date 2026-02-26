@@ -1,0 +1,2044 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="System Design Reference — Core Concepts & Basics">
+  <title>📖 Core Concepts & Basics — System Design Fundamentals</title>
+  <link rel="stylesheet" href="../styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+  <style>
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      font-size: 15px;
+      line-height: 1.7;
+      color: #1a1a2e;
+      background: #f4f6f9;
+    }
+
+    /* ---- Layout ---- */
+    .layout {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    .sidebar {
+      width: 300px;
+      min-width: 300px;
+      background: #1a1a2e;
+      color: #cdd6f4;
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 100vh;
+      overflow-y: auto;
+      z-index: 100;
+      padding-bottom: 40px;
+    }
+
+    .sidebar-header {
+      padding: 24px 20px 16px;
+      border-bottom: 1px solid #2d2d4e;
+      position: sticky;
+      top: 0;
+      background: #1a1a2e;
+      z-index: 1;
+    }
+
+    .sidebar-header h1 {
+      font-size: 1rem;
+      font-weight: 700;
+      color: #89b4fa;
+      letter-spacing: 0.3px;
+      margin-bottom: 4px;
+    }
+
+    .sidebar-header p {
+      font-size: 0.75rem;
+      color: #6c7086;
+    }
+
+    .nav-module {
+      margin: 6px 0;
+    }
+
+    .nav-module-title {
+      padding: 10px 20px 6px;
+      font-size: 0.68rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #585b70;
+    }
+
+    .nav-item {
+      display: block;
+      padding: 7px 20px 7px 28px;
+      font-size: 0.82rem;
+      color: #a6adc8;
+      cursor: pointer;
+      border-left: 3px solid transparent;
+      transition: all 0.15s;
+    }
+
+    .nav-item:hover {
+      background: #252540;
+      color: #cdd6f4;
+    }
+
+    .nav-item.active {
+      background: #1e2050;
+      border-left-color: #89b4fa;
+      color: #89b4fa;
+      font-weight: 600;
+    }
+
+    /* ---- Main content ---- */
+    .main {
+      margin-left: 300px;
+      flex: 1;
+      padding: 0;
+    }
+
+    .progress-bar-wrap {
+      position: fixed;
+      top: 0;
+      left: 300px;
+      right: 0;
+      height: 3px;
+      background: #2d2d4e;
+      z-index: 200;
+    }
+
+    .progress-bar {
+      height: 100%;
+      background: linear-gradient(90deg, #89b4fa, #b4befe);
+      transition: width 0.3s;
+      width: 0%;
+    }
+
+    .section {
+      display: none;
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 48px 48px 80px;
+    }
+
+    .section.active {
+      display: block;
+      animation: fadein 0.25s ease;
+    }
+
+    @keyframes fadein {
+      from {
+        opacity: 0;
+        transform: translateY(8px);
+      }
+
+      to {
+        opacity: 1;
+        transform: none;
+      }
+    }
+
+    /* ---- Typography ---- */
+    .section-title {
+      font-size: 1.9rem;
+      font-weight: 800;
+      color: #1a1a2e;
+      margin-bottom: 6px;
+      padding-bottom: 14px;
+      border-bottom: 3px solid #89b4fa;
+    }
+
+    .section-subtitle {
+      font-size: 0.85rem;
+      color: #6c7086;
+      margin-bottom: 36px;
+    }
+
+    h2 {
+      font-size: 1.45rem;
+      font-weight: 700;
+      color: #1a1a2e;
+      margin: 44px 0 14px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid #e0e4f0;
+    }
+
+    h3 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #2d2d4e;
+      margin: 30px 0 10px;
+    }
+
+    h4 {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #3d3d6e;
+      margin: 22px 0 8px;
+    }
+
+    p {
+      margin-bottom: 12px;
+      color: #333355;
+    }
+
+    ul,
+    ol {
+      margin: 8px 0 14px 22px;
+    }
+
+    li {
+      margin-bottom: 5px;
+      color: #333355;
+    }
+
+    li strong {
+      color: #1a1a2e;
+    }
+
+    /* ---- Callout boxes ---- */
+    .callout {
+      border-radius: 6px;
+      padding: 18px 22px;
+      margin: 20px 0;
+      font-size: 0.9rem;
+    }
+
+    .callout-title {
+      font-weight: 700;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 6px;
+    }
+
+    .callout.info {
+      background: #eff6ff;
+      border-left: 4px solid #3b82f6;
+    }
+
+    .callout.info .callout-title {
+      color: #1d4ed8;
+    }
+
+    .callout.warn {
+      background: #fffbeb;
+      border-left: 4px solid #f59e0b;
+    }
+
+    .callout.warn .callout-title {
+      color: #b45309;
+    }
+
+    .callout.tip {
+      background: #f0fdf4;
+      border-left: 4px solid #22c55e;
+    }
+
+    .callout.tip .callout-title {
+      color: #15803d;
+    }
+
+    .callout.danger {
+      background: #fff1f2;
+      border-left: 4px solid #f43f5e;
+    }
+
+    .callout.danger .callout-title {
+      color: #be123c;
+    }
+
+    /* ---- Example / Real World ---- */
+    .example {
+      background: #f8faff;
+      border: 1px solid #dde3f5;
+      border-radius: 8px;
+      padding: 20px 24px;
+      margin: 20px 0;
+    }
+
+    .example-label {
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: #6c7086;
+      margin-bottom: 8px;
+    }
+
+    .example h4 {
+      margin-top: 0;
+    }
+
+    /* ---- Code blocks ---- */
+    pre,
+    code {
+      font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
+    }
+
+    pre {
+      background: #1e1e2e;
+      color: #cdd6f4;
+      padding: 20px 24px;
+      border-radius: 8px;
+      overflow-x: auto;
+      margin: 16px 0;
+      font-size: 0.84rem;
+      line-height: 1.6;
+    }
+
+    code {
+      background: #eef0f8;
+      color: #1a1a2e;
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-size: 0.85em;
+    }
+
+    pre code {
+      background: transparent;
+      color: inherit;
+      padding: 0;
+      border-radius: 0;
+      font-size: inherit;
+    }
+
+    /* ---- Tables ---- */
+    .table-wrap {
+      overflow-x: auto;
+      margin: 20px 0;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.88rem;
+    }
+
+    th {
+      background: #1a1a2e;
+      color: #cdd6f4;
+      padding: 10px 14px;
+      text-align: left;
+      font-weight: 600;
+      font-size: 0.82rem;
+      letter-spacing: 0.3px;
+    }
+
+    td {
+      padding: 9px 14px;
+      border-bottom: 1px solid #e8ebf5;
+      vertical-align: top;
+    }
+
+    tr:nth-child(even) td {
+      background: #f8f9fe;
+    }
+
+    /* ---- Comparison grid ---- */
+    .compare {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin: 20px 0;
+    }
+
+    .compare.three {
+      grid-template-columns: 1fr 1fr 1fr;
+    }
+
+    .compare.four {
+      grid-template-columns: 1fr 1fr 1fr 1fr;
+    }
+
+    .compare-card {
+      background: white;
+      border: 1px solid #e0e4f0;
+      border-radius: 8px;
+      padding: 18px 20px;
+    }
+
+    .compare-card h4 {
+      margin-top: 0;
+    }
+
+    .compare-card.pro {
+      border-top: 3px solid #22c55e;
+    }
+
+    .compare-card.con {
+      border-top: 3px solid #f43f5e;
+    }
+
+    .compare-card.neutral {
+      border-top: 3px solid #3b82f6;
+    }
+
+    /* ---- Diagram wrapper ---- */
+    .diagram {
+      background: white;
+      border: 1px solid #e0e4f0;
+      border-radius: 8px;
+      padding: 20px;
+      margin: 20px 0;
+      overflow-x: auto;
+      text-align: center;
+    }
+
+    .diagram-caption {
+      font-size: 0.78rem;
+      color: #6c7086;
+      text-align: center;
+      margin-top: 8px;
+    }
+
+    /* ---- Tags ---- */
+    .tag {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.4px;
+      margin: 0 4px 4px 0;
+    }
+
+    .tag-interview {
+      background: #fef3c7;
+      color: #92400e;
+    }
+
+    .tag-critical {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    .tag-concept {
+      background: #ede9fe;
+      color: #5b21b6;
+    }
+
+    .tag-realworld {
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    /* ---- Definition list ---- */
+    .def {
+      margin: 12px 0 16px 0;
+    }
+
+    .def dt {
+      font-weight: 700;
+      color: #1a1a2e;
+      margin-bottom: 3px;
+    }
+
+    .def dd {
+      margin-left: 20px;
+      color: #333355;
+      margin-bottom: 10px;
+    }
+
+    /* ---- Subsection separator ---- */
+    .subsection {
+      margin-top: 48px;
+    }
+
+    @media (max-width: 768px) {
+      .sidebar {
+        width: 100%;
+        height: auto;
+        position: relative;
+      }
+
+      .main {
+        margin-left: 0;
+      }
+
+      .section {
+        padding: 24px 20px;
+      }
+
+      .compare,
+      .compare.three,
+      .compare.four {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+
+  <style id="sidebar-improvements">
+    .sidebar { width: 280px; }
+    .main    { margin-left: 280px; }
+
+    /* Header */
+    .sidebar-header {
+      background: linear-gradient(160deg,#1e1e3f 0%,#12122a 100%);
+      border-bottom: 1px solid rgba(137,180,250,0.12);
+    }
+    .sidebar-header h1 { font-size:.9rem; color:#e2e8f9; letter-spacing:.3px; }
+    .sidebar-header p  { font-size:.72rem; color:#6272a4; }
+
+    .back-link {
+      display:inline-flex; align-items:center; gap:6px;
+      font-size:.75rem; color:#89b4fa; text-decoration:none;
+      padding:4px 12px; border:1px solid rgba(137,180,250,.25);
+      border-radius:20px; transition:all .2s;
+    }
+    .back-link:hover { background:rgba(137,180,250,.1); border-color:#89b4fa; }
+
+    /* Accordion wrapper */
+    .sidebar-accordion {
+      overflow-y: auto;
+      flex: 1;
+      padding: 8px 0 24px;
+    }
+
+    /* Accordion chapter */
+    .acc-chapter {
+      border-bottom: 1px solid rgba(137,180,250,0.07);
+    }
+    .acc-chapter[open] { background: rgba(137,180,250,0.04); }
+
+    /* Summary row = clickable chapter header */
+    .acc-summary {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      cursor: pointer;
+      list-style: none;
+      user-select: none;
+      transition: background 0.15s;
+    }
+    .acc-summary::-webkit-details-marker { display: none; }
+    .acc-summary:hover { background: rgba(137,180,250,0.08); }
+    .acc-chapter[open] > .acc-summary { background: rgba(137,180,250,0.1); }
+
+    .chap-icon {
+      font-size: 1rem;
+      flex-shrink: 0;
+      width: 24px;
+      text-align: center;
+    }
+    .chap-text {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+      flex: 1;
+      min-width: 0;
+    }
+    .chap-num {
+      font-size: .58rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .8px;
+      color: #585b70;
+    }
+    .chap-label {
+      font-size: .8rem;
+      color: #a6adc8;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .acc-chapter[open] .chap-num   { color: #89b4fa; }
+    .acc-chapter[open] .chap-label { color: #cdd6f4; font-weight: 600; }
+
+    .chap-curr {
+      font-size: .45rem;
+      color: #89b4fa;
+      flex-shrink: 0;
+      animation: blink 2s infinite;
+    }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.2} }
+
+    .acc-arrow {
+      font-size: .85rem;
+      color: #585b70;
+      flex-shrink: 0;
+      transition: transform 0.2s;
+    }
+    .acc-chapter[open] .acc-arrow { transform: rotate(90deg); color:#89b4fa; }
+
+    /* Sub-items panel */
+    .acc-sub {
+      padding: 2px 0 6px 0;
+      animation: slideDown .18s ease;
+    }
+    @keyframes slideDown {
+      from { opacity:0; transform:translateY(-6px); }
+      to   { opacity:1; transform:translateY(0); }
+    }
+
+    .acc-sub-item {
+      display: block;
+      padding: 7px 14px 7px 48px;
+      font-size: .78rem;
+      color: #7f849c;
+      cursor: pointer;
+      border-left: 2px solid transparent;
+      text-decoration: none;
+      transition: all 0.14s;
+      line-height: 1.35;
+    }
+    .acc-sub-item:hover {
+      color: #cdd6f4;
+      background: rgba(137,180,250,0.07);
+      border-left-color: rgba(137,180,250,.4);
+    }
+    .acc-sub-item.active {
+      color: #cdd6f4;
+      background: rgba(137,180,250,0.12);
+      border-left-color: #89b4fa;
+      font-weight: 600;
+    }
+
+    /* Page nav */
+    .page-nav {
+      display:flex; justify-content:space-between; align-items:center;
+      padding:28px 40px 48px; border-top:1px solid #e0e4f0;
+      margin-top:24px; gap:12px;
+    }
+    .page-nav-btn {
+      display:inline-flex; align-items:center; gap:8px;
+      padding:10px 22px; background:#1a1a2e; color:#cdd6f4;
+      border-radius:8px; text-decoration:none; font-size:.84rem;
+      font-weight:600; transition:all .18s;
+      border:1px solid rgba(137,180,250,.15);
+    }
+    .page-nav-btn:hover {
+      background:#313244; border-color:rgba(137,180,250,.35);
+      transform:translateY(-1px); box-shadow:0 4px 12px rgba(0,0,0,.2);
+    }
+    .page-nav-btn.home { background:linear-gradient(135deg,#1e3a5f,#162d48); }
+    .page-nav-btn.home:hover { background:linear-gradient(135deg,#264a78,#1e3a5f); }
+
+    @media (max-width:768px) { .sidebar{width:100%} .main{margin-left:0} }
+
+    /* ── Mermaid diagram consistency ── */
+    .mermaid {
+      background: transparent !important;
+      padding: 0 !important;
+    }
+    .mermaid svg {
+      background: transparent !important;
+      max-width: 100%;
+    }
+    /* Override Mermaid's internal background rect (dark in state/sequence diagrams) */
+    .mermaid svg > rect:first-child,
+    .mermaid svg > g:first-child > rect:first-child {
+      fill: transparent !important;
+      stroke: none !important;
+    }
+    /* State diagram node styling */
+    .mermaid .state-note rect,
+    .mermaid .note rect { fill: #fffbdd !important; stroke: #e6d87a !important; }
+    /* Ensure subgraph labels are readable */
+    .mermaid .cluster rect { fill: #f1f5f9 !important; stroke: #cbd5e1 !important; }
+    .mermaid .cluster text { fill: #475569 !important; }
+    /* Entity / node labels */
+    .mermaid .label { color: #1e293b !important; }
+    .mermaid .nodeLabel { color: #1e293b !important; }
+    .mermaid .edgeLabel { background: #fff !important; color: #475569 !important; }
+  </style>
+
+</head>
+<body>
+  <div class="layout">
+
+    <nav class="sidebar" style="display:flex;flex-direction:column">
+      <div class="sidebar-header">
+        <div style="margin-bottom:14px">
+          <a href="../index.html" class="back-link">&#8592; Back to Home</a>
+        </div>
+        <h1>System Design Fundamentals</h1>
+        <p>180+ topics &nbsp;|&nbsp; Complete Reference</p>
+      </div>
+
+      <div class="sidebar-accordion">
+        <details class="acc-chapter">
+          <summary class="acc-summary">
+            <span class="chap-icon">🚀</span>
+            <span class="chap-text">
+              <span class="chap-num">Chapter 01</span>
+              <span class="chap-label">Introduction to SDI</span>
+            </span>
+            
+            <span class="acc-arrow">›</span>
+          </summary>
+          <div class="acc-sub">
+              <a class="acc-sub-item" href="01-introduction.html#intro">The SDI Process</a>
+          </div>
+        </details>
+        <details class="acc-chapter" open>
+          <summary class="acc-summary">
+            <span class="chap-icon">📖</span>
+            <span class="chap-text">
+              <span class="chap-num">Chapter 02</span>
+              <span class="chap-label">Glossary of Basics</span>
+            </span>
+            <span class="chap-curr">●</span>
+            <span class="acc-arrow">›</span>
+          </summary>
+          <div class="acc-sub">
+              <div class="acc-sub-item active" data-sec="core">Core Characteristics</div>
+              <div class="acc-sub-item" data-sec="cap">CAP & PACELC Theorems</div>
+              <div class="acc-sub-item" data-sec="pacelc">PACELC In Depth</div>
+              <div class="acc-sub-item" data-sec="hashing">Consistent Hashing</div>
+          </div>
+        </details>
+        <details class="acc-chapter">
+          <summary class="acc-summary">
+            <span class="chap-icon">⚖️</span>
+            <span class="chap-text">
+              <span class="chap-num">Chapter 03</span>
+              <span class="chap-label">Trade-offs</span>
+            </span>
+            
+            <span class="acc-arrow">›</span>
+          </summary>
+          <div class="acc-sub">
+              <a class="acc-sub-item" href="03-tradeoffs.html#tradeoffs">Topic-by-Topic Trade-offs</a>
+          </div>
+        </details>
+        <details class="acc-chapter">
+          <summary class="acc-summary">
+            <span class="chap-icon">🌐</span>
+            <span class="chap-text">
+              <span class="chap-num">Chapter 04</span>
+              <span class="chap-label">Networking</span>
+            </span>
+            
+            <span class="acc-arrow">›</span>
+          </summary>
+          <div class="acc-sub">
+              <a class="acc-sub-item" href="04-networking.html#networking">OSI, TCP/UDP, HTTP, DNS</a>
+              <a class="acc-sub-item" href="04-networking.html#proxy">Proxy & Reverse Proxy</a>
+          </div>
+        </details>
+        <details class="acc-chapter">
+          <summary class="acc-summary">
+            <span class="chap-icon">🏗️</span>
+            <span class="chap-text">
+              <span class="chap-num">Chapter 05</span>
+              <span class="chap-label">Infrastructure</span>
+            </span>
+            
+            <span class="acc-arrow">›</span>
+          </summary>
+          <div class="acc-sub">
+              <a class="acc-sub-item" href="05-infrastructure.html#lb">Load Balancing & Algorithms</a>
+              <a class="acc-sub-item" href="05-infrastructure.html#caching">Caching Strategies</a>
+              <a class="acc-sub-item" href="05-infrastructure.html#cdn">CDN & Distributed Cache</a>
+              <a class="acc-sub-item" href="05-infrastructure.html#storage">Storage Systems</a>
+          </div>
+        </details>
+        <details class="acc-chapter">
+          <summary class="acc-summary">
+            <span class="chap-icon">🔌</span>
+            <span class="chap-text">
+              <span class="chap-num">Chapter 06</span>
+              <span class="chap-label">API & Communication</span>
+            </span>
+            
+            <span class="acc-arrow">›</span>
+          </summary>
+          <div class="acc-sub">
+              <a class="acc-sub-item" href="06-api-communication.html#api-design">API Design (REST, GraphQL, gRPC)</a>
+              <a class="acc-sub-item" href="06-api-communication.html#api-infra">API Gateway & Rate Limiting</a>
+              <a class="acc-sub-item" href="06-api-communication.html#api-auth">Authentication & Authorization</a>
+              <a class="acc-sub-item" href="06-api-communication.html#realtime">Real-Time Communication</a>
+              <a class="acc-sub-item" href="06-api-communication.html#async">Async Messaging (Queues, Pub/Sub)</a>
+          </div>
+        </details>
+        <details class="acc-chapter">
+          <summary class="acc-summary">
+            <span class="chap-icon">🏛️</span>
+            <span class="chap-text">
+              <span class="chap-num">Chapter 07</span>
+              <span class="chap-label">Architecture</span>
+            </span>
+            
+            <span class="acc-arrow">›</span>
+          </summary>
+          <div class="acc-sub">
+              <a class="acc-sub-item" href="07-architecture.html#arch-patterns">Architectural Patterns</a>
+              <a class="acc-sub-item" href="07-architecture.html#microservices">Microservices & Service Mesh</a>
+              <a class="acc-sub-item" href="07-architecture.html#containers">Containers & Orchestration</a>
+          </div>
+        </details>
+        <details class="acc-chapter">
+          <summary class="acc-summary">
+            <span class="chap-icon">🗄️</span>
+            <span class="chap-text">
+              <span class="chap-num">Chapter 08</span>
+              <span class="chap-label">Data Layer</span>
+            </span>
+            
+            <span class="acc-arrow">›</span>
+          </summary>
+          <div class="acc-sub">
+              <a class="acc-sub-item" href="08-data-layer.html#db-types">Database Types</a>
+              <a class="acc-sub-item" href="08-data-layer.html#db-internals">Database Internals</a>
+              <a class="acc-sub-item" href="08-data-layer.html#db-scaling">Database Scaling</a>
+          </div>
+        </details>
+        <details class="acc-chapter">
+          <summary class="acc-summary">
+            <span class="chap-icon">🕸️</span>
+            <span class="chap-text">
+              <span class="chap-num">Chapter 09</span>
+              <span class="chap-label">Distributed Systems</span>
+            </span>
+            
+            <span class="acc-arrow">›</span>
+          </summary>
+          <div class="acc-sub">
+              <a class="acc-sub-item" href="09-distributed-systems.html#db-federation">Database Federation</a>
+              <a class="acc-sub-item" href="09-distributed-systems.html#dist-fundamentals">Challenges & Failures</a>
+              <a class="acc-sub-item" href="09-distributed-systems.html#time-ordering">Time, Ordering & Clocks</a>
+              <a class="acc-sub-item" href="09-distributed-systems.html#consensus">Consensus & Coordination</a>
+              <a class="acc-sub-item" href="09-distributed-systems.html#dist-tx">Distributed Transactions</a>
+              <a class="acc-sub-item" href="09-distributed-systems.html#data-structures">Design Data Structures</a>
+              <a class="acc-sub-item" href="09-distributed-systems.html#big-data">Big Data & Stream Processing</a>
+          </div>
+        </details>
+        <details class="acc-chapter">
+          <summary class="acc-summary">
+            <span class="chap-icon">🔍</span>
+            <span class="chap-text">
+              <span class="chap-num">Chapter 10</span>
+              <span class="chap-label">Search, Ops & Security</span>
+            </span>
+            
+            <span class="acc-arrow">›</span>
+          </summary>
+          <div class="acc-sub">
+              <a class="acc-sub-item" href="10-search-operations.html#search">FTS, Inverted Index, Ranking</a>
+              <a class="acc-sub-item" href="10-search-operations.html#disaster-recovery">Disaster Recovery & Deployments</a>
+              <a class="acc-sub-item" href="10-search-operations.html#observability">Logs, Metrics, Tracing</a>
+              <a class="acc-sub-item" href="10-search-operations.html#security">Encryption, IAM, Zero Trust</a>
+          </div>
+        </details>
+        <details class="acc-chapter">
+          <summary class="acc-summary">
+            <span class="chap-icon">🎯</span>
+            <span class="chap-text">
+              <span class="chap-num">Chapter 11</span>
+              <span class="chap-label">Interview Framework</span>
+            </span>
+            
+            <span class="acc-arrow">›</span>
+          </summary>
+          <div class="acc-sub">
+              <a class="acc-sub-item" href="11-interview-framework.html#framework">The 4-Step SDI Framework</a>
+          </div>
+        </details>
+      </div>
+    </nav>
+
+    <div class="main">
+      <div class="progress-bar-wrap"><div class="progress-bar" id="pb"></div></div>
+
+<div class="section active" id="core">
+        <h1 class="section-title">Core Concepts</h1>
+        <p class="section-subtitle">Module 2 &nbsp;|&nbsp; Scalability · Availability · Reliability · Distributed
+          Characteristics</p>
+
+        <h2>Key Characteristics of Distributed Systems</h2>
+        <p>A distributed system is a collection of independent computers that appears to its users as a single coherent
+          system. To build such systems at scale, we must prioritize specific characteristics:</p>
+        <ul>
+          <li><strong>Scalability:</strong> The ability to handle more load by adding resources (CPU, RAM, nodes).</li>
+          <li><strong>Reliability:</strong> The probability the system performs correctly over time, even with failures.
+          </li>
+          <li><strong>Availability:</strong> The percentage of time the system is operational and accessible.</li>
+          <li><strong>Efficiency:</strong> How effectively the system uses resources (latency and throughput).</li>
+          <li><strong>Fault Tolerance:</strong> The ability to continue operating despite one or more component
+            failures.</li>
+          <li><strong>Manageability:</strong> How easy it is to operate, monitor, and maintain the system.</li>
+        </ul>
+
+        <h2>Scalability</h2>
+        <p>Scalability is the ability of a system to handle an increasing amount of work by adding resources. A scalable
+          system maintains acceptable performance as load grows.</p>
+
+        <h3>Vertical Scaling (Scale Up)</h3>
+        <p>Vertical scaling means increasing the capacity of a single machine — adding more CPU cores, RAM, faster
+          storage, or a faster network card.</p>
+
+        <div class="compare">
+          <div class="compare-card pro">
+            <h4>Advantages</h4>
+            <ul>
+              <li>No application changes required</li>
+              <li>No distributed system complexity</li>
+              <li>Low-latency access to all data (single machine)</li>
+              <li>Transactions remain simple and consistent</li>
+            </ul>
+          </div>
+          <div class="compare-card con">
+            <h4>Limitations</h4>
+            <ul>
+              <li>Hard physical ceiling (largest machine on market)</li>
+              <li>Very expensive at high end (diminishing returns)</li>
+              <li>Single point of failure</li>
+              <li>Requires downtime to upgrade hardware</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="example">
+          <div class="example-label">Real World</div>
+          <h4>Database vertical scaling</h4>
+          <p>A startup runs PostgreSQL on a 4-core, 16 GB RAM machine. As read queries increase, they upgrade to 32
+            cores and 256 GB RAM. This buys time but eventually hits the ceiling — a single machine can only go so far
+            before cost explodes or the hardware ceiling is reached. At that point they must switch to horizontal
+            scaling strategies (read replicas, sharding).</p>
+        </div>
+
+        <h3>Horizontal Scaling (Scale Out)</h3>
+        <p>Horizontal scaling means adding more machines to the pool and distributing the workload among them. This
+          requires the application to be designed for distribution: stateless request handling, distributed data
+          storage, and coordination protocols.</p>
+
+        <div class="compare">
+          <div class="compare-card pro">
+            <h4>Advantages</h4>
+            <ul>
+              <li>Theoretically unlimited capacity</li>
+              <li>Commodity hardware keeps cost lower</li>
+              <li>Fault tolerance — one machine failing doesn't bring down the system</li>
+              <li>Can scale specific tiers independently</li>
+            </ul>
+          </div>
+          <div class="compare-card con">
+            <h4>Challenges</h4>
+            <ul>
+              <li>Distributed systems complexity (coordination, consensus)</li>
+              <li>Data consistency becomes harder</li>
+              <li>Network becomes a factor (latency, partitions)</li>
+              <li>Application must be designed to be stateless or share state externally</li>
+            </ul>
+          </div>
+        </div>
+
+        <h3>Dimensions of Scalability</h3>
+        <ul>
+          <li><strong>Request scalability:</strong> Handle more requests per second (add API servers)</li>
+          <li><strong>Data scalability:</strong> Store more data (sharding, object storage)</li>
+          <li><strong>Geographic scalability:</strong> Serve users worldwide with low latency (CDN, multi-region)</li>
+          <li><strong>Operational scalability:</strong> Maintain system without linear team growth (automation)</li>
+        </ul>
+
+        <h2>Availability</h2>
+        <p>Availability is the proportion of time a system is in a functioning condition. It is typically expressed as a
+          percentage over a year.</p>
+
+        <div class="table-wrap">
+          <table>
+            <tr>
+              <th>Nines</th>
+              <th>Availability</th>
+              <th>Downtime per year</th>
+              <th>Downtime per month</th>
+              <th>Typical use case</th>
+            </tr>
+            <tr>
+              <td>Two nines</td>
+              <td>99%</td>
+              <td>87.7 hours</td>
+              <td>7.2 hours</td>
+              <td>Internal dev tools</td>
+            </tr>
+            <tr>
+              <td>Three nines</td>
+              <td>99.9%</td>
+              <td>8.76 hours</td>
+              <td>43 minutes</td>
+              <td>Standard web apps</td>
+            </tr>
+            <tr>
+              <td>Four nines</td>
+              <td>99.99%</td>
+              <td>52.6 minutes</td>
+              <td>4.4 minutes</td>
+              <td>E-commerce, payments</td>
+            </tr>
+            <tr>
+              <td>Five nines</td>
+              <td>99.999%</td>
+              <td>5.26 minutes</td>
+              <td>26 seconds</td>
+              <td>Telecom, critical finance</td>
+            </tr>
+          </table>
+        </div>
+
+        <h3>Techniques for High Availability</h3>
+        <ul>
+          <li><strong>Redundancy:</strong> Deploy multiple instances of each component so no single failure causes
+            outage.</li>
+          <li><strong>Failover:</strong> Automatically redirect traffic to healthy instances when one fails
+            (active-passive or active-active).</li>
+          <li><strong>Geographic distribution:</strong> Deploy across multiple availability zones or regions.</li>
+          <li><strong>Health checks and circuit breakers:</strong> Detect and isolate unhealthy components before they
+            cause cascading failures.</li>
+          <li><strong>Graceful degradation:</strong> Serve partial functionality rather than total failure (e.g., show
+            cached results when database is slow).</li>
+        </ul>
+
+        <div class="callout warn">
+          <div class="callout-title">Common Misconception</div>
+          <p>High availability does not mean zero downtime forever. It means <em>designed</em> downtime is minimized and
+            <em>unplanned</em> downtime is rare and short. Even five-nines systems have maintenance windows.
+          </p>
+        </div>
+
+        <h3>SLA, SLO, and SLI</h3>
+        <dl class="def">
+          <dt>SLI (Service Level Indicator)</dt>
+          <dd>A quantitative measure of service quality. Example: "The fraction of HTTP requests that complete in under
+            200 ms."</dd>
+          <dt>SLO (Service Level Objective)</dt>
+          <dd>A target value for an SLI. Example: "99.9% of requests should complete in under 200 ms."</dd>
+          <dt>SLA (Service Level Agreement)</dt>
+          <dd>A contract with customers that includes SLOs and consequences for missing them. Example: "If monthly
+            availability falls below 99.9%, customers receive a service credit."</dd>
+        </dl>
+
+        <h2>Reliability</h2>
+        <p>Reliability is the probability that a system performs its intended function correctly over a specified
+          period, even under adverse conditions. A reliable system produces correct results and does not corrupt data,
+          even when components fail.</p>
+
+        <h3>Reliability vs Availability</h3>
+        <p>These two properties are related but distinct:</p>
+        <ul>
+          <li>A system that is <strong>available but unreliable</strong> responds to requests but returns incorrect
+            results (e.g., shows wrong bank balance).</li>
+          <li>A system that is <strong>reliable but unavailable</strong> gives correct answers whenever it responds, but
+            may be down frequently.</li>
+          <li>The goal is both: always available <em>and</em> always correct.</li>
+        </ul>
+
+        <h3>Techniques for Reliability</h3>
+        <ul>
+          <li><strong>Replication:</strong> Keep multiple copies of data so hardware failure doesn't cause loss.</li>
+          <li><strong>Checksums and data integrity:</strong> Detect corruption at rest and in transit.</li>
+          <li><strong>Idempotency:</strong> Design operations so retrying a failed request doesn't cause duplicate side
+            effects.</li>
+          <li><strong>Testing:</strong> Unit, integration, chaos engineering (deliberately inject failures to find
+            weaknesses).</li>
+          <li><strong>Write-ahead logging (WAL):</strong> Record intended changes before applying them so partial
+            failures can be recovered.</li>
+        </ul>
+
+        <h2>Single Point of Failure (SPOF)</h2>
+        <p>A Single Point of Failure is any component whose failure would bring down the entire system. Eliminating
+          SPOFs is a core goal of high-availability design.</p>
+
+        <h3>Common Sources of SPOF</h3>
+        <ul>
+          <li><strong>Single load balancer:</strong> If the load balancer fails, all traffic is blocked. Fix: deploy an
+            active-passive pair of load balancers.</li>
+          <li><strong>Single database primary:</strong> If the primary database crashes, writes are unavailable. Fix:
+            automated failover to a replica.</li>
+          <li><strong>Single datacenter:</strong> Power outage, network cut, or natural disaster takes down everything.
+            Fix: multi-region deployment.</li>
+          <li><strong>Shared external service:</strong> Your system depends on a third-party API with no fallback. Fix:
+            circuit breakers, caching, alternative providers.</li>
+        </ul>
+
+        <div class="diagram">
+          <pre class="mermaid">
+graph TD
+  subgraph With_SPOF["Architecture with SPOF"]
+    U1[Users] --> LB1[Load Balancer — SPOF]
+    LB1 --> A1[App Server 1]
+    LB1 --> A2[App Server 2]
+    A1 --> DB1[(Database — SPOF)]
+    A2 --> DB1
+  end
+
+  subgraph No_SPOF["Architecture without SPOF"]
+    U2[Users] --> DNS2[DNS Round Robin]
+    DNS2 --> LB2[Load Balancer A]
+    DNS2 --> LB3[Load Balancer B]
+    LB2 --> A3[App Server 1]
+    LB3 --> A4[App Server 2]
+    A3 --> DB2[(Primary DB)]
+    A4 --> DB2
+    DB2 --> DB3[(Replica DB)]
+  end
+</pre>
+          <p class="diagram-caption">Eliminating SPOF requires redundancy at every layer</p>
+        </div>
+
+        <h2>Latency, Throughput, and Bandwidth</h2>
+
+        <h3>Latency</h3>
+        <p>Latency is the time elapsed between sending a request and receiving a response. It is typically measured in
+          milliseconds (ms) and expressed as percentiles rather than averages, because averages hide the tail behavior
+          that users actually experience.</p>
+
+        <div class="callout info">
+          <div class="callout-title">Why Percentiles Matter</div>
+          <p>If p50 (median) latency is 20 ms but p99 latency is 2000 ms, then 1 in 100 requests takes two full seconds
+            — users experience this as "sometimes the site is slow." The average (e.g., 40 ms) hides this problem
+            entirely.</p>
+        </div>
+
+        <h4>Latency numbers every engineer should know</h4>
+        <div class="table-wrap">
+          <table>
+            <tr>
+              <th>Operation</th>
+              <th>Approximate latency</th>
+            </tr>
+            <tr>
+              <td>CPU L1 cache hit</td>
+              <td>0.5 ns</td>
+            </tr>
+            <tr>
+              <td>CPU L2 cache hit</td>
+              <td>7 ns</td>
+            </tr>
+            <tr>
+              <td>Main memory (RAM) access</td>
+              <td>100 ns</td>
+            </tr>
+            <tr>
+              <td>SSD random read</td>
+              <td>150 µs</td>
+            </tr>
+            <tr>
+              <td>HDD seek</td>
+              <td>10 ms</td>
+            </tr>
+            <tr>
+              <td>Network round trip within datacenter</td>
+              <td>0.5 ms</td>
+            </tr>
+            <tr>
+              <td>Network round trip cross-continent</td>
+              <td>150 ms</td>
+            </tr>
+            <tr>
+              <td>Redis GET</td>
+              <td>0.1–1 ms</td>
+            </tr>
+            <tr>
+              <td>PostgreSQL simple query (indexed)</td>
+              <td>1–5 ms</td>
+            </tr>
+            <tr>
+              <td>PostgreSQL complex aggregation</td>
+              <td>100 ms – 5 s</td>
+            </tr>
+          </table>
+        </div>
+
+        <h3>Throughput</h3>
+        <p>Throughput is the number of operations a system can process per unit of time. Common units include requests
+          per second (RPS), transactions per second (TPS), or bytes per second.</p>
+        <p>Throughput and latency are related but different: you can have high throughput with high latency (batch
+          processing), or low latency with low throughput (synchronous real-time operations). Optimizing one often harms
+          the other.</p>
+
+        <h3>Bandwidth</h3>
+        <p>Bandwidth is the maximum rate at which data can be transferred across a network link. It is a ceiling on
+          throughput, not throughput itself. Actual throughput is limited by bandwidth but also by packet loss, protocol
+          overhead, and hardware limits.</p>
+
+        <h4>Bandwidth estimation example</h4>
+        <div class="example">
+          <div class="example-label">Capacity Estimation</div>
+          <p>A video streaming service streams at 4 Mbps per user. With 1 million concurrent users: 4 Mbps × 1,000,000 =
+            4,000 Gbps = 4 Tbps of egress bandwidth required. This drives decisions around CDN architecture and peering
+            agreements.</p>
+        </div>
+      </div>
+
+<div class="section" id="cap">
+        <h1 class="section-title">CAP Theorem and Consistency Models</h1>
+        <p class="section-subtitle">Module 2 &nbsp;|&nbsp; CAP Theorem · Consistency Models</p>
+
+        <h2>CAP Theorem</h2>
+        <span class="tag tag-interview">Interview Classic</span>
+        <span class="tag tag-critical">Critical</span>
+
+        <p>The CAP theorem, formulated by Eric Brewer in 2000 and proven by Gilbert and Lynch in 2002, states that a
+          distributed data store can provide at most two of the following three guarantees simultaneously:</p>
+
+        <dl class="def">
+          <dt>Consistency (C)</dt>
+          <dd>Every read receives the most recent write, or an error. All nodes in the system see the same data at the
+            same time. From a client's perspective, the system behaves as if there is only one copy of the data.</dd>
+          <dt>Availability (A)</dt>
+          <dd>Every request to a non-failing node receives a response — not an error. The system is always operational
+            and will respond, though the response may not reflect the most recent write.</dd>
+          <dt>Partition Tolerance (P)</dt>
+          <dd>The system continues to operate even when network partitions occur — i.e., when messages between nodes are
+            lost or delayed indefinitely.</dd>
+        </dl>
+
+        <div class="callout warn">
+          <div class="callout-title">The Key Insight</div>
+          <p>In any distributed system operating over a real network, network partitions <em>will</em> happen.
+            Therefore, Partition Tolerance is not optional — it must be accepted. The real choice is between Consistency
+            and Availability <em>during a partition event</em>.</p>
+        </div>
+
+        <h3>CP Systems: Consistency + Partition Tolerance</h3>
+        <p>During a network partition, a CP system chooses to stop responding rather than risk returning inconsistent
+          data. Clients may receive an error or timeout, but any successful response reflects the latest committed data.
+        </p>
+
+        <div class="example">
+          <div class="example-label">Example: Banking Transfer</div>
+          <p>Node A and Node B are partitioned. A user transfers $500 from their account. A CP system will refuse to
+            process the transaction rather than risk completing it on one node and not the other. The user gets an error
+            ("service temporarily unavailable") rather than an incorrect balance. This is acceptable for financial
+            systems.</p>
+          <p><strong>Systems:</strong> HBase, ZooKeeper, MongoDB (with majority write concern), etcd, Consul</p>
+        </div>
+
+        <h3>AP Systems: Availability + Partition Tolerance</h3>
+        <p>During a network partition, an AP system continues serving requests on all nodes. Nodes may have stale data.
+          The system sacrifices consistency in exchange for staying available. After the partition heals, nodes
+          eventually reconcile their state.</p>
+
+        <div class="example">
+          <div class="example-label">Example: Social Media Like Count</div>
+          <p>Node A and Node B are partitioned. A user likes a post. The count on Node A updates to 1001. A different
+            user reading from Node B sees 1000. This is acceptable — a slightly stale like count is far better than the
+            entire site being unavailable.</p>
+          <p><strong>Systems:</strong> Cassandra, DynamoDB, CouchDB, Riak, DNS</p>
+        </div>
+
+        <div class="diagram">
+          <pre class="mermaid">
+graph TD
+  CAP[CAP Theorem] --> C[Consistency]
+  CAP --> A[Availability]
+  CAP --> P[Partition Tolerance]
+
+  C --- CA[CA Systems\nTraditional SQL\nsingle node only]
+  C --- CP[CP Systems\nZooKeeper, HBase\nMongoDB strong mode]
+  A --- CA
+  A --- AP[AP Systems\nCassandra, DynamoDB\nCouchDB, DNS]
+  P --- CP
+  P --- AP
+
+  style CP fill:#dbeafe,stroke:#3b82f6
+  style AP fill:#dcfce7,stroke:#22c55e
+  style CA fill:#fef9c3,stroke:#ca8a04
+</pre>
+          <p class="diagram-caption">CA systems only exist in theory (single-node); real distributed systems must
+            tolerate partitions</p>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <tr>
+              <th>System</th>
+              <th>Type</th>
+              <th>On partition</th>
+              <th>Best for</th>
+            </tr>
+            <tr>
+              <td>ZooKeeper</td>
+              <td>CP</td>
+              <td>Rejects writes until quorum</td>
+              <td>Distributed coordination, config</td>
+            </tr>
+            <tr>
+              <td>etcd</td>
+              <td>CP</td>
+              <td>Rejects writes until quorum</td>
+              <td>Kubernetes control plane, service discovery</td>
+            </tr>
+            <tr>
+              <td>HBase</td>
+              <td>CP</td>
+              <td>Unavailable during partition</td>
+              <td>Large-scale data, consistent reads</td>
+            </tr>
+            <tr>
+              <td>Cassandra</td>
+              <td>AP</td>
+              <td>Serves stale data</td>
+              <td>Write-heavy, global distribution</td>
+            </tr>
+            <tr>
+              <td>DynamoDB</td>
+              <td>AP (default)</td>
+              <td>Serves stale data</td>
+              <td>Web-scale, low-latency reads</td>
+            </tr>
+            <tr>
+              <td>CouchDB</td>
+              <td>AP</td>
+              <td>Conflicts resolved later</td>
+              <td>Offline-capable apps</td>
+            </tr>
+          </table>
+        </div>
+
+        <h2>Consistency Models</h2>
+        <p>Consistency models define the rules about when writes become visible to reads. They form a spectrum from
+          strictest to most relaxed, with tradeoffs in latency and availability.</p>
+
+        <h3>Strong Consistency (Linearizability)</h3>
+        <p>After a write completes, any subsequent read — from any node — will see that write. Operations appear as if
+          executed on a single machine in real time order. This is the strongest and most intuitive model.</p>
+        <ul>
+          <li><strong>Implementation:</strong> All replicas must acknowledge before write is considered complete. High
+            coordination overhead.</li>
+          <li><strong>Latency:</strong> High, because reads and writes must wait for cross-node confirmation.</li>
+          <li><strong>Use cases:</strong> Bank balances, inventory counts, leader election.</li>
+          <li><strong>Examples:</strong> Google Spanner, etcd, single-node PostgreSQL.</li>
+        </ul>
+
+        <h3>Sequential Consistency</h3>
+        <p>All operations appear to have executed in some sequential order, and the operations of each individual
+          process appear in this sequence in the order specified by the process. Weaker than linearizability — the
+          sequence does not need to match real-time order, but each process's operations must appear in order.</p>
+
+        <h3>Causal Consistency</h3>
+        <p>Operations that are causally related are seen by all nodes in the same order. Operations that have no causal
+          relationship may be seen in different orders by different nodes.</p>
+
+        <div class="example">
+          <div class="example-label">Example: Comment thread</div>
+          <p>Alice posts "Is anyone around?" (event A). Bob replies "Yes!" (event B, caused by A). With causal
+            consistency, every user sees A before B, because B causally depends on A. However, unrelated posts from
+            Charlie may appear in any order relative to A and B.</p>
+        </div>
+
+        <h3>Read-Your-Writes Consistency</h3>
+        <p>A client that writes a value will always see that value (or a more recent one) in subsequent reads, even if
+          other clients still see the old value. This is a practical guarantee that prevents confusing user experiences.
+        </p>
+
+        <div class="example">
+          <div class="example-label">Example: Profile photo update</div>
+          <p>You upload a new profile photo. The operation succeeds. When you reload your profile page, you see the new
+            photo — not the old one — even though other users might still see the old photo for a few seconds while
+            replicas catch up.</p>
+        </div>
+
+        <h3>Monotonic Read Consistency</h3>
+        <p>If a client reads value V at time T, all subsequent reads by that client will return V or a more recent
+          value. A client will never read progressively older values (it won't go "backwards in time").</p>
+
+        <h3>Eventual Consistency</h3>
+        <p>If no new updates are made to a given data item, eventually all reads will return the last updated value.
+          This is the weakest mainstream model — the system makes no guarantee about when convergence happens, only that
+          it will.</p>
+        <ul>
+          <li><strong>Implementation:</strong> Replicas accept writes locally and sync asynchronously.</li>
+          <li><strong>Latency:</strong> Very low — no coordination needed for writes.</li>
+          <li><strong>Use cases:</strong> DNS propagation, social media counters, product availability.</li>
+          <li><strong>Examples:</strong> Amazon DynamoDB (default), Apache Cassandra, Amazon S3.</li>
+        </ul>
+
+        <div class="table-wrap">
+          <table>
+            <tr>
+              <th>Model</th>
+              <th>Guarantee</th>
+              <th>Latency</th>
+              <th>Use case</th>
+            </tr>
+            <tr>
+              <td>Strong / Linearizable</td>
+              <td>Reads always see latest write, globally</td>
+              <td>Highest</td>
+              <td>Bank balances, distributed locks</td>
+            </tr>
+            <tr>
+              <td>Sequential</td>
+              <td>Global order exists, not real-time</td>
+              <td>High</td>
+              <td>Collaborative editing order</td>
+            </tr>
+            <tr>
+              <td>Causal</td>
+              <td>Causally related ops in order</td>
+              <td>Medium</td>
+              <td>Comment threads, message replies</td>
+            </tr>
+            <tr>
+              <td>Read-Your-Writes</td>
+              <td>Your writes visible to you immediately</td>
+              <td>Medium</td>
+              <td>User profile updates</td>
+            </tr>
+            <tr>
+              <td>Monotonic Reads</td>
+              <td>Never read older data than before</td>
+              <td>Medium</td>
+              <td>Any UI that must not go backward</td>
+            </tr>
+            <tr>
+              <td>Eventual</td>
+              <td>Converges eventually, no timing guarantee</td>
+              <td>Lowest</td>
+              <td>DNS, like counts, carts</td>
+            </tr>
+          </table>
+        </div>
+      </div>
+
+<div class="section" id="pacelc">
+        <h1 class="section-title">PACELC Theorem</h1>
+        <p class="section-subtitle">Extension of CAP Theorem - Understanding latency-consistency tradeoffs during normal
+          operation</p>
+
+        <div class="callout info">
+          <div class="callout-title">Real Story: The Gap CAP Didn't Address</div>
+          <p>CAP Theorem became famous for explaining distributed systems behavior during network partitions. But
+            engineers realized something: partitions are rare (happening 0.01% of the time), yet we make consistency vs
+            latency tradeoffs <strong>every single day</strong> during normal operation. PACELC fills this gap.</p>
+        </div>
+
+        <h2>What is PACELC?</h2>
+
+        <p>The <strong>PACELC theorem</strong> (pronounced "pass-elk") extends CAP by stating:</p>
+
+        <div class="callout info">
+          <div class="callout-title">PACELC Definition</div>
+          <p><strong>If Partition (P):</strong> Choose between Availability (A) and Consistency (C)</p>
+          <p><strong>Else (E):</strong> When system is running normally, choose between Latency (L) and Consistency (C)
+          </p>
+        </div>
+
+        <p>This creates four possible system configurations: PA/EL, PA/EC, PC/EL, and PC/EC.</p>
+
+        <h2>Why PACELC Matters</h2>
+
+        <p>Consider a typical production system:</p>
+        <ul>
+          <li><strong>99.99% of the time:</strong> System runs normally (no partition)</li>
+          <li><strong>0.01% of the time:</strong> Network partition occurs</li>
+        </ul>
+
+        <p>CAP only addresses the 0.01% case. PACELC addresses both cases, making it far more practical for day-to-day
+          architectural decisions.</p>
+
+        <div class="example">
+          <div class="example-label">Example: Reality Check</div>
+          <pre>
+Your e-commerce site runs 365 days/year.
+
+Partition time: 0.01% = 52.6 minutes/year
+Normal operation: 99.99% = 525,547 minutes/year
+
+CAP helps you plan for 52 minutes.
+PACELC helps you optimize for 525,547 minutes.
+
+Which matters more for your users?
+  </pre>
+        </div>
+
+        <h2>The Four PACELC Configurations</h2>
+
+        <h3>1. PA/EL - High Availability + Low Latency</h3>
+
+        <p><strong>During Partition:</strong> Choose Availability (keep serving requests)</p>
+        <p><strong>Normal Operation:</strong> Choose Low Latency (async replication)</p>
+
+        <p><strong>Characteristics:</strong></p>
+        <ul>
+          <li>Eventually consistent</li>
+          <li>Fast response times (<100ms)< /li>
+          <li>Always available</li>
+          <li>May serve stale data briefly</li>
+        </ul>
+
+        <p><strong>Examples:</strong> Cassandra, DynamoDB, Riak, Voldemort</p>
+
+        <p><strong>Use Cases:</strong> Social media feeds, product catalogs, recommendation engines, shopping carts,
+          session stores</p>
+
+        <div class="example">
+          <div class="example-label">Real Example: Amazon Shopping Cart</div>
+          <p>Amazon's shopping cart uses a PA/EL system (Dynamo). When you add an item:</p>
+          <ul>
+            <li>Response is instant (<50ms)< /li>
+            <li>Your item is saved locally first</li>
+            <li>Replication happens asynchronously</li>
+            <li>During partition, you can still add items</li>
+            <li>Brief inconsistency is acceptable (cart eventually syncs)</li>
+          </ul>
+          <p><strong>Why:</strong> User experience demands instant feedback. Nobody wants to wait 500ms to add to cart.
+            Losing an item temporarily is acceptable; losing the customer isn't.</p>
+        </div>
+
+        <h3>2. PC/EC - Strong Consistency Always</h3>
+
+        <p><strong>During Partition:</strong> Choose Consistency (may become unavailable)</p>
+        <p><strong>Normal Operation:</strong> Choose Consistency (synchronous replication)</p>
+
+        <p><strong>Characteristics:</strong></p>
+        <ul>
+          <li>Always strongly consistent</li>
+          <li>Higher latency (100-500ms)</li>
+          <li>May be unavailable during partition</li>
+          <li>No stale reads ever</li>
+        </ul>
+
+        <p><strong>Examples:</strong> PostgreSQL (with sync replication), MongoDB (with majority write concern), HBase,
+          VoltDB</p>
+
+        <p><strong>Use Cases:</strong> Banking, payments, financial transactions, inventory management, booking systems,
+          critical user data</p>
+
+        <div class="example">
+          <div class="example-label">Real Example: Bank Account Balance</div>
+          <p>Your bank uses a PC/EC system for account balances:</p>
+          <ul>
+            <li>Every transaction waits for replication (~200ms)</li>
+            <li>All replicas must acknowledge before success</li>
+            <li>During partition, may reject transactions</li>
+            <li>You always see accurate balance</li>
+          </ul>
+          <p><strong>Why:</strong> Accuracy matters more than speed. Showing wrong balance = legal/regulatory issues.
+            Brief downtime during partition is acceptable; showing incorrect money is not.</p>
+        </div>
+
+        <h3>3. PA/EC - Rare Configuration</h3>
+
+        <p><strong>During Partition:</strong> Choose Availability</p>
+        <p><strong>Normal Operation:</strong> Choose Consistency</p>
+
+        <p>This configuration is rare because it creates operational challenges:</p>
+        <ul>
+          <li>You must handle inconsistency during partitions</li>
+          <li>Then reconcile when partition heals</li>
+          <li>Application logic becomes complex</li>
+        </ul>
+
+        <p><strong>Use Case:</strong> Systems with geographic locality where partitions are extremely rare, and you can
+          afford conflict resolution.</p>
+
+        <h3>4. PC/EL - Rare Configuration</h3>
+
+        <p><strong>During Partition:</strong> Choose Consistency</p>
+        <p><strong>Normal Operation:</strong> Choose Low Latency</p>
+
+        <p>This configuration is contradictory and rarely used:</p>
+        <ul>
+          <li>Hard to achieve low latency with strong consistency</li>
+          <li>Typically requires expensive infrastructure</li>
+          <li>Only viable with very low replication distance</li>
+        </ul>
+
+        <h2>Latency vs Consistency During Normal Operation</h2>
+
+        <p>The key insight: even without partitions, you face tradeoffs.</p>
+
+        <div class="compare">
+          <div class="compare-card pro">
+            <h4>Low Latency (EL) Approach</h4>
+            <pre>
+Client → Primary
+Primary → [ACK to client immediately]
+Primary → [async replicate to replicas]
+
+Response time: 10-50ms
+Consistency: Eventually consistent
+Risk: Brief stale reads possible
+    </pre>
+            <p><strong>Best for:</strong> User-facing features where speed matters</p>
+          </div>
+
+          <div class="compare-card con">
+            <h4>Strong Consistency (EC) Approach</h4>
+            <pre>
+Client → Primary
+Primary → Replica 1 [wait for ACK]
+Primary → Replica 2 [wait for ACK]
+Primary → Replica 3 [wait for ACK]
+Primary → [ACK to client after majority]
+
+Response time: 100-500ms
+Consistency: Strongly consistent
+Risk: Higher latency, possible timeouts
+    </pre>
+            <p><strong>Best for:</strong> Critical data where accuracy matters</p>
+          </div>
+        </div>
+
+        <h2>Real-World Decision Framework</h2>
+
+        <table>
+          <tr>
+            <th>Data Type</th>
+            <th>Configuration</th>
+            <th>Reasoning</th>
+          </tr>
+          <tr>
+            <td>User profiles</td>
+            <td>PA/EL</td>
+            <td>Fast reads needed, brief staleness OK</td>
+          </tr>
+          <tr>
+            <td>Product catalog</td>
+            <td>PA/EL</td>
+            <td>High read volume, updates infrequent</td>
+          </tr>
+          <tr>
+            <td>Shopping cart</td>
+            <td>PA/EL</td>
+            <td>UX demands instant response</td>
+          </tr>
+          <tr>
+            <td>Inventory count</td>
+            <td>PC/EC</td>
+            <td>Cannot oversell products</td>
+          </tr>
+          <tr>
+            <td>Payment transactions</td>
+            <td>PC/EC</td>
+            <td>Money requires accuracy</td>
+          </tr>
+          <tr>
+            <td>Seat reservations</td>
+            <td>PC/EC</td>
+            <td>Cannot double-book seats</td>
+          </tr>
+          <tr>
+            <td>Like counts</td>
+            <td>PA/EL</td>
+            <td>Approximate count acceptable</td>
+          </tr>
+          <tr>
+            <td>Account balance</td>
+            <td>PC/EC</td>
+            <td>Must be accurate always</td>
+          </tr>
+        </table>
+
+        <h2>Database Systems by PACELC Classification</h2>
+
+        <table>
+          <tr>
+            <th>Database</th>
+            <th>Classification</th>
+            <th>Partition Behavior</th>
+            <th>Normal Operation</th>
+          </tr>
+          <tr>
+            <td><strong>Cassandra</strong></td>
+            <td>PA/EL</td>
+            <td>Always available</td>
+            <td>Tunable consistency (default: eventual)</td>
+          </tr>
+          <tr>
+            <td><strong>DynamoDB</strong></td>
+            <td>PA/EL</td>
+            <td>Highly available</td>
+            <td>Eventually consistent by default</td>
+          </tr>
+          <tr>
+            <td><strong>Riak</strong></td>
+            <td>PA/EL</td>
+            <td>Always available</td>
+            <td>Eventually consistent</td>
+          </tr>
+          <tr>
+            <td><strong>PostgreSQL</strong></td>
+            <td>PC/EC</td>
+            <td>May reject writes</td>
+            <td>Synchronous replication</td>
+          </tr>
+          <tr>
+            <td><strong>MongoDB</strong></td>
+            <td>PC/EC</td>
+            <td>Majority write concern</td>
+            <td>Strong consistency with majority</td>
+          </tr>
+          <tr>
+            <td><strong>HBase</strong></td>
+            <td>PC/EC</td>
+            <td>Blocks on partition</td>
+            <td>Strong consistency</td>
+          </tr>
+          <tr>
+            <td><strong>Redis</strong></td>
+            <td>PA/EC (configurable)</td>
+            <td>Available</td>
+            <td>Can configure for consistency</td>
+          </tr>
+        </table>
+
+        <h2>PACELC vs CAP: Key Differences</h2>
+
+        <div class="compare">
+          <div class="compare-card neutral">
+            <h4>CAP Theorem</h4>
+            <ul>
+              <li>Only addresses partition scenario (0.01% of time)</li>
+              <li>Binary choice: A or C during partition</li>
+              <li>Ignores normal operation completely</li>
+              <li>Doesn't consider latency</li>
+              <li>Published 2000, revolutionary at the time</li>
+              <li>Good for understanding failure modes</li>
+            </ul>
+          </div>
+
+          <div class="compare-card pro">
+            <h4>PACELC Theorem</h4>
+            <ul>
+              <li>Addresses both partition AND normal operation</li>
+              <li>Considers latency-consistency tradeoff (99.99% of time)</li>
+              <li>More practical for daily decisions</li>
+              <li>Helps choose database and configuration</li>
+              <li>Published 2012 by Daniel Abadi</li>
+              <li>Better for operational architecture</li>
+            </ul>
+          </div>
+        </div>
+
+        <h2>Practical Implementation: Configuring PACELC</h2>
+
+        <div class="example">
+          <div class="example-label">Example: Cassandra Configuration</div>
+          <pre>
+// PA/EL Configuration (default)
+CONSISTENCY LEVEL = ONE    // Read from any replica (fast)
+REPLICATION = ASYNC        // Don't wait for replicas
+
+Result: 10ms reads, eventually consistent
+
+// PC/EC Configuration (strict)
+CONSISTENCY LEVEL = QUORUM // Read from majority (slower)
+REPLICATION = QUORUM       // Wait for majority write
+
+Result: 150ms reads, strongly consistent
+
+// You choose based on use case!
+  </pre>
+        </div>
+
+        <div class="callout tip">
+          <div class="callout-title">Design Principle</div>
+          <p><strong>Different data, different tradeoffs:</strong> Use PA/EL for user-facing features (speed matters).
+            Use PC/EC for critical data (accuracy matters). Same application can use both!</p>
+        </div>
+
+        <h2>Common Misconceptions</h2>
+
+        <p><strong>Myth:</strong> "PA/EL systems are unreliable because of eventual consistency"</p>
+        <p><strong>Reality:</strong> They're highly reliable. "Eventual" typically means milliseconds. Amazon, Facebook,
+          Netflix use PA/EL for most data.</p>
+
+        <p><strong>Myth:</strong> "PC/EC is always better because of strong consistency"</p>
+        <p><strong>Reality:</strong> Higher latency hurts user experience. Use PC/EC only where accuracy is critical,
+          not everywhere.</p>
+
+        <p><strong>Myth:</strong> "I must choose one configuration for my entire system"</p>
+        <p><strong>Reality:</strong> Most systems use both. Shopping cart = PA/EL. Checkout = PC/EC.</p>
+
+        <div class="callout info">
+          <div class="callout-title">Key Takeaway</div>
+          <p>PACELC is more practical than CAP because systems spend 99.99% of time in normal operation, not
+            partitioned. Understanding the latency-consistency tradeoff helps you make better database choices and
+            configuration decisions for everyday scenarios.</p>
+          <p><strong>Use PACELC to:</strong></p>
+          <ul>
+            <li>Choose the right database for each use case</li>
+            <li>Configure consistency levels appropriately</li>
+            <li>Explain tradeoffs to stakeholders</li>
+            <li>Make informed architecture decisions</li>
+          </ul>
+        </div>
+
+      </div>
+
+<div class="section" id="hashing">
+        <h1 class="section-title">Consistent Hashing</h1>
+        <p class="section-subtitle">Module 2 &nbsp;|&nbsp; The Algorithm Behind Distributed Caches, DHTs, and Database
+          Sharding</p>
+
+        <h2>The Problem: Naive Modulo Hashing</h2>
+        <p>The simplest way to distribute keys across N nodes is <code>hash(key) % N</code>. This works perfectly
+          until you add or remove a node — at which point <strong>almost every key maps to a different node</strong>,
+          causing a massive cache invalidation storm or data migration.</p>
+
+        <div class="callout warn">
+          <div class="callout-title">Modulo Hashing Failure at Scale</div>
+          <p>With 10 nodes: <code>hash("user:42") % 10 = 3</code> → node 3. Add one node (11 total):
+            <code>hash("user:42") % 11 = 8</code> → node 8. The key moved. With 1 million keys,
+            <strong>~91% of keys must migrate</strong> when you add just 1 of 10 nodes.
+            This is catastrophic for a cache or distributed database.
+          </p>
+        </div>
+
+        <h2>Consistent Hashing: The Ring</h2>
+        <p>Consistent hashing places both nodes and keys on a <strong>virtual hash ring</strong> (0 to
+          2<sup>32</sup>−1).
+          A key is assigned to the first node found <em>clockwise</em> on the ring from its position.
+          When a node is added or removed, only the keys between the new node and its predecessor need to move —
+          approximately <strong>K/N keys total</strong> (K = total keys, N = nodes).</p>
+
+        <div class="mermaid">
+          flowchart LR
+          subgraph Hash Ring
+          K1((Key A\nhash=10)) -->|clockwise| N1[Node 1\nhash=20]
+          K2((Key B\nhash=35)) -->|clockwise| N2[Node 2\nhash=50]
+          K3((Key C\nhash=70)) -->|clockwise| N3[Node 3\nhash=80]
+          K4((Key D\nhash=90)) -->|wraps around| N1
+          end
+        </div>
+
+        <div class="def">
+          <dt>Adding a node:</dt>
+          <dd>Insert Node 4 at hash=40. Only keys between hash=20 and hash=40 (previously owned by Node 2) move to Node
+            4.
+            All other keys are unaffected.</dd>
+          <dt>Removing a node:</dt>
+          <dd>Remove Node 2 (hash=50). Its keys are reassigned to Node 3 (its clockwise successor). ~1/N of all keys
+            move.
+          </dd>
+          <dt>Key migration formula:</dt>
+          <dd>Adding 1 node to a cluster of N: <strong>only K/N keys move</strong> (vs. ~K×(N-1)/N for modulo hashing).
+          </dd>
+        </div>
+
+        <h2>Virtual Nodes (vnodes): Solving Uneven Distribution</h2>
+        <p>A simple ring has a problem: random placement causes unequal load distribution. Node A might own 40% of the
+          ring; Node B owns 10%. <strong>Virtual nodes</strong> solve this — each physical node gets <em>M</em>
+          positions
+          on the ring (typically 150–200 vnodes per physical node).</p>
+
+        <div class="compare">
+          <div class="compare-card con">
+            <h4>Without vnodes</h4>
+            <ul>
+              <li>Random hash placement → unequal arc lengths</li>
+              <li>One node may own 5× more keys than another</li>
+              <li>Heterogeneous hardware can't be accounted for</li>
+            </ul>
+          </div>
+          <div class="compare-card pro">
+            <h4>With vnodes (150 per node)</h4>
+            <ul>
+              <li>Each node's vnodes are spread evenly across the ring</li>
+              <li>Load variance typically &lt;5% across nodes</li>
+              <li>Larger nodes get proportionally more vnodes (weighted)</li>
+              <li>Node failure redistributes load evenly across all others</li>
+            </ul>
+          </div>
+        </div>
+
+        <h2>Hash Functions for Consistent Hashing</h2>
+        <div class="table-wrap">
+          <table>
+            <tr>
+              <th>Hash Function</th>
+              <th>Speed</th>
+              <th>Distribution Quality</th>
+              <th>Used By</th>
+            </tr>
+            <tr>
+              <td>MD5</td>
+              <td>Slow</td>
+              <td>Good</td>
+              <td>Early DHTs (Chord protocol)</td>
+            </tr>
+            <tr>
+              <td>SHA-1 / SHA-256</td>
+              <td>Slow</td>
+              <td>Excellent</td>
+              <td>Git objects, S3 ETags</td>
+            </tr>
+            <tr>
+              <td>MurmurHash3</td>
+              <td>Very fast</td>
+              <td>Excellent (non-crypto)</td>
+              <td>Cassandra, Redis Cluster, Kafka</td>
+            </tr>
+            <tr>
+              <td>FNV-1a</td>
+              <td>Extremely fast</td>
+              <td>Good</td>
+              <td>Memcached clients, some CDNs</td>
+            </tr>
+            <tr>
+              <td>xxHash</td>
+              <td>Fastest</td>
+              <td>Excellent</td>
+              <td>ClickHouse, LZ4, modern systems</td>
+            </tr>
+          </table>
+        </div>
+
+        <h2>Real-World Implementations</h2>
+        <div class="def">
+          <dt>Amazon DynamoDB</dt>
+          <dd>DynamoDB uses consistent hashing across its storage nodes. Each item's partition key is hashed to
+            determine
+            which storage node owns it. DynamoDB automatically splits hot partitions and re-distributes load — this
+            is consistent hashing operating transparently at hyper-scale (millions of requests/sec globally).</dd>
+          <dt>Apache Cassandra</dt>
+          <dd>Cassandra's ring uses MurmurHash3 with configurable vnodes (default: 256 per node). The
+            <strong>replication factor</strong> (RF) means each key is stored on RF consecutive nodes clockwise —
+            so data is always available even if RF-1 nodes fail. With RF=3, Cassandra can survive 2 node failures
+            per partition.
+          </dd>
+          <dt>Redis Cluster</dt>
+          <dd>Redis Cluster uses a fixed 16,384-slot hash ring. Each slot is owned by one primary node. Keys are
+            mapped to slots via <code>CRC16(key) % 16384</code>. This is a simplified consistent hashing variant —
+            no vnodes, but slot assignment is explicit and easily resharded.</dd>
+          <dt>Akamai CDN</dt>
+          <dd>Consistent hashing was invented by David Karger et al. at MIT in 1997 — directly motivated by the
+            problem of distributing web content across Akamai's cache servers. The original paper described exactly
+            this problem: how to route requests to cache servers such that server additions/removals don't
+            invalidate most cached content.</dd>
+        </div>
+
+        <h2>Consistent Hashing in Database Sharding</h2>
+        <div class="example">
+          <div class="example-label">FAANG Interview: Design a Distributed Key-Value Store</div>
+          <p>A standard question. The expected answer mentions consistent hashing for the routing layer:</p>
+          <ol>
+            <li>Client computes <code>ring_position = hash(key)</code></li>
+            <li>Client queries a <strong>routing layer</strong> (or maintains a local cluster map) to find the
+              responsible node</li>
+            <li>Request goes directly to that node (like Cassandra's coordinator pattern)</li>
+            <li>Replication copies to the next RF-1 nodes clockwise on the ring</li>
+            <li>On node failure: successor node absorbs its keys until the failed node recovers</li>
+          </ol>
+        </div>
+
+        <div class="callout tip">
+          <div class="callout-title">Hotspot Mitigation with Consistent Hashing</div>
+          <p>If a specific key is extremely hot (celebrity social media post, trending product), consistent hashing
+            still routes it to one node. Solutions: (1) <strong>key suffixing</strong> — append a random suffix
+            (0–N) to spread the key across N nodes, then aggregate on read; (2) <strong>local cache</strong> in
+            front of the distributed cache for the hottest keys; (3) <strong>read replicas</strong> for the hot
+            partition specifically.</p>
+        </div>
+      </div>
+
+
+      <div class="page-nav">
+        <a class="page-nav-btn" href="01-introduction.html">&#8592; Introduction to SDI</a>
+        <a class="page-nav-btn home" href="../system-design-complete.html">&#9776; All Topics</a>
+        <a class="page-nav-btn" href="03-tradeoffs.html">Trade-offs &#8594;</a>
+      </div>
+    </div>
+  </div>
+
+  <button id="back-to-top" title="Back to top" aria-label="Back to top">&#8593;</button>
+
+  <script>
+    mermaid.initialize({
+      startOnLoad: false,
+      theme: 'default',
+      themeVariables: {
+        primaryColor: '#e8f4fd',
+        primaryTextColor: '#1e293b',
+        primaryBorderColor: '#93c5fd',
+        lineColor: '#64748b',
+        secondaryColor: '#f0fdf4',
+        tertiaryColor: '#faf5ff',
+        background: '#ffffff',
+        mainBkg: '#f8fafc',
+        nodeBorder: '#cbd5e1',
+        clusterBkg: '#f1f5f9',
+        titleColor: '#1e293b',
+        edgeLabelBackground: '#ffffff',
+        attributeBackgroundColorEven: '#f8fafc',
+        attributeBackgroundColorOdd: '#f1f5f9'
+      },
+      flowchart: { useMaxWidth: true, htmlLabels: true, curve: 'basis' },
+      sequence: { useMaxWidth: true },
+      stateDiagram: { useMaxWidth: true },
+      securityLevel: 'loose'
+    });
+
+    // ── Section switching (same-page nav items only) ──
+    const pageSections = document.querySelectorAll('.section');
+    const subItems     = document.querySelectorAll('.acc-sub-item[data-sec]');
+    const pb           = document.getElementById('pb');
+
+    function showSection(id) {
+      pageSections.forEach(s => s.classList.remove('active'));
+      subItems.forEach(n => n.classList.remove('active'));
+      const target = document.getElementById(id);
+      if (target) {
+        target.classList.add('active');
+        const diags = target.querySelectorAll('.mermaid:not([data-processed])');
+        if (diags.length) mermaid.run({ nodes: diags });
+        // Scroll content area to top, NOT the whole window
+        const main = document.querySelector('.main');
+        if (main) main.scrollTo(0, 0);
+      }
+      const item = document.querySelector(`.acc-sub-item[data-sec="${id}"]`);
+      if (item) item.classList.add('active');
+      updateProgress(id);
+    }
+
+    function updateProgress(activeId) {
+      const ids = Array.from(subItems).map(n => n.dataset.sec);
+      const idx = ids.indexOf(activeId);
+      const pct = idx >= 0 ? Math.round(((idx + 1) / ids.length) * 100) : 0;
+      pb.style.width = pct + '%';
+    }
+
+    subItems.forEach(item => {
+      item.addEventListener('click', () => {
+        if (item.dataset.sec) showSection(item.dataset.sec);
+      });
+    });
+
+    // On load: check URL hash for deep link from another page
+    const hash = window.location.hash.slice(1);
+    if (hash && document.getElementById(hash)) {
+      showSection(hash);
+    } else if (subItems.length) {
+      showSection(subItems[0].dataset.sec);
+    }
+
+    // Scroll progress
+    const mainEl = document.querySelector('.main');
+    if (mainEl) {
+      mainEl.style.overflowY = 'auto';
+      mainEl.style.height = '100vh';
+      mainEl.addEventListener('scroll', () => {
+        const scrolled = mainEl.scrollTop + mainEl.clientHeight;
+        const total = mainEl.scrollHeight;
+        if (total > 0) pb.style.width = Math.min(100, Math.round((scrolled / total) * 100)) + '%';
+      });
+    }
+
+    const bttBtn = document.getElementById('back-to-top');
+    (mainEl || window).addEventListener('scroll', () => {
+      const top = mainEl ? mainEl.scrollTop : window.scrollY;
+      bttBtn.classList.toggle('visible', top > 500);
+    });
+    bttBtn.addEventListener('click', () => {
+      if (mainEl) mainEl.scrollTo({top:0,behavior:'smooth'});
+      else window.scrollTo({top:0,behavior:'smooth'});
+    });
+  </script>
+</body>
+</html>
