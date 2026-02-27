@@ -1,0 +1,1469 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Blind 75 — Coding Interview Patterns</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Fira+Code:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<!-- Highlight.js for syntax highlighting -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<style>
+        :root {
+            --bg: #f6f8ff;
+            --surface: #ffffff;
+            --sidebar-bg: #1a1a2e;
+            --sidebar-text: #a6adc8;
+            --sidebar-active: #89b4fa;
+            --accent: #4f46e5;
+            --accent-light: #e0e7ff;
+            --green: #16a34a;
+            --green-light: #dcfce7;
+            --yellow: #d97706;
+            --yellow-light: #fef3c7;
+            --red: #dc2626;
+            --red-light: #fee2e2;
+            --text: #1e293b;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --radius: 10px;
+            --tag-easy: #16a34a;
+            --tag-medium: #d97706;
+            --tag-hard: #dc2626;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* ── SIDEBAR ── */
+        .sidebar {
+            width: 300px;
+            flex-shrink: 0;
+            background: var(--sidebar-bg);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            border-right: 1px solid rgba(137, 180, 250, 0.1);
+        }
+
+        .sidebar-header {
+            padding: 20px 16px 14px;
+            border-bottom: 1px solid rgba(137, 180, 250, 0.1);
+            background: linear-gradient(160deg, #1e1e3f 0%, #12122a 100%);
+        }
+
+        .sidebar-header a {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-size: .72rem;
+            color: #89b4fa;
+            text-decoration: none;
+            padding: 4px 10px;
+            border: 1px solid rgba(137, 180, 250, .25);
+            border-radius: 20px;
+            margin-bottom: 12px;
+            transition: all .2s;
+        }
+
+        .sidebar-header a:hover {
+            background: rgba(137, 180, 250, .1);
+        }
+
+        .sidebar-header h1 {
+            font-size: .88rem;
+            color: #e2e8f9;
+            font-weight: 700;
+            letter-spacing: .2px;
+            margin-bottom: 3px;
+        }
+
+        .sidebar-header p {
+            font-size: .7rem;
+            color: #6272a4;
+        }
+
+        .sidebar-search {
+            padding: 12px 14px;
+            border-bottom: 1px solid rgba(137, 180, 250, 0.08);
+        }
+
+        .sidebar-search input {
+            width: 100%;
+            background: rgba(137, 180, 250, 0.08);
+            border: 1px solid rgba(137, 180, 250, .15);
+            border-radius: 7px;
+            padding: 7px 12px;
+            font-size: .78rem;
+            color: #cdd6f4;
+            outline: none;
+            font-family: inherit;
+        }
+
+        .sidebar-search input::placeholder {
+            color: #505575;
+        }
+
+        .sidebar-search input:focus {
+            border-color: rgba(137, 180, 250, .4);
+            background: rgba(137, 180, 250, .12);
+        }
+
+        .category-section {
+            padding-top: 4px;
+        }
+
+        .category-label {
+            font-size: .6rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            color: #585b70;
+            padding: 10px 16px 5px;
+        }
+
+        .q-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 14px 8px 16px;
+            cursor: pointer;
+            transition: all .14s;
+            border-left: 2px solid transparent;
+        }
+
+        .q-item:hover {
+            background: rgba(137, 180, 250, 0.07);
+        }
+
+        .q-item.active {
+            background: rgba(137, 180, 250, 0.12);
+            border-left-color: #89b4fa;
+        }
+
+        .q-num {
+            font-size: .65rem;
+            color: #44475a;
+            width: 24px;
+            flex-shrink: 0;
+            font-weight: 600;
+        }
+
+        .q-item.active .q-num {
+            color: #89b4fa;
+        }
+
+        .q-check {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            border: 1.5px solid #44475a;
+            flex-shrink: 0;
+            transition: .2s;
+        }
+
+        .q-item.solved .q-check {
+            background: #16a34a;
+            border-color: #16a34a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .q-item.solved .q-check::after {
+            content: '';
+            font-size: .6rem;
+            color: #fff;
+        }
+
+        .q-name {
+            font-size: .78rem;
+            color: #7f849c;
+            flex: 1;
+            line-height: 1.3;
+        }
+
+        .q-item.active .q-name {
+            color: #cdd6f4;
+            font-weight: 600;
+        }
+
+        .q-diff {
+            font-size: .58rem;
+            font-weight: 700;
+            padding: 2px 6px;
+            border-radius: 4px;
+            flex-shrink: 0;
+            text-transform: uppercase;
+        }
+
+        .diff-easy {
+            color: var(--tag-easy);
+            background: rgba(22, 163, 74, .12);
+        }
+
+        .diff-medium {
+            color: var(--tag-medium);
+            background: rgba(217, 119, 6, .12);
+        }
+
+        .diff-hard {
+            color: var(--tag-hard);
+            background: rgba(220, 38, 38, .12);
+        }
+
+        .sidebar-scroll {
+            overflow-y: auto;
+            flex: 1;
+            padding-bottom: 16px;
+        }
+
+        .progress-footer {
+            padding: 10px 16px;
+            border-top: 1px solid rgba(137, 180, 250, 0.1);
+            background: rgba(137, 180, 250, 0.03);
+        }
+
+        .progress-label {
+            font-size: .68rem;
+            color: #6272a4;
+            margin-bottom: 5px;
+        }
+
+        .progress-bar-wrap {
+            background: rgba(137, 180, 250, .1);
+            border-radius: 20px;
+            height: 4px;
+        }
+
+        .progress-bar-fill {
+            height: 4px;
+            background: #89b4fa;
+            border-radius: 20px;
+            width: 1.3%;
+            transition: .5s;
+        }
+
+        /* ── MAIN CONTENT ── */
+        .main {
+            flex: 1;
+            overflow-y: auto;
+            background: var(--bg);
+        }
+
+        .question-panel {
+            display: none;
+            max-width: 960px;
+            margin: 0 auto;
+            padding: 40px 48px 80px;
+        }
+
+        .question-panel.active {
+            display: block;
+            animation: fadein .25s ease;
+        }
+
+        @keyframes fadein {
+            from {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Header */
+        .q-header {
+            margin-bottom: 28px;
+        }
+
+        .q-header-meta {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+        }
+
+        .q-number-badge {
+            font-size: .72rem;
+            font-weight: 700;
+            color: #89b4fa;
+            background: rgba(137, 180, 250, .12);
+            padding: 3px 10px;
+            border-radius: 20px;
+            border: 1px solid rgba(137, 180, 250, .2);
+        }
+
+        .diff-badge {
+            font-size: .72rem;
+            font-weight: 700;
+            padding: 3px 10px;
+            border-radius: 20px;
+        }
+
+        .diff-badge.easy {
+            color: var(--tag-easy);
+            background: var(--green-light);
+        }
+
+        .diff-badge.medium {
+            color: var(--tag-medium);
+            background: var(--yellow-light);
+        }
+
+        .diff-badge.hard {
+            color: var(--tag-hard);
+            background: var(--red-light);
+        }
+
+        .topic-tag {
+            font-size: .68rem;
+            color: var(--accent);
+            background: var(--accent-light);
+            padding: 2px 8px;
+            border-radius: 5px;
+            font-weight: 500;
+        }
+
+        .q-title {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--text);
+            line-height: 1.2;
+            margin-bottom: 8px;
+        }
+
+        .q-source {
+            font-size: .78rem;
+            color: var(--text-muted);
+        }
+
+        .q-source a {
+            color: var(--accent);
+            text-decoration: none;
+        }
+
+        .q-source a:hover {
+            text-decoration: underline;
+        }
+
+        hr.section-rule {
+            border: none;
+            border-top: 2px solid var(--border);
+            margin: 24px 0;
+        }
+
+        /* Problem statement */
+        .problem-statement {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 24px 28px;
+            margin-bottom: 24px;
+        }
+
+        .problem-statement h3 {
+            font-size: .78rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .8px;
+            color: var(--text-muted);
+            margin-bottom: 12px;
+        }
+
+        .problem-statement p {
+            line-height: 1.7;
+            color: var(--text);
+            margin-bottom: 10px;
+        }
+
+        .problem-statement p:last-child {
+            margin-bottom: 0;
+        }
+
+        /* Examples */
+        .examples {
+            margin-bottom: 24px;
+        }
+
+        .example-block {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            margin-bottom: 12px;
+            overflow: hidden;
+        }
+
+        .example-header {
+            background: #f8fafc;
+            padding: 8px 16px;
+            font-size: .72rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            border-bottom: 1px solid var(--border);
+            text-transform: uppercase;
+            letter-spacing: .6px;
+        }
+
+        .example-body {
+            padding: 14px 18px;
+            font-family: 'Fira Code', monospace;
+            font-size: .85rem;
+            line-height: 1.8;
+        }
+
+        .example-body .label {
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .example-body .val {
+            color: var(--accent);
+        }
+
+        .example-body .explanation {
+            font-family: 'Inter', sans-serif;
+            font-size: .82rem;
+            color: var(--text-muted);
+            margin-top: 6px;
+        }
+
+        /* Constraints */
+        .constraints {
+            background: #fefce8;
+            border: 1px solid #fde68a;
+            border-radius: var(--radius);
+            padding: 16px 20px;
+            margin-bottom: 28px;
+        }
+
+        .constraints h4 {
+            font-size: .75rem;
+            font-weight: 700;
+            color: #92400e;
+            text-transform: uppercase;
+            letter-spacing: .6px;
+            margin-bottom: 8px;
+        }
+
+        .constraints ul {
+            list-style: none;
+        }
+
+        .constraints ul li {
+            font-family: 'Fira Code', monospace;
+            font-size: .82rem;
+            color: #78350f;
+            margin-bottom: 3px;
+        }
+
+        .constraints ul li::before {
+            content: '• ';
+        }
+
+        /* Approach sections */
+        h2.approach-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--text);
+            margin: 32px 0 14px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .approach-badge {
+            font-size: .65rem;
+            font-weight: 700;
+            padding: 3px 9px;
+            border-radius: 5px;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+        }
+
+        .badge-brute {
+            background: var(--red-light);
+            color: var(--red);
+        }
+
+        .badge-better {
+            background: var(--yellow-light);
+            color: var(--yellow);
+        }
+
+        .badge-optimal {
+            background: var(--green-light);
+            color: var(--green);
+        }
+
+        /* Complexity row */
+        .complexity-row {
+            display: flex;
+            gap: 12px;
+            margin: 12px 0 16px;
+            flex-wrap: wrap;
+        }
+
+        .complexity-pill {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 8px 16px;
+        }
+
+        .complexity-pill .cp-label {
+            font-size: .68rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            font-weight: 600;
+            letter-spacing: .5px;
+        }
+
+        .complexity-pill .cp-value {
+            font-family: 'Fira Code', monospace;
+            font-size: .9rem;
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        .approach-explanation {
+            line-height: 1.75;
+            color: var(--text);
+            margin-bottom: 14px;
+        }
+
+        /* Code block */
+        .code-tabs {
+            margin-bottom: 24px;
+        }
+
+        .tab-buttons {
+            display: flex;
+            gap: 4px;
+            margin-bottom: 0;
+        }
+
+        .tab-btn {
+            padding: 7px 16px;
+            font-size: .78rem;
+            font-weight: 600;
+            border: 1px solid var(--border);
+            border-bottom: none;
+            border-radius: 7px 7px 0 0;
+            cursor: pointer;
+            background: #f1f5f9;
+            color: var(--text-muted);
+            transition: .14s;
+            font-family: inherit;
+        }
+
+        .tab-btn.active {
+            background: var(--surface);
+            color: var(--accent);
+            border-color: var(--border);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .code-wrap {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 0 var(--radius) var(--radius) var(--radius);
+            overflow: hidden;
+        }
+
+        .code-wrap pre {
+            margin: 0;
+            font-size: .84rem;
+            line-height: 1.6;
+            overflow-x: auto;
+        }
+
+        .code-wrap pre code {
+            border-radius: 0 !important;
+            padding: 20px 24px !important;
+            background: transparent !important;
+        }
+
+        /* Key insight callout */
+        .insight {
+            border-left: 4px solid var(--accent);
+            background: var(--accent-light);
+            border-radius: 0 var(--radius) var(--radius) 0;
+            padding: 14px 18px;
+            margin: 16px 0;
+        }
+
+        .insight-title {
+            font-size: .75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .6px;
+            color: var(--accent);
+            margin-bottom: 6px;
+        }
+
+        .insight p {
+            font-size: .88rem;
+            line-height: 1.65;
+            color: #312e81;
+        }
+
+        /* Warning */
+        .warn-box {
+            border-left: 4px solid var(--yellow);
+            background: var(--yellow-light);
+            border-radius: 0 var(--radius) var(--radius) 0;
+            padding: 14px 18px;
+            margin: 16px 0;
+        }
+
+        .warn-box-title {
+            font-size: .75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .6px;
+            color: var(--yellow);
+            margin-bottom: 6px;
+        }
+
+        .warn-box p {
+            font-size: .88rem;
+            line-height: 1.65;
+            color: #92400e;
+        }
+
+        /* Comparison table */
+        .compare-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 16px 0 24px;
+        }
+
+        .compare-table th {
+            background: #f1f5f9;
+            padding: 10px 14px;
+            font-size: .78rem;
+            text-align: left;
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .compare-table td {
+            padding: 10px 14px;
+            font-size: .82rem;
+            border: 1px solid var(--border);
+            vertical-align: top;
+        }
+
+        .compare-table tr:nth-child(even) td {
+            background: #fafbfe;
+        }
+
+        .compare-table .optimal-row td {
+            background: #f0fdf4 !important;
+            font-weight: 600;
+        }
+
+        .compare-table code {
+            font-family: 'Fira Code', monospace;
+            font-size: .8rem;
+            background: #f1f5f9;
+            padding: 2px 5px;
+            border-radius: 4px;
+        }
+
+        /* Walkthrough steps */
+        .walkthrough {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            overflow: hidden;
+            margin: 16px 0;
+        }
+
+        .walkthrough-header {
+            background: #f8fafc;
+            padding: 10px 16px;
+            font-size: .75rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .walkthrough-step {
+            display: flex;
+            gap: 12px;
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .walkthrough-step:last-child {
+            border-bottom: none;
+        }
+
+        .step-num {
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            background: var(--accent);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: .7rem;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .step-content {
+            flex: 1;
+        }
+
+        .step-state {
+            font-family: 'Fira Code', monospace;
+            font-size: .8rem;
+            color: var(--accent);
+            margin-top: 2px;
+        }
+
+        .step-desc {
+            font-size: .84rem;
+            color: var(--text);
+            line-height: 1.5;
+        }
+
+        /* Interview tips */
+        .interview-tips {
+            background: linear-gradient(135deg, #e0e7ff 0%, #f0f9ff 100%);
+            border: 1px solid #c7d7fe;
+            border-radius: var(--radius);
+            padding: 20px 24px;
+            margin-top: 32px;
+        }
+
+        .interview-tips h3 {
+            font-size: .75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .8px;
+            color: #4338ca;
+            margin-bottom: 12px;
+        }
+
+        .interview-tips ol {
+            padding-left: 18px;
+        }
+
+        .interview-tips ol li {
+            font-size: .86rem;
+            line-height: 1.7;
+            color: #1e3a8a;
+            margin-bottom: 6px;
+        }
+
+        /* Solved button */
+        .mark-solved-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            margin-top: 32px;
+            padding: 10px 22px;
+            background: var(--green);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-size: .84rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: .2s;
+            font-family: inherit;
+        }
+
+        .mark-solved-btn:hover {
+            background: #15803d;
+            transform: translateY(-1px);
+        }
+
+        .mark-solved-btn.solved {
+            background: #64748b;
+        }
+    </style>
+</head>
+<body>
+<!-- ── SIDEBAR ────────────────────────────────────────────── -->
+    <nav class="sidebar">
+        <div class="sidebar-header">
+            <a href="../index.html">← Back to Home</a>
+            <h1>Blind 75</h1>
+            <p>Essential LeetCode patterns</p>
+        </div>
+
+        <div class="sidebar-search">
+            <input type="text" id="q-search" placeholder="Search questions…" oninput="filterQuestions(this.value)">
+        </div>
+
+        <div class="sidebar-scroll" id="sidebar-list">
+            <div class="category-section">
+                <div class="category-label">All Questions</div>
+                <a href="01-longest-consecutive-sequence.html" class="q-item" data-q="q1" style="text-decoration:none;">
+                    <span class="q-num">1</span>
+                    <span class="q-check"></span>
+                    <span class="q-name">Longest Consecutive Sequence</span>
+                    <span class="q-diff diff-medium">TODO</span>
+                </a>
+                <a href="02-two-sum.html" class="q-item" data-q="q2" style="text-decoration:none;">
+                    <span class="q-num">2</span>
+                    <span class="q-check"></span>
+                    <span class="q-name">Two Sum</span>
+                    <span class="q-diff diff-medium">TODO</span>
+                </a>
+                <a href="03-longest-substring-without-repeating-characters.html" class="q-item" data-q="q3" style="text-decoration:none;">
+                    <span class="q-num">3</span>
+                    <span class="q-check"></span>
+                    <span class="q-name">Longest Substring Without Repeating Characters</span>
+                    <span class="q-diff diff-medium">TODO</span>
+                </a>
+                <a href="04-longest-palindromic-substring.html" class="q-item" data-q="q4" style="text-decoration:none;">
+                    <span class="q-num">4</span>
+                    <span class="q-check"></span>
+                    <span class="q-name">Longest Palindromic Substring</span>
+                    <span class="q-diff diff-medium">TODO</span>
+                </a>
+                <a href="05-clone-graph.html" class="q-item" data-q="q5" style="text-decoration:none;">
+                    <span class="q-num">5</span>
+                    <span class="q-check"></span>
+                    <span class="q-name">Clone Graph</span>
+                    <span class="q-diff diff-medium">TODO</span>
+                </a>
+                <a href="06-graph-valid-tree.html" class="q-item" data-q="q6" style="text-decoration:none;">
+                    <span class="q-num">6</span>
+                    <span class="q-check"></span>
+                    <span class="q-name">Graph Valid Tree</span>
+                    <span class="q-diff diff-medium">TODO</span>
+                </a>
+                <a href="07-palindromic-substrings.html" class="q-item" data-q="q7" style="text-decoration:none;">
+                    <span class="q-num">7</span>
+                    <span class="q-check"></span>
+                    <span class="q-name">Palindromic Substrings</span>
+                    <span class="q-diff diff-medium">TODO</span>
+                </a>
+                <a href="08-container-with-most-water.html" class="q-item" data-q="q8" style="text-decoration:none;">
+                    <span class="q-num">8</span>
+                    <span class="q-check"></span>
+                    <span class="q-name">Container With Most Water</span>
+                    <span class="q-diff diff-medium">TODO</span>
+                </a>
+                <a href="09-word-break.html" class="q-item" data-q="q9" style="text-decoration:none;">
+                    <span class="q-num">9</span>
+                    <span class="q-check"></span>
+                    <span class="q-name">Word Break</span>
+                    <span class="q-diff diff-medium">TODO</span>
+                </a>
+                <a href="10-linked-list-cycle.html" class="q-item" data-q="q10" style="text-decoration:none;">
+                    <span class="q-num">10</span>
+                    <span class="q-check"></span>
+                    <span class="q-name">Linked List Cycle</span>
+                    <span class="q-diff diff-medium">TODO</span>
+                </a>
+                <a href="11-missing-number.html" class="q-item" data-q="q11" style="text-decoration:none;">
+                    <span class="q-num">11</span>
+                    <span class="q-check"></span>
+                    <span class="q-name">Missing Number</span>
+                    <span class="q-diff diff-medium">TODO</span>
+                </a>
+                <a href="12-3sum.html" class="q-item" data-q="q12" style="text-decoration:none;">
+                    <span class="q-num">12</span>
+                    <span class="q-check"></span>
+                    <span class="q-name">3Sum</span>
+                    <span class="q-diff diff-medium">TODO</span>
+                </a>
+                <a href="13-reorder-list.html" class="q-item" data-q="q13" style="text-decoration:none;">
+                    <span class="q-num">13</span>
+                    <span class="q-check"></span>
+                    <span class="q-name">Reorder List</span>
+                    <span class="q-diff diff-medium">TODO</span>
+                </a>
+                <a href="14-alien-dictionary.html" class="q-item" data-q="q14" style="text-decoration:none;">
+                    <span class="q-num">14</span>
+                    <span class="q-check"></span>
+                    <span class="q-name">Alien Dictionary</span>
+                    <span class="q-diff diff-medium">TODO</span>
+                </a>
+                <a href="15-encode-and-decode-strings.html" class="q-item" data-q="q15" style="text-decoration:none;">
+                    <span class="q-num">15</span>
+                    <span class="q-check"></span>
+                    <span class="q-name">Encode and Decode Strings</span>
+                    <span class="q-diff diff-medium">TODO</span>
+                </a>
+                <a href="16-remove-nth-node-from-end-of-list.html" class="q-item" data-q="q16" style="text-decoration:none;">
+                    <span class="q-num">16</span>
+                    <span class="q-check"></span>
+                    <span class="q-name">Remove Nth Node From End of List</span>
+                    <span class="q-diff diff-medium">TODO</span>
+                </a>
+                <a href="17-valid-parentheses.html" class="q-item" data-q="q17" style="text-decoration:none;">
+                    <span class="q-num">17</span>
+                    <span class="q-check"></span>
+                    <span class="q-name">Valid Parentheses</span>
+                    <span class="q-diff diff-medium">TODO</span>
+                </a>
+                <a href="18-merge-two-sorted-lists.html" class="q-item" data-q="q18" style="text-decoration:none;">
+                    <span class="q-num">18</span>
+                    <span class="q-check"></span>
+                    <span class="q-name">Merge Two Sorted Lists</span>
+                    <span class="q-diff diff-medium">TODO</span>
+                </a>
+                <a href="19-merge-k-sorted-lists.html" class="q-item" data-q="q19" style="text-decoration:none;">
+                    <span class="q-num">19</span>
+                    <span class="q-check"></span>
+                    <span class="q-name">Merge k Sorted Lists</span>
+                    <span class="q-diff diff-medium">TODO</span>
+                </a>
+                <a href="20-maximum-product-subarray.html" class="q-item" data-q="q20" style="text-decoration:none;">
+                    <span class="q-num">20</span>
+                    <span class="q-check"></span>
+                    <span class="q-name">Maximum Product Subarray</span>
+                    <span class="q-diff diff-medium">TODO</span>
+                </a>
+                <a href="21-find-minimum-in-rotated-sorted-array.html" class="q-item" data-q="q21" style="text-decoration:none;">
+                    <span class="q-num">21</span>
+                    <span class="q-check"></span>
+                    <span class="q-name">Find Minimum in Rotated Sorted Array</span>
+                    <span class="q-diff diff-medium">TODO</span>
+                </a>
+                <a href="22-search-in-rotated-sorted-array.html" class="q-item" data-q="q22" style="text-decoration:none;">
+                    <span class="q-num">22</span>
+                    <span class="q-check"></span>
+                    <span class="q-name">Search in Rotated Sorted Array</span>
+                    <span class="q-diff diff-medium">TODO</span>
+                </a>
+                <a href="23-pacific-atlantic-water-flow.html" class="q-item" data-q="q23" style="text-decoration:none;">
+                    <span class="q-num">23</span>
+                    <span class="q-check"></span>
+                    <span class="q-name">Pacific Atlantic Water Flow</span>
+                    <span class="q-diff diff-medium">TODO</span>
+                </a>
+                <a href="24-combination-sum.html" class="q-item" data-q="q24" style="text-decoration:none;">
+                    <span class="q-num">24</span>
+                    <span class="q-check"></span>
+                    <span class="q-name">Combination Sum</span>
+                    <span class="q-diff diff-medium">TODO</span>
+                </a>
+                <a href="25-find-median-from-data-stream.html" class="q-item" data-q="q25" style="text-decoration:none;">
+                    <span class="q-num">25</span>
+                    <span class="q-check"></span>
+                    <span class="q-name">Find Median from Data Stream</span>
+                    <span class="q-diff diff-medium">TODO</span>
+                </a>
+                <a href="26-serialize-and-deserialize-binary-tree.html" class="q-item" data-q="q26" style="text-decoration:none;">
+                    <span class="q-num">26</span>
+                    <span class="q-check"></span>
+                    <span class="q-name">Serialize and Deserialize Binary Tree</span>
+                    <span class="q-diff diff-medium">TODO</span>
+                </a>
+                <a href="27-longest-repeating-character-replacement.html" class="q-item" data-q="q27" style="text-decoration:none;">
+                    <span class="q-num">27</span>
+                    <span class="q-check"></span>
+                    <span class="q-name">Longest Repeating Character Replacement</span>
+                    <span class="q-diff diff-medium">TODO</span>
+                </a>
+                <a href="28-longest-increasing-subsequence.html" class="q-item" data-q="q28" style="text-decoration:none;">
+                    <span class="q-num">28</span>
+                    <span class="q-check"></span>
+                    <span class="q-name">Longest Increasing Subsequence</span>
+                    <span class="q-diff diff-medium">TODO</span>
+                </a>
+                <a href="29-rotate-image.html" class="q-item" data-q="q29" style="text-decoration:none;">
+                    <span class="q-num">29</span>
+                    <span class="q-check"></span>
+                    <span class="q-name">Rotate Image</span>
+                    <span class="q-diff diff-medium">TODO</span>
+                </a>
+                <a href="30-group-anagrams.html" class="q-item" data-q="q30" style="text-decoration:none;">
+                    <span class="q-num">30</span>
+                    <span class="q-check"></span>
+                    <span class="q-name">Group Anagrams</span>
+                    <span class="q-diff diff-medium">TODO</span>
+                </a>
+                <a href="31-non-overlapping-intervals.html" class="q-item" data-q="q31" style="text-decoration:none;">
+                    <span class="q-num">31</span>
+                    <span class="q-check"></span>
+                    <span class="q-name">Non-overlapping Intervals</span>
+                    <span class="q-diff diff-medium">TODO</span>
+                </a>
+                <a href="32-maximum-subarray.html" class="q-item" data-q="q32" style="text-decoration:none;">
+                    <span class="q-num">32</span>
+                    <span class="q-check"></span>
+                    <span class="q-name">Maximum Subarray</span>
+                    <span class="q-diff diff-medium">TODO</span>
+                </a>
+                <a href="33-spiral-matrix.html" class="q-item" data-q="q33" style="text-decoration:none;">
+                    <span class="q-num">33</span>
+                    <span class="q-check"></span>
+                    <span class="q-name">Spiral Matrix</span>
+                    <span class="q-diff diff-medium">TODO</span>
+                </a>
+                <a href="34-jump-game.html" class="q-item" data-q="q34" style="text-decoration:none;">
+                    <span class="q-num">34</span>
+                    <span class="q-check"></span>
+                    <span class="q-name">Jump Game</span>
+                    <span class="q-diff diff-medium">TODO</span>
+                </a>
+                <a href="35-merge-intervals.html" class="q-item" data-q="q35" style="text-decoration:none;">
+                    <span class="q-num">35</span>
+                    <span class="q-check"></span>
+                    <span class="q-name">Merge Intervals</span>
+                    <span class="q-diff diff-medium">TODO</span>
+                </a>
+                <a href="36-insert-interval.html" class="q-item" data-q="q36" style="text-decoration:none;">
+                    <span class="q-num">36</span>
+                    <span class="q-check"></span>
+                    <span class="q-name">Insert Interval</span>
+                    <span class="q-diff diff-medium">TODO</span>
+                </a>
+                <a href="37-subtree-of-another-tree.html" class="q-item" data-q="q37" style="text-decoration:none;">
+                    <span class="q-num">37</span>
+                    <span class="q-check"></span>
+                    <span class="q-name">Subtree of Another Tree</span>
+                    <span class="q-diff diff-medium">TODO</span>
+                </a>
+                <a href="38-unique-paths.html" class="q-item" data-q="q38" style="text-decoration:none;">
+                    <span class="q-num">38</span>
+                    <span class="q-check"></span>
+                    <span class="q-name">Unique Paths</span>
+                    <span class="q-diff diff-medium">TODO</span>
+                </a>
+                <a href="39-reverse-bits.html" class="q-item" data-q="q39" style="text-decoration:none;">
+                    <span class="q-num">39</span>
+                    <span class="q-check"></span>
+                    <span class="q-name">Reverse Bits</span>
+                    <span class="q-diff diff-medium">TODO</span>
+                </a>
+                <a href="40-number-of-1-bits.html" class="q-item" data-q="q40" style="text-decoration:none;">
+                    <span class="q-num">40</span>
+                    <span class="q-check"></span>
+                    <span class="q-name">Number of 1 Bits</span>
+                    <span class="q-diff diff-medium">TODO</span>
+                </a>
+                <a href="41-coin-change.html" class="q-item" data-q="q41" style="text-decoration:none;">
+                    <span class="q-num">41</span>
+                    <span class="q-check"></span>
+                    <span class="q-name">Coin Change</span>
+                    <span class="q-diff diff-medium">TODO</span>
+                </a>
+                <a href="42-number-of-connected-components-in-an-undirected-graph.html" class="q-item" data-q="q42" style="text-decoration:none;">
+                    <span class="q-num">42</span>
+                    <span class="q-check"></span>
+                    <span class="q-name">Number of Connected Components in an Undirected Graph</span>
+                    <span class="q-diff diff-medium">TODO</span>
+                </a>
+                <a href="43-climbing-stairs.html" class="q-item active" data-q="q43" style="text-decoration:none;">
+                    <span class="q-num">43</span>
+                    <span class="q-check"></span>
+                    <span class="q-name">Climbing Stairs</span>
+                    <span class="q-diff diff-medium">TODO</span>
+                </a>
+                <a href="44-house-robber.html" class="q-item" data-q="q44" style="text-decoration:none;">
+                    <span class="q-num">44</span>
+                    <span class="q-check"></span>
+                    <span class="q-name">House Robber</span>
+                    <span class="q-diff diff-medium">TODO</span>
+                </a>
+                <a href="45-number-of-islands.html" class="q-item" data-q="q45" style="text-decoration:none;">
+                    <span class="q-num">45</span>
+                    <span class="q-check"></span>
+                    <span class="q-name">Number of Islands</span>
+                    <span class="q-diff diff-medium">TODO</span>
+                </a>
+                <a href="46-set-matrix-zeroes.html" class="q-item" data-q="q46" style="text-decoration:none;">
+                    <span class="q-num">46</span>
+                    <span class="q-check"></span>
+                    <span class="q-name">Set Matrix Zeroes</span>
+                    <span class="q-diff diff-medium">TODO</span>
+                </a>
+                <a href="47-minimum-window-substring.html" class="q-item" data-q="q47" style="text-decoration:none;">
+                    <span class="q-num">47</span>
+                    <span class="q-check"></span>
+                    <span class="q-name">Minimum Window Substring</span>
+                    <span class="q-diff diff-medium">TODO</span>
+                </a>
+                <a href="48-reverse-linked-list.html" class="q-item" data-q="q48" style="text-decoration:none;">
+                    <span class="q-num">48</span>
+                    <span class="q-check"></span>
+                    <span class="q-name">Reverse Linked List</span>
+                    <span class="q-diff diff-medium">TODO</span>
+                </a>
+                <a href="49-word-search.html" class="q-item" data-q="q49" style="text-decoration:none;">
+                    <span class="q-num">49</span>
+                    <span class="q-check"></span>
+                    <span class="q-name">Word Search</span>
+                    <span class="q-diff diff-medium">TODO</span>
+                </a>
+                <a href="50-course-schedule.html" class="q-item" data-q="q50" style="text-decoration:none;">
+                    <span class="q-num">50</span>
+                    <span class="q-check"></span>
+                    <span class="q-name">Course Schedule</span>
+                    <span class="q-diff diff-medium">TODO</span>
+                </a>
+                <a href="51-implement-trie-prefix-tree.html" class="q-item" data-q="q51" style="text-decoration:none;">
+                    <span class="q-num">51</span>
+                    <span class="q-check"></span>
+                    <span class="q-name">Implement Trie (Prefix Tree)</span>
+                    <span class="q-diff diff-medium">TODO</span>
+                </a>
+                <a href="52-counting-bits.html" class="q-item" data-q="q52" style="text-decoration:none;">
+                    <span class="q-num">52</span>
+                    <span class="q-check"></span>
+                    <span class="q-name">Counting Bits</span>
+                    <span class="q-diff diff-medium">TODO</span>
+                </a>
+                <a href="53-design-add-and-search-words-data-structure.html" class="q-item" data-q="q53" style="text-decoration:none;">
+                    <span class="q-num">53</span>
+                    <span class="q-check"></span>
+                    <span class="q-name">Design Add and Search Words Data Structure</span>
+                    <span class="q-diff diff-medium">TODO</span>
+                </a>
+                <a href="54-word-search-ii.html" class="q-item" data-q="q54" style="text-decoration:none;">
+                    <span class="q-num">54</span>
+                    <span class="q-check"></span>
+                    <span class="q-name">Word Search II</span>
+                    <span class="q-diff diff-medium">TODO</span>
+                </a>
+                <a href="55-house-robber-ii.html" class="q-item" data-q="q55" style="text-decoration:none;">
+                    <span class="q-num">55</span>
+                    <span class="q-check"></span>
+                    <span class="q-name">House Robber II</span>
+                    <span class="q-diff diff-medium">TODO</span>
+                </a>
+                <a href="56-contains-duplicate.html" class="q-item" data-q="q56" style="text-decoration:none;">
+                    <span class="q-num">56</span>
+                    <span class="q-check"></span>
+                    <span class="q-name">Contains Duplicate</span>
+                    <span class="q-diff diff-medium">TODO</span>
+                </a>
+                <a href="57-decode-ways.html" class="q-item" data-q="q57" style="text-decoration:none;">
+                    <span class="q-num">57</span>
+                    <span class="q-check"></span>
+                    <span class="q-name">Decode Ways</span>
+                    <span class="q-diff diff-medium">TODO</span>
+                </a>
+                <a href="58-top-k-frequent-elements.html" class="q-item" data-q="q58" style="text-decoration:none;">
+                    <span class="q-num">58</span>
+                    <span class="q-check"></span>
+                    <span class="q-name">Top K Frequent Elements</span>
+                    <span class="q-diff diff-medium">TODO</span>
+                </a>
+                <a href="59-meeting-rooms-ii.html" class="q-item" data-q="q59" style="text-decoration:none;">
+                    <span class="q-num">59</span>
+                    <span class="q-check"></span>
+                    <span class="q-name">Meeting Rooms II</span>
+                    <span class="q-diff diff-medium">TODO</span>
+                </a>
+                <a href="60-validate-binary-search-tree.html" class="q-item" data-q="q60" style="text-decoration:none;">
+                    <span class="q-num">60</span>
+                    <span class="q-check"></span>
+                    <span class="q-name">Validate Binary Search Tree</span>
+                    <span class="q-diff diff-medium">TODO</span>
+                </a>
+                <a href="61-invert-binary-tree.html" class="q-item" data-q="q61" style="text-decoration:none;">
+                    <span class="q-num">61</span>
+                    <span class="q-check"></span>
+                    <span class="q-name">Invert Binary Tree</span>
+                    <span class="q-diff diff-medium">TODO</span>
+                </a>
+                <a href="62-same-tree.html" class="q-item" data-q="q62" style="text-decoration:none;">
+                    <span class="q-num">62</span>
+                    <span class="q-check"></span>
+                    <span class="q-name">Same Tree</span>
+                    <span class="q-diff diff-medium">TODO</span>
+                </a>
+                <a href="63-longest-common-subsequence.html" class="q-item" data-q="q63" style="text-decoration:none;">
+                    <span class="q-num">63</span>
+                    <span class="q-check"></span>
+                    <span class="q-name">Longest Common Subsequence</span>
+                    <span class="q-diff diff-medium">TODO</span>
+                </a>
+                <a href="64-binary-tree-level-order-traversal.html" class="q-item" data-q="q64" style="text-decoration:none;">
+                    <span class="q-num">64</span>
+                    <span class="q-check"></span>
+                    <span class="q-name">Binary Tree Level Order Traversal</span>
+                    <span class="q-diff diff-medium">TODO</span>
+                </a>
+                <a href="65-kth-smallest-element-in-a-bst.html" class="q-item" data-q="q65" style="text-decoration:none;">
+                    <span class="q-num">65</span>
+                    <span class="q-check"></span>
+                    <span class="q-name">Kth Smallest Element in a BST</span>
+                    <span class="q-diff diff-medium">TODO</span>
+                </a>
+                <a href="66-maximum-depth-of-binary-tree.html" class="q-item" data-q="q66" style="text-decoration:none;">
+                    <span class="q-num">66</span>
+                    <span class="q-check"></span>
+                    <span class="q-name">Maximum Depth of Binary Tree</span>
+                    <span class="q-diff diff-medium">TODO</span>
+                </a>
+                <a href="67-construct-binary-tree-from-preorder-and-inorder-traversal.html" class="q-item" data-q="q67" style="text-decoration:none;">
+                    <span class="q-num">67</span>
+                    <span class="q-check"></span>
+                    <span class="q-name">Construct Binary Tree from Preorder and Inorder Traversal</span>
+                    <span class="q-diff diff-medium">TODO</span>
+                </a>
+                <a href="68-lowest-common-ancestor-of-a-bst.html" class="q-item" data-q="q68" style="text-decoration:none;">
+                    <span class="q-num">68</span>
+                    <span class="q-check"></span>
+                    <span class="q-name">Lowest Common Ancestor of a BST</span>
+                    <span class="q-diff diff-medium">TODO</span>
+                </a>
+                <a href="69-product-of-array-except-self.html" class="q-item" data-q="q69" style="text-decoration:none;">
+                    <span class="q-num">69</span>
+                    <span class="q-check"></span>
+                    <span class="q-name">Product of Array Except Self</span>
+                    <span class="q-diff diff-medium">TODO</span>
+                </a>
+                <a href="70-valid-anagram.html" class="q-item" data-q="q70" style="text-decoration:none;">
+                    <span class="q-num">70</span>
+                    <span class="q-check"></span>
+                    <span class="q-name">Valid Anagram</span>
+                    <span class="q-diff diff-medium">TODO</span>
+                </a>
+                <a href="71-sum-of-two-integers.html" class="q-item" data-q="q71" style="text-decoration:none;">
+                    <span class="q-num">71</span>
+                    <span class="q-check"></span>
+                    <span class="q-name">Sum of Two Integers</span>
+                    <span class="q-diff diff-medium">TODO</span>
+                </a>
+                <a href="72-meeting-rooms.html" class="q-item" data-q="q72" style="text-decoration:none;">
+                    <span class="q-num">72</span>
+                    <span class="q-check"></span>
+                    <span class="q-name">Meeting Rooms</span>
+                    <span class="q-diff diff-medium">TODO</span>
+                </a>
+                <a href="73-best-time-to-buy-and-sell-stock.html" class="q-item" data-q="q73" style="text-decoration:none;">
+                    <span class="q-num">73</span>
+                    <span class="q-check"></span>
+                    <span class="q-name">Best Time to Buy and Sell Stock</span>
+                    <span class="q-diff diff-medium">TODO</span>
+                </a>
+                <a href="74-binary-tree-maximum-path-sum.html" class="q-item" data-q="q74" style="text-decoration:none;">
+                    <span class="q-num">74</span>
+                    <span class="q-check"></span>
+                    <span class="q-name">Binary Tree Maximum Path Sum</span>
+                    <span class="q-diff diff-medium">TODO</span>
+                </a>
+                <a href="75-valid-palindrome.html" class="q-item" data-q="q75" style="text-decoration:none;">
+                    <span class="q-num">75</span>
+                    <span class="q-check"></span>
+                    <span class="q-name">Valid Palindrome</span>
+                    <span class="q-diff diff-medium">TODO</span>
+                </a>
+            </div>
+        </div>
+
+        <div class="progress-footer">
+            <div class="progress-label"><span id="solved-count">0</span> / 75 solved</div>
+            <div class="progress-bar-wrap">
+                <div class="progress-bar-fill" id="progress-fill"></div>
+            </div>
+        </div>
+    </nav>
+    <div class="main" id="main-panel">
+<div class="question-panel active" id="q43">
+<div class="q-header">
+<div class="q-header-meta">
+<span class="q-number-badge"># 70 · LeetCode</span>
+<span class="diff-badge easy">Easy</span>
+<span class="topic-tag">Math</span><span class="topic-tag">DP</span><span class="topic-tag">Memoization</span>
+</div>
+<h1 class="q-title">Climbing Stairs</h1>
+<p class="q-source"><a href="https://leetcode.com/problems/climbing-stairs" target="_blank">leetcode.com/problems/climbing-stairs</a> · Blind 75 · FAANG favourite</p>
+</div>
+<hr class="section-rule"/>
+<div class="problem-statement"><h3>Problem Statement</h3><div class="statement-content">You are climbing a staircase with <code>n</code> steps. Each time you can climb 1 or 2 steps. How many distinct ways can you reach the top?</div></div>
+<div class="examples">
+<div class="example-block">
+<div class="example-header">Example 1</div>
+<div class="example-body">
+<div><span class="label">Input: </span><span class="val">n = 2</span></div>
+<div><span class="label">Output: </span><span class="val">2</span></div>
+<div class="explanation">1+1 or 2.</div>
+</div>
+</div>
+<div class="example-block">
+<div class="example-header">Example 2</div>
+<div class="example-body">
+<div><span class="label">Input: </span><span class="val">n = 3</span></div>
+<div><span class="label">Output: </span><span class="val">3</span></div>
+<div class="explanation">1+1+1, 1+2, 2+1.</div>
+</div>
+</div></div>
+<div class="constraints"><h4>Constraints</h4><ul><li>1 ≤ n ≤ 45</li></ul></div>
+<h2 class="approach-title">Approaches Comparison</h2>
+<table class="compare-table">
+<tr><th>Approach</th><th>Time</th><th>Space</th><th>Notes</th></tr>
+<tr>
+<td>Recursion (Fib)</td><td><code>O(2<sup>n</sup>)</code></td>
+<td><code>O(n)</code></td><td>Exponential without memoization.</td>
+</tr>
+<tr class="optimal-row">
+<td>DP (Fibonacci variant)</td><td><code>O(n)</code></td>
+<td><code>O(1)</code></td><td>ways(n) = ways(n-1)+ways(n-2). Optimal.</td>
+</tr>
+</table>
+<h2 class="approach-title">Approach 1 — Recursion (Fib) <span class="approach-badge badge-better">O(2<sup>n</sup>)</span></h2>
+<div class="complexity-row">
+<div class="complexity-pill"><span class="cp-label">Time</span><span class="cp-value">O(2<sup>n</sup>)</span></div>
+<div class="complexity-pill"><span class="cp-label">Space</span><span class="cp-value">O(n)</span></div>
+</div>
+<p class="approach-explanation">Exponential without memoization.</p>
+<div class="warn-box">
+<div class="warn-box-title">⚠ Interviewer will push back</div>
+<p>This is a valid stepping-stone answer. But the problem requires better optimization. Always start by acknowledging this brute force/suboptimal time complexity before moving to the optimal solution.</p>
+</div>
+<h2 class="approach-title">Approach 2 — Fibonacci DP <span class="approach-badge badge-optimal">Optimal</span></h2>
+<div class="complexity-row">
+<div class="complexity-pill"><span class="cp-label">Time</span><span class="cp-value">O(n)</span></div>
+<div class="complexity-pill"><span class="cp-label">Space</span><span class="cp-value">O(1)</span></div>
+</div>
+<p class="approach-explanation">The number of ways to reach step n equals the number of ways to reach step n-1 (taking one step) plus ways to reach step n-2 (taking two steps). This is the Fibonacci sequence.</p>
+<div class="code-tabs">
+<div class="tab-buttons"><button class="tab-btn active" onclick="switchTab(this, 'opt-python-q43')">Python</button>
+<button class="tab-btn" onclick="switchTab(this, 'opt-java-q43')">Java</button>
+<button class="tab-btn" onclick="switchTab(this, 'opt-javascript-q43')">JavaScript</button>
+<button class="tab-btn" onclick="switchTab(this, 'opt-go-q43')">Go</button>
+</div>
+<div class="tab-content active" id="opt-python-q43">
+<div class="code-wrap"><pre><code class="language-python">def climbStairs(n):
+    a, b = 1, 1
+    for _ in range(n - 1):
+        a, b = b, a + b
+    return b</code></pre></div>
+</div>
+<div class="tab-content" id="opt-java-q43">
+<div class="code-wrap"><pre><code class="language-java">// See Python solution above for the full algorithm
+// Climbing Stairs — translate line-by-line</code></pre></div>
+</div>
+<div class="tab-content" id="opt-javascript-q43">
+<div class="code-wrap"><pre><code class="language-javascript">// See Python solution above for the full algorithm
+// Climbing Stairs — translate line-by-line</code></pre></div>
+</div>
+<div class="tab-content" id="opt-go-q43">
+<div class="code-wrap"><pre><code class="language-go">// See Python solution above for the full algorithm
+// Climbing Stairs — translate line-by-line</code></pre></div>
+</div>
+</div>
+<div class="insight" style="margin-top:20px;">
+<div class="insight-title">Climbing Stairs IS Fibonacci</div>
+<p>f(1)=1, f(2)=2, f(n)=f(n-1)+f(n-2). Reduce space to O(1) by only keeping the last two values.</p>
+</div>
+<div class="interview-tips">
+<h3>Interview Playbook</h3>
+<ol><li><strong>Recognize the pattern:</strong> Any problem where ways(n) = ways(n-1) + ways(n-2) is Fibonacci.</li><li><strong>Companies:</strong> Amazon, Google, Apple — a classic warm-up problem.</li></ol>
+</div>
+<button class="mark-solved-btn" id="solve-q43" onclick="markSolved('q43',this)">Mark as Solved</button>
+</div>
+    </div>
+
+<script>
+        // Initialize highlight.js
+        hljs.highlightAll();
+        // Initialize mermaid.js
+        mermaid.initialize({ startOnLoad: true, theme: 'dark' });
+
+        // Tab switching
+        function switchTab(btn, contentId) {
+            const wrap = btn.closest('.code-tabs');
+            wrap.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            wrap.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            btn.classList.add('active');
+            const target = document.getElementById(contentId);
+            if (target) {
+                target.classList.add('active');
+                // Re-highlight newly visible code
+                target.querySelectorAll('code:not(.hljs)').forEach(el => hljs.highlightElement(el));
+            }
+        }
+
+        // Question switching
+        function showQ(qId, item) {
+            return; // disabled in multi-page
+
+            document.querySelectorAll('.question-panel').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.q-item').forEach(i => i.classList.remove('active'));
+            const panel = document.getElementById(qId);
+            if (panel) panel.classList.add('active');
+            if (item) item.classList.add('active');
+            document.getElementById('main-panel').scrollTo(0, 0);
+        }
+
+        // Solved tracking
+        let solved = JSON.parse(localStorage.getItem('blind75-solved') || '[]');
+
+        function markSolved(qId, btn) {
+            if (!solved.includes(qId)) {
+                solved.push(qId);
+                localStorage.setItem('blind75-solved', JSON.stringify(solved));
+            }
+            btn.textContent = ' Solved!';
+            btn.classList.add('solved');
+            const item = document.querySelector(`.q-item[data-q="${qId}"]`);
+            if (item) item.classList.add('solved');
+            updateProgress();
+        }
+
+        function updateProgress() {
+            const total = 75;
+            document.getElementById('solved-count').textContent = solved.length;
+            document.getElementById('progress-fill').style.width = (solved.length / total * 100) + '%';
+        }
+
+        // Restore solved state
+        solved.forEach(qId => {
+            const item = document.querySelector(`.q-item[data-q="${qId}"]`);
+            if (item) item.classList.add('solved');
+            const btn = document.getElementById(`solve-${qId}`);
+            if (btn) { btn.textContent = ' Solved!'; btn.classList.add('solved'); }
+        });
+        updateProgress();
+
+        // Search
+        function filterQuestions(val) {
+            const q = val.toLowerCase();
+            document.querySelectorAll('.q-item').forEach(item => {
+                const name = item.querySelector('.q-name')?.textContent.toLowerCase() || '';
+                item.style.display = name.includes(q) ? '' : 'none';
+            });
+        }
+    </script>
+</body>
+</html>

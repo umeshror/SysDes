@@ -1,0 +1,83 @@
+<component name="InspectionProjectProfileManager">
+  <profile version="1.0">
+    <option name="myName" value="Project Default" />
+    <inspection_tool class="Eslint" enabled="true" level="WARNING" enabled_by_default="true" />
+    <inspection_tool class="PyPackageRequirementsInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <option name="ignoredPackages">
+        <list>
+          <option value="alembic" />
+          <option value="aniso8601" />
+          <option value="apispec" />
+          <option value="backcall" />
+          <option value="beautifulsoup4" />
+          <option value="billiard" />
+          <option value="blinker" />
+          <option value="boto3" />
+          <option value="boto" />
+          <option value="botocore" />
+          <option value="celery" />
+          <option value="certifi" />
+          <option value="cffi" />
+          <option value="click-didyoumean" />
+          <option value="click-plugins" />
+          <option value="click-repl" />
+          <option value="contextlib2" />
+          <option value="factory-boy" />
+          <option value="faker" />
+          <option value="flask-apispec" />
+          <option value="flask-apscheduler" />
+          <option value="flask-basicauth" />
+          <option value="flask-caching" />
+          <option value="flask-cors" />
+          <option value="flask-jwt-extended" />
+          <option value="flask-migrate" />
+          <option value="flask-restful" />
+          <option value="flask-script" />
+          <option value="flask-sqlalchemy" />
+          <option value="flask-webtest" />
+          <option value="flask" />
+          <option value="gunicorn" />
+          <option value="importlib-metadata" />
+          <option value="iniconfig" />
+          <option value="ipython-genutils" />
+          <option value="ipython" />
+          <option value="jinja2" />
+          <option value="mypy" />
+          <option value="more-itertools" />
+          <option value="moto" />
+          <option value="phonenumbers" />
+          <option value="pickleshare" />
+          <option value="pika" />
+          <option value="psycopg2" />
+          <option value="ptyprocess" />
+          <option value="pyhamcrest" />
+          <option value="pyjwt" />
+          <option value="pytest-cov" />
+          <option value="pytest-mock" />
+          <option value="pytest-parallel" />
+          <option value="pytest" />
+          <option value="python-editor" />
+          <option value="python-json-logger" />
+          <option value="pytz" />
+          <option value="redis" />
+          <option value="requests" />
+          <option value="responses" />
+          <option value="s3transfer" />
+          <option value="schema" />
+          <option value="sqlalchemy-utils" />
+          <option value="sqlalchemy-wrapper" />
+          <option value="sqlalchemy" />
+          <option value="text-unidecode" />
+          <option value="tzlocal" />
+          <option value="wcwidth" />
+          <option value="webargs" />
+          <option value="xmltodict" />
+          <option value="httplib2" />
+          <option value="GeoAlchemy2" />
+          <option value="koko-logging" />
+        </list>
+      </option>
+    </inspection_tool>
+    <inspection_tool class="TsLint" enabled="true" level="WARNING" enabled_by_default="true" />
+  </profile>
+</component>
