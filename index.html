@@ -397,7 +397,15 @@
     <nav class="topnav dark">
         <div class="nav-inner">
             <a href="index.html" class="logo">Umesh Saruk</a>
-            <ul>
+            <button class="nav-toggle" aria-label="Toggle Navigation" aria-expanded="false">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="3" y1="12" x2="21" y2="12"></line>
+                    <line x1="3" y1="6" x2="21" y2="6"></line>
+                    <line x1="3" y1="18" x2="21" y2="18"></line>
+                </svg>
+            </button>
+            <ul id="nav-list">
                 <li><a href="#experience">Work</a></li>
                 <li><a href="#approach">Approach</a></li>
                 <li><a href="#interests">Interests</a></li>
@@ -722,6 +730,7 @@
         window.addEventListener('scroll', () => btt.classList.toggle('visible', window.scrollY > 400));
         btt.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
 
+        // Highlight active section on scroll
         const sections = document.querySelectorAll('section[id], footer[id]');
         const navLinks = document.querySelectorAll('.topnav a[href^="#"]');
         const ob = new IntersectionObserver(entries => {
@@ -734,6 +743,26 @@
             });
         }, { threshold: 0.35 });
         sections.forEach(s => ob.observe(s));
+
+        // Mobile Nav Toggle Logic
+        const navToggle = document.querySelector('.nav-toggle');
+        const navList = document.getElementById('nav-list');
+        if (navToggle && navList) {
+            navToggle.addEventListener('click', () => {
+                const isExpanded = navToggle.getAttribute('aria-expanded') === 'true';
+                navToggle.setAttribute('aria-expanded', !isExpanded);
+                navList.classList.toggle('active');
+            });
+
+            // Close menu when a link is clicked on mobile
+            const mobileLinks = navList.querySelectorAll('a');
+            mobileLinks.forEach(link => {
+                link.addEventListener('click', () => {
+                    navToggle.setAttribute('aria-expanded', 'false');
+                    navList.classList.remove('active');
+                });
+            });
+        }
     </script>
 </body>
 

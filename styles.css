@@ -22,21 +22,21 @@
 /* Dark theme (index.html / portfolio) */
 :root {
   /* Dark palette */
-  --dk-bg:          #0d1117;
-  --dk-surface:     #161b22;
-  --dk-border:      #21262d;
-  --dk-text:        #e6edf3;
-  --dk-muted:       #8b949e;
-  --dk-accent:      #3a86ff;
-  --dk-accent-hover:#2e75e6;
+  --dk-bg: #0d1117;
+  --dk-surface: #161b22;
+  --dk-border: #21262d;
+  --dk-text: #e6edf3;
+  --dk-muted: #8b949e;
+  --dk-accent: #3a86ff;
+  --dk-accent-hover: #2e75e6;
 
   /* Light palette (system-design page) */
-  --lt-bg:          #f4f6fb;
-  --lt-surface:     #ffffff;
-  --lt-border:      #e0e4f0;
-  --lt-text:        #1a1a2e;
-  --lt-muted:       #6c7086;
-  --lt-accent:      #89b4fa;
+  --lt-bg: #f4f6fb;
+  --lt-surface: #ffffff;
+  --lt-border: #e0e4f0;
+  --lt-text: #1a1a2e;
+  --lt-muted: #6c7086;
+  --lt-accent: #89b4fa;
 
   /* Shared spacing */
   --radius-sm: 4px;
@@ -54,7 +54,7 @@ html {
 
 body {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
-               'Helvetica Neue', Arial, sans-serif;
+    'Helvetica Neue', Arial, sans-serif;
   line-height: 1.7;
   font-size: 16px;
   -webkit-font-smoothing: antialiased;
@@ -107,9 +107,17 @@ body {
   transition: opacity var(--transition);
 }
 
-.topnav.dark .logo  { color: var(--dk-text); }
-.topnav.light .logo { color: var(--lt-text); }
-.topnav .logo:hover { opacity: 0.75; }
+.topnav.dark .logo {
+  color: var(--dk-text);
+}
+
+.topnav.light .logo {
+  color: var(--lt-text);
+}
+
+.topnav .logo:hover {
+  opacity: 0.75;
+}
 
 .topnav ul {
   display: flex;
@@ -127,17 +135,35 @@ body {
   transition: all var(--transition);
 }
 
-.topnav.dark  a { color: var(--dk-muted); }
-.topnav.light a { color: var(--lt-muted); }
+.topnav.dark a {
+  color: var(--dk-muted);
+}
 
-.topnav.dark  a:hover { color: var(--dk-text); background: rgba(255,255,255,0.06); }
-.topnav.light a:hover { color: var(--lt-text); background: rgba(0,0,0,0.05); }
+.topnav.light a {
+  color: var(--lt-muted);
+}
+
+.topnav.dark a:hover {
+  color: var(--dk-text);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.topnav.light a:hover {
+  color: var(--lt-text);
+  background: rgba(0, 0, 0, 0.05);
+}
 
 .topnav a.nav-active {
   font-weight: 600;
 }
-.topnav.dark  a.nav-active { color: var(--dk-accent); }
-.topnav.light a.nav-active { color: var(--lt-accent); }
+
+.topnav.dark a.nav-active {
+  color: var(--dk-accent);
+}
+
+.topnav.light a.nav-active {
+  color: var(--lt-accent);
+}
 
 /* Back-link chip (used in system-design sidebar) */
 .back-link {
@@ -215,10 +241,25 @@ body {
   margin: 0 4px 4px 0;
 }
 
-.tag-interview  { background: #fef3c7; color: #92400e; }
-.tag-critical   { background: #fee2e2; color: #991b1b; }
-.tag-concept    { background: #ede9fe; color: #5b21b6; }
-.tag-realworld  { background: #dcfce7; color: #166534; }
+.tag-interview {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.tag-critical {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.tag-concept {
+  background: #ede9fe;
+  color: #5b21b6;
+}
+
+.tag-realworld {
+  background: #dcfce7;
+  color: #166534;
+}
 
 /* ─── Shared Footer ──────────────────────────────────────── */
 .site-footer {
@@ -335,15 +376,82 @@ body {
   background: var(--dk-accent-hover);
 }
 
+/* ─── Base Nav Toggle (Hidden on Desktop) ─────────────────── */
+.nav-toggle {
+  display: none;
+  background: transparent;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  padding: 0.5rem;
+}
+
+.topnav.dark .nav-toggle {
+  color: var(--dk-text);
+}
+
+.topnav.light .nav-toggle {
+  color: var(--lt-text);
+}
+
 /* ─── Responsive ─────────────────────────────────────────── */
 @media (max-width: 768px) {
-  .topnav .nav-inner { padding: 0 1.25rem; }
+  .topnav .nav-inner {
+    padding: 0 1.25rem;
+    position: relative;
+  }
 
-  .topnav ul { gap: 0; }
+  .nav-toggle {
+    display: block;
+    /* Show hamburger on mobile */
+  }
+
+  /* Style the ul as a mobile dropdown */
+  .topnav ul {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: inherit;
+    /* inherit the dark/light blur background */
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    padding: 1rem 0;
+    border-top: 1px solid var(--dk-border);
+    border-bottom: 1px solid var(--dk-border);
+
+    /* Animation states */
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .topnav.light ul {
+    border-top: 1px solid var(--lt-border);
+    border-bottom: 1px solid var(--lt-border);
+  }
+
+  /* When the toggle is clicked (JS adds .active class) */
+  .topnav ul.active {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+  }
+
+  .topnav ul li {
+    width: 100%;
+    text-align: center;
+  }
 
   .topnav a {
-    padding: 0.4rem 0.6rem;
-    font-size: 0.82rem;
+    display: block;
+    padding: 0.8rem 1.5rem;
+    font-size: 1rem;
+    border-radius: 0;
   }
 
   .footer-grid {
@@ -363,11 +471,13 @@ body {
 }
 
 @media (max-width: 480px) {
-  .container { padding: 0 1.25rem; }
+  .container {
+    padding: 0 1.25rem;
+  }
 
-  .topnav .logo { font-size: 0.95rem; }
-
-  .topnav ul { display: none; }
+  .topnav .logo {
+    font-size: 0.95rem;
+  }
 
   .footer-bottom {
     flex-direction: column;
