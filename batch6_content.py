@@ -1,4 +1,4 @@
-        """Batch 6: q31-q50 — Intervals, Dynamic Programming, Trees, Backtracking, Binary Search"""
+"""Batch 6: q31-q50 — Intervals, Dynamic Programming, Trees, Backtracking, Binary Search"""
 from shared_generator import add_problem
 
 problems_data = [

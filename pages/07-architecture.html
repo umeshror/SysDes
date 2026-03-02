@@ -30,6 +30,11 @@
       min-height: 100vh;
     }
 
+    .sidebar-toggle {
+      display: none;
+      /* Hidden on desktop */
+    }
+
     .sidebar {
       width: 300px;
       min-width: 300px;
@@ -72,11 +77,55 @@
 
     .nav-module-title {
       padding: 10px 20px 6px;
-      font-size: 0.68rem;
+      font-size: 0.72rem;
       font-weight: 700;
       text-transform: uppercase;
-      letter-spacing: 1px;
+      letter-spacing: 0.5px;
+      color: #7f849c;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      user-select: none;
+      transition: color 0.2s;
+    }
+
+    .nav-module-title:hover {
+      color: #cdd6f4;
+    }
+
+    .nav-module-title::after {
+      content: '▼';
+      font-size: 0.6rem;
       color: #585b70;
+      transition: transform 0.3s ease;
+    }
+
+    /* Hide children by default */
+    .nav-module>*:not(.nav-module-title) {
+      display: none;
+    }
+
+    /* Show children when expanded */
+    .nav-module.expanded>*:not(.nav-module-title) {
+      display: block;
+      animation: slideDown 0.2s ease-out forwards;
+    }
+
+    .nav-module.expanded>.nav-module-title::after {
+      transform: rotate(180deg);
+    }
+
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        transform: translateY(-5px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
 
     .nav-item {
@@ -457,10 +506,43 @@
     }
 
     @media (max-width: 768px) {
+      .layout {
+        flex-direction: column;
+      }
+
       .sidebar {
         width: 100%;
+        min-width: 100%;
         height: auto;
         position: relative;
+        padding-bottom: 0;
+      }
+
+      /* Hide the navigation links by default on mobile */
+      #sidebar-nav-content {
+        display: none;
+        padding-bottom: 20px;
+      }
+
+      /* Show links when the active class is added via JS */
+      #sidebar-nav-content.active {
+        display: block;
+      }
+
+      /* Style the hamburger button */
+      .sidebar-toggle {
+        display: block;
+        background: transparent;
+        border: none;
+        color: #89b4fa;
+        cursor: pointer;
+        padding: 5px;
+      }
+
+      .sidebar-header {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
       }
 
       .main {
@@ -849,7 +931,7 @@
         </details>
         <details class="acc-chapter">
           <summary class="acc-summary">
-            <span class="chap-icon">🏆</span>
+            <span class="chap-icon">📚</span>
             <span class="chap-text">
               <span class="chap-num">Chapter 12</span>
               <span class="chap-label">Case Studies</span>
@@ -858,7 +940,7 @@
             <span class="acc-arrow">›</span>
           </summary>
           <div class="acc-sub">
-              <a class="acc-sub-item" href="12-case-studies.html#case-opentable">Design OpenTable</a>
+              <a class="acc-sub-item" href="../case_studies/open-table.html#case-opentable">Design OpenTable (Deep Dive)</a>
           </div>
         </details>
       </div>
@@ -868,82 +950,82 @@
       <div class="progress-bar-wrap"><div class="progress-bar" id="pb"></div></div>
 
 <div class="section active" id="arch-patterns">
-    <h1 class="section-title">Architectural Patterns</h1>
-    <p class="section-subtitle">Module 7 &nbsp;|&nbsp; Monolith vs Microservices · Hexagonal · Orchestration vs
-      Choreography</p>
+        <h1 class="section-title">Architectural Patterns</h1>
+        <p class="section-subtitle">Module 7 &nbsp;|&nbsp; Monolith vs Microservices · Hexagonal · Orchestration vs
+          Choreography</p>
 
-    <h2>Strategic Patterns</h2>
-    <div class="compare">
-      <div class="compare-card neutral">
-        <h4>Monolith</h4>
-        <ul>
-          <li><strong>Scale:</strong> Vertical (larger servers).</li>
-          <li><strong>Release:</strong> All-or-nothing.</li>
-          <li><strong>Pros:</strong> Simple, low latency, easy ACID.</li>
-        </ul>
-      </div>
-      <div class="compare-card neutral">
-        <h4>Microservices</h4>
-        <ul>
-          <li><strong>Scale:</strong> Horizontal (more small servers).</li>
-          <li><strong>Release:</strong> Independent per service.</li>
-          <li><strong>Pros:</strong> Fault isolation, team autonomy.</li>
-        </ul>
-      </div>
-    </div>
+        <h2>Strategic Patterns</h2>
+        <div class="compare">
+          <div class="compare-card neutral">
+            <h4>Monolith</h4>
+            <ul>
+              <li><strong>Scale:</strong> Vertical (larger servers).</li>
+              <li><strong>Release:</strong> All-or-nothing.</li>
+              <li><strong>Pros:</strong> Simple, low latency, easy ACID.</li>
+            </ul>
+          </div>
+          <div class="compare-card neutral">
+            <h4>Microservices</h4>
+            <ul>
+              <li><strong>Scale:</strong> Horizontal (more small servers).</li>
+              <li><strong>Release:</strong> Independent per service.</li>
+              <li><strong>Pros:</strong> Fault isolation, team autonomy.</li>
+            </ul>
+          </div>
+        </div>
 
-    <h2>Module Organization: Three Common Styles</h2>
-    <div class="table-wrap">
-      <table>
-        <thead>
-          <tr>
-            <th>Style</th>
-            <th>Concept</th>
-            <th>Key Characteristic</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td><strong>Layered</strong></td>
-            <td>Controller $\rightarrow$ Service $\rightarrow$ DAO.</td>
-            <td>Dependencies flow downwards.</td>
-          </tr>
-          <tr>
-            <td><strong>Hexagonal</strong></td>
-            <td>Domain at core. Ports & Adapters.</td>
-            <td>Logic is isolated from exterior.</td>
-          </tr>
-          <tr>
-            <td><strong>Clean</strong></td>
-            <td>Concentric circles. UseCases at core.</td>
-            <td>Dependencies flow inwards.</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+        <h2>Module Organization: Three Common Styles</h2>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Style</th>
+                <th>Concept</th>
+                <th>Key Characteristic</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Layered</strong></td>
+                <td>Controller $\rightarrow$ Service $\rightarrow$ DAO.</td>
+                <td>Dependencies flow downwards.</td>
+              </tr>
+              <tr>
+                <td><strong>Hexagonal</strong></td>
+                <td>Domain at core. Ports & Adapters.</td>
+                <td>Logic is isolated from exterior.</td>
+              </tr>
+              <tr>
+                <td><strong>Clean</strong></td>
+                <td>Concentric circles. UseCases at core.</td>
+                <td>Dependencies flow inwards.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
 
-    <h3>Hexagonal Architecture (Ports & Adapters)</h3>
-    <p>The goal is to decouple the core business logic from external concerns like databases, UI, or messaging. The
-      logic talks to <strong>Ports</strong>, and external systems implement <strong>Adapters</strong> to connect.
-    </p>
-
-    <h2>Service Coordination</h2>
-    <div class="compare">
-      <div class="compare-card neutral">
-        <h4>Orchestration (Centralized)</h4>
-        <p>One service (the "Orchestrator") tells everyone else what to do. Simple to follow but creates a
-          <strong>bottleneck</strong> and single point of failure.
+        <h3>Hexagonal Architecture (Ports & Adapters)</h3>
+        <p>The goal is to decouple the core business logic from external concerns like databases, UI, or messaging. The
+          logic talks to <strong>Ports</strong>, and external systems implement <strong>Adapters</strong> to connect.
         </p>
-      </div>
-      <div class="compare-card neutral">
-        <h4>Choreography (Decentralized)</h4>
-        <p>Services "dance" based on events. No central brain. Highly scalable but <strong>hard to
-            visualize</strong> the end-to-end flow.</p>
-      </div>
-    </div>
 
-    <div class="diagram">
-      <pre class="mermaid">
+        <h2>Service Coordination</h2>
+        <div class="compare">
+          <div class="compare-card neutral">
+            <h4>Orchestration (Centralized)</h4>
+            <p>One service (the "Orchestrator") tells everyone else what to do. Simple to follow but creates a
+              <strong>bottleneck</strong> and single point of failure.
+            </p>
+          </div>
+          <div class="compare-card neutral">
+            <h4>Choreography (Decentralized)</h4>
+            <p>Services "dance" based on events. No central brain. Highly scalable but <strong>hard to
+                visualize</strong> the end-to-end flow.</p>
+          </div>
+        </div>
+
+        <div class="diagram">
+          <pre class="mermaid">
 graph LR
     subgraph Orchestration
     O[Orchestrator] --> S1[Service 1]
@@ -954,57 +1036,57 @@ graph LR
     C2 -- Event --> C3[Service 3]
     end
 </pre>
-    </div>
+        </div>
 
-    <h2>Service Mesh (The Sidecar Pattern)</h2>
-    <p>A dedicated infrastructure layer for handling service-to-service communication. Uses a <strong>Sidecar
-        Proxy</strong> (like Envoy) running next to every service.</p>
-    <div class="example">
-      <div class="example-label">Service Mesh Features</div>
-      <ul>
-        <li><strong>mTLS:</strong> Automatic encryption between services.</li>
-        <li><strong>Traffic Splitting:</strong> Easy Blue/Green or Canary deployments.</li>
-        <li><strong>Retries/Timeouts:</strong> Managed at infrastructure level, not code.</li>
-        <li><strong>Observability:</strong> Automatic tracing (Zipkin/Jaeger) and metrics.</li>
-      </ul>
-    </div>
+        <h2>Service Mesh (The Sidecar Pattern)</h2>
+        <p>A dedicated infrastructure layer for handling service-to-service communication. Uses a <strong>Sidecar
+            Proxy</strong> (like Envoy) running next to every service.</p>
+        <div class="example">
+          <div class="example-label">Service Mesh Features</div>
+          <ul>
+            <li><strong>mTLS:</strong> Automatic encryption between services.</li>
+            <li><strong>Traffic Splitting:</strong> Easy Blue/Green or Canary deployments.</li>
+            <li><strong>Retries/Timeouts:</strong> Managed at infrastructure level, not code.</li>
+            <li><strong>Observability:</strong> Automatic tracing (Zipkin/Jaeger) and metrics.</li>
+          </ul>
+        </div>
 
-    <h2>Event-Driven Architecture</h2>
-    <p>In event-driven architecture, services communicate by emitting and consuming events rather than through
-      direct API calls. An event represents something that happened — a fact about a past state change. Services
-      react to events without needing to know which service produced them.</p>
+        <h2>Event-Driven Architecture</h2>
+        <p>In event-driven architecture, services communicate by emitting and consuming events rather than through
+          direct API calls. An event represents something that happened — a fact about a past state change. Services
+          react to events without needing to know which service produced them.</p>
 
-    <h3>Event vs Command</h3>
-    <div class="compare">
-      <div class="compare-card neutral">
-        <h4>Event</h4>
-        <ul>
-          <li>Describes something that happened: OrderPlaced, UserRegistered, PaymentFailed</li>
-          <li>Immutable fact — you cannot un-happen an event</li>
-          <li>Named in past tense</li>
-          <li>Producer does not know or care who processes it</li>
-          <li>Multiple consumers may react independently</li>
-        </ul>
-      </div>
-      <div class="compare-card neutral">
-        <h4>Command</h4>
-        <ul>
-          <li>Requests something to happen: PlaceOrder, SendEmail, ProcessPayment</li>
-          <li>May be rejected or fail</li>
-          <li>Named in imperative form</li>
-          <li>Directed at a specific recipient</li>
-          <li>One receiver (typically)</li>
-        </ul>
-      </div>
-    </div>
+        <h3>Event vs Command</h3>
+        <div class="compare">
+          <div class="compare-card neutral">
+            <h4>Event</h4>
+            <ul>
+              <li>Describes something that happened: OrderPlaced, UserRegistered, PaymentFailed</li>
+              <li>Immutable fact — you cannot un-happen an event</li>
+              <li>Named in past tense</li>
+              <li>Producer does not know or care who processes it</li>
+              <li>Multiple consumers may react independently</li>
+            </ul>
+          </div>
+          <div class="compare-card neutral">
+            <h4>Command</h4>
+            <ul>
+              <li>Requests something to happen: PlaceOrder, SendEmail, ProcessPayment</li>
+              <li>May be rejected or fail</li>
+              <li>Named in imperative form</li>
+              <li>Directed at a specific recipient</li>
+              <li>One receiver (typically)</li>
+            </ul>
+          </div>
+        </div>
 
-    <h2>CQRS — Command Query Responsibility Segregation</h2>
-    <p>CQRS separates the model used for writing data (commands) from the model used for reading data (queries).
-      These two responsibilities have fundamentally different requirements — writes need strong consistency and
-      complex validation; reads need performance and flexible projections.</p>
+        <h2>CQRS — Command Query Responsibility Segregation</h2>
+        <p>CQRS separates the model used for writing data (commands) from the model used for reading data (queries).
+          These two responsibilities have fundamentally different requirements — writes need strong consistency and
+          complex validation; reads need performance and flexible projections.</p>
 
-    <h3>Architecture</h3>
-    <pre>
+        <h3>Architecture</h3>
+        <pre>
 # Write side (Command Model)
 POST /orders
   → Validates business rules
@@ -1020,28 +1102,28 @@ GET /dashboard/stats        → Returns materialized analytics
 Event bus: OrderCreated → Update read model asynchronously
 </pre>
 
-    <h3>Benefits</h3>
-    <ul>
-      <li>Read and write stores can be scaled independently</li>
-      <li>Read models can be denormalized, cached, and optimized without affecting write integrity</li>
-      <li>Multiple read projections of the same data (different views for mobile vs desktop vs analytics)</li>
-      <li>Commands can enforce complex business invariants without sacrificing query performance</li>
-    </ul>
+        <h3>Benefits</h3>
+        <ul>
+          <li>Read and write stores can be scaled independently</li>
+          <li>Read models can be denormalized, cached, and optimized without affecting write integrity</li>
+          <li>Multiple read projections of the same data (different views for mobile vs desktop vs analytics)</li>
+          <li>Commands can enforce complex business invariants without sacrificing query performance</li>
+        </ul>
 
-    <h3>Costs</h3>
-    <ul>
-      <li>Eventual consistency between write and read models — reads may be slightly stale</li>
-      <li>More complex — two models to maintain, synchronization infrastructure</li>
-      <li>Justified primarily when read and write patterns differ significantly (e.g., 95% reads)</li>
-    </ul>
+        <h3>Costs</h3>
+        <ul>
+          <li>Eventual consistency between write and read models — reads may be slightly stale</li>
+          <li>More complex — two models to maintain, synchronization infrastructure</li>
+          <li>Justified primarily when read and write patterns differ significantly (e.g., 95% reads)</li>
+        </ul>
 
-    <h2>Event Sourcing</h2>
-    <p>Event sourcing stores the complete history of changes to a domain object as an append-only sequence of
-      events, rather than storing only the current state. The current state is derived by replaying events from the
-      beginning (or from a snapshot).</p>
+        <h2>Event Sourcing</h2>
+        <p>Event sourcing stores the complete history of changes to a domain object as an append-only sequence of
+          events, rather than storing only the current state. The current state is derived by replaying events from the
+          beginning (or from a snapshot).</p>
 
-    <h3>Traditional State vs Event Sourcing</h3>
-    <pre>
+        <h3>Traditional State vs Event Sourcing</h3>
+        <pre>
 # Traditional: Only current state stored
 accounts table: { id: 123, balance: 450.00 }
 
@@ -1054,82 +1136,82 @@ events: [
 # Current balance = replay: 0 + 500 - 50 = 450
 </pre>
 
-    <h3>Advantages</h3>
-    <ul>
-      <li><strong>Complete audit trail:</strong> Every change is recorded with full context. Invaluable for
-        compliance, debugging, and customer support.</li>
-      <li><strong>Time travel:</strong> Reconstruct the state at any point in time by replaying events up to that
-        timestamp.</li>
-      <li><strong>Event replay:</strong> If a bug is found in a read projection, fix the projection logic and
-        rebuild it from events.</li>
-      <li><strong>Natural fit with CQRS:</strong> Events are published to build multiple read projections.</li>
-    </ul>
+        <h3>Advantages</h3>
+        <ul>
+          <li><strong>Complete audit trail:</strong> Every change is recorded with full context. Invaluable for
+            compliance, debugging, and customer support.</li>
+          <li><strong>Time travel:</strong> Reconstruct the state at any point in time by replaying events up to that
+            timestamp.</li>
+          <li><strong>Event replay:</strong> If a bug is found in a read projection, fix the projection logic and
+            rebuild it from events.</li>
+          <li><strong>Natural fit with CQRS:</strong> Events are published to build multiple read projections.</li>
+        </ul>
 
-    <h3>Challenges</h3>
-    <ul>
-      <li>Querying current state requires replaying events (mitigated by snapshots — persist state periodically,
-        replay only from last snapshot)</li>
-      <li>Event schema evolution — once events are stored, changing their schema is complex</li>
-      <li>Conceptual complexity — unfamiliar paradigm for most developers</li>
-      <li>Eventually consistent read models</li>
-    </ul>
+        <h3>Challenges</h3>
+        <ul>
+          <li>Querying current state requires replaying events (mitigated by snapshots — persist state periodically,
+            replay only from last snapshot)</li>
+          <li>Event schema evolution — once events are stored, changing their schema is complex</li>
+          <li>Conceptual complexity — unfamiliar paradigm for most developers</li>
+          <li>Eventually consistent read models</li>
+        </ul>
 
-    <h2>Serverless Architecture</h2>
-    <p>Serverless is a cloud execution model where the cloud provider dynamically manages infrastructure
-      provisioning and scaling. Developers deploy functions (FaaS — Function as a Service), and the provider runs
-      them in stateless compute containers that are created on demand and destroyed when idle.</p>
+        <h2>Serverless Architecture</h2>
+        <p>Serverless is a cloud execution model where the cloud provider dynamically manages infrastructure
+          provisioning and scaling. Developers deploy functions (FaaS — Function as a Service), and the provider runs
+          them in stateless compute containers that are created on demand and destroyed when idle.</p>
 
-    <h3>Execution Model</h3>
-    <ul>
-      <li><strong>Event-triggered:</strong> Functions are invoked by events — HTTP requests, queue messages,
-        database changes, scheduled timers, file uploads.</li>
-      <li><strong>Stateless:</strong> No state is preserved between invocations. External state (database, cache,
-        object storage) must be used.</li>
-      <li><strong>Ephemeral containers:</strong> Each invocation runs in a fresh (or reused) container. Local
-        filesystem is temporary.</li>
-      <li><strong>Automatic scaling:</strong> From 0 to millions of concurrent invocations. No capacity planning.
-      </li>
-      <li><strong>Pay-per-execution:</strong> Billed for compute time consumed, not for idle capacity.</li>
-    </ul>
+        <h3>Execution Model</h3>
+        <ul>
+          <li><strong>Event-triggered:</strong> Functions are invoked by events — HTTP requests, queue messages,
+            database changes, scheduled timers, file uploads.</li>
+          <li><strong>Stateless:</strong> No state is preserved between invocations. External state (database, cache,
+            object storage) must be used.</li>
+          <li><strong>Ephemeral containers:</strong> Each invocation runs in a fresh (or reused) container. Local
+            filesystem is temporary.</li>
+          <li><strong>Automatic scaling:</strong> From 0 to millions of concurrent invocations. No capacity planning.
+          </li>
+          <li><strong>Pay-per-execution:</strong> Billed for compute time consumed, not for idle capacity.</li>
+        </ul>
 
-    <h3>Cold Start Problem</h3>
-    <p>When a function has not been invoked recently, the provider must provision a new container, load the runtime,
-      and initialize the function before execution. This cold start latency can range from 100ms (lightweight
-      Node.js) to 10 seconds (Java with heavy JVM initialization). Mitigations: keep functions warm with scheduled
-      pings, use provisioned concurrency (reserved warm containers), minimize function package size.</p>
+        <h3>Cold Start Problem</h3>
+        <p>When a function has not been invoked recently, the provider must provision a new container, load the runtime,
+          and initialize the function before execution. This cold start latency can range from 100ms (lightweight
+          Node.js) to 10 seconds (Java with heavy JVM initialization). Mitigations: keep functions warm with scheduled
+          pings, use provisioned concurrency (reserved warm containers), minimize function package size.</p>
 
-    <h2>Peer-to-Peer Architecture</h2>
-    <p>In P2P architecture, all nodes (peers) are functionally equivalent and can act as both client and server.
-      There is no dedicated central server — peers directly communicate with each other, share resources, and form a
-      self-organizing overlay network.</p>
+        <h2>Peer-to-Peer Architecture</h2>
+        <p>In P2P architecture, all nodes (peers) are functionally equivalent and can act as both client and server.
+          There is no dedicated central server — peers directly communicate with each other, share resources, and form a
+          self-organizing overlay network.</p>
 
-    <h3>Structured vs Unstructured P2P</h3>
-    <ul>
-      <li><strong>Unstructured P2P (BitTorrent):</strong> Peers connect randomly. Finding content requires flooding
-        or random walk queries. Resilient but inefficient for search.</li>
-      <li><strong>Structured P2P (Kademlia DHT):</strong> Peers and content are organized according to a distributed
-        hash table. Any peer can be found in O(log N) hops. Used by BitTorrent DHT, IPFS, Ethereum peer discovery.
-      </li>
-      <li><strong>Hybrid P2P (early Spotify):</strong> Central servers handle discovery and metadata; data transfer
-        is direct peer-to-peer. Combines manageability of central infrastructure with P2P efficiency for bulk
-        transfer.</li>
-    </ul>
-  </div>
+        <h3>Structured vs Unstructured P2P</h3>
+        <ul>
+          <li><strong>Unstructured P2P (BitTorrent):</strong> Peers connect randomly. Finding content requires flooding
+            or random walk queries. Resilient but inefficient for search.</li>
+          <li><strong>Structured P2P (Kademlia DHT):</strong> Peers and content are organized according to a distributed
+            hash table. Any peer can be found in O(log N) hops. Used by BitTorrent DHT, IPFS, Ethereum peer discovery.
+          </li>
+          <li><strong>Hybrid P2P (early Spotify):</strong> Central servers handle discovery and metadata; data transfer
+            is direct peer-to-peer. Combines manageability of central infrastructure with P2P efficiency for bulk
+            transfer.</li>
+        </ul>
+      </div>
 
 <div class="section" id="microservices">
-    <h1 class="section-title">Microservices Patterns</h1>
-    <p class="section-subtitle">Module 7 &nbsp;|&nbsp; Service Discovery · Circuit Breaker · Bulkhead · Sidecar ·
-      API Gateway · BFF · Service Mesh · Strangler Fig</p>
+        <h1 class="section-title">Microservices Patterns</h1>
+        <p class="section-subtitle">Module 7 &nbsp;|&nbsp; Service Discovery · Circuit Breaker · Bulkhead · Sidecar ·
+          API Gateway · BFF · Service Mesh · Strangler Fig</p>
 
-    <h2>Service Discovery</h2>
-    <p>In a dynamic environment where services are deployed as containers and instances are added or removed
-      constantly, services cannot be reached at hardcoded IP addresses. Service discovery is the mechanism by which
-      services find each other.</p>
+        <h2>Service Discovery</h2>
+        <p>In a dynamic environment where services are deployed as containers and instances are added or removed
+          constantly, services cannot be reached at hardcoded IP addresses. Service discovery is the mechanism by which
+          services find each other.</p>
 
-    <h3>Client-Side Discovery</h3>
-    <p>The client queries a service registry to get a list of available instances of the target service, then
-      selects one using a load balancing strategy and calls it directly.</p>
-    <pre>
+        <h3>Client-Side Discovery</h3>
+        <p>The client queries a service registry to get a list of available instances of the target service, then
+          selects one using a load balancing strategy and calls it directly.</p>
+        <pre>
 # Client code
 instances = registry.get_instances("payment-service")
 # → [{ host: "10.0.1.5", port: 8080 }, { host: "10.0.1.6", port: 8080 }]
@@ -1137,60 +1219,60 @@ instances = registry.get_instances("payment-service")
 selected = round_robin_select(instances)
 response = http.post(f"http://{selected.host}:{selected.port}/charge", body)
 </pre>
-    <p><strong>Pros:</strong> No extra network hop (client calls service directly). Client controls load balancing
-      logic.<br>
-      <strong>Cons:</strong> Every client must implement discovery and load balancing logic. Client is coupled to
-      the registry API. Used by: Netflix Ribbon + Eureka.
-    </p>
+        <p><strong>Pros:</strong> No extra network hop (client calls service directly). Client controls load balancing
+          logic.<br>
+          <strong>Cons:</strong> Every client must implement discovery and load balancing logic. Client is coupled to
+          the registry API. Used by: Netflix Ribbon + Eureka.
+        </p>
 
-    <h3>Server-Side Discovery</h3>
-    <p>The client calls a fixed endpoint (load balancer or API gateway). The load balancer queries the registry and
-      routes to an available instance. The client knows nothing about discovery.</p>
-    <p><strong>Pros:</strong> Client is simple — no discovery logic. Load balancing is centralized.<br>
-      <strong>Cons:</strong> Load balancer is an extra network hop. Load balancer must be highly available. Used by:
-      Kubernetes Services, AWS ALB.
-    </p>
+        <h3>Server-Side Discovery</h3>
+        <p>The client calls a fixed endpoint (load balancer or API gateway). The load balancer queries the registry and
+          routes to an available instance. The client knows nothing about discovery.</p>
+        <p><strong>Pros:</strong> Client is simple — no discovery logic. Load balancing is centralized.<br>
+          <strong>Cons:</strong> Load balancer is an extra network hop. Load balancer must be highly available. Used by:
+          Kubernetes Services, AWS ALB.
+        </p>
 
-    <h3>Service Registry Systems</h3>
-    <ul>
-      <li><strong>Consul:</strong> Service registry with health checking, DNS interface, and KV store. Uses Raft for
-        strong consistency. Widely used outside Kubernetes.</li>
-      <li><strong>etcd:</strong> Strongly consistent distributed KV store. Kubernetes stores all cluster state in
-        etcd.</li>
-      <li><strong>Kubernetes Services + CoreDNS:</strong> Services are registered in etcd; CoreDNS answers DNS
-        queries for service names within the cluster. Standard for containerized environments.</li>
-      <li><strong>Eureka (Netflix):</strong> AP-mode service registry — favors availability over consistency.
-        Instances self-register. Used in JVM-based microservices.</li>
-    </ul>
+        <h3>Service Registry Systems</h3>
+        <ul>
+          <li><strong>Consul:</strong> Service registry with health checking, DNS interface, and KV store. Uses Raft for
+            strong consistency. Widely used outside Kubernetes.</li>
+          <li><strong>etcd:</strong> Strongly consistent distributed KV store. Kubernetes stores all cluster state in
+            etcd.</li>
+          <li><strong>Kubernetes Services + CoreDNS:</strong> Services are registered in etcd; CoreDNS answers DNS
+            queries for service names within the cluster. Standard for containerized environments.</li>
+          <li><strong>Eureka (Netflix):</strong> AP-mode service registry — favors availability over consistency.
+            Instances self-register. Used in JVM-based microservices.</li>
+        </ul>
 
-    <h2>Circuit Breaker Pattern</h2>
-    <p>The circuit breaker pattern prevents a service from repeatedly calling a downstream service that is failing,
-      giving the failing service time to recover and preventing thread pool exhaustion from piling up slow calls.
-    </p>
+        <h2>Circuit Breaker Pattern</h2>
+        <p>The circuit breaker pattern prevents a service from repeatedly calling a downstream service that is failing,
+          giving the failing service time to recover and preventing thread pool exhaustion from piling up slow calls.
+        </p>
 
-    <h3>States</h3>
-    <ul>
-      <li><strong>Closed:</strong> Normal operation. Requests pass through. The circuit breaker counts failures. If
-        the failure rate exceeds a threshold (e.g., 50% of last 10 requests), the circuit opens.</li>
-      <li><strong>Open:</strong> All requests are rejected immediately without calling the downstream service.
-        Returns a fast failure (or cached fallback) to the caller. After a timeout period (e.g., 30 seconds),
-        transitions to half-open.</li>
-      <li><strong>Half-Open:</strong> Allows a limited number of requests through as a probe. If they succeed, the
-        circuit closes. If they fail, the circuit opens again.</li>
-    </ul>
+        <h3>States</h3>
+        <ul>
+          <li><strong>Closed:</strong> Normal operation. Requests pass through. The circuit breaker counts failures. If
+            the failure rate exceeds a threshold (e.g., 50% of last 10 requests), the circuit opens.</li>
+          <li><strong>Open:</strong> All requests are rejected immediately without calling the downstream service.
+            Returns a fast failure (or cached fallback) to the caller. After a timeout period (e.g., 30 seconds),
+            transitions to half-open.</li>
+          <li><strong>Half-Open:</strong> Allows a limited number of requests through as a probe. If they succeed, the
+            circuit closes. If they fail, the circuit opens again.</li>
+        </ul>
 
-    <div class="diagram">
-      <pre class="mermaid">
+        <div class="diagram">
+          <pre class="mermaid">
 stateDiagram-v2
   Closed --> Open : failure rate exceeds threshold
   Open --> HalfOpen : timeout expires (probe allowed)
   HalfOpen --> Closed : probe requests succeed
   HalfOpen --> Open : probe requests fail
 </pre>
-      <p class="diagram-caption">Circuit breaker state machine</p>
-    </div>
+          <p class="diagram-caption">Circuit breaker state machine</p>
+        </div>
 
-    <pre>
+        <pre>
 # Pseudo-implementation
 class CircuitBreaker:
     def __init__(self, failure_threshold=5, timeout=30):
@@ -1221,19 +1303,19 @@ class CircuitBreaker:
             raise
 </pre>
 
-    <p><strong>Libraries:</strong> Hystrix (Netflix, JVM), Resilience4j (Java), Polly (.NET), go-resilience (Go),
-      pybreaker (Python)</p>
+        <p><strong>Libraries:</strong> Hystrix (Netflix, JVM), Resilience4j (Java), Polly (.NET), go-resilience (Go),
+          pybreaker (Python)</p>
 
-    <h2>Bulkhead Pattern</h2>
-    <p>The bulkhead pattern isolates components of an application into pools so that if one fails, the others
-      continue functioning. Named after the bulkheads on a ship that contain flooding to a single compartment.</p>
+        <h2>Bulkhead Pattern</h2>
+        <p>The bulkhead pattern isolates components of an application into pools so that if one fails, the others
+          continue functioning. Named after the bulkheads on a ship that contain flooding to a single compartment.</p>
 
-    <h3>Thread Pool Isolation</h3>
-    <p>Each downstream dependency gets its own thread pool. If the payment service is slow and its thread pool fills
-      up, those threads cannot spill over and starve the threads handling other dependencies (order service, user
-      service). The payment pool is the only casualty.</p>
+        <h3>Thread Pool Isolation</h3>
+        <p>Each downstream dependency gets its own thread pool. If the payment service is slow and its thread pool fills
+          up, those threads cannot spill over and starve the threads handling other dependencies (order service, user
+          service). The payment pool is the only casualty.</p>
 
-    <pre>
+        <pre>
 # Separate executors per downstream service
 payment_executor  = ThreadPoolExecutor(max_workers=10)
 inventory_executor = ThreadPoolExecutor(max_workers=20)
@@ -1247,33 +1329,33 @@ except TimeoutError:
     return fallback_response()
 </pre>
 
-    <h3>Connection Pool Isolation</h3>
-    <p>Similarly, database connection pools can be isolated per service or query type. Write operations get a
-      separate pool from read operations; batch jobs get a separate pool from real-time requests.</p>
+        <h3>Connection Pool Isolation</h3>
+        <p>Similarly, database connection pools can be isolated per service or query type. Write operations get a
+          separate pool from read operations; batch jobs get a separate pool from real-time requests.</p>
 
-    <h2>Sidecar Pattern</h2>
-    <p>The sidecar pattern places a helper container alongside the main application container, sharing the same
-      network namespace and lifecycle. The sidecar handles infrastructure concerns so the application does not have
-      to.</p>
+        <h2>Sidecar Pattern</h2>
+        <p>The sidecar pattern places a helper container alongside the main application container, sharing the same
+          network namespace and lifecycle. The sidecar handles infrastructure concerns so the application does not have
+          to.</p>
 
-    <h3>Common Sidecar Responsibilities</h3>
-    <ul>
-      <li><strong>Proxy and traffic management:</strong> Envoy proxy intercepts all inbound and outbound network
-        traffic, providing load balancing, retries, circuit breaking, and mTLS without application changes.</li>
-      <li><strong>Log forwarding:</strong> Fluentd sidecar tails the application's log files and ships them to a
-        central log aggregation system.</li>
-      <li><strong>Metrics scraping:</strong> Prometheus exporter sidecar exposes application metrics in Prometheus
-        format.</li>
-      <li><strong>Configuration synchronization:</strong> Consul-template or Vault Agent sidecar writes secrets and
-        configuration from the registry to the local filesystem where the application can read them.</li>
-    </ul>
+        <h3>Common Sidecar Responsibilities</h3>
+        <ul>
+          <li><strong>Proxy and traffic management:</strong> Envoy proxy intercepts all inbound and outbound network
+            traffic, providing load balancing, retries, circuit breaking, and mTLS without application changes.</li>
+          <li><strong>Log forwarding:</strong> Fluentd sidecar tails the application's log files and ships them to a
+            central log aggregation system.</li>
+          <li><strong>Metrics scraping:</strong> Prometheus exporter sidecar exposes application metrics in Prometheus
+            format.</li>
+          <li><strong>Configuration synchronization:</strong> Consul-template or Vault Agent sidecar writes secrets and
+            configuration from the registry to the local filesystem where the application can read them.</li>
+        </ul>
 
-    <h2>Backend for Frontend (BFF) Pattern</h2>
-    <p>Instead of a single general-purpose API serving all client types, the BFF pattern creates a dedicated backend
-      for each type of client (mobile, web, partner API). Each BFF is tailored to its client's specific needs — data
-      shape, bandwidth constraints, and interaction patterns.</p>
+        <h2>Backend for Frontend (BFF) Pattern</h2>
+        <p>Instead of a single general-purpose API serving all client types, the BFF pattern creates a dedicated backend
+          for each type of client (mobile, web, partner API). Each BFF is tailored to its client's specific needs — data
+          shape, bandwidth constraints, and interaction patterns.</p>
 
-    <pre>
+        <pre>
 # Mobile BFF: optimized for bandwidth
 GET /mobile/home-screen
 → Returns only: user_name, unread_count, 3 recent items
@@ -1289,82 +1371,82 @@ GET /partner/v2/users
 → API key authentication, different pagination, different fields
 </pre>
 
-    <h2>Service Mesh</h2>
-    <p>A service mesh is a dedicated infrastructure layer for managing service-to-service communication. Rather than
-      implementing communication concerns (retries, timeouts, circuit breaking, mutual TLS, observability) in each
-      service, the service mesh handles them via a data plane of sidecar proxies and a control plane that configures
-      those proxies.</p>
+        <h2>Service Mesh</h2>
+        <p>A service mesh is a dedicated infrastructure layer for managing service-to-service communication. Rather than
+          implementing communication concerns (retries, timeouts, circuit breaking, mutual TLS, observability) in each
+          service, the service mesh handles them via a data plane of sidecar proxies and a control plane that configures
+          those proxies.</p>
 
-    <h3>Components</h3>
-    <ul>
-      <li><strong>Data plane:</strong> Sidecar proxies (Envoy) injected into each service pod. Intercept all inbound
-        and outbound traffic. Enforce policy, collect telemetry.</li>
-      <li><strong>Control plane:</strong> Centralized management system (Istio, Linkerd) that distributes
-        configuration to all proxies — routing rules, security policies, health checking parameters.</li>
-    </ul>
+        <h3>Components</h3>
+        <ul>
+          <li><strong>Data plane:</strong> Sidecar proxies (Envoy) injected into each service pod. Intercept all inbound
+            and outbound traffic. Enforce policy, collect telemetry.</li>
+          <li><strong>Control plane:</strong> Centralized management system (Istio, Linkerd) that distributes
+            configuration to all proxies — routing rules, security policies, health checking parameters.</li>
+        </ul>
 
-    <h3>Capabilities</h3>
-    <ul>
-      <li>Mutual TLS (mTLS) for all service-to-service communication — automatic, zero-configuration encryption and
-        identity verification</li>
-      <li>Traffic management: canary deployments, A/B testing, traffic mirroring, fault injection</li>
-      <li>Observability: distributed tracing, per-service latency and error rate metrics automatically, without
-        application code changes</li>
-      <li>Resilience: configurable retries, timeouts, circuit breaking at the proxy level</li>
-    </ul>
+        <h3>Capabilities</h3>
+        <ul>
+          <li>Mutual TLS (mTLS) for all service-to-service communication — automatic, zero-configuration encryption and
+            identity verification</li>
+          <li>Traffic management: canary deployments, A/B testing, traffic mirroring, fault injection</li>
+          <li>Observability: distributed tracing, per-service latency and error rate metrics automatically, without
+            application code changes</li>
+          <li>Resilience: configurable retries, timeouts, circuit breaking at the proxy level</li>
+        </ul>
 
-    <h2>Strangler Fig Pattern</h2>
-    <p>The Strangler Fig pattern provides a strategy for incrementally migrating a legacy monolith to a
-      microservices architecture. Named after the strangler fig tree that grows around its host, eventually
-      replacing it.</p>
+        <h2>Strangler Fig Pattern</h2>
+        <p>The Strangler Fig pattern provides a strategy for incrementally migrating a legacy monolith to a
+          microservices architecture. Named after the strangler fig tree that grows around its host, eventually
+          replacing it.</p>
 
-    <h3>Process</h3>
-    <ol>
-      <li><strong>Introduce a facade:</strong> Place a routing layer (API gateway or reverse proxy) in front of the
-        monolith. Initially it passes all traffic through unchanged.</li>
-      <li><strong>Identify a slice to extract:</strong> Choose a bounded context with clear boundaries (e.g., user
-        authentication, notifications). Implement it as a new microservice.</li>
-      <li><strong>Route traffic to the new service:</strong> Update the facade to route the relevant paths to the
-        new service. The monolith still handles everything else.</li>
-      <li><strong>Validate and remove:</strong> After the new service is proven in production, remove the
-        corresponding code from the monolith.</li>
-      <li><strong>Repeat:</strong> Continue extracting slices until the monolith is empty or small enough to be
-        acceptable.</li>
-    </ol>
+        <h3>Process</h3>
+        <ol>
+          <li><strong>Introduce a facade:</strong> Place a routing layer (API gateway or reverse proxy) in front of the
+            monolith. Initially it passes all traffic through unchanged.</li>
+          <li><strong>Identify a slice to extract:</strong> Choose a bounded context with clear boundaries (e.g., user
+            authentication, notifications). Implement it as a new microservice.</li>
+          <li><strong>Route traffic to the new service:</strong> Update the facade to route the relevant paths to the
+            new service. The monolith still handles everything else.</li>
+          <li><strong>Validate and remove:</strong> After the new service is proven in production, remove the
+            corresponding code from the monolith.</li>
+          <li><strong>Repeat:</strong> Continue extracting slices until the monolith is empty or small enough to be
+            acceptable.</li>
+        </ol>
 
-    <h3>Risk Management</h3>
-    <ul>
-      <li><strong>Parallel running:</strong> Run the new service alongside the monolith logic, compare results,
-        before switching traffic.</li>
-      <li><strong>Canary routing:</strong> Route 5% of traffic to the new service, monitor, then gradually increase.
-      </li>
-      <li><strong>Feature flags:</strong> Control which users experience the new service.</li>
-      <li><strong>Quick rollback:</strong> The facade makes it trivial to route all traffic back to the monolith if
-        the new service has issues.</li>
-    </ul>
-  </div>
+        <h3>Risk Management</h3>
+        <ul>
+          <li><strong>Parallel running:</strong> Run the new service alongside the monolith logic, compare results,
+            before switching traffic.</li>
+          <li><strong>Canary routing:</strong> Route 5% of traffic to the new service, monitor, then gradually increase.
+          </li>
+          <li><strong>Feature flags:</strong> Control which users experience the new service.</li>
+          <li><strong>Quick rollback:</strong> The facade makes it trivial to route all traffic back to the monolith if
+            the new service has issues.</li>
+        </ul>
+      </div>
 
 <div class="section" id="containers">
-    <h1 class="section-title">Virtual Machines vs Containers</h1>
-    <p class="section-subtitle">Understanding modern infrastructure choices and orchestration</p>
+        <h1 class="section-title">Virtual Machines vs Containers</h1>
+        <p class="section-subtitle">Understanding modern infrastructure choices and orchestration</p>
 
-    <div class="callout info">
-      <div class="callout-title">Real Story: Docker's Revolution</div>
-      <p>In 2013, Docker launched and changed infrastructure forever. Before Docker, deploying apps required complex
-        server setup, dependency management, and "it works on my machine" nightmares. Docker made apps portable with
-        containers. By 2015, Google revealed they'd been running everything in containers for years (their Borg
-        system). Today, Kubernetes orchestrates millions of containers worldwide.</p>
-    </div>
+        <div class="callout info">
+          <div class="callout-title">Real Story: Docker's Revolution</div>
+          <p>In 2013, Docker launched and changed infrastructure forever. Before Docker, deploying apps required complex
+            server setup, dependency management, and "it works on my machine" nightmares. Docker made apps portable with
+            containers. By 2015, Google revealed they'd been running everything in containers for years (their Borg
+            system). Today, Kubernetes orchestrates millions of containers worldwide.</p>
+        </div>
 
-    <h2>Architecture Comparison</h2>
+        <h2>Architecture Comparison</h2>
 
-    <p>The fundamental difference:</p>
+        <p>The fundamental difference:</p>
 
-    <div class="compare">
-      <div class="compare-card neutral">
-        <h4>Virtual Machines (VMs)</h4>
-        <p><strong>Architecture:</strong></p>
-        <pre>
+        <div class="compare">
+          <div class="compare-card neutral">
+            <h4>Virtual Machines (VMs)</h4>
+            <p><strong>Architecture:</strong></p>
+            <pre>
 Physical Hardware
 └── Hypervisor (ESXi, Hyper-V, KVM)
     ├── VM 1
@@ -1377,13 +1459,13 @@ Physical Hardware
         ├── Guest OS (Full Linux)
         └── App + Dependencies
     </pre>
-        <p>Each VM runs a complete operating system</p>
-      </div>
+            <p>Each VM runs a complete operating system</p>
+          </div>
 
-      <div class="compare-card neutral">
-        <h4>Containers</h4>
-        <p><strong>Architecture:</strong></p>
-        <pre>
+          <div class="compare-card neutral">
+            <h4>Containers</h4>
+            <p><strong>Architecture:</strong></p>
+            <pre>
 Physical Hardware
 └── Host Operating System
     └── Container Engine (Docker, containerd)
@@ -1392,177 +1474,177 @@ Physical Hardware
         ├── Container 3 (App + Libs)
         └── Container 4 (App + Libs)
     </pre>
-        <p>All containers share the host kernel</p>
-      </div>
-    </div>
+            <p>All containers share the host kernel</p>
+          </div>
+        </div>
 
-    <h2>Detailed Feature Comparison</h2>
+        <h2>Detailed Feature Comparison</h2>
 
-    <table>
-      <tr>
-        <th>Feature</th>
-        <th>Virtual Machines</th>
-        <th>Containers</th>
-        <th>Winner</th>
-      </tr>
-      <tr>
-        <td><strong>Size</strong></td>
-        <td>GBs (full OS included)</td>
-        <td>MBs (no OS, shares host kernel)</td>
-        <td>🏆 Containers</td>
-      </tr>
-      <tr>
-        <td><strong>Startup Time</strong></td>
-        <td>1-2 minutes</td>
-        <td>1-2 seconds</td>
-        <td>🏆 Containers</td>
-      </tr>
-      <tr>
-        <td><strong>Isolation</strong></td>
-        <td>Complete (hardware-level)</td>
-        <td>Process-level (shared kernel)</td>
-        <td>🏆 VMs</td>
-      </tr>
-      <tr>
-        <td><strong>Security</strong></td>
-        <td>Strong (separate kernels)</td>
-        <td>Good (namespace isolation)</td>
-        <td>🏆 VMs</td>
-      </tr>
-      <tr>
-        <td><strong>Resource Overhead</strong></td>
-        <td>High (full OS per VM)</td>
-        <td>Low (shared kernel)</td>
-        <td>🏆 Containers</td>
-      </tr>
-      <tr>
-        <td><strong>Density per Host</strong></td>
-        <td>10-50 VMs</td>
-        <td>100-1000+ containers</td>
-        <td>🏆 Containers</td>
-      </tr>
-      <tr>
-        <td><strong>Portability</strong></td>
-        <td>Good (but OS-dependent)</td>
-        <td>Excellent (run anywhere)</td>
-        <td>🏆 Containers</td>
-      </tr>
-      <tr>
-        <td><strong>Performance</strong></td>
-        <td>Near-native (hypervisor overhead)</td>
-        <td>Native (no virtualization)</td>
-        <td>🏆 Containers</td>
-      </tr>
-      <tr>
-        <td><strong>Boot to Production</strong></td>
-        <td>5-10 minutes</td>
-        <td>10-30 seconds</td>
-        <td>🏆 Containers</td>
-      </tr>
-      <tr>
-        <td><strong>Different OS Support</strong></td>
-        <td>Yes (Linux + Windows simultaneously)</td>
-        <td>No (must match host kernel)</td>
-        <td>🏆 VMs</td>
-      </tr>
-    </table>
+        <table>
+          <tr>
+            <th>Feature</th>
+            <th>Virtual Machines</th>
+            <th>Containers</th>
+            <th>Winner</th>
+          </tr>
+          <tr>
+            <td><strong>Size</strong></td>
+            <td>GBs (full OS included)</td>
+            <td>MBs (no OS, shares host kernel)</td>
+            <td>🏆 Containers</td>
+          </tr>
+          <tr>
+            <td><strong>Startup Time</strong></td>
+            <td>1-2 minutes</td>
+            <td>1-2 seconds</td>
+            <td>🏆 Containers</td>
+          </tr>
+          <tr>
+            <td><strong>Isolation</strong></td>
+            <td>Complete (hardware-level)</td>
+            <td>Process-level (shared kernel)</td>
+            <td>🏆 VMs</td>
+          </tr>
+          <tr>
+            <td><strong>Security</strong></td>
+            <td>Strong (separate kernels)</td>
+            <td>Good (namespace isolation)</td>
+            <td>🏆 VMs</td>
+          </tr>
+          <tr>
+            <td><strong>Resource Overhead</strong></td>
+            <td>High (full OS per VM)</td>
+            <td>Low (shared kernel)</td>
+            <td>🏆 Containers</td>
+          </tr>
+          <tr>
+            <td><strong>Density per Host</strong></td>
+            <td>10-50 VMs</td>
+            <td>100-1000+ containers</td>
+            <td>🏆 Containers</td>
+          </tr>
+          <tr>
+            <td><strong>Portability</strong></td>
+            <td>Good (but OS-dependent)</td>
+            <td>Excellent (run anywhere)</td>
+            <td>🏆 Containers</td>
+          </tr>
+          <tr>
+            <td><strong>Performance</strong></td>
+            <td>Near-native (hypervisor overhead)</td>
+            <td>Native (no virtualization)</td>
+            <td>🏆 Containers</td>
+          </tr>
+          <tr>
+            <td><strong>Boot to Production</strong></td>
+            <td>5-10 minutes</td>
+            <td>10-30 seconds</td>
+            <td>🏆 Containers</td>
+          </tr>
+          <tr>
+            <td><strong>Different OS Support</strong></td>
+            <td>Yes (Linux + Windows simultaneously)</td>
+            <td>No (must match host kernel)</td>
+            <td>🏆 VMs</td>
+          </tr>
+        </table>
 
-    <h2>When to Use Virtual Machines</h2>
+        <h2>When to Use Virtual Machines</h2>
 
-    <div class="callout tip">
-      <div class="callout-title">VMs are Best For</div>
+        <div class="callout tip">
+          <div class="callout-title">VMs are Best For</div>
 
-      <p><strong>1. Full OS Control Needed</strong></p>
-      <ul>
-        <li>Need to install custom kernel modules</li>
-        <li>Require specific kernel parameters</li>
-        <li>Low-level system access required</li>
-      </ul>
+          <p><strong>1. Full OS Control Needed</strong></p>
+          <ul>
+            <li>Need to install custom kernel modules</li>
+            <li>Require specific kernel parameters</li>
+            <li>Low-level system access required</li>
+          </ul>
 
-      <p><strong>2. Running Different Operating Systems</strong></p>
-      <ul>
-        <li>Windows + Linux on same physical hardware</li>
-        <li>Multiple Linux distributions with different kernels</li>
-        <li>Legacy OS versions (Windows Server 2008)</li>
-      </ul>
+          <p><strong>2. Running Different Operating Systems</strong></p>
+          <ul>
+            <li>Windows + Linux on same physical hardware</li>
+            <li>Multiple Linux distributions with different kernels</li>
+            <li>Legacy OS versions (Windows Server 2008)</li>
+          </ul>
 
-      <p><strong>3. Maximum Isolation & Security</strong></p>
-      <ul>
-        <li>Multi-tenant environments (cloud providers)</li>
-        <li>Untrusted workloads</li>
-        <li>Regulatory compliance requiring hardware isolation</li>
-        <li>Defense in depth (separate kernel per tenant)</li>
-      </ul>
+          <p><strong>3. Maximum Isolation & Security</strong></p>
+          <ul>
+            <li>Multi-tenant environments (cloud providers)</li>
+            <li>Untrusted workloads</li>
+            <li>Regulatory compliance requiring hardware isolation</li>
+            <li>Defense in depth (separate kernel per tenant)</li>
+          </ul>
 
-      <p><strong>4. Resource-Heavy Applications</strong></p>
-      <ul>
-        <li>Databases (PostgreSQL, MySQL, Oracle)</li>
-        <li>Message queues (Kafka, RabbitMQ)</li>
-        <li>Cache servers (Redis, Memcached)</li>
-        <li>Data processing (Hadoop, Spark)</li>
-      </ul>
+          <p><strong>4. Resource-Heavy Applications</strong></p>
+          <ul>
+            <li>Databases (PostgreSQL, MySQL, Oracle)</li>
+            <li>Message queues (Kafka, RabbitMQ)</li>
+            <li>Cache servers (Redis, Memcached)</li>
+            <li>Data processing (Hadoop, Spark)</li>
+          </ul>
 
-      <p><strong>5. Legacy Applications</strong></p>
-      <ul>
-        <li>Monolithic apps that can't be containerized easily</li>
-        <li>Applications with complex OS dependencies</li>
-        <li>Third-party software requiring specific OS</li>
-      </ul>
-    </div>
+          <p><strong>5. Legacy Applications</strong></p>
+          <ul>
+            <li>Monolithic apps that can't be containerized easily</li>
+            <li>Applications with complex OS dependencies</li>
+            <li>Third-party software requiring specific OS</li>
+          </ul>
+        </div>
 
-    <h2>When to Use Containers</h2>
+        <h2>When to Use Containers</h2>
 
-    <div class="callout tip">
-      <div class="callout-title">Containers are Best For</div>
+        <div class="callout tip">
+          <div class="callout-title">Containers are Best For</div>
 
-      <p><strong>1. Microservices Architecture</strong></p>
-      <ul>
-        <li>Deploy hundreds of small services</li>
-        <li>Each service in its own container</li>
-        <li>Independent scaling per service</li>
-        <li>Fast deployment and rollback</li>
-      </ul>
+          <p><strong>1. Microservices Architecture</strong></p>
+          <ul>
+            <li>Deploy hundreds of small services</li>
+            <li>Each service in its own container</li>
+            <li>Independent scaling per service</li>
+            <li>Fast deployment and rollback</li>
+          </ul>
 
-      <p><strong>2. Rapid Deployment & Scaling</strong></p>
-      <ul>
-        <li>Auto-scaling based on load (scale to 1000s of instances)</li>
-        <li>Spin up new instances in seconds</li>
-        <li>Handle traffic spikes (Black Friday, product launches)</li>
-      </ul>
+          <p><strong>2. Rapid Deployment & Scaling</strong></p>
+          <ul>
+            <li>Auto-scaling based on load (scale to 1000s of instances)</li>
+            <li>Spin up new instances in seconds</li>
+            <li>Handle traffic spikes (Black Friday, product launches)</li>
+          </ul>
 
-      <p><strong>3. CI/CD Pipelines</strong></p>
-      <ul>
-        <li>Build once, run everywhere</li>
-        <li>Test in identical environment to production</li>
-        <li>Fast build-test-deploy cycles</li>
-        <li>Consistent between dev/staging/prod</li>
-      </ul>
+          <p><strong>3. CI/CD Pipelines</strong></p>
+          <ul>
+            <li>Build once, run everywhere</li>
+            <li>Test in identical environment to production</li>
+            <li>Fast build-test-deploy cycles</li>
+            <li>Consistent between dev/staging/prod</li>
+          </ul>
 
-      <p><strong>4. Resource Efficiency</strong></p>
-      <ul>
-        <li>Run 10x more containers than VMs per host</li>
-        <li>Better server utilization</li>
-        <li>Lower infrastructure costs</li>
-      </ul>
+          <p><strong>4. Resource Efficiency</strong></p>
+          <ul>
+            <li>Run 10x more containers than VMs per host</li>
+            <li>Better server utilization</li>
+            <li>Lower infrastructure costs</li>
+          </ul>
 
-      <p><strong>5. Stateless Applications</strong></p>
-      <ul>
-        <li>Web servers (nginx, Apache)</li>
-        <li>API servers (Node.js, Python, Go)</li>
-        <li>Workers (background jobs, async tasks)</li>
-        <li>Frontend applications</li>
-      </ul>
-    </div>
+          <p><strong>5. Stateless Applications</strong></p>
+          <ul>
+            <li>Web servers (nginx, Apache)</li>
+            <li>API servers (Node.js, Python, Go)</li>
+            <li>Workers (background jobs, async tasks)</li>
+            <li>Frontend applications</li>
+          </ul>
+        </div>
 
-    <h2>Real-World Example: Hybrid Architecture</h2>
+        <h2>Real-World Example: Hybrid Architecture</h2>
 
-    <div class="example">
-      <div class="example-label">Large E-Commerce Platform (Netflix-style)</div>
+        <div class="example">
+          <div class="example-label">Large E-Commerce Platform (Netflix-style)</div>
 
-      <p><strong>Virtual Machines Used For:</strong></p>
+          <p><strong>Virtual Machines Used For:</strong></p>
 
-      <p><strong>1. Stateful Data Layer</strong></p>
-      <pre>
+          <p><strong>1. Stateful Data Layer</strong></p>
+          <pre>
 • PostgreSQL Cluster
   - 3 VMs: 16 cores, 128GB RAM each
   - Dedicated storage with 10K IOPS
@@ -1577,25 +1659,25 @@ Physical Hardware
   - Reason: High disk I/O, needs OS-level tuning
   </pre>
 
-      <p><strong>2. Legacy Monolith</strong></p>
-      <pre>
+          <p><strong>2. Legacy Monolith</strong></p>
+          <pre>
 • Java Monolith
   - 4 VMs: 8 cores, 32GB RAM each
   - Windows Server 2016
   - Reason: Can't easily containerize, specific OS needs
   </pre>
 
-      <p><strong>3. Big Data Processing</strong></p>
-      <pre>
+          <p><strong>3. Big Data Processing</strong></p>
+          <pre>
 • Hadoop/Spark Cluster
   - 20 VMs: 32 cores, 256GB RAM each
   - Reason: Resource-intensive, needs full OS control
   </pre>
 
-      <p><strong>Containers Used For:</strong></p>
+          <p><strong>Containers Used For:</strong></p>
 
-      <p><strong>1. Microservices (200+ services)</strong></p>
-      <pre>
+          <p><strong>1. Microservices (200+ services)</strong></p>
+          <pre>
 • API Gateway: 50 containers
 • User Service: 30 containers
 • Product Service: 100 containers (high traffic)
@@ -1608,46 +1690,46 @@ Orchestrated by: Kubernetes
 Auto-scaling: Yes (based on CPU/requests)
   </pre>
 
-      <p><strong>2. Frontend Applications</strong></p>
-      <pre>
+          <p><strong>2. Frontend Applications</strong></p>
+          <pre>
 • React Web App: 40 containers
 • Mobile API Backend: 30 containers
 • Admin Dashboard: 10 containers
   </pre>
 
-      <p><strong>3. Worker Processes</strong></p>
-      <pre>
+          <p><strong>3. Worker Processes</strong></p>
+          <pre>
 • Image Processing: 50 containers (scales with uploads)
 • Email Workers: 20 containers
 • Report Generation: 15 containers
 • Data Sync Jobs: 25 containers
   </pre>
 
-      <p><strong>Architecture Summary:</strong></p>
-      <pre>
+          <p><strong>Architecture Summary:</strong></p>
+          <pre>
 VMs: ~40 total (stateful, resource-heavy)
 Containers: ~500 total (stateless, microservices)
 Ratio: 1:12.5 (containers dominate count)
 Cost: VMs 60% of bill, Containers 40%
   </pre>
-    </div>
+        </div>
 
-    <h2>Docker: The Container Standard</h2>
+        <h2>Docker: The Container Standard</h2>
 
-    <h3>Core Docker Concepts</h3>
+        <h3>Core Docker Concepts</h3>
 
-    <ul>
-      <li><strong>Image:</strong> Immutable template (like a class in OOP)</li>
-      <li><strong>Container:</strong> Running instance of an image (like an object)</li>
-      <li><strong>Dockerfile:</strong> Recipe to build an image</li>
-      <li><strong>Registry:</strong> Repository for images (Docker Hub, ECR, GCR)</li>
-      <li><strong>Volume:</strong> Persistent storage for containers</li>
-      <li><strong>Network:</strong> Communication between containers</li>
-    </ul>
+        <ul>
+          <li><strong>Image:</strong> Immutable template (like a class in OOP)</li>
+          <li><strong>Container:</strong> Running instance of an image (like an object)</li>
+          <li><strong>Dockerfile:</strong> Recipe to build an image</li>
+          <li><strong>Registry:</strong> Repository for images (Docker Hub, ECR, GCR)</li>
+          <li><strong>Volume:</strong> Persistent storage for containers</li>
+          <li><strong>Network:</strong> Communication between containers</li>
+        </ul>
 
-    <div class="example">
-      <div class="example-label">Simple Dockerfile Example</div>
-      <pre>
+        <div class="example">
+          <div class="example-label">Simple Dockerfile Example</div>
+          <pre>
 # Start from Node.js 18 base image
 FROM node:18-alpine
 
@@ -1670,8 +1752,8 @@ EXPOSE 3000
 CMD ["node", "server.js"]
   </pre>
 
-      <p><strong>Build & Run:</strong></p>
-      <pre>
+          <p><strong>Build & Run:</strong></p>
+          <pre>
 # Build image
 docker build -t my-app:1.0 .
 
@@ -1680,26 +1762,26 @@ docker run -d -p 3000:3000 my-app:1.0
 
 # Container starts in 2 seconds!
   </pre>
-    </div>
+        </div>
 
-    <h2>Kubernetes: Container Orchestration</h2>
+        <h2>Kubernetes: Container Orchestration</h2>
 
-    <p>Managing hundreds of containers manually is impossible. Kubernetes automates:</p>
+        <p>Managing hundreds of containers manually is impossible. Kubernetes automates:</p>
 
-    <ul>
-      <li><strong>Deployment:</strong> Roll out new versions with zero downtime</li>
-      <li><strong>Scaling:</strong> Auto-scale based on CPU, memory, custom metrics</li>
-      <li><strong>Self-Healing:</strong> Restart failed containers automatically</li>
-      <li><strong>Load Balancing:</strong> Distribute traffic across containers</li>
-      <li><strong>Service Discovery:</strong> Containers find each other via DNS</li>
-      <li><strong>Secret Management:</strong> Store passwords, API keys securely</li>
-      <li><strong>Rolling Updates:</strong> Update without downtime</li>
-      <li><strong>Rollback:</strong> Revert bad deployments instantly</li>
-    </ul>
+        <ul>
+          <li><strong>Deployment:</strong> Roll out new versions with zero downtime</li>
+          <li><strong>Scaling:</strong> Auto-scale based on CPU, memory, custom metrics</li>
+          <li><strong>Self-Healing:</strong> Restart failed containers automatically</li>
+          <li><strong>Load Balancing:</strong> Distribute traffic across containers</li>
+          <li><strong>Service Discovery:</strong> Containers find each other via DNS</li>
+          <li><strong>Secret Management:</strong> Store passwords, API keys securely</li>
+          <li><strong>Rolling Updates:</strong> Update without downtime</li>
+          <li><strong>Rollback:</strong> Revert bad deployments instantly</li>
+        </ul>
 
-    <div class="example">
-      <div class="example-label">Kubernetes Deployment Example</div>
-      <pre>
+        <div class="example">
+          <div class="example-label">Kubernetes Deployment Example</div>
+          <pre>
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -1734,88 +1816,88 @@ spec:
           periodSeconds: 10
   </pre>
 
-      <p><strong>Result:</strong> Kubernetes ensures 10 healthy copies always running</p>
-    </div>
+          <p><strong>Result:</strong> Kubernetes ensures 10 healthy copies always running</p>
+        </div>
 
-    <h2>Performance Comparison</h2>
+        <h2>Performance Comparison</h2>
 
-    <table>
-      <tr>
-        <th>Metric</th>
-        <th>Virtual Machine</th>
-        <th>Container</th>
-        <th>Difference</th>
-      </tr>
-      <tr>
-        <td>Startup Time</td>
-        <td>60-120 seconds</td>
-        <td>1-2 seconds</td>
-        <td>60x faster</td>
-      </tr>
-      <tr>
-        <td>Memory per Instance</td>
-        <td>512MB - 8GB</td>
-        <td>10MB - 500MB</td>
-        <td>10-50x less</td>
-      </tr>
-      <tr>
-        <td>Disk Space</td>
-        <td>10-100GB</td>
-        <td>100MB - 2GB</td>
-        <td>50x smaller</td>
-      </tr>
-      <tr>
-        <td>Instances per Host</td>
-        <td>10-50</td>
-        <td>100-1000+</td>
-        <td>20x more</td>
-      </tr>
-      <tr>
-        <td>Deploy + Ready</td>
-        <td>5-10 minutes</td>
-        <td>10-30 seconds</td>
-        <td>20x faster</td>
-      </tr>
-    </table>
+        <table>
+          <tr>
+            <th>Metric</th>
+            <th>Virtual Machine</th>
+            <th>Container</th>
+            <th>Difference</th>
+          </tr>
+          <tr>
+            <td>Startup Time</td>
+            <td>60-120 seconds</td>
+            <td>1-2 seconds</td>
+            <td>60x faster</td>
+          </tr>
+          <tr>
+            <td>Memory per Instance</td>
+            <td>512MB - 8GB</td>
+            <td>10MB - 500MB</td>
+            <td>10-50x less</td>
+          </tr>
+          <tr>
+            <td>Disk Space</td>
+            <td>10-100GB</td>
+            <td>100MB - 2GB</td>
+            <td>50x smaller</td>
+          </tr>
+          <tr>
+            <td>Instances per Host</td>
+            <td>10-50</td>
+            <td>100-1000+</td>
+            <td>20x more</td>
+          </tr>
+          <tr>
+            <td>Deploy + Ready</td>
+            <td>5-10 minutes</td>
+            <td>10-30 seconds</td>
+            <td>20x faster</td>
+          </tr>
+        </table>
 
-    <h2>Security Considerations</h2>
+        <h2>Security Considerations</h2>
 
-    <div class="compare">
-      <div class="compare-card con">
-        <h4>VMs: Stronger Isolation</h4>
-        <ul>
-          <li>Each VM has its own kernel</li>
-          <li>Hardware-level isolation via hypervisor</li>
-          <li>Guest OS compromise doesn't affect host</li>
-          <li>Perfect for multi-tenant cloud (AWS, Azure)</li>
-          <li>Used by cloud providers to isolate customers</li>
-        </ul>
-      </div>
-
-      <div class="compare-card warn">
-        <h4>Containers: Shared Kernel Risks</h4>
-        <ul>
-          <li>All containers share host kernel</li>
-          <li>Kernel vulnerability affects all containers</li>
-          <li>Container escape possible (rare but serious)</li>
-          <li>Need proper security practices:
+        <div class="compare">
+          <div class="compare-card con">
+            <h4>VMs: Stronger Isolation</h4>
             <ul>
-              <li>Run as non-root user</li>
-              <li>Use minimal base images</li>
-              <li>Scan for vulnerabilities</li>
-              <li>Limit capabilities</li>
-              <li>Use security policies (Pod Security Standards)</li>
+              <li>Each VM has its own kernel</li>
+              <li>Hardware-level isolation via hypervisor</li>
+              <li>Guest OS compromise doesn't affect host</li>
+              <li>Perfect for multi-tenant cloud (AWS, Azure)</li>
+              <li>Used by cloud providers to isolate customers</li>
             </ul>
-          </li>
-        </ul>
-      </div>
-    </div>
+          </div>
 
-    <h2>Cost Comparison</h2>
+          <div class="compare-card warn">
+            <h4>Containers: Shared Kernel Risks</h4>
+            <ul>
+              <li>All containers share host kernel</li>
+              <li>Kernel vulnerability affects all containers</li>
+              <li>Container escape possible (rare but serious)</li>
+              <li>Need proper security practices:
+                <ul>
+                  <li>Run as non-root user</li>
+                  <li>Use minimal base images</li>
+                  <li>Scan for vulnerabilities</li>
+                  <li>Limit capabilities</li>
+                  <li>Use security policies (Pod Security Standards)</li>
+                </ul>
+              </li>
+            </ul>
+          </div>
+        </div>
 
-    <div class="example">
-      <div class="example-label">Cost Analysis: 1000 Microservices</div>
-      <pre>
+        <h2>Cost Comparison</h2>
+
+        <div class="example">
+          <div class="example-label">Cost Analysis: 1000 Microservices</div>
+          <pre>
 Scenario: Run 1000 microservice instances
 
 Option 1: VMs
@@ -1832,69 +1914,69 @@ Option 2: Containers on VMs
 
 Savings: $20,000/month (66% cheaper)
   </pre>
-    </div>
+        </div>
 
-    <h2>Modern Best Practice: The Hybrid Approach</h2>
+        <h2>Modern Best Practice: The Hybrid Approach</h2>
 
-    <div class="callout tip">
-      <div class="callout-title">Production Architecture Pattern</div>
+        <div class="callout tip">
+          <div class="callout-title">Production Architecture Pattern</div>
 
-      <p><strong>Use VMs for:</strong></p>
-      <ul>
-        <li>Databases (PostgreSQL, MySQL, MongoDB)</li>
-        <li>Message queues (Kafka, RabbitMQ)</li>
-        <li>Cache servers (Redis, Memcached)</li>
-        <li>Legacy applications</li>
-        <li>Data processing (Hadoop, Spark)</li>
-      </ul>
+          <p><strong>Use VMs for:</strong></p>
+          <ul>
+            <li>Databases (PostgreSQL, MySQL, MongoDB)</li>
+            <li>Message queues (Kafka, RabbitMQ)</li>
+            <li>Cache servers (Redis, Memcached)</li>
+            <li>Legacy applications</li>
+            <li>Data processing (Hadoop, Spark)</li>
+          </ul>
 
-      <p><strong>Use Containers for:</strong></p>
-      <ul>
-        <li>API servers and microservices</li>
-        <li>Web servers and frontends</li>
-        <li>Worker processes</li>
-        <li>Batch jobs and cron tasks</li>
-        <li>CI/CD build agents</li>
-      </ul>
+          <p><strong>Use Containers for:</strong></p>
+          <ul>
+            <li>API servers and microservices</li>
+            <li>Web servers and frontends</li>
+            <li>Worker processes</li>
+            <li>Batch jobs and cron tasks</li>
+            <li>CI/CD build agents</li>
+          </ul>
 
-      <p><strong>Use Serverless for:</strong></p>
-      <ul>
-        <li>Event-driven functions (AWS Lambda)</li>
-        <li>Sporadic workloads</li>
-        <li>Very short tasks (<15 min)</li>
-      </ul>
-    </div>
+          <p><strong>Use Serverless for:</strong></p>
+          <ul>
+            <li>Event-driven functions (AWS Lambda)</li>
+            <li>Sporadic workloads</li>
+            <li>Very short tasks (<15 min)</li>
+          </ul>
+        </div>
 
-    <h2>Migration Path: VMs → Containers</h2>
+        <h2>Migration Path: VMs → Containers</h2>
 
-    <p>How companies typically migrate:</p>
+        <p>How companies typically migrate:</p>
 
-    <ol>
-      <li><strong>Phase 1:</strong> Start with new services in containers</li>
-      <li><strong>Phase 2:</strong> Containerize stateless parts of monolith</li>
-      <li><strong>Phase 3:</strong> Extract microservices, deploy as containers</li>
-      <li><strong>Phase 4:</strong> Keep databases on VMs (stateful = harder)</li>
-      <li><strong>Phase 5:</strong> Eventually, most services containerized</li>
-    </ol>
+        <ol>
+          <li><strong>Phase 1:</strong> Start with new services in containers</li>
+          <li><strong>Phase 2:</strong> Containerize stateless parts of monolith</li>
+          <li><strong>Phase 3:</strong> Extract microservices, deploy as containers</li>
+          <li><strong>Phase 4:</strong> Keep databases on VMs (stateful = harder)</li>
+          <li><strong>Phase 5:</strong> Eventually, most services containerized</li>
+        </ol>
 
-    <div class="callout info">
-      <div class="callout-title">Key Takeaway</div>
-      <p>VMs and containers solve different problems. VMs provide strong isolation and full OS control. Containers
-        provide portability and efficiency. Modern production systems use BOTH strategically:</p>
-      <ul>
-        <li><strong>VMs:</strong> Stateful services, databases, legacy apps, maximum isolation</li>
-        <li><strong>Containers:</strong> Stateless microservices, APIs, workers, rapid scaling</li>
-        <li><strong>Decision:</strong> Choose based on workload requirements, not trends</li>
-      </ul>
-      <p>The future isn't "containers replacing VMs" - it's using the right tool for each job.</p>
-    </div>
+        <div class="callout info">
+          <div class="callout-title">Key Takeaway</div>
+          <p>VMs and containers solve different problems. VMs provide strong isolation and full OS control. Containers
+            provide portability and efficiency. Modern production systems use BOTH strategically:</p>
+          <ul>
+            <li><strong>VMs:</strong> Stateful services, databases, legacy apps, maximum isolation</li>
+            <li><strong>Containers:</strong> Stateless microservices, APIs, workers, rapid scaling</li>
+            <li><strong>Decision:</strong> Choose based on workload requirements, not trends</li>
+          </ul>
+          <p>The future isn't "containers replacing VMs" - it's using the right tool for each job.</p>
+        </div>
 
-  </div>
+      </div>
 
 
       <div class="page-nav">
         <a class="page-nav-btn" href="06-api-communication.html">&#8592; API & Communication</a>
-        <a class="page-nav-btn home" href="../system-design-complete.html">&#9776; All Topics</a>
+        <a class="page-nav-btn home" href="01-introduction.html">&#9776; All Topics</a>
         <a class="page-nav-btn" href="08-data-layer.html">Data Layer &#8594;</a>
       </div>
     </div>

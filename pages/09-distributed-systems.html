@@ -30,6 +30,11 @@
       min-height: 100vh;
     }
 
+    .sidebar-toggle {
+      display: none;
+      /* Hidden on desktop */
+    }
+
     .sidebar {
       width: 300px;
       min-width: 300px;
@@ -72,11 +77,55 @@
 
     .nav-module-title {
       padding: 10px 20px 6px;
-      font-size: 0.68rem;
+      font-size: 0.72rem;
       font-weight: 700;
       text-transform: uppercase;
-      letter-spacing: 1px;
+      letter-spacing: 0.5px;
+      color: #7f849c;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      user-select: none;
+      transition: color 0.2s;
+    }
+
+    .nav-module-title:hover {
+      color: #cdd6f4;
+    }
+
+    .nav-module-title::after {
+      content: '▼';
+      font-size: 0.6rem;
       color: #585b70;
+      transition: transform 0.3s ease;
+    }
+
+    /* Hide children by default */
+    .nav-module>*:not(.nav-module-title) {
+      display: none;
+    }
+
+    /* Show children when expanded */
+    .nav-module.expanded>*:not(.nav-module-title) {
+      display: block;
+      animation: slideDown 0.2s ease-out forwards;
+    }
+
+    .nav-module.expanded>.nav-module-title::after {
+      transform: rotate(180deg);
+    }
+
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        transform: translateY(-5px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
 
     .nav-item {
@@ -457,10 +506,43 @@
     }
 
     @media (max-width: 768px) {
+      .layout {
+        flex-direction: column;
+      }
+
       .sidebar {
         width: 100%;
+        min-width: 100%;
         height: auto;
         position: relative;
+        padding-bottom: 0;
+      }
+
+      /* Hide the navigation links by default on mobile */
+      #sidebar-nav-content {
+        display: none;
+        padding-bottom: 20px;
+      }
+
+      /* Show links when the active class is added via JS */
+      #sidebar-nav-content.active {
+        display: block;
+      }
+
+      /* Style the hamburger button */
+      .sidebar-toggle {
+        display: block;
+        background: transparent;
+        border: none;
+        color: #89b4fa;
+        cursor: pointer;
+        padding: 5px;
+      }
+
+      .sidebar-header {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
       }
 
       .main {
@@ -849,7 +931,7 @@
         </details>
         <details class="acc-chapter">
           <summary class="acc-summary">
-            <span class="chap-icon">🏆</span>
+            <span class="chap-icon">📚</span>
             <span class="chap-text">
               <span class="chap-num">Chapter 12</span>
               <span class="chap-label">Case Studies</span>
@@ -858,7 +940,7 @@
             <span class="acc-arrow">›</span>
           </summary>
           <div class="acc-sub">
-              <a class="acc-sub-item" href="12-case-studies.html#case-opentable">Design OpenTable</a>
+              <a class="acc-sub-item" href="../case_studies/open-table.html#case-opentable">Design OpenTable (Deep Dive)</a>
           </div>
         </details>
       </div>
@@ -867,794 +949,404 @@
     <div class="main">
       <div class="progress-bar-wrap"><div class="progress-bar" id="pb"></div></div>
 
-<div class="section active" id="db-federation">
-    <h1 class="section-title">Data Layer Internals & Scaling</h1>
-    <p class="section-subtitle">Module 8 &nbsp;|&nbsp; Indexing · Replication · Sharding · ACID vs BASE</p>
+<div class="section active" id="dist-fundamentals">
+        <h1 class="section-title">Distributed Systems Fundamentals</h1>
+        <p class="section-subtitle">Module 9 &nbsp;|&nbsp; Fallacies, Failure Modes, Replication, and the FLP
+          Impossibility
+        </p>
 
-    <h2>Database Indexing</h2>
-    <p>An index is a data structure designed to improve the speed of data retrieval operations on a database table
-      at the cost of additional storage and slower writes (INSERT/UPDATE).</p>
+        <h2>The 8 Fallacies of Distributed Computing</h2>
+        <p>Originally enumerated by L. Peter Deutsch and James Gosling at Sun Microsystems. Every distributed
+          system that ignores these eventually breaks in production.</p>
 
-    <div class="compare">
-      <div class="compare-card neutral">
-        <h4>B-Trees / B+ Trees</h4>
-        <ul>
-          <li><strong>Type:</strong> On-disk, balanced trees.</li>
-          <li><strong>Usage:</strong> Standard in RDBMS (MySQL, PostgreSQL).</li>
-          <li><strong>Pros:</strong> Predictable performance, efficient range queries.</li>
-          <li><strong>Cons:</strong> Slower random writes compared to LSM.</li>
-        </ul>
-      </div>
-      <div class="compare-card neutral">
-        <h4>LSM Trees (Log-Structured Merge-Tree)</h4>
-        <ul>
-          <li><strong>Type:</strong> Append-only logs + merged sorted slices.</li>
-          <li><strong>Usage:</strong> NoSQL (Cassandra, LevelDB, RocksDB).</li>
-          <li><strong>Pros:</strong> Extremely fast writes (sequential).</li>
-          <li><strong>Cons:</strong> "Write amplification", complex read paths.</li>
-        </ul>
-      </div>
-    </div>
+        <div class="table-wrap">
+          <table>
+            <tr>
+              <th>#</th>
+              <th>Fallacy</th>
+              <th>The Real-World Pain</th>
+              <th>Mitigation</th>
+            </tr>
+            <tr>
+              <td>1</td>
+              <td><strong>"The network is reliable"</strong></td>
+              <td>Packets are dropped, NIC crashes, cables are unplugged. 1 in every 10M TCP packets retransmits.</td>
+              <td>Retries, idempotency, circuit breakers</td>
+            </tr>
+            <tr>
+              <td>2</td>
+              <td><strong>"Latency is zero"</strong></td>
+              <td>Cross-AZ: 0.5–2ms. Cross-region (US <-> EU): 80–100ms. Cross-continent: 150–300ms.</td>
+              <td>Async communication, minimize hops, co-locate</td>
+            </tr>
+            <tr>
+              <td>3</td>
+              <td><strong>"Bandwidth is infinite"</strong></td>
+              <td>Chatty microservices generate 10GB/day of internal traffic. N+1 query fan-outs saturate links.</td>
+              <td>Data compression, pagination, projection</td>
+            </tr>
+            <tr>
+              <td>4</td>
+              <td><strong>"The network is secure"</strong></td>
+              <td>ARP spoofing, MITM inside "trusted" VPCs, supply-chain attacks.</td>
+              <td>mTLS, zero trust, end-to-end encryption</td>
+            </tr>
+            <tr>
+              <td>5</td>
+              <td><strong>"Topology doesn't change"</strong></td>
+              <td>Pods are deleted and recreated. IP addresses change. DNS TTL caches stale IPs.</td>
+              <td>Service discovery (Consul, etcd, k8s svc)</td>
+            </tr>
+            <tr>
+              <td>6</td>
+              <td><strong>"There is one administrator"</strong></td>
+              <td>Infra team, DB team, app team, SRE team, security team all have different constraints</td>
+              <td>Clear ownership, runbooks, IaC</td>
+            </tr>
+            <tr>
+              <td>7</td>
+              <td><strong>"Transport cost is zero"</strong></td>
+              <td>AWS cross-region data transfer: $0.09/GB. 10TB/month = $900/month just for data movement.</td>
+              <td>Data locality, compression, CDN</td>
+            </tr>
+            <tr>
+              <td>8</td>
+              <td><strong>"The network is homogeneous"</strong></td>
+              <td>Mobile clients have 200ms latency + 2% packet loss. Corporate proxies strip headers.</td>
+              <td>Adaptive protocols, fallback mechanisms</td>
+            </tr>
+          </table>
+        </div>
 
-    <h2>Replication Models</h2>
-    <div class="table-wrap">
-      <table>
-        <thead>
-          <tr>
-            <th>Model</th>
-            <th>Logic</th>
-            <th>When to use</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td><strong>Single Leader</strong></td>
-            <td>1 Primary (Writes) $\rightarrow$ Many Replicas (Reads).</td>
-            <td>Read-heavy workloads.</td>
-          </tr>
-          <tr>
-            <td><strong>Multi Leader</strong></td>
-            <td>Multiple nodes accept writes.</td>
-            <td>Multi-datacenter setups.</td>
-          </tr>
-          <tr>
-            <td><strong>Leaderless</strong></td>
-            <td>Client writes to $N$ nodes (Quorum).</td>
-            <td>High availability (Amazon Dynamo).</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-
-    <h2>Horizontal Partitioning (Sharding)</h2>
-    <p>Splitting a large dataset across multiple database instances using a <strong>Shard Key</strong>.</p>
-    <div class="def">
-      <dt>Shard Key</dt>
-      <dd>The column used to determine where data lives (e.g., <code>user_id</code>). Choosing a poor key leads to
-        <strong>Hotspots</strong>.
-      </dd>
-    </div>
-
-    <h3>Sharding Strategies</h3>
-    <ul>
-      <li><strong>Range-based:</strong> ID 1-100 on Node A, 101-200 on Node B. Easy ranges, but high skew risks.
-      </li>
-      <li><strong>Hash-based:</strong> <code>hash(id) % count</code>. Even distribution, but harder to add nodes.
-      </li>
-      <li><strong>Directory-based:</strong> Lookup table to find where an ID lives. Flexible, but lookup is a
-        bottleneck.</li>
-    </ul>
-
-    <h2>Database Federation (Vertical Partitioning)</h2>
-
-    <div class="callout info">
-      <div class="callout-title">Real Story: Amazon's Evolution</div>
-      <p>In early 2000s, Amazon ran on a giant Oracle database handling everything: users, products, orders,
-        inventory. As they scaled, this became a bottleneck. They pioneered database federation - splitting into
-        separate databases: Users DB, Products DB, Orders DB, each owned by different teams. This enabled Amazon to
-        scale to millions of transactions per day.</p>
-    </div>
-
-    <h2>What is Database Federation?</h2>
-
-    <p><strong>Database Federation</strong> (also called <em>functional partitioning</em> or <em>vertical
-        partitioning</em>) is an architectural pattern where you split your application's database by business
-      function or bounded context, creating multiple independent databases.</p>
-
-    <p>Instead of one monolithic database containing all tables, you create separate databases for different parts
-      of your application:</p>
-
-    <ul>
-      <li><strong>User Service DB:</strong> users, profiles, authentication</li>
-      <li><strong>Product Service DB:</strong> products, categories, reviews</li>
-      <li><strong>Order Service DB:</strong> orders, order_items, shipping</li>
-      <li><strong>Payment Service DB:</strong> transactions, payment_methods</li>
-      <li><strong>Inventory Service DB:</strong> stock, warehouses, suppliers</li>
-    </ul>
-
-    <h2>Federation vs Sharding - Critical Difference</h2>
-
-    <p>These are often confused but fundamentally different:</p>
-
-    <div class="compare">
-      <div class="compare-card neutral">
-        <h4>Sharding (Horizontal Partitioning)</h4>
-        <p><strong>What:</strong> Split the <em>same</em> table across multiple databases</p>
-        <p><strong>Example:</strong></p>
-        <pre>
-Database 1: users WHERE id 1-1,000,000
-Database 2: users WHERE id 1,000,001-2,000,000
-Database 3: users WHERE id 2,000,001-3,000,000
-    </pre>
-        <p><strong>Schema:</strong> Identical across all shards</p>
-        <p><strong>Split by:</strong> Data range (shard key like user_id)</p>
-        <p><strong>Goal:</strong> Scale a single large table</p>
-      </div>
-
-      <div class="compare-card neutral">
-        <h4>Federation (Vertical Partitioning)</h4>
-        <p><strong>What:</strong> Split <em>different</em> tables into separate databases</p>
-        <p><strong>Example:</strong></p>
-        <pre>
-Database 1: users, profiles, auth_tokens
-Database 2: products, categories, reviews
-Database 3: orders, order_items, shipping
-    </pre>
-        <p><strong>Schema:</strong> Different per database</p>
-        <p><strong>Split by:</strong> Business domain/function</p>
-        <p><strong>Goal:</strong> Scale entire application architecture</p>
-      </div>
-    </div>
-
-    <h2>Real-World Example: E-Commerce Platform</h2>
-
-    <div class="example">
-      <div class="example-label">Before Federation - Monolithic Database</div>
-      <pre>
-Single PostgreSQL Database: "ecommerce_db"
-├── Tables: 50+ tables
-├── Size: 10 TB total
-├── Load: Mixed (reads + writes)
-├── Bottleneck: Single database overwhelmed
-└── Problems:
-    • One team's query impacts everyone
-    • Can't scale components independently
-    • Schema changes require coordination
-    • Single point of failure
-  </pre>
-    </div>
-
-    <div class="example">
-      <div class="example-label">After Federation - Distributed by Function</div>
-      <pre>
-1. User Service Database (2 TB)
-   • Tables: users, profiles, sessions, auth_tokens
-   • Load: 70% reads, 30% writes
-   • Traffic: 10K req/sec
-   • Team: Identity team
-   • Optimization: Heavy caching, read replicas
-
-2. Product Catalog Database (5 TB)
-   • Tables: products, categories, reviews, ratings
-   • Load: 95% reads, 5% writes
-   • Traffic: 50K req/sec
-   • Team: Catalog team
-   • Optimization: CDN, aggressive caching
-
-3. Order Management Database (2 TB)
-   • Tables: orders, order_items, shipping, returns
-   • Load: 40% reads, 60% writes
-   • Traffic: 8K req/sec
-   • Team: Orders team
-   • Optimization: Write-optimized, sharded by order_id
-
-4. Payment Database (500 GB)
-   • Tables: transactions, payment_methods, invoices
-   • Load: 50% reads, 50% writes
-   • Traffic: 3K req/sec
-   • Team: Payments team
-   • Optimization: ACID guarantees, audit logs
-
-5. Inventory Database (500 GB)
-   • Tables: stock, warehouses, suppliers
-   • Load: 30% reads, 70% writes
-   • Traffic: 5K req/sec
-   • Team: Supply chain team
-   • Optimization: Real-time updates, strong consistency
-  </pre>
-    </div>
-
-    <h2>Advantages of Federation</h2>
-
-    <h3>1. Independent Scaling</h3>
-    <p>Each database can scale based on its specific needs:</p>
-    <ul>
-      <li><strong>Product Catalog:</strong> Add read replicas (read-heavy)</li>
-      <li><strong>Orders:</strong> Shard by order_id (write-heavy)</li>
-      <li><strong>Users:</strong> Aggressive caching (mostly reads)</li>
-      <li><strong>Payments:</strong> Keep small with strong ACID (critical data)</li>
-    </ul>
-
-    <h3>2. Team Autonomy & Velocity</h3>
-    <p>Different teams own different databases:</p>
-    <ul>
-      <li>Make schema changes independently</li>
-      <li>Choose optimal database technology per domain</li>
-      <li>Deploy updates without coordinating with other teams</li>
-      <li>Take ownership of performance and reliability</li>
-    </ul>
-
-    <h3>3. Technology Diversity</h3>
-    <p>Use the best database for each workload:</p>
-    <ul>
-      <li><strong>User profiles:</strong> PostgreSQL (relational data)</li>
-      <li><strong>Product catalog:</strong> Elasticsearch (full-text search)</li>
-      <li><strong>Session data:</strong> Redis (fast cache)</li>
-      <li><strong>Order history:</strong> MongoDB (flexible schema)</li>
-      <li><strong>Analytics:</strong> Snowflake (data warehouse)</li>
-    </ul>
-
-    <h3>4. Fault Isolation</h3>
-    <p>Failure in one database doesn't affect others:</p>
-    <ul>
-      <li>Payment DB goes down → orders can still be created (process payments later)</li>
-      <li>Product DB slow → users can still checkout (product data cached)</li>
-      <li>Blast radius is limited to one domain</li>
-    </ul>
-
-    <h3>5. Simpler Per-Database Operations</h3>
-    <p>Smaller databases are easier to manage:</p>
-    <ul>
-      <li>Faster backups (500 GB vs 10 TB)</li>
-      <li>Quicker restores</li>
-      <li>Easier schema migrations</li>
-      <li>Better query performance (fewer tables)</li>
-    </ul>
-
-    <h2>Challenges and Tradeoffs</h2>
-
-    <h3>1. Cross-Database Joins</h3>
-    <p><strong>Problem:</strong> Can't JOIN across databases</p>
-
-    <div class="example">
-      <div class="example-label">Problem Example</div>
-      <pre>
-// Before Federation (Easy):
-SELECT users.name, orders.total
-FROM users
-JOIN orders ON users.id = orders.user_id
-WHERE users.country = 'US';
-
-// After Federation (Hard):
-// Users in "users_db", Orders in "orders_db"
-// Can't JOIN across databases!
-  </pre>
-    </div>
-
-    <p><strong>Solutions:</strong></p>
-    <ul>
-      <li><strong>Application-level joins:</strong> Fetch from both DBs, join in code</li>
-      <li><strong>Data duplication:</strong> Store user_name in orders_db</li>
-      <li><strong>Separate analytics DB:</strong> ETL data to warehouse for reporting</li>
-      <li><strong>API composition:</strong> User Service API + Order Service API</li>
-    </ul>
-
-    <h3>2. Distributed Transactions</h3>
-    <p><strong>Problem:</strong> Transactions can't span databases atomically</p>
-
-    <div class="example">
-      <div class="example-label">Transaction Challenge</div>
-      <pre>
-// Need atomic operation across 3 databases:
-BEGIN TRANSACTION;
-  UPDATE inventory_db.stock SET quantity = quantity - 1;  // DB1
-  INSERT INTO orders_db.orders VALUES (...);               // DB2
-  INSERT INTO payments_db.transactions VALUES (...);       // DB3
-COMMIT;
-
-// This doesn't work with federation!
-  </pre>
-    </div>
-
-    <p><strong>Solutions:</strong></p>
-    <ul>
-      <li><strong>SAGA pattern:</strong> Chain of local transactions with compensation</li>
-      <li><strong>Eventual consistency:</strong> Accept that operations complete asynchronously</li>
-      <li><strong>Two-Phase Commit (2PC):</strong> Distributed transaction protocol (slow, avoid if possible)</li>
-      <li><strong>Event sourcing:</strong> Use event log to maintain consistency</li>
-    </ul>
-
-    <h3>3. Data Duplication</h3>
-    <p>You'll need to duplicate some reference data:</p>
-    <ul>
-      <li>Store user_name in orders_db (even though it's in users_db)</li>
-      <li>Store product_name in order_items (even though it's in products_db)</li>
-      <li>This is intentional denormalization for performance</li>
-    </ul>
-
-    <h3>4. Operational Complexity</h3>
-    <p>More databases = more to manage:</p>
-    <ul>
-      <li>Multiple backups to coordinate</li>
-      <li>Multiple monitoring dashboards</li>
-      <li>Multiple disaster recovery plans</li>
-      <li>Need more database expertise on team</li>
-    </ul>
-
-    <h2>When to Use Database Federation</h2>
-
-    <div class="callout tip">
-      <div class="callout-title">Federation is Right When</div>
-      <ul>
-        <li><strong>Clear Bounded Contexts:</strong> Your application has distinct business domains (users,
-          products, orders)</li>
-        <li><strong>Different Scaling Needs:</strong> Some parts need heavy reads, others heavy writes</li>
-        <li><strong>Team Organization:</strong> You have multiple teams that want autonomy</li>
-        <li><strong>Microservices Architecture:</strong> Each service owns its own database</li>
-        <li><strong>Monolith Bottleneck:</strong> Single database can't handle all load</li>
-        <li><strong>Technology Diversity Needed:</strong> Different workloads need different database types</li>
-      </ul>
-    </div>
-
-    <div class="callout warn">
-      <div class="callout-title">Don't Use Federation When</div>
-      <ul>
-        <li><strong>Small Application:</strong> One database works fine (don't over-engineer)</li>
-        <li><strong>Heavy Cross-Domain Queries:</strong> You frequently need to join across domains</li>
-        <li><strong>Strong Transactional Requirements:</strong> You need ACID across all data</li>
-        <li><strong>Limited Team:</strong> You don't have expertise to manage multiple databases</li>
-        <li><strong>Tight Coupling:</strong> Your domains aren't actually independent</li>
-      </ul>
-    </div>
-
-    <h2>Federation + Sharding Combined</h2>
-
-    <p>For maximum scale, combine both patterns:</p>
-
-    <div class="example">
-      <div class="example-label">Hybrid Approach at Scale</div>
-      <pre>
-1. Federation by Domain:
-   ├── Users Database
-   ├── Products Database  
-   └── Orders Database
-
-2. Then Shard Within Each:
-   
-   Orders Database (Federated)
-   ├── Orders Shard 1: order_id 1-1M
-   ├── Orders Shard 2: order_id 1M-2M
-   └── Orders Shard 3: order_id 2M-3M
-   
-   Users Database (Federated)
-   ├── Users Shard 1: user_id 1-10M
-   └── Users Shard 2: user_id 10M-20M
-
-This gives you both:
-• Domain isolation (federation)
-• Data distribution (sharding)
-  </pre>
-    </div>
-
-    <h2>Migration Strategy</h2>
-
-    <p>Moving from monolith to federation:</p>
-
-    <ol>
-      <li><strong>Identify Bounded Contexts:</strong> Map your domains (users, products, orders)</li>
-      <li><strong>Start with One Domain:</strong> Extract least coupled domain first</li>
-      <li><strong>Create New Database:</strong> Copy relevant tables to new DB</li>
-      <li><strong>Dual Write:</strong> Write to both old and new DB temporarily</li>
-      <li><strong>Migrate Reads:</strong> Point reads to new DB incrementally</li>
-      <li><strong>Remove from Monolith:</strong> Delete tables from old DB once fully migrated</li>
-      <li><strong>Repeat:</strong> Extract next domain</li>
-    </ol>
-
-    <div class="callout info">
-      <div class="callout-title">Key Takeaway</div>
-      <p>Database Federation splits your database by business function, enabling independent scaling, team autonomy,
-        and technology diversity. It's essential for microservices architectures but adds complexity in
-        cross-database operations. Use it when your application has clear domain boundaries and different scaling
-        needs per domain.</p>
-    </div>
-
-  </div>
-
-<div class="section" id="dist-fundamentals">
-    <h1 class="section-title">Distributed Systems Fundamentals</h1>
-    <p class="section-subtitle">Module 9 &nbsp;|&nbsp; Fallacies, Failure Modes, Replication, and the FLP Impossibility
-    </p>
-
-    <h2>The 8 Fallacies of Distributed Computing</h2>
-    <p>Originally enumerated by L. Peter Deutsch and James Gosling at Sun Microsystems. Every distributed
-      system that ignores these eventually breaks in production.</p>
-
-    <div class="table-wrap">
-      <table>
-        <tr>
-          <th>#</th>
-          <th>Fallacy</th>
-          <th>The Real-World Pain</th>
-          <th>Mitigation</th>
-        </tr>
-        <tr>
-          <td>1</td>
-          <td><strong>"The network is reliable"</strong></td>
-          <td>Packets are dropped, NIC crashes, cables are unplugged. 1 in every 10M TCP packets retransmits.</td>
-          <td>Retries, idempotency, circuit breakers</td>
-        </tr>
-        <tr>
-          <td>2</td>
-          <td><strong>"Latency is zero"</strong></td>
-          <td>Cross-AZ: 0.5–2ms. Cross-region (US <-> EU): 80–100ms. Cross-continent: 150–300ms.</td>
-          <td>Async communication, minimize hops, co-locate</td>
-        </tr>
-        <tr>
-          <td>3</td>
-          <td><strong>"Bandwidth is infinite"</strong></td>
-          <td>Chatty microservices generate 10GB/day of internal traffic. N+1 query fan-outs saturate links.</td>
-          <td>Data compression, pagination, projection</td>
-        </tr>
-        <tr>
-          <td>4</td>
-          <td><strong>"The network is secure"</strong></td>
-          <td>ARP spoofing, MITM inside "trusted" VPCs, supply-chain attacks.</td>
-          <td>mTLS, zero trust, end-to-end encryption</td>
-        </tr>
-        <tr>
-          <td>5</td>
-          <td><strong>"Topology doesn't change"</strong></td>
-          <td>Pods are deleted and recreated. IP addresses change. DNS TTL caches stale IPs.</td>
-          <td>Service discovery (Consul, etcd, k8s svc)</td>
-        </tr>
-        <tr>
-          <td>6</td>
-          <td><strong>"There is one administrator"</strong></td>
-          <td>Infra team, DB team, app team, SRE team, security team all have different constraints</td>
-          <td>Clear ownership, runbooks, IaC</td>
-        </tr>
-        <tr>
-          <td>7</td>
-          <td><strong>"Transport cost is zero"</strong></td>
-          <td>AWS cross-region data transfer: $0.09/GB. 10TB/month = $900/month just for data movement.</td>
-          <td>Data locality, compression, CDN</td>
-        </tr>
-        <tr>
-          <td>8</td>
-          <td><strong>"The network is homogeneous"</strong></td>
-          <td>Mobile clients have 200ms latency + 2% packet loss. Corporate proxies strip headers.</td>
-          <td>Adaptive protocols, fallback mechanisms</td>
-        </tr>
-      </table>
-    </div>
-
-    <h2>Failure in Distributed Systems: The Spectrum</h2>
-    <div class="mermaid">
-      flowchart LR
-      subgraph Failure Types
-      C[Crash Failure\nNode stops\ncompletely] --> O[Omission Failure\nMessages dropped\nbut node responds]
-      O --> T[Timing Failure\nSlow response\nbeyond expected]
-      T --> B[Byzantine Failure\nNode responds\nincorrectly or maliciously]
-      end
-      B --> Worst[Hardest to detect\nand handle]
-      C --> Easiest[Easiest to handle\ndetect via heartbeat]
-    </div>
-
-    <div class="def">
-      <dt>Byzantine Fault Tolerance (BFT)</dt>
-      <dd>A Byzantine fault is when a node sends arbitrary, incorrect, or conflicting messages — possibly
-        maliciously. Tolerating F Byzantine faults requires 3F+1 nodes (vs. just 2F+1 for crash faults).
-        BFT is used in: blockchain consensus (Tendermint, BFT-SMaRt), aircraft flight control systems,
-        and some financial infrastructure. Most distributed databases only handle crash faults (much simpler).</dd>
-      <dt>The Two Generals Problem</dt>
-      <dd>Two generals must coordinate an attack via messenger — but messengers can be captured. The problem
-        proves that it is <strong>impossible to achieve guaranteed consensus</strong> over an unreliable channel.
-        Real-world: TCP's 3-way handshake is the practical "good enough" solution — it doesn't guarantee perfect
-        agreement but makes the probability of desynchronization negligible.</dd>
-    </div>
-
-    <h2>Exactly-Once Semantics: Theory vs. Reality</h2>
-    <div class="compare">
-      <div class="compare-card con">
-        <h4>At-Most-Once</h4>
-        <ul>
-          <li>Fire and forget — no retry</li>
-          <li>May lose messages</li>
-          <li>UDP, StatsD metrics</li>
-        </ul>
-      </div>
-      <div class="compare-card neutral">
-        <h4>At-Least-Once</h4>
-        <ul>
-          <li>Retry until acknowledged</li>
-          <li>May deliver duplicates</li>
-          <li>Most queues: Kafka (default), SQS</li>
-        </ul>
-      </div>
-      <div class="compare-card pro">
-        <h4>Exactly-Once</h4>
-        <ul>
-          <li>No loss, no duplicates</li>
-          <li>Requires idempotency keys + transactional state</li>
-          <li>Kafka exactly-once (transactions API, ~2019)</li>
-          <li>Payment processing, financial ledgers</li>
-        </ul>
-      </div>
-    </div>
-    <div class="callout warn">
-      <div class="callout-title">Exactly-Once is an Illusion — Idempotency is the Reality</div>
-      <p>True exactly-once delivery across systems is extremely expensive (2PC, distributed transactions).
-        Most engineering teams implement <strong>at-least-once delivery + idempotent consumers</strong>.
-        An idempotent consumer stores a processed-message-id set. If a message is re-delivered (duplicate),
-        the consumer detects it and skips. Stripe generates an idempotency key per payment — if the request
-        is retried, the same charge is not double-applied.</p>
-    </div>
-
-    <h2>FLP Impossibility: Why Consensus is Hard</h2>
-    <div class="def">
-      <dt>Fischer, Lynch, Patterson (1985) — Nobel Prize level insight</dt>
-      <dd>It is <strong>impossible</strong> to design a deterministic consensus algorithm that guarantees
-        both <em>safety</em> (all nodes agree on the same value) and <em>liveness</em> (the algorithm always
-        terminates) in a purely asynchronous system where even one node can fail by crashing.
-        <br><br>
-        <strong>Practical interpretation:</strong> Raft and Paxos work around FLP by using timeouts and leader
-        election. They may fail to make progress during extreme network partitions (sacrificing liveness), but
-        they never make incorrect decisions (maintaining safety). This is the "bias toward safety" principle:
-        it's better to stop (be unavailable) than to make a wrong decision.
-      </dd>
-    </div>
-
-    <h2>Replication Topologies</h2>
-    <div class="mermaid">
-      flowchart TD
-      subgraph Primary-Replica
-      M1[Primary] -->|async| R1[Replica 1]
-      M1 -->|async| R2[Replica 2]
-      end
-      subgraph Multi-Primary
-      L1[Leader 1] <-->|sync| L2[Leader 2]
-        L1 <-->|sync| L3[Leader 3]
+        <h2>Failure in Distributed Systems: The Spectrum</h2>
+        <div class="mermaid">
+          flowchart LR
+          subgraph Failure Types
+          C[Crash Failure\nNode stops\ncompletely] --> O[Omission Failure\nMessages dropped\nbut node responds]
+          O --> T[Timing Failure\nSlow response\nbeyond expected]
+          T --> B[Byzantine Failure\nNode responds\nincorrectly or maliciously]
           end
-          subgraph Leaderless
-          N1[Node 1] <-->|quorum| N2[Node 2]
-            N2 <-->|quorum| N3[Node 3]
-              N1 <-->|quorum| N3
-                end
-    </div>
+          B --> Worst[Hardest to detect\nand handle]
+          C --> Easiest[Easiest to handle\ndetect via heartbeat]
+        </div>
 
-    <div class="def">
-      <dt>Leaderless replication (Dynamo-style)</dt>
-      <dd>No single leader. Any node accepts reads/writes. Uses quorum: write to W of N nodes; read from R of N nodes.
-        Set W + R &gt; N to guarantee reading at least one node with the latest write.
-        Common setting: N=3, W=2, R=2. Cassandra, Riak, and Voldemort use this model.
-        Trade-off: no strict ordering, conflicts possible — resolved by last-write-wins or CRDTs.</dd>
-    </div>
-  </div>
+        <div class="def">
+          <dt>Byzantine Fault Tolerance (BFT)</dt>
+          <dd>A Byzantine fault is when a node sends arbitrary, incorrect, or conflicting messages — possibly
+            maliciously. Tolerating F Byzantine faults requires 3F+1 nodes (vs. just 2F+1 for crash faults).
+            BFT is used in: blockchain consensus (Tendermint, BFT-SMaRt), aircraft flight control systems,
+            and some financial infrastructure. Most distributed databases only handle crash faults (much simpler).</dd>
+          <dt>The Two Generals Problem</dt>
+          <dd>Two generals must coordinate an attack via messenger — but messengers can be captured. The problem
+            proves that it is <strong>impossible to achieve guaranteed consensus</strong> over an unreliable channel.
+            Real-world: TCP's 3-way handshake is the practical "good enough" solution — it doesn't guarantee perfect
+            agreement but makes the probability of desynchronization negligible.</dd>
+        </div>
+
+        <h2>Exactly-Once Semantics: Theory vs. Reality</h2>
+        <div class="compare">
+          <div class="compare-card con">
+            <h4>At-Most-Once</h4>
+            <ul>
+              <li>Fire and forget — no retry</li>
+              <li>May lose messages</li>
+              <li>UDP, StatsD metrics</li>
+            </ul>
+          </div>
+          <div class="compare-card neutral">
+            <h4>At-Least-Once</h4>
+            <ul>
+              <li>Retry until acknowledged</li>
+              <li>May deliver duplicates</li>
+              <li>Most queues: Kafka (default), SQS</li>
+            </ul>
+          </div>
+          <div class="compare-card pro">
+            <h4>Exactly-Once</h4>
+            <ul>
+              <li>No loss, no duplicates</li>
+              <li>Requires idempotency keys + transactional state</li>
+              <li>Kafka exactly-once (transactions API, ~2019)</li>
+              <li>Payment processing, financial ledgers</li>
+            </ul>
+          </div>
+        </div>
+        <div class="callout warn">
+          <div class="callout-title">Exactly-Once is an Illusion — Idempotency is the Reality</div>
+          <p>True exactly-once delivery across systems is extremely expensive (2PC, distributed transactions).
+            Most engineering teams implement <strong>at-least-once delivery + idempotent consumers</strong>.
+            An idempotent consumer stores a processed-message-id set. If a message is re-delivered (duplicate),
+            the consumer detects it and skips. Stripe generates an idempotency key per payment — if the request
+            is retried, the same charge is not double-applied.</p>
+        </div>
+
+        <h2>FLP Impossibility: Why Consensus is Hard</h2>
+        <div class="def">
+          <dt>Fischer, Lynch, Patterson (1985) — Nobel Prize level insight</dt>
+          <dd>It is <strong>impossible</strong> to design a deterministic consensus algorithm that guarantees
+            both <em>safety</em> (all nodes agree on the same value) and <em>liveness</em> (the algorithm always
+            terminates) in a purely asynchronous system where even one node can fail by crashing.
+            <br><br>
+            <strong>Practical interpretation:</strong> Raft and Paxos work around FLP by using timeouts and leader
+            election. They may fail to make progress during extreme network partitions (sacrificing liveness), but
+            they never make incorrect decisions (maintaining safety). This is the "bias toward safety" principle:
+            it's better to stop (be unavailable) than to make a wrong decision.
+          </dd>
+        </div>
+
+        <h2>Replication Topologies</h2>
+        <div class="mermaid">
+          flowchart TD
+          subgraph Primary-Replica
+          M1[Primary] -->|async| R1[Replica 1]
+          M1 -->|async| R2[Replica 2]
+          end
+          subgraph Multi-Primary
+          L1[Leader 1] <-->|sync| L2[Leader 2]
+            L1 <-->|sync| L3[Leader 3]
+              end
+              subgraph Leaderless
+              N1[Node 1] <-->|quorum| N2[Node 2]
+                N2 <-->|quorum| N3[Node 3]
+                  N1 <-->|quorum| N3
+                    end
+        </div>
+
+        <div class="def">
+          <dt>Leaderless replication (Dynamo-style)</dt>
+          <dd>No single leader. Any node accepts reads/writes. Uses quorum: write to W of N nodes; read from R of N
+            nodes.
+            Set W + R &gt; N to guarantee reading at least one node with the latest write.
+            Common setting: N=3, W=2, R=2. Cassandra, Riak, and Voldemort use this model.
+            Trade-off: no strict ordering, conflicts possible — resolved by last-write-wins or CRDTs.</dd>
+        </div>
+      </div>
 
 <div class="section" id="time-ordering">
-    <h1 class="section-title">Time, Ordering &amp; Clocks in Distributed Systems</h1>
-    <p class="section-subtitle">Module 9 &nbsp;|&nbsp; Why Clocks Lie, Vector Clocks, HLC, and the Google Spanner
-      TrueTime Solution</p>
+        <h1 class="section-title">Time, Ordering &amp; Clocks in Distributed Systems</h1>
+        <p class="section-subtitle">Module 9 &nbsp;|&nbsp; Why Clocks Lie, Vector Clocks, HLC, and the Google Spanner
+          TrueTime Solution</p>
 
-    <h2>The Problem: Clocks in Distributed Systems Are Unreliable</h2>
-    <p>In a single machine, <code>System.currentTimeMillis()</code> gives consistent ordering. In a distributed
-      system of N machines, each has its own clock — and clocks drift, jump, and disagree. NTP syncs
-      clocks to within a few milliseconds — but a few ms is an eternity for systems handling millions of
-      requests per second. <strong>We cannot use wall-clock time to determine ordering of distributed events.</strong>
-    </p>
+        <h2>The Problem: Clocks in Distributed Systems Are Unreliable</h2>
+        <p>In a single machine, <code>System.currentTimeMillis()</code> gives consistent ordering. In a distributed
+          system of N machines, each has its own clock — and clocks drift, jump, and disagree. NTP syncs
+          clocks to within a few milliseconds — but a few ms is an eternity for systems handling millions of
+          requests per second. <strong>We cannot use wall-clock time to determine ordering of distributed
+            events.</strong>
+        </p>
 
-    <div class="callout warn">
-      <div class="callout-title">Wall Clocks Are Not Monotonic</div>
-      <p>NTP can jump a clock <em>backwards</em> to correct drift. If event A is timestamped 10:00:00.500
-        and event B is timestamped 10:00:00.490 (after NTP corrected the clock), it appears B happened before A —
-        even if A was processed first. This is why you must never use wall-clock time for ordering in distributed
-        systems.</p>
-    </div>
+        <div class="callout warn">
+          <div class="callout-title">Wall Clocks Are Not Monotonic</div>
+          <p>NTP can jump a clock <em>backwards</em> to correct drift. If event A is timestamped 10:00:00.500
+            and event B is timestamped 10:00:00.490 (after NTP corrected the clock), it appears B happened before A —
+            even if A was processed first. This is why you must never use wall-clock time for ordering in distributed
+            systems.</p>
+        </div>
 
-    <h2>Lamport Clocks: Logical Ordering Without a Global Clock</h2>
-    <div class="def">
-      <dt>The Algorithm (Leslie Lamport, 1978)</dt>
-      <dd>Each node maintains a counter L. Rules: (1) Increment L before any event. (2) When sending a message,
-        include L. (3) On receive: <code>L = max(L, received_L) + 1</code>.
-        <br>If event A caused event B (A happened-before B), then <code>L(A) &lt; L(B)</code>.
-        But the converse is NOT guaranteed — two events may have the same or inverted Lamport timestamps without one
-        causing the other (concurrent events).
-      </dd>
-      <dt>Limitation</dt>
-      <dd>Lamport clocks can't distinguish between concurrent events and causally related events.
-        If A has Lamport time 5 and B has Lamport time 7, B may have happened after A OR B may have
-        happened concurrently with A (just at a node with a higher counter). This is where vector clocks come in.
-      </dd>
-    </div>
+        <h2>Lamport Clocks: Logical Ordering Without a Global Clock</h2>
+        <div class="def">
+          <dt>The Algorithm (Leslie Lamport, 1978)</dt>
+          <dd>Each node maintains a counter L. Rules: (1) Increment L before any event. (2) When sending a message,
+            include L. (3) On receive: <code>L = max(L, received_L) + 1</code>.
+            <br>If event A caused event B (A happened-before B), then <code>L(A) &lt; L(B)</code>.
+            But the converse is NOT guaranteed — two events may have the same or inverted Lamport timestamps without one
+            causing the other (concurrent events).
+          </dd>
+          <dt>Limitation</dt>
+          <dd>Lamport clocks can't distinguish between concurrent events and causally related events.
+            If A has Lamport time 5 and B has Lamport time 7, B may have happened after A OR B may have
+            happened concurrently with A (just at a node with a higher counter). This is where vector clocks come in.
+          </dd>
+        </div>
 
-    <h2>Vector Clocks: Tracking Causality</h2>
-    <div class="mermaid">
-      sequenceDiagram
-      participant A as Node A
-      participant B as Node B
-      participant C as Node C
-      Note over A: [1,0,0] Event a1
-      A->>B: Send msg [1,0,0]
-      Note over B: [1,1,0] Event b1
-      Note over A: [2,0,0] Event a2
-      B->>C: Send msg [1,1,0]
-      Note over C: [1,1,1] Event c1
-      A->>C: Send msg [2,0,0]
-      Note over C: [2,1,2] merge: max each + 1
-    </div>
+        <h2>Vector Clocks: Tracking Causality</h2>
+        <div class="mermaid">
+          sequenceDiagram
+          participant A as Node A
+          participant B as Node B
+          participant C as Node C
+          Note over A: [1,0,0] Event a1
+          A->>B: Send msg [1,0,0]
+          Note over B: [1,1,0] Event b1
+          Note over A: [2,0,0] Event a2
+          B->>C: Send msg [1,1,0]
+          Note over C: [1,1,1] Event c1
+          A->>C: Send msg [2,0,0]
+          Note over C: [2,1,2] merge: max each + 1
+        </div>
 
-    <div class="def">
-      <dt>Reading vector clocks</dt>
-      <dd>Vector <code>[A:2, B:1, C:0]</code> for event X means:
-        "X has seen all of A's events up to A:2, all of B's events up to B:1, and none of C's."
-        To compare two events X and Y: if every element of X's vector ≤ Y's vector, X happened-before Y.
-        If neither is ≤ the other → concurrent events (potential conflict).</dd>
-      <dt>Where vector clocks are used</dt>
-      <dd><strong>Amazon DynamoDB:</strong> Uses vector clocks (Dynamo paper, 2007) to detect concurrent
-        writes to the same key. When a conflict is detected, all versions are returned to the client for
-        semantic reconciliation (the application decides which value is correct).
-        <strong>Riak:</strong> Uses dvv (Dotted Version Vectors) — a more efficient variant.
-        <strong>Git:</strong> Conceptually similar — merge conflicts are concurrent edit detection.
-      </dd>
-    </div>
+        <div class="def">
+          <dt>Reading vector clocks</dt>
+          <dd>Vector <code>[A:2, B:1, C:0]</code> for event X means:
+            "X has seen all of A's events up to A:2, all of B's events up to B:1, and none of C's."
+            To compare two events X and Y: if every element of X's vector ≤ Y's vector, X happened-before Y.
+            If neither is ≤ the other → concurrent events (potential conflict).</dd>
+          <dt>Where vector clocks are used</dt>
+          <dd><strong>Amazon DynamoDB:</strong> Uses vector clocks (Dynamo paper, 2007) to detect concurrent
+            writes to the same key. When a conflict is detected, all versions are returned to the client for
+            semantic reconciliation (the application decides which value is correct).
+            <strong>Riak:</strong> Uses dvv (Dotted Version Vectors) — a more efficient variant.
+            <strong>Git:</strong> Conceptually similar — merge conflicts are concurrent edit detection.
+          </dd>
+        </div>
 
-    <h2>Hybrid Logical Clocks (HLC)</h2>
-    <p>HLC = max(NTP wall clock, logical component). It advances with real time where possible,
-      falls back to logical increments when clocks are ahead. This gives you both:</p>
-    <ul>
-      <li>Real-time approximation (useful for humans and debugging)</li>
-      <li>Causal ordering guarantees (useful for distributed systems correctness)</li>
-    </ul>
-    <div class="def">
-      <dt>Used by:</dt>
-      <dd>CockroachDB uses HLC for timestamp assignment. Each transaction gets an HLC timestamp.
-        Causally related transactions are ordered correctly. No atomic clocks needed — just NTP + logical fallback.
-      </dd>
-    </div>
+        <h2>Hybrid Logical Clocks (HLC)</h2>
+        <p>HLC = max(NTP wall clock, logical component). It advances with real time where possible,
+          falls back to logical increments when clocks are ahead. This gives you both:</p>
+        <ul>
+          <li>Real-time approximation (useful for humans and debugging)</li>
+          <li>Causal ordering guarantees (useful for distributed systems correctness)</li>
+        </ul>
+        <div class="def">
+          <dt>Used by:</dt>
+          <dd>CockroachDB uses HLC for timestamp assignment. Each transaction gets an HLC timestamp.
+            Causally related transactions are ordered correctly. No atomic clocks needed — just NTP + logical fallback.
+          </dd>
+        </div>
 
-    <h2>Google TrueTime: Bounded Uncertainty Clocks</h2>
-    <div class="def">
-      <dt>The Innovation</dt>
-      <dd>Every Google datacenter has GPS receivers and atomic clocks. TrueTime's <code>TT.now()</code> API
-        returns an interval <code>[earliest, latest]</code> — NOT a single timestamp. Google guarantees the
-        true current time is within this interval (typically ±7ms uncertainty).
-        Spanner's commit protocol: before committing, wait until <code>TT.now().earliest</code> is past the
-        transaction's commit timestamp. This ensures the commit is globally after all reads. Cost: ~7ms added
-        latency per external-consistency write. Benefit: true global linearizability across continents.</dd>
-      <dt>Why other systems can't have this</dt>
-      <dd>GPS + atomic clock infrastructure costs millions per DC. Maintaining the global TrueTime service
-        requires Google-scale investment. Others approximate it with tighter NTP (±1ms in some data centers),
-        but can't guarantee the bound.</dd>
-    </div>
+        <h2>Google TrueTime: Bounded Uncertainty Clocks</h2>
+        <div class="def">
+          <dt>The Innovation</dt>
+          <dd>Every Google datacenter has GPS receivers and atomic clocks. TrueTime's <code>TT.now()</code> API
+            returns an interval <code>[earliest, latest]</code> — NOT a single timestamp. Google guarantees the
+            true current time is within this interval (typically ±7ms uncertainty).
+            Spanner's commit protocol: before committing, wait until <code>TT.now().earliest</code> is past the
+            transaction's commit timestamp. This ensures the commit is globally after all reads. Cost: ~7ms added
+            latency per external-consistency write. Benefit: true global linearizability across continents.</dd>
+          <dt>Why other systems can't have this</dt>
+          <dd>GPS + atomic clock infrastructure costs millions per DC. Maintaining the global TrueTime service
+            requires Google-scale investment. Others approximate it with tighter NTP (±1ms in some data centers),
+            but can't guarantee the bound.</dd>
+        </div>
 
-    <h2>Ordering Without Perfect Clocks: Practical Patterns</h2>
-    <div class="table-wrap">
-      <table>
-        <tr>
-          <th>Pattern</th>
-          <th>Mechanism</th>
-          <th>Consistency</th>
-          <th>Used By</th>
-        </tr>
-        <tr>
-          <td>Lamport Clock</td>
-          <td>Monotonic counter per node</td>
-          <td>Causal (partial order only)</td>
-          <td>Cassandra, early distributed systems</td>
-        </tr>
-        <tr>
-          <td>Vector Clock</td>
-          <td>Per-node counter vector</td>
-          <td>Detects concurrent events</td>
-          <td>DynamoDB, Riak, Voldemort</td>
-        </tr>
-        <tr>
-          <td>HLC</td>
-          <td>max(wall, logical)</td>
-          <td>Causal + near-real-time</td>
-          <td>CockroachDB, YugabyteDB</td>
-        </tr>
-        <tr>
-          <td>TrueTime</td>
-          <td>Bounded uncertainty via GPS+atomic</td>
-          <td>External-consistent (linearizable globally)</td>
-          <td>Google Spanner</td>
-        </tr>
-        <tr>
-          <td>Kafka offset</td>
-          <td>Single broker log sequence number</td>
-          <td>Total order within partition</td>
-          <td>Kafka, event sourcing systems</td>
-        </tr>
-        <tr>
-          <td>Snowflake ID</td>
-          <td>timestamp + datacenter + sequence</td>
-          <td>Approx. time-sorted, globally unique</td>
-          <td>Twitter, Discord, Instagram</td>
-        </tr>
-      </table>
-    </div>
+        <h2>Ordering Without Perfect Clocks: Practical Patterns</h2>
+        <div class="table-wrap">
+          <table>
+            <tr>
+              <th>Pattern</th>
+              <th>Mechanism</th>
+              <th>Consistency</th>
+              <th>Used By</th>
+            </tr>
+            <tr>
+              <td>Lamport Clock</td>
+              <td>Monotonic counter per node</td>
+              <td>Causal (partial order only)</td>
+              <td>Cassandra, early distributed systems</td>
+            </tr>
+            <tr>
+              <td>Vector Clock</td>
+              <td>Per-node counter vector</td>
+              <td>Detects concurrent events</td>
+              <td>DynamoDB, Riak, Voldemort</td>
+            </tr>
+            <tr>
+              <td>HLC</td>
+              <td>max(wall, logical)</td>
+              <td>Causal + near-real-time</td>
+              <td>CockroachDB, YugabyteDB</td>
+            </tr>
+            <tr>
+              <td>TrueTime</td>
+              <td>Bounded uncertainty via GPS+atomic</td>
+              <td>External-consistent (linearizable globally)</td>
+              <td>Google Spanner</td>
+            </tr>
+            <tr>
+              <td>Kafka offset</td>
+              <td>Single broker log sequence number</td>
+              <td>Total order within partition</td>
+              <td>Kafka, event sourcing systems</td>
+            </tr>
+            <tr>
+              <td>Snowflake ID</td>
+              <td>timestamp + datacenter + sequence</td>
+              <td>Approx. time-sorted, globally unique</td>
+              <td>Twitter, Discord, Instagram</td>
+            </tr>
+          </table>
+        </div>
 
-    <div class="callout tip">
-      <div class="callout-title">Interview Tip: Snowflake IDs</div>
-      <p>For "design a globally unique ID generator," the answer is a Snowflake ID:
-        <strong>41 bits timestamp (ms)</strong> + <strong>10 bits datacenter/worker ID</strong> +
-        <strong>12 bits sequence</strong> = 64-bit integer. 41 bits of ms timestamps lasts 69 years.
-        12-bit sequence allows 4,096 IDs/ms/worker. No coordination needed between workers.
-        Twitter generates ~1 billion Snowflake IDs/day this way.
-      </p>
-    </div>
-  </div>
+        <div class="callout tip">
+          <div class="callout-title">Interview Tip: Snowflake IDs</div>
+          <p>For "design a globally unique ID generator," the answer is a Snowflake ID:
+            <strong>41 bits timestamp (ms)</strong> + <strong>10 bits datacenter/worker ID</strong> +
+            <strong>12 bits sequence</strong> = 64-bit integer. 41 bits of ms timestamps lasts 69 years.
+            12-bit sequence allows 4,096 IDs/ms/worker. No coordination needed between workers.
+            Twitter generates ~1 billion Snowflake IDs/day this way.
+          </p>
+        </div>
+      </div>
 
 <div class="section" id="consensus">
-    <h1 class="section-title">Consensus and Coordination</h1>
-    <p class="section-subtitle">Module 9 &nbsp;|&nbsp; The Consensus Problem · Raft · Paxos · Split Brain · Leader
-      Election · Quorum</p>
+        <h1 class="section-title">Consensus and Coordination</h1>
+        <p class="section-subtitle">Module 9 &nbsp;|&nbsp; The Consensus Problem · Raft · Paxos · Split Brain · Leader
+          Election · Quorum</p>
 
-    <h2>The Consensus Problem</h2>
-    <p>Consensus is the problem of getting a set of distributed nodes to agree on a single value or decision, even
-      when some nodes fail or messages are delayed. This is fundamental to implementing replicated state machines,
-      distributed databases, distributed locks, and any system requiring coordination.</p>
+        <h2>The Consensus Problem</h2>
+        <p>Consensus is the problem of getting a set of distributed nodes to agree on a single value or decision, even
+          when some nodes fail or messages are delayed. This is fundamental to implementing replicated state machines,
+          distributed databases, distributed locks, and any system requiring coordination.</p>
 
-    <h3>Requirements for a Consensus Algorithm</h3>
-    <ul>
-      <li><strong>Agreement:</strong> All non-faulty nodes decide on the same value.</li>
-      <li><strong>Validity:</strong> The decided value must have been proposed by some node (not invented).</li>
-      <li><strong>Termination:</strong> All non-faulty nodes eventually decide (liveness).</li>
-      <li><strong>Fault tolerance:</strong> The algorithm continues to work despite some nodes failing.</li>
-    </ul>
+        <h3>Requirements for a Consensus Algorithm</h3>
+        <ul>
+          <li><strong>Agreement:</strong> All non-faulty nodes decide on the same value.</li>
+          <li><strong>Validity:</strong> The decided value must have been proposed by some node (not invented).</li>
+          <li><strong>Termination:</strong> All non-faulty nodes eventually decide (liveness).</li>
+          <li><strong>Fault tolerance:</strong> The algorithm continues to work despite some nodes failing.</li>
+        </ul>
 
-    <h3>FLP Impossibility</h3>
-    <p>The Fischer-Lynch-Paterson (FLP) theorem proves that in an asynchronous system where even one node can fail,
-      it is impossible to guarantee that a consensus algorithm will always terminate. In practice, systems work
-      around this by using timeouts and probabilistic liveness guarantees — they may not terminate in theory but do
-      in practice under realistic conditions.</p>
+        <h3>FLP Impossibility</h3>
+        <p>The Fischer-Lynch-Paterson (FLP) theorem proves that in an asynchronous system where even one node can fail,
+          it is impossible to guarantee that a consensus algorithm will always terminate. In practice, systems work
+          around this by using timeouts and probabilistic liveness guarantees — they may not terminate in theory but do
+          in practice under realistic conditions.</p>
 
-    <h2>Raft Consensus Algorithm</h2>
-    <p>Raft is a consensus algorithm designed to be more understandable than Paxos while providing the same
-      guarantees. It decomposes consensus into three relatively independent subproblems: leader election, log
-      replication, and safety.</p>
+        <h2>Raft Consensus Algorithm</h2>
+        <p>Raft is a consensus algorithm designed to be more understandable than Paxos while providing the same
+          guarantees. It decomposes consensus into three relatively independent subproblems: leader election, log
+          replication, and safety.</p>
 
-    <h3>Node States</h3>
-    <ul>
-      <li><strong>Leader:</strong> Exactly one leader at a time (per term). Handles all client requests. Sends log
-        entries and heartbeats to followers.</li>
-      <li><strong>Follower:</strong> Passive — responds to RPCs from leaders and candidates. If no heartbeat
-        received within election timeout, converts to candidate.</li>
-      <li><strong>Candidate:</strong> Attempting to become leader. Sends RequestVote RPCs to all other nodes.</li>
-    </ul>
+        <h3>Node States</h3>
+        <ul>
+          <li><strong>Leader:</strong> Exactly one leader at a time (per term). Handles all client requests. Sends log
+            entries and heartbeats to followers.</li>
+          <li><strong>Follower:</strong> Passive — responds to RPCs from leaders and candidates. If no heartbeat
+            received within election timeout, converts to candidate.</li>
+          <li><strong>Candidate:</strong> Attempting to become leader. Sends RequestVote RPCs to all other nodes.</li>
+        </ul>
 
-    <h3>Leader Election</h3>
-    <ol>
-      <li>All nodes start as followers with a randomized election timeout (150–300ms).</li>
-      <li>A follower that times out without receiving a heartbeat becomes a candidate and increments its term
-        number.</li>
-      <li>The candidate votes for itself and sends RequestVote RPCs to all other nodes.</li>
-      <li>A node grants its vote if: it has not voted in this term, and the candidate's log is at least as
-        up-to-date as the voter's log.</li>
-      <li>If the candidate receives votes from a majority (N/2 + 1), it becomes the leader.</li>
-      <li>If multiple candidates split the vote, the election times out and a new election begins. Randomized
-        timeouts reduce split vote probability.</li>
-    </ol>
+        <h3>Leader Election</h3>
+        <ol>
+          <li>All nodes start as followers with a randomized election timeout (150–300ms).</li>
+          <li>A follower that times out without receiving a heartbeat becomes a candidate and increments its term
+            number.</li>
+          <li>The candidate votes for itself and sends RequestVote RPCs to all other nodes.</li>
+          <li>A node grants its vote if: it has not voted in this term, and the candidate's log is at least as
+            up-to-date as the voter's log.</li>
+          <li>If the candidate receives votes from a majority (N/2 + 1), it becomes the leader.</li>
+          <li>If multiple candidates split the vote, the election times out and a new election begins. Randomized
+            timeouts reduce split vote probability.</li>
+        </ol>
 
-    <h3>Log Replication</h3>
-    <ol>
-      <li>Client sends command to the leader.</li>
-      <li>Leader appends the command to its log as a new entry (with the current term).</li>
-      <li>Leader sends AppendEntries RPCs to all followers in parallel.</li>
-      <li>When a majority has written the entry to their logs, the leader commits the entry.</li>
-      <li>Leader applies the committed entry to its state machine and responds to the client.</li>
-      <li>Leader notifies followers of the commit in subsequent AppendEntries. Followers apply committed entries.
-      </li>
-    </ol>
+        <h3>Log Replication</h3>
+        <ol>
+          <li>Client sends command to the leader.</li>
+          <li>Leader appends the command to its log as a new entry (with the current term).</li>
+          <li>Leader sends AppendEntries RPCs to all followers in parallel.</li>
+          <li>When a majority has written the entry to their logs, the leader commits the entry.</li>
+          <li>Leader applies the committed entry to its state machine and responds to the client.</li>
+          <li>Leader notifies followers of the commit in subsequent AppendEntries. Followers apply committed entries.
+          </li>
+        </ol>
 
-    <h3>Safety Guarantee</h3>
-    <p>Raft guarantees that if a log entry is committed at index i with term T, any future leader's log will contain
-      that entry at index i. This is enforced by the election restriction: a candidate cannot win an election unless
-      its log is at least as up-to-date as a majority of nodes' logs.</p>
+        <h3>Safety Guarantee</h3>
+        <p>Raft guarantees that if a log entry is committed at index i with term T, any future leader's log will contain
+          that entry at index i. This is enforced by the election restriction: a candidate cannot win an election unless
+          its log is at least as up-to-date as a majority of nodes' logs.</p>
 
-    <div class="diagram">
-      <pre class="mermaid">
+        <div class="diagram">
+          <pre class="mermaid">
 stateDiagram-v2
   [*] --> Follower : start
 
@@ -1664,128 +1356,128 @@ stateDiagram-v2
   Leader --> Follower : discovers higher term
   Candidate --> Candidate : election timeout\n(split vote)
 </pre>
-      <p class="diagram-caption">Raft node state transitions</p>
-    </div>
+          <p class="diagram-caption">Raft node state transitions</p>
+        </div>
 
-    <p><strong>Used by:</strong> etcd (Kubernetes control plane), CockroachDB, TiKV, Consul, Kafka (KRaft mode
-      replacing ZooKeeper), MongoDB (replication)</p>
+        <p><strong>Used by:</strong> etcd (Kubernetes control plane), CockroachDB, TiKV, Consul, Kafka (KRaft mode
+          replacing ZooKeeper), MongoDB (replication)</p>
 
-    <h2>Paxos Algorithm</h2>
-    <p>Paxos is the original consensus algorithm, proposed by Leslie Lamport in 1989. It is provably correct but
-      notoriously difficult to understand and implement correctly. Most practical consensus systems either implement
-      Multi-Paxos (an optimized variant) or Raft (which was designed as a more understandable alternative).</p>
+        <h2>Paxos Algorithm</h2>
+        <p>Paxos is the original consensus algorithm, proposed by Leslie Lamport in 1989. It is provably correct but
+          notoriously difficult to understand and implement correctly. Most practical consensus systems either implement
+          Multi-Paxos (an optimized variant) or Raft (which was designed as a more understandable alternative).</p>
 
-    <h3>Roles</h3>
-    <ul>
-      <li><strong>Proposer:</strong> Proposes values to be agreed upon.</li>
-      <li><strong>Acceptor:</strong> Votes on proposals. A quorum of acceptors must accept a value for consensus.
-      </li>
-      <li><strong>Learner:</strong> Learns which value was chosen after a quorum of acceptors has accepted it.</li>
-    </ul>
+        <h3>Roles</h3>
+        <ul>
+          <li><strong>Proposer:</strong> Proposes values to be agreed upon.</li>
+          <li><strong>Acceptor:</strong> Votes on proposals. A quorum of acceptors must accept a value for consensus.
+          </li>
+          <li><strong>Learner:</strong> Learns which value was chosen after a quorum of acceptors has accepted it.</li>
+        </ul>
 
-    <h3>Phase 1: Prepare</h3>
-    <ol>
-      <li>Proposer chooses a unique proposal number N and sends Prepare(N) to a quorum of acceptors.</li>
-      <li>Each acceptor that has not responded to a Prepare with a higher number responds with: a promise not to
-        accept any proposal numbered less than N, and the highest-numbered proposal it has already accepted (if
-        any).</li>
-    </ol>
+        <h3>Phase 1: Prepare</h3>
+        <ol>
+          <li>Proposer chooses a unique proposal number N and sends Prepare(N) to a quorum of acceptors.</li>
+          <li>Each acceptor that has not responded to a Prepare with a higher number responds with: a promise not to
+            accept any proposal numbered less than N, and the highest-numbered proposal it has already accepted (if
+            any).</li>
+        </ol>
 
-    <h3>Phase 2: Accept</h3>
-    <ol>
-      <li>If the proposer receives responses from a quorum, it sends Accept(N, V) where V is either the value from
-        the highest-numbered prior accepted proposal (if any), or the proposer's own chosen value.</li>
-      <li>Each acceptor accepts the proposal unless it has already responded to a Prepare with a higher number.</li>
-      <li>If a quorum of acceptors accepts the proposal, the value V is chosen.</li>
-    </ol>
+        <h3>Phase 2: Accept</h3>
+        <ol>
+          <li>If the proposer receives responses from a quorum, it sends Accept(N, V) where V is either the value from
+            the highest-numbered prior accepted proposal (if any), or the proposer's own chosen value.</li>
+          <li>Each acceptor accepts the proposal unless it has already responded to a Prepare with a higher number.</li>
+          <li>If a quorum of acceptors accepts the proposal, the value V is chosen.</li>
+        </ol>
 
-    <h3>Paxos vs Raft</h3>
-    <div class="table-wrap">
-      <table>
-        <tr>
-          <th>Aspect</th>
-          <th>Paxos (Multi-Paxos)</th>
-          <th>Raft</th>
-        </tr>
-        <tr>
-          <td>Understandability</td>
-          <td>Very difficult — underspecified in original paper</td>
-          <td>Designed for understandability; clear algorithm specification</td>
-        </tr>
-        <tr>
-          <td>Leader election</td>
-          <td>Not fully specified — left to implementation</td>
-          <td>Fully specified with randomized timeouts</td>
-        </tr>
-        <tr>
-          <td>Log replication</td>
-          <td>Not directly addressed — requires Multi-Paxos extension</td>
-          <td>Core part of the algorithm</td>
-        </tr>
-        <tr>
-          <td>Implementation complexity</td>
-          <td>High — many edge cases</td>
-          <td>Lower — more complete specification</td>
-        </tr>
-        <tr>
-          <td>Known uses</td>
-          <td>Google Chubby, Spanner, Cosmos DB, Zookeeper (ZAB variant)</td>
-          <td>etcd, CockroachDB, Consul, Kafka KRaft</td>
-        </tr>
-      </table>
-    </div>
+        <h3>Paxos vs Raft</h3>
+        <div class="table-wrap">
+          <table>
+            <tr>
+              <th>Aspect</th>
+              <th>Paxos (Multi-Paxos)</th>
+              <th>Raft</th>
+            </tr>
+            <tr>
+              <td>Understandability</td>
+              <td>Very difficult — underspecified in original paper</td>
+              <td>Designed for understandability; clear algorithm specification</td>
+            </tr>
+            <tr>
+              <td>Leader election</td>
+              <td>Not fully specified — left to implementation</td>
+              <td>Fully specified with randomized timeouts</td>
+            </tr>
+            <tr>
+              <td>Log replication</td>
+              <td>Not directly addressed — requires Multi-Paxos extension</td>
+              <td>Core part of the algorithm</td>
+            </tr>
+            <tr>
+              <td>Implementation complexity</td>
+              <td>High — many edge cases</td>
+              <td>Lower — more complete specification</td>
+            </tr>
+            <tr>
+              <td>Known uses</td>
+              <td>Google Chubby, Spanner, Cosmos DB, Zookeeper (ZAB variant)</td>
+              <td>etcd, CockroachDB, Consul, Kafka KRaft</td>
+            </tr>
+          </table>
+        </div>
 
-    <h2>Split Brain Problem</h2>
-    <p>Split brain occurs when a network partition causes multiple nodes to independently believe they are the
-      leader (or the authoritative node), leading to conflicting decisions and data divergence. After the partition
-      heals, the system has two incompatible versions of the truth.</p>
+        <h2>Split Brain Problem</h2>
+        <p>Split brain occurs when a network partition causes multiple nodes to independently believe they are the
+          leader (or the authoritative node), leading to conflicting decisions and data divergence. After the partition
+          heals, the system has two incompatible versions of the truth.</p>
 
-    <h3>Example Scenario</h3>
-    <p>A 5-node cluster is partitioned into two groups: {A, B} and {C, D, E}. Both groups elect their own leader.
-      Both leaders accept writes. When the partition heals, the cluster has two conflicting sets of writes that must
-      be reconciled or one discarded.</p>
+        <h3>Example Scenario</h3>
+        <p>A 5-node cluster is partitioned into two groups: {A, B} and {C, D, E}. Both groups elect their own leader.
+          Both leaders accept writes. When the partition heals, the cluster has two conflicting sets of writes that must
+          be reconciled or one discarded.</p>
 
-    <h3>Prevention via Quorum</h3>
-    <p>Quorum-based systems prevent split brain by requiring that any decision must be acknowledged by a majority
-      (N/2 + 1) of nodes. In a 5-node cluster, quorum is 3. During a {2} vs {3} partition, only the group of 3 can
-      form a quorum and continue operating. The group of 2 stops accepting writes, preventing split brain.</p>
+        <h3>Prevention via Quorum</h3>
+        <p>Quorum-based systems prevent split brain by requiring that any decision must be acknowledged by a majority
+          (N/2 + 1) of nodes. In a 5-node cluster, quorum is 3. During a {2} vs {3} partition, only the group of 3 can
+          form a quorum and continue operating. The group of 2 stops accepting writes, preventing split brain.</p>
 
-    <h2>Leader Election</h2>
-    <p>Leader election is the process by which a group of distributed nodes selects one node to act as the
-      coordinator or primary. Common algorithms:</p>
+        <h2>Leader Election</h2>
+        <p>Leader election is the process by which a group of distributed nodes selects one node to act as the
+          coordinator or primary. Common algorithms:</p>
 
-    <ul>
-      <li><strong>Bully algorithm:</strong> Each node has a unique priority. When a node notices the leader is gone,
-        it sends election messages to all nodes with higher priority. If no higher-priority node responds, it
-        becomes the leader. Simple but generates O(N^2) messages.</li>
-      <li><strong>Ring algorithm:</strong> Nodes are arranged logically in a ring. Each node forwards election
-        messages around the ring. The node with the highest ID that the message passes through becomes the leader.
-        O(N) messages.</li>
-      <li><strong>Raft election:</strong> As described above — randomized timeouts with term numbers. Used in modern
-        systems.</li>
-      <li><strong>External coordination:</strong> Use ZooKeeper, etcd, or Consul to run an election and store the
-        result. Services watch the stored key; whoever wins the distributed lock becomes leader.</li>
-    </ul>
+        <ul>
+          <li><strong>Bully algorithm:</strong> Each node has a unique priority. When a node notices the leader is gone,
+            it sends election messages to all nodes with higher priority. If no higher-priority node responds, it
+            becomes the leader. Simple but generates O(N^2) messages.</li>
+          <li><strong>Ring algorithm:</strong> Nodes are arranged logically in a ring. Each node forwards election
+            messages around the ring. The node with the highest ID that the message passes through becomes the leader.
+            O(N) messages.</li>
+          <li><strong>Raft election:</strong> As described above — randomized timeouts with term numbers. Used in modern
+            systems.</li>
+          <li><strong>External coordination:</strong> Use ZooKeeper, etcd, or Consul to run an election and store the
+            result. Services watch the stored key; whoever wins the distributed lock becomes leader.</li>
+        </ul>
 
-    <h2>Quorum</h2>
-    <p>A quorum is the minimum number of nodes that must agree for an operation to proceed. For a cluster of N
-      nodes, the standard quorum is N/2 + 1 (strict majority). Using a quorum ensures that any two quorums overlap
-      by at least one node — meaning any decision made by one quorum is visible to any subsequent quorum.</p>
+        <h2>Quorum</h2>
+        <p>A quorum is the minimum number of nodes that must agree for an operation to proceed. For a cluster of N
+          nodes, the standard quorum is N/2 + 1 (strict majority). Using a quorum ensures that any two quorums overlap
+          by at least one node — meaning any decision made by one quorum is visible to any subsequent quorum.</p>
 
-    <h3>Quorum in Read/Write Operations</h3>
-    <p>In a replicated system with N replicas:</p>
-    <ul>
-      <li><strong>Write quorum (W):</strong> Write must be acknowledged by at least W replicas before confirming
-        success.</li>
-      <li><strong>Read quorum (R):</strong> Read must consult at least R replicas and return the most recent value.
-      </li>
-      <li><strong>Strong consistency guarantee:</strong> W + R > N ensures that every read quorum overlaps with
-        every write quorum by at least one node, so reads always see the latest write.</li>
-    </ul>
+        <h3>Quorum in Read/Write Operations</h3>
+        <p>In a replicated system with N replicas:</p>
+        <ul>
+          <li><strong>Write quorum (W):</strong> Write must be acknowledged by at least W replicas before confirming
+            success.</li>
+          <li><strong>Read quorum (R):</strong> Read must consult at least R replicas and return the most recent value.
+          </li>
+          <li><strong>Strong consistency guarantee:</strong> W + R > N ensures that every read quorum overlaps with
+            every write quorum by at least one node, so reads always see the latest write.</li>
+        </ul>
 
-    <div class="example">
-      <div class="example-label">Cassandra tunable consistency</div>
-      <pre>
+        <div class="example">
+          <div class="example-label">Cassandra tunable consistency</div>
+          <pre>
 N = 3 replicas per key
 
 # Strong consistency: W=2, R=2 (W+R=4 > N=3)
@@ -1800,55 +1492,55 @@ session.execute(query, consistency_level=ONE)     # W=1, R=1
 # Every replica must acknowledge write
 session.execute(query, consistency_level=ALL)
   </pre>
-    </div>
-  </div>
+        </div>
+      </div>
 
 <div class="section" id="dist-tx">
-    <h1 class="section-title">Distributed Transactions</h1>
-    <p class="section-subtitle">Module 9 &nbsp;|&nbsp; Two-Phase Commit · SAGA Pattern · Outbox Pattern</p>
+        <h1 class="section-title">Distributed Transactions</h1>
+        <p class="section-subtitle">Module 9 &nbsp;|&nbsp; Two-Phase Commit · SAGA Pattern · Outbox Pattern</p>
 
-    <h2>The Distributed Transaction Problem</h2>
-    <p>A distributed transaction spans multiple independent resources (databases, services) and must either commit
-      or roll back atomically across all of them. This is fundamentally harder than a local transaction because any
-      participant can fail independently at any point — including after some participants have committed but before
-      others have.</p>
+        <h2>The Distributed Transaction Problem</h2>
+        <p>A distributed transaction spans multiple independent resources (databases, services) and must either commit
+          or roll back atomically across all of them. This is fundamentally harder than a local transaction because any
+          participant can fail independently at any point — including after some participants have committed but before
+          others have.</p>
 
-    <h2>Two-Phase Commit (2PC)</h2>
-    <p>Two-Phase Commit is a distributed protocol that coordinates atomic commits across multiple participants. A
-      coordinator node orchestrates two phases to ensure all participants either commit or roll back.</p>
+        <h2>Two-Phase Commit (2PC)</h2>
+        <p>Two-Phase Commit is a distributed protocol that coordinates atomic commits across multiple participants. A
+          coordinator node orchestrates two phases to ensure all participants either commit or roll back.</p>
 
-    <h3>Phase 1: Prepare</h3>
-    <ol>
-      <li>Coordinator sends Prepare message to all participants (P1, P2, P3).</li>
-      <li>Each participant writes the transaction to its log (durably), acquires all necessary locks, and verifies
-        it can commit.</li>
-      <li>Participants respond with Vote-Commit (if ready) or Vote-Abort (if they cannot commit).</li>
-    </ol>
+        <h3>Phase 1: Prepare</h3>
+        <ol>
+          <li>Coordinator sends Prepare message to all participants (P1, P2, P3).</li>
+          <li>Each participant writes the transaction to its log (durably), acquires all necessary locks, and verifies
+            it can commit.</li>
+          <li>Participants respond with Vote-Commit (if ready) or Vote-Abort (if they cannot commit).</li>
+        </ol>
 
-    <h3>Phase 2: Commit or Abort</h3>
-    <ol>
-      <li>If all participants voted Commit: coordinator writes "commit" to its log, then sends Commit to all
-        participants.</li>
-      <li>If any participant voted Abort: coordinator sends Abort to all participants.</li>
-      <li>Participants apply the decision and release their locks.</li>
-      <li>Participants acknowledge the commit/abort.</li>
-    </ol>
+        <h3>Phase 2: Commit or Abort</h3>
+        <ol>
+          <li>If all participants voted Commit: coordinator writes "commit" to its log, then sends Commit to all
+            participants.</li>
+          <li>If any participant voted Abort: coordinator sends Abort to all participants.</li>
+          <li>Participants apply the decision and release their locks.</li>
+          <li>Participants acknowledge the commit/abort.</li>
+        </ol>
 
-    <h3>Problems with 2PC</h3>
-    <ul>
-      <li><strong>Blocking protocol:</strong> If the coordinator crashes after Phase 1 but before Phase 2,
-        participants are stuck holding locks indefinitely — they cannot proceed without the coordinator's decision.
-        This is the most severe limitation.</li>
-      <li><strong>Single point of failure:</strong> The coordinator is essential. If it fails at the wrong moment,
-        the system is blocked until recovery.</li>
-      <li><strong>Latency:</strong> Two round-trips plus logging overhead add significant latency compared to a
-        single-participant transaction. Locks held during both phases reduce concurrency.</li>
-      <li><strong>No partition tolerance:</strong> If a network partition isolates some participants from the
-        coordinator, those participants are blocked.</li>
-    </ul>
+        <h3>Problems with 2PC</h3>
+        <ul>
+          <li><strong>Blocking protocol:</strong> If the coordinator crashes after Phase 1 but before Phase 2,
+            participants are stuck holding locks indefinitely — they cannot proceed without the coordinator's decision.
+            This is the most severe limitation.</li>
+          <li><strong>Single point of failure:</strong> The coordinator is essential. If it fails at the wrong moment,
+            the system is blocked until recovery.</li>
+          <li><strong>Latency:</strong> Two round-trips plus logging overhead add significant latency compared to a
+            single-participant transaction. Locks held during both phases reduce concurrency.</li>
+          <li><strong>No partition tolerance:</strong> If a network partition isolates some participants from the
+            coordinator, those participants are blocked.</li>
+        </ul>
 
-    <div class="diagram">
-      <pre class="mermaid">
+        <div class="diagram">
+          <pre class="mermaid">
 sequenceDiagram
   participant C as Coordinator
   participant P1 as Participant 1\nOrder DB
@@ -1865,32 +1557,32 @@ sequenceDiagram
   P1->>C: Ack
   P2->>C: Ack
 </pre>
-      <p class="diagram-caption">2PC happy path with two participants</p>
-    </div>
+          <p class="diagram-caption">2PC happy path with two participants</p>
+        </div>
 
-    <h2>SAGA Pattern</h2>
-    <p>The SAGA pattern is an alternative to 2PC for long-running, multi-step transactions in microservices. Instead
-      of a single atomic transaction, a SAGA decomposes a business process into a sequence of local transactions.
-      Each local transaction updates a single service and publishes an event or message to trigger the next step. If
-      any step fails, compensating transactions are executed in reverse order to undo the completed steps.</p>
+        <h2>SAGA Pattern</h2>
+        <p>The SAGA pattern is an alternative to 2PC for long-running, multi-step transactions in microservices. Instead
+          of a single atomic transaction, a SAGA decomposes a business process into a sequence of local transactions.
+          Each local transaction updates a single service and publishes an event or message to trigger the next step. If
+          any step fails, compensating transactions are executed in reverse order to undo the completed steps.</p>
 
-    <h3>Key Concepts</h3>
-    <ul>
-      <li><strong>Local transaction:</strong> Each step is an ACID transaction within a single service's database.
-      </li>
-      <li><strong>Compensating transaction:</strong> A transaction that semantically undoes a previously completed
-        step. Note: compensation is not always a technical rollback — it may create new records (e.g., a refund
-        record rather than deleting the payment record) to preserve audit trail.</li>
-      <li><strong>Idempotency:</strong> Steps and compensations must be idempotent — they may be retried on failure.
-      </li>
-    </ul>
+        <h3>Key Concepts</h3>
+        <ul>
+          <li><strong>Local transaction:</strong> Each step is an ACID transaction within a single service's database.
+          </li>
+          <li><strong>Compensating transaction:</strong> A transaction that semantically undoes a previously completed
+            step. Note: compensation is not always a technical rollback — it may create new records (e.g., a refund
+            record rather than deleting the payment record) to preserve audit trail.</li>
+          <li><strong>Idempotency:</strong> Steps and compensations must be idempotent — they may be retried on failure.
+          </li>
+        </ul>
 
-    <h3>Choreography-Based SAGA</h3>
-    <p>Services react to events from other services without a central coordinator. Each service publishes events
-      when a step completes; other services subscribe and react.</p>
+        <h3>Choreography-Based SAGA</h3>
+        <p>Services react to events from other services without a central coordinator. Each service publishes events
+          when a step completes; other services subscribe and react.</p>
 
-    <div class="diagram">
-      <pre class="mermaid">
+        <div class="diagram">
+          <pre class="mermaid">
 sequenceDiagram
     participant O as Order Service
     participant I as Inventory Service
@@ -1906,37 +1598,37 @@ sequenceDiagram
     deactivate P
     O->>I: Cancel Reservation (COMPENSATE)
 </pre>
-    </div>
+        </div>
 
-    <div class="compare">
-      <div class="compare-card neutral">
-        <h4>Choreography</h4>
-        <ul>
-          <li>No central orchestrator — each service is autonomous</li>
-          <li>Loosely coupled — services only know about events</li>
-          <li>Hard to visualize the complete transaction flow</li>
-          <li>Debugging is difficult — must trace events across many services</li>
-          <li>Risk of circular dependencies if not carefully designed</li>
-        </ul>
-      </div>
-      <div class="compare-card neutral">
-        <h4>Orchestration</h4>
-        <ul>
-          <li>Central orchestrator (saga orchestrator service) directs each step</li>
-          <li>Business logic is centralized and visible in one place</li>
-          <li>Easier to understand, test, and monitor the transaction flow</li>
-          <li>Orchestrator becomes a dependency of all participant services</li>
-          <li>Technology examples: AWS Step Functions, Temporal, Conductor</li>
-        </ul>
-      </div>
-    </div>
+        <div class="compare">
+          <div class="compare-card neutral">
+            <h4>Choreography</h4>
+            <ul>
+              <li>No central orchestrator — each service is autonomous</li>
+              <li>Loosely coupled — services only know about events</li>
+              <li>Hard to visualize the complete transaction flow</li>
+              <li>Debugging is difficult — must trace events across many services</li>
+              <li>Risk of circular dependencies if not carefully designed</li>
+            </ul>
+          </div>
+          <div class="compare-card neutral">
+            <h4>Orchestration</h4>
+            <ul>
+              <li>Central orchestrator (saga orchestrator service) directs each step</li>
+              <li>Business logic is centralized and visible in one place</li>
+              <li>Easier to understand, test, and monitor the transaction flow</li>
+              <li>Orchestrator becomes a dependency of all participant services</li>
+              <li>Technology examples: AWS Step Functions, Temporal, Conductor</li>
+            </ul>
+          </div>
+        </div>
 
-    <h2>The Outbox Pattern</h2>
-    <p>The outbox pattern solves the dual-write problem: how to atomically update a database record AND publish an
-      event to a message broker, when these are two separate systems with no shared transaction.</p>
+        <h2>The Outbox Pattern</h2>
+        <p>The outbox pattern solves the dual-write problem: how to atomically update a database record AND publish an
+          event to a message broker, when these are two separate systems with no shared transaction.</p>
 
-    <h3>The Dual-Write Problem</h3>
-    <pre>
+        <h3>The Dual-Write Problem</h3>
+        <pre>
 # Naive approach — NOT atomic:
 db.update("UPDATE orders SET status='paid' WHERE id=123")
 # Process crashes here — order is paid but event not published
@@ -1947,16 +1639,16 @@ kafka.publish(...)
 db.update(...)
 </pre>
 
-    <h3>Outbox Solution</h3>
-    <ol>
-      <li>In the same database transaction that updates business data, also insert a row into an "outbox" table
-        describing the event to be published.</li>
-      <li>A separate message relay process (or Debezium CDC) reads the outbox table and publishes messages to the
-        broker.</li>
-      <li>After publishing, the relay marks the outbox row as processed (or deletes it).</li>
-    </ol>
+        <h3>Outbox Solution</h3>
+        <ol>
+          <li>In the same database transaction that updates business data, also insert a row into an "outbox" table
+            describing the event to be published.</li>
+          <li>A separate message relay process (or Debezium CDC) reads the outbox table and publishes messages to the
+            broker.</li>
+          <li>After publishing, the relay marks the outbox row as processed (or deletes it).</li>
+        </ol>
 
-    <pre>
+        <pre>
 # Atomic: both happen in one database transaction
 BEGIN;
   UPDATE orders SET status = 'paid' WHERE id = 123;
@@ -1971,71 +1663,71 @@ FOR row IN unprocessed_rows:
     UPDATE outbox SET processed = true WHERE id = row.id
 </pre>
 
-    <h3>Guarantees</h3>
-    <ul>
-      <li>The business state update and the event intent are always consistent — they commit together or roll back
-        together.</li>
-      <li>At-least-once delivery: if the relay crashes after publishing but before marking processed, the message
-        will be republished on retry. Consumers must be idempotent.</li>
-      <li>Ordering: events in the outbox are ordered by insertion time, which preserves causal ordering within a
-        service.</li>
-    </ul>
-  </div>
+        <h3>Guarantees</h3>
+        <ul>
+          <li>The business state update and the event intent are always consistent — they commit together or roll back
+            together.</li>
+          <li>At-least-once delivery: if the relay crashes after publishing but before marking processed, the message
+            will be republished on retry. Consumers must be idempotent.</li>
+          <li>Ordering: events in the outbox are ordered by insertion time, which preserves causal ordering within a
+            service.</li>
+        </ul>
+      </div>
 
 <div class="section" id="data-structures">
-    <h1 class="section-title">Data Structures for Scale</h1>
-    <p class="section-subtitle">Module 10 &nbsp;|&nbsp; Geohash · Quad Trees · R-Trees · Skip Lists · HyperLogLog ·
-      Count-Min Sketch · Merkle Trees · Bloom Filters</p>
+        <h1 class="section-title">Data Structures for Scale</h1>
+        <p class="section-subtitle">Module 10 &nbsp;|&nbsp; Geohash · Quad Trees · R-Trees · Skip Lists · HyperLogLog ·
+          Count-Min Sketch · Merkle Trees · Bloom Filters</p>
 
-    <h2>Geohash</h2>
-    <p>Geohash is a geocoding system that encodes a geographic location (latitude/longitude pair) into a short
-      string of alphanumeric characters. The encoding subdivides the world into a grid of rectangular cells.
-      Adjacent cells share common prefixes, enabling proximity queries using simple string prefix matching.</p>
+        <h2>Geohash</h2>
+        <p>Geohash is a geocoding system that encodes a geographic location (latitude/longitude pair) into a short
+          string of alphanumeric characters. The encoding subdivides the world into a grid of rectangular cells.
+          Adjacent cells share common prefixes, enabling proximity queries using simple string prefix matching.</p>
 
-    <h3>Encoding Process</h3>
-    <ol>
-      <li>Interleave latitude and longitude bits to produce a single binary sequence.</li>
-      <li>Encode the binary sequence using Base32 (characters: 0-9 and b-z excluding a,i,l,o).</li>
-      <li>Each additional character doubles the precision (halves the cell size).</li>
-    </ol>
+        <h3>Encoding Process</h3>
+        <ol>
+          <li>Interleave latitude and longitude bits to produce a single binary sequence.</li>
+          <li>Encode the binary sequence using Base32 (characters: 0-9 and b-z excluding a,i,l,o).</li>
+          <li>Each additional character doubles the precision (halves the cell size).</li>
+        </ol>
 
-    <div class="table-wrap">
-      <table>
-        <tr>
-          <th>Geohash length</th>
-          <th>Cell size (approx)</th>
-          <th>Use case</th>
-        </tr>
-        <tr>
-          <td>1 character</td>
-          <td>5000 km × 5000 km</td>
-          <td>Continental</td>
-        </tr>
-        <tr>
-          <td>4 characters</td>
-          <td>40 km × 20 km</td>
-          <td>City-level</td>
-        </tr>
-        <tr>
-          <td>6 characters</td>
-          <td>1.2 km × 0.6 km</td>
-          <td>Neighborhood</td>
-        </tr>
-        <tr>
-          <td>8 characters</td>
-          <td>38 m × 19 m</td>
-          <td>Block-level</td>
-        </tr>
-        <tr>
-          <td>10 characters</td>
-          <td>1.2 m × 0.6 m</td>
-          <td>Building precision</td>
-        </tr>
-      </table>
-    </div>
+        <div class="table-wrap">
+          <table>
+            <tr>
+              <th>Geohash length</th>
+              <th>Cell size (approx)</th>
+              <th>Use case</th>
+            </tr>
+            <tr>
+              <td>1 character</td>
+              <td>5000 km × 5000 km</td>
+              <td>Continental</td>
+            </tr>
+            <tr>
+              <td>4 characters</td>
+              <td>40 km × 20 km</td>
+              <td>City-level</td>
+            </tr>
+            <tr>
+              <td>6 characters</td>
+              <td>1.2 km × 0.6 km</td>
+              <td>Neighborhood</td>
+            </tr>
+            <tr>
+              <td>8 characters</td>
+              <td>38 m × 19 m</td>
+              <td>Block-level</td>
+            </tr>
+            <tr>
+              <td>10 characters</td>
+              <td>1.2 m × 0.6 m</td>
+              <td>Building precision</td>
+            </tr>
+          </table>
+        </div>
 
-    <h3>System Design Application</h3>
-    <pre>
+        <h3>System Design Application</h3>
+        <pre>
 # Index locations by geohash prefix
 CREATE INDEX idx_drivers_geohash ON drivers (geohash);
 
@@ -2046,28 +1738,28 @@ WHERE geohash LIKE '9q8yy%'   -- 6-character prefix
   AND status = 'available';
 </pre>
 
-    <p><strong>Edge case:</strong> Cells at the boundary of a geohash prefix may be near the rider but have a
-      different prefix. Solution: include the 8 neighboring geohash cells in the query.</p>
+        <p><strong>Edge case:</strong> Cells at the boundary of a geohash prefix may be near the rider but have a
+          different prefix. Solution: include the 8 neighboring geohash cells in the query.</p>
 
-    <p><strong>Used by:</strong> Uber, Lyft (driver matching), Instagram (location tagging), Redis GEOSEARCH command
-    </p>
+        <p><strong>Used by:</strong> Uber, Lyft (driver matching), Instagram (location tagging), Redis GEOSEARCH command
+        </p>
 
-    <h2>Quad Trees</h2>
-    <p>A quad tree is a tree data structure where each internal node has exactly four children, partitioning a 2D
-      space into four quadrants (NW, NE, SW, SE). Quad trees are used to efficiently index spatial data and support
-      range queries and proximity searches.</p>
+        <h2>Quad Trees</h2>
+        <p>A quad tree is a tree data structure where each internal node has exactly four children, partitioning a 2D
+          space into four quadrants (NW, NE, SW, SE). Quad trees are used to efficiently index spatial data and support
+          range queries and proximity searches.</p>
 
-    <h3>How It Works</h3>
-    <ul>
-      <li>Start with a root node representing the entire area.</li>
-      <li>Each node tracks points within its region.</li>
-      <li>When a node's point count exceeds a threshold (e.g., 4 points), subdivide into four equal quadrants and
-        distribute points.</li>
-      <li>Recurse until all regions have acceptable density or minimum cell size is reached.</li>
-    </ul>
+        <h3>How It Works</h3>
+        <ul>
+          <li>Start with a root node representing the entire area.</li>
+          <li>Each node tracks points within its region.</li>
+          <li>When a node's point count exceeds a threshold (e.g., 4 points), subdivide into four equal quadrants and
+            distribute points.</li>
+          <li>Recurse until all regions have acceptable density or minimum cell size is reached.</li>
+        </ul>
 
-    <h3>Query</h3>
-    <pre>
+        <h3>Query</h3>
+        <pre>
 def range_query(node, search_rect):
     results = []
     if not node.rect.intersects(search_rect):
@@ -2084,30 +1776,30 @@ def range_query(node, search_rect):
     return results
 </pre>
 
-    <h3>Advantages and Limitations</h3>
-    <ul>
-      <li>Queries skip entire quadrants that do not intersect the search region — O(log N) average</li>
-      <li>Good for point data that is roughly uniformly distributed</li>
-      <li>Poor for clustered data: dense areas create very deep trees; sparse areas waste space</li>
-      <li>Not well-suited for non-point objects (polygons, line segments) — use R-trees</li>
-    </ul>
+        <h3>Advantages and Limitations</h3>
+        <ul>
+          <li>Queries skip entire quadrants that do not intersect the search region — O(log N) average</li>
+          <li>Good for point data that is roughly uniformly distributed</li>
+          <li>Poor for clustered data: dense areas create very deep trees; sparse areas waste space</li>
+          <li>Not well-suited for non-point objects (polygons, line segments) — use R-trees</li>
+        </ul>
 
-    <h2>R-Trees</h2>
-    <p>An R-tree is a height-balanced tree data structure designed for indexing multi-dimensional information,
-      particularly geometric objects such as points, rectangles, and polygons. Unlike quad trees (which partition
-      space uniformly), R-trees group nearby objects together using minimum bounding rectangles (MBRs) regardless of
-      spatial uniformity.</p>
+        <h2>R-Trees</h2>
+        <p>An R-tree is a height-balanced tree data structure designed for indexing multi-dimensional information,
+          particularly geometric objects such as points, rectangles, and polygons. Unlike quad trees (which partition
+          space uniformly), R-trees group nearby objects together using minimum bounding rectangles (MBRs) regardless of
+          spatial uniformity.</p>
 
-    <h3>Structure</h3>
-    <ul>
-      <li>Each leaf node contains references to spatial objects (up to M objects per leaf)</li>
-      <li>Each internal node contains entries of the form (MBR, child_pointer) where MBR is the minimum bounding
-        rectangle that encloses all objects in the subtree</li>
-      <li>MBRs can overlap between sibling nodes — a query may need to search multiple subtrees</li>
-    </ul>
+        <h3>Structure</h3>
+        <ul>
+          <li>Each leaf node contains references to spatial objects (up to M objects per leaf)</li>
+          <li>Each internal node contains entries of the form (MBR, child_pointer) where MBR is the minimum bounding
+            rectangle that encloses all objects in the subtree</li>
+          <li>MBRs can overlap between sibling nodes — a query may need to search multiple subtrees</li>
+        </ul>
 
-    <h3>Query</h3>
-    <pre>
+        <h3>Query</h3>
+        <pre>
 def search_rtree(node, query_rect):
     results = []
     for entry in node.entries:
@@ -2119,26 +1811,26 @@ def search_rtree(node, query_rect):
     return results
 </pre>
 
-    <p><strong>Used by:</strong> PostGIS (PostgreSQL spatial extension), SQLite R-Tree module, most GIS databases.
-      Used to efficiently answer spatial queries: "find all restaurants within 500m," "find all polygons that
-      overlap this region."</p>
+        <p><strong>Used by:</strong> PostGIS (PostgreSQL spatial extension), SQLite R-Tree module, most GIS databases.
+          Used to efficiently answer spatial queries: "find all restaurants within 500m," "find all polygons that
+          overlap this region."</p>
 
-    <h2>Skip Lists</h2>
-    <p>A skip list is a probabilistic data structure providing O(log N) average time complexity for search, insert,
-      and delete operations — comparable to balanced trees but with simpler implementation. It is a layered linked
-      list where higher layers contain fewer nodes, allowing efficient search by skipping over large sections of the
-      base list.</p>
+        <h2>Skip Lists</h2>
+        <p>A skip list is a probabilistic data structure providing O(log N) average time complexity for search, insert,
+          and delete operations — comparable to balanced trees but with simpler implementation. It is a layered linked
+          list where higher layers contain fewer nodes, allowing efficient search by skipping over large sections of the
+          base list.</p>
 
-    <h3>Structure</h3>
-    <ul>
-      <li>Level 0: Contains all elements in sorted order (standard linked list).</li>
-      <li>Level 1: Contains approximately half of level 0's elements (randomly promoted).</li>
-      <li>Level k: Contains approximately half of level (k-1)'s elements.</li>
-      <li>Maximum height: O(log N) levels.</li>
-    </ul>
+        <h3>Structure</h3>
+        <ul>
+          <li>Level 0: Contains all elements in sorted order (standard linked list).</li>
+          <li>Level 1: Contains approximately half of level 0's elements (randomly promoted).</li>
+          <li>Level k: Contains approximately half of level (k-1)'s elements.</li>
+          <li>Maximum height: O(log N) levels.</li>
+        </ul>
 
-    <h3>Search Algorithm</h3>
-    <pre>
+        <h3>Search Algorithm</h3>
+        <pre>
 def search(target):
     current = head
     level = max_level
@@ -2155,45 +1847,45 @@ def search(target):
     return None
 </pre>
 
-    <h3>Insert: Probabilistic Promotion</h3>
-    <p>When inserting a new node, the node is always added to level 0. With probability 0.5, it is also added to
-      level 1. With probability 0.25, to level 2. And so on. This random promotion maintains the logarithmic height
-      property on average without requiring rotations.</p>
+        <h3>Insert: Probabilistic Promotion</h3>
+        <p>When inserting a new node, the node is always added to level 0. With probability 0.5, it is also added to
+          level 1. With probability 0.25, to level 2. And so on. This random promotion maintains the logarithmic height
+          property on average without requiring rotations.</p>
 
-    <p><strong>Redis Sorted Sets (ZSET):</strong> Redis implements sorted sets using a skip list combined with a
-      hash table. Skip lists enable O(log N) ZRANGEBYSCORE and ZRANK operations. Redis chose skip lists over
-      balanced trees because: simpler code, easier range queries, better cache locality for range scans.</p>
+        <p><strong>Redis Sorted Sets (ZSET):</strong> Redis implements sorted sets using a skip list combined with a
+          hash table. Skip lists enable O(log N) ZRANGEBYSCORE and ZRANK operations. Redis chose skip lists over
+          balanced trees because: simpler code, easier range queries, better cache locality for range scans.</p>
 
-    <h2>HyperLogLog</h2>
-    <p>HyperLogLog (HLL) is a probabilistic algorithm for estimating the cardinality (number of distinct elements)
-      of a multiset using a fixed, small amount of memory, regardless of how many elements are in the set.</p>
+        <h2>HyperLogLog</h2>
+        <p>HyperLogLog (HLL) is a probabilistic algorithm for estimating the cardinality (number of distinct elements)
+          of a multiset using a fixed, small amount of memory, regardless of how many elements are in the set.</p>
 
-    <h3>How It Works</h3>
-    <p>The key insight: if you hash each element and count the maximum number of leading zeros in any hash, the
-      cardinality can be estimated as 2^(max_leading_zeros). More precisely, HyperLogLog uses multiple hash
-      functions and combines their estimates to reduce variance.</p>
+        <h3>How It Works</h3>
+        <p>The key insight: if you hash each element and count the maximum number of leading zeros in any hash, the
+          cardinality can be estimated as 2^(max_leading_zeros). More precisely, HyperLogLog uses multiple hash
+          functions and combines their estimates to reduce variance.</p>
 
-    <div class="table-wrap">
-      <table>
-        <tr>
-          <th>Approach</th>
-          <th>Memory for 1 billion distinct elements</th>
-          <th>Error rate</th>
-        </tr>
-        <tr>
-          <td>Hash set (exact)</td>
-          <td>~10 GB</td>
-          <td>0%</td>
-        </tr>
-        <tr>
-          <td>HyperLogLog (approximate)</td>
-          <td>~1.5 KB</td>
-          <td>~2%</td>
-        </tr>
-      </table>
-    </div>
+        <div class="table-wrap">
+          <table>
+            <tr>
+              <th>Approach</th>
+              <th>Memory for 1 billion distinct elements</th>
+              <th>Error rate</th>
+            </tr>
+            <tr>
+              <td>Hash set (exact)</td>
+              <td>~10 GB</td>
+              <td>0%</td>
+            </tr>
+            <tr>
+              <td>HyperLogLog (approximate)</td>
+              <td>~1.5 KB</td>
+              <td>~2%</td>
+            </tr>
+          </table>
+        </div>
 
-    <pre>
+        <pre>
 # Redis HyperLogLog
 # Count unique website visitors
 PFADD daily_visitors:2024-01-15 user_123 user_456 user_789
@@ -2208,24 +1900,24 @@ PFCOUNT weekly_visitors
 # → Approximate unique visitors over the week
 </pre>
 
-    <p><strong>Used by:</strong> Redis PFADD/PFCOUNT commands, Apache Spark, Facebook (unique ad impressions),
-      Google (unique search queries)</p>
+        <p><strong>Used by:</strong> Redis PFADD/PFCOUNT commands, Apache Spark, Facebook (unique ad impressions),
+          Google (unique search queries)</p>
 
-    <h2>Count-Min Sketch</h2>
-    <p>Count-Min Sketch (CMS) is a probabilistic data structure for frequency estimation of elements in a data
-      stream. It provides approximate frequency counts using a two-dimensional array of counters, with a tunable
-      tradeoff between accuracy, memory, and computation.</p>
+        <h2>Count-Min Sketch</h2>
+        <p>Count-Min Sketch (CMS) is a probabilistic data structure for frequency estimation of elements in a data
+          stream. It provides approximate frequency counts using a two-dimensional array of counters, with a tunable
+          tradeoff between accuracy, memory, and computation.</p>
 
-    <h3>Structure and Update</h3>
-    <ul>
-      <li>Maintain a d×w matrix of integer counters, initialized to zero.</li>
-      <li>Use d independent hash functions h1, h2, …, hd each mapping elements to [0, w).</li>
-      <li><strong>Update(element):</strong> For each hash function hi, increment matrix[i][hi(element)].</li>
-      <li><strong>Query(element):</strong> For each hash function hi, read matrix[i][hi(element)]. Return the
-        minimum of all d values (overestimates due to hash collisions, but minimum is least overestimated).</li>
-    </ul>
+        <h3>Structure and Update</h3>
+        <ul>
+          <li>Maintain a d×w matrix of integer counters, initialized to zero.</li>
+          <li>Use d independent hash functions h1, h2, …, hd each mapping elements to [0, w).</li>
+          <li><strong>Update(element):</strong> For each hash function hi, increment matrix[i][hi(element)].</li>
+          <li><strong>Query(element):</strong> For each hash function hi, read matrix[i][hi(element)]. Return the
+            minimum of all d values (overestimates due to hash collisions, but minimum is least overestimated).</li>
+        </ul>
 
-    <pre>
+        <pre>
 # Twitter trending topics approximation
 cms = CountMinSketch(width=1000, depth=5)
 
@@ -2238,14 +1930,14 @@ estimated_count = cms.query("#AI")
 # Accurate within a bound: actual_count <= estimated <= actual + epsilon * N
 </pre>
 
-    <h2>Merkle Trees</h2>
-    <p>A Merkle tree is a hash tree where every leaf node is labeled with the cryptographic hash of its data, and
-      every non-leaf node is labeled with the hash of its children's labels. The root hash represents all data in
-      the tree — any change to any leaf changes the root hash, and the specific changed leaf can be identified
-      efficiently without examining all leaves.</p>
+        <h2>Merkle Trees</h2>
+        <p>A Merkle tree is a hash tree where every leaf node is labeled with the cryptographic hash of its data, and
+          every non-leaf node is labeled with the hash of its children's labels. The root hash represents all data in
+          the tree — any change to any leaf changes the root hash, and the specific changed leaf can be identified
+          efficiently without examining all leaves.</p>
 
-    <h3>Structure</h3>
-    <pre>
+        <h3>Structure</h3>
+        <pre>
           Root = H(H(H1,H2), H(H3,H4))
          /                            \
     H(H1,H2)                    H(H3,H4)
@@ -2254,87 +1946,87 @@ estimated_count = cms.query("#AI")
 (data 1)  (data 2)          (data 3)  (data 4)
 </pre>
 
-    <h3>Efficient Synchronization</h3>
-    <p>Given two replicas with different root hashes:</p>
-    <ol>
-      <li>Compare root hashes — if equal, all data is identical.</li>
-      <li>If different, recursively compare left subtree hashes, then right subtree hashes.</li>
-      <li>Differences are localized to subtrees with mismatching hashes.</li>
-      <li>Only data blocks under differing leaf nodes need to be transferred.</li>
-    </ol>
-    <p>This finds differences in O(changes log N) time rather than O(N) by scanning all data.</p>
+        <h3>Efficient Synchronization</h3>
+        <p>Given two replicas with different root hashes:</p>
+        <ol>
+          <li>Compare root hashes — if equal, all data is identical.</li>
+          <li>If different, recursively compare left subtree hashes, then right subtree hashes.</li>
+          <li>Differences are localized to subtrees with mismatching hashes.</li>
+          <li>Only data blocks under differing leaf nodes need to be transferred.</li>
+        </ol>
+        <p>This finds differences in O(changes log N) time rather than O(N) by scanning all data.</p>
 
-    <div class="example">
-      <div class="example-label">Cassandra Anti-Entropy Repair</div>
-      <p>Cassandra builds a Merkle tree for each table on each replica during repair operations. Nodes compare
-        Merkle tree roots to detect inconsistencies. Only the data blocks corresponding to differing leaf nodes are
-        transferred, making repair efficient even for tables with billions of rows where only a handful of rows have
-        diverged.</p>
-    </div>
+        <div class="example">
+          <div class="example-label">Cassandra Anti-Entropy Repair</div>
+          <p>Cassandra builds a Merkle tree for each table on each replica during repair operations. Nodes compare
+            Merkle tree roots to detect inconsistencies. Only the data blocks corresponding to differing leaf nodes are
+            transferred, making repair efficient even for tables with billions of rows where only a handful of rows have
+            diverged.</p>
+        </div>
 
-    <h2>Bloom Filters</h2>
-    <p>A Bloom filter is a space-efficient probabilistic data structure used to test whether an element is a member
-      of a set. It can return <strong>False Positives</strong> (maybe in set) but never <strong>False
-        Negatives</strong> (definitely not in set).</p>
-    <div class="example">
-      <div class="example-label">How it works</div>
-      <p>Uses a bit array of $m$ bits and $k$ different hash functions. When adding an element, set bits at all $k$
-        hash positions to 1. When querying, if any of the $k$ bits are 0, the element is definitely NOT in the set.
-      </p>
-    </div>
-    <p><strong>Use Cases:</strong> Reducing expensive disk lookups for non-existent keys (BigTable, Cassandra),
-      Malicious URL filtering (Chrome).</p>
-  </div>
+        <h2>Bloom Filters</h2>
+        <p>A Bloom filter is a space-efficient probabilistic data structure used to test whether an element is a member
+          of a set. It can return <strong>False Positives</strong> (maybe in set) but never <strong>False
+            Negatives</strong> (definitely not in set).</p>
+        <div class="example">
+          <div class="example-label">How it works</div>
+          <p>Uses a bit array of $m$ bits and $k$ different hash functions. When adding an element, set bits at all $k$
+            hash positions to 1. When querying, if any of the $k$ bits are 0, the element is definitely NOT in the set.
+          </p>
+        </div>
+        <p><strong>Use Cases:</strong> Reducing expensive disk lookups for non-existent keys (BigTable, Cassandra),
+          Malicious URL filtering (Chrome).</p>
+      </div>
 
 <div class="section" id="big-data">
-    <h1 class="section-title">Big Data Processing</h1>
-    <p class="section-subtitle">Module 10 &nbsp;|&nbsp; Batch vs Stream · MapReduce · ETL · Data Lakes · Data
-      Warehousing · Lakehouse · Lambda Architecture · Kappa Architecture · Streaming Engines</p>
+        <h1 class="section-title">Big Data Processing</h1>
+        <p class="section-subtitle">Module 10 &nbsp;|&nbsp; Batch vs Stream · MapReduce · ETL · Data Lakes · Data
+          Warehousing · Lakehouse · Lambda Architecture · Kappa Architecture · Streaming Engines</p>
 
-    <h2>Batch vs Stream Processing</h2>
-    <div class="compare">
-      <div class="compare-card neutral">
-        <h4>Batch Processing</h4>
+        <h2>Batch vs Stream Processing</h2>
+        <div class="compare">
+          <div class="compare-card neutral">
+            <h4>Batch Processing</h4>
+            <ul>
+              <li>Process bounded data sets (finite input)</li>
+              <li>High latency — runs periodically (hourly, nightly)</li>
+              <li>High throughput — processes massive data efficiently</li>
+              <li>Can re-read input data (idempotent, correctable)</li>
+              <li>Examples: daily sales report, ML model training, ETL pipelines</li>
+              <li>Technologies: Apache Spark (batch), Hadoop MapReduce</li>
+            </ul>
+          </div>
+          <div class="compare-card neutral">
+            <h4>Stream Processing</h4>
+            <ul>
+              <li>Process unbounded data as it arrives (infinite input)</li>
+              <li>Low latency — milliseconds to seconds</li>
+              <li>Lower throughput per unit time than batch</li>
+              <li>State management more complex (windowing, watermarks)</li>
+              <li>Examples: fraud detection, real-time dashboards, alerting</li>
+              <li>Technologies: Apache Flink, Kafka Streams, Apache Spark Streaming</li>
+            </ul>
+          </div>
+        </div>
+
+        <h2>MapReduce</h2>
+        <p>MapReduce is a programming model for processing large datasets in parallel across a distributed cluster.
+          Introduced by Google in 2004, it abstracts data parallelism into two phases: Map and Reduce.</p>
+
+        <h3>Phases</h3>
         <ul>
-          <li>Process bounded data sets (finite input)</li>
-          <li>High latency — runs periodically (hourly, nightly)</li>
-          <li>High throughput — processes massive data efficiently</li>
-          <li>Can re-read input data (idempotent, correctable)</li>
-          <li>Examples: daily sales report, ML model training, ETL pipelines</li>
-          <li>Technologies: Apache Spark (batch), Hadoop MapReduce</li>
+          <li><strong>Map phase:</strong> Input data is split into chunks. Each chunk is processed by a Map function
+            independently and in parallel. The Map function outputs zero or more key-value pairs. Workers do not
+            communicate — fully parallel.</li>
+          <li><strong>Shuffle and Sort:</strong> All key-value pairs with the same key are grouped together and sent to
+            the same Reduce worker. This is the most network-intensive phase.</li>
+          <li><strong>Reduce phase:</strong> Each Reduce function receives a key and all values associated with it. It
+            computes an aggregate and emits the result.</li>
         </ul>
-      </div>
-      <div class="compare-card neutral">
-        <h4>Stream Processing</h4>
-        <ul>
-          <li>Process unbounded data as it arrives (infinite input)</li>
-          <li>Low latency — milliseconds to seconds</li>
-          <li>Lower throughput per unit time than batch</li>
-          <li>State management more complex (windowing, watermarks)</li>
-          <li>Examples: fraud detection, real-time dashboards, alerting</li>
-          <li>Technologies: Apache Flink, Kafka Streams, Apache Spark Streaming</li>
-        </ul>
-      </div>
-    </div>
 
-    <h2>MapReduce</h2>
-    <p>MapReduce is a programming model for processing large datasets in parallel across a distributed cluster.
-      Introduced by Google in 2004, it abstracts data parallelism into two phases: Map and Reduce.</p>
-
-    <h3>Phases</h3>
-    <ul>
-      <li><strong>Map phase:</strong> Input data is split into chunks. Each chunk is processed by a Map function
-        independently and in parallel. The Map function outputs zero or more key-value pairs. Workers do not
-        communicate — fully parallel.</li>
-      <li><strong>Shuffle and Sort:</strong> All key-value pairs with the same key are grouped together and sent to
-        the same Reduce worker. This is the most network-intensive phase.</li>
-      <li><strong>Reduce phase:</strong> Each Reduce function receives a key and all values associated with it. It
-        computes an aggregate and emits the result.</li>
-    </ul>
-
-    <div class="example">
-      <div class="example-label">Word count across 1 TB of text files</div>
-      <pre>
+        <div class="example">
+          <div class="example-label">Word count across 1 TB of text files</div>
+          <pre>
 # Map function (runs on each text chunk, independently)
 def map(document_id, document_text):
     for word in document_text.split():
@@ -2350,102 +2042,102 @@ def reduce(word, counts):
 
 # → Output: ("the", 14523), ("quick", 421), ("fox", 207), ...
   </pre>
-    </div>
+        </div>
 
-    <h2>ETL Pipelines</h2>
-    <p>ETL (Extract, Transform, Load) is a data integration pattern that extracts data from source systems,
-      transforms it (cleans, enriches, aggregates, restructures), and loads it into a target system (data warehouse,
-      data lake, or operational database).</p>
+        <h2>ETL Pipelines</h2>
+        <p>ETL (Extract, Transform, Load) is a data integration pattern that extracts data from source systems,
+          transforms it (cleans, enriches, aggregates, restructures), and loads it into a target system (data warehouse,
+          data lake, or operational database).</p>
 
-    <h3>Extract</h3>
-    <p>Pull data from heterogeneous sources: relational databases (full extract or incremental via CDC), REST APIs,
-      flat files (CSV, JSON), event streams, SaaS platforms (Salesforce, HubSpot). Frequency: nightly batch, hourly
-      micro-batch, or continuous streaming.</p>
+        <h3>Extract</h3>
+        <p>Pull data from heterogeneous sources: relational databases (full extract or incremental via CDC), REST APIs,
+          flat files (CSV, JSON), event streams, SaaS platforms (Salesforce, HubSpot). Frequency: nightly batch, hourly
+          micro-batch, or continuous streaming.</p>
 
-    <h3>Transform</h3>
-    <p>Operations performed during transformation:</p>
-    <ul>
-      <li><strong>Data cleaning:</strong> Handle nulls, duplicates, malformed records, encoding issues.</li>
-      <li><strong>Type casting:</strong> Convert strings to dates, normalize numeric precision.</li>
-      <li><strong>Deduplication:</strong> Identify and merge duplicate records across sources.</li>
-      <li><strong>Enrichment:</strong> Join with reference data (geocode IP addresses, translate product codes to
-        names).</li>
-      <li><strong>Aggregation:</strong> Compute sums, counts, averages per dimension.</li>
-      <li><strong>Business rule application:</strong> Apply domain-specific categorization and filtering.</li>
-    </ul>
-
-    <h3>Load</h3>
-    <p>Write transformed data to the target store. Strategies:</p>
-    <ul>
-      <li><strong>Full load:</strong> Truncate and reload target. Simple, consistent, but expensive for large data.
-      </li>
-      <li><strong>Incremental load:</strong> Only load new or changed records (using a watermark timestamp or CDC).
-        Efficient but requires careful handling of late-arriving data.</li>
-      <li><strong>Upsert (merge):</strong> Update existing records, insert new ones. Maintains target as current
-        state.</li>
-    </ul>
-
-    <p><strong>Modern ELT:</strong> Modern cloud data warehouses (Snowflake, BigQuery) are so powerful that it is
-      often more efficient to load raw data first and transform it within the warehouse. This "ELT" approach
-      (Extract, Load, Transform) allows flexible re-transformation without re-ingestion.</p>
-
-    <h2>Data Lakes</h2>
-    <p>A data lake is a centralized repository that stores data in its raw, native format at any scale. Unlike a
-      data warehouse (which stores data in a structured, processed form), a data lake accepts any data — structured,
-      semi-structured, and unstructured — without requiring a schema to be defined at write time.</p>
-
-    <h3>Schema on Read vs Schema on Write</h3>
-    <ul>
-      <li><strong>Schema on Write (Data Warehouse):</strong> Data is transformed to match a defined schema before
-        being written. Queries are fast; schema is enforced. Inflexible — schema changes are expensive.</li>
-      <li><strong>Schema on Read (Data Lake):</strong> Raw data is written without transformation. The schema is
-        applied when data is read. Flexible — raw data can be reprocessed with new schemas. Risk of data quality
-        issues if not governed.</li>
-    </ul>
-
-    <h3>Data Swamp</h3>
-    <p>A data lake without governance, documentation, and data quality processes quickly becomes a "data swamp" — a
-      repository of poorly documented, duplicated, inconsistent data that nobody trusts or can effectively use.
-      Prevention requires: data cataloging (Apache Atlas, AWS Glue Data Catalog), data quality checks, clear
-      ownership, and access control.</p>
-
-    <h2>Data Warehousing</h2>
-    <p>A data warehouse is a relational database optimized for analytical queries. It integrates data from multiple
-      source systems, enforces consistent schemas, and provides a query interface optimized for aggregations and
-      scans rather than transactional workloads.</p>
-
-    <h3>OLTP vs OLAP</h3>
-    <div class="compare">
-      <div class="compare-card neutral">
-        <h4>OLTP (Online Transaction Processing)</h4>
+        <h3>Transform</h3>
+        <p>Operations performed during transformation:</p>
         <ul>
-          <li>Optimized for short, simple transactions</li>
-          <li>High write throughput (thousands of writes/second)</li>
-          <li>Row-oriented storage</li>
-          <li>Normalized schema (3NF)</li>
-          <li>Current data only (no history)</li>
-          <li>Examples: PostgreSQL, MySQL for production apps</li>
+          <li><strong>Data cleaning:</strong> Handle nulls, duplicates, malformed records, encoding issues.</li>
+          <li><strong>Type casting:</strong> Convert strings to dates, normalize numeric precision.</li>
+          <li><strong>Deduplication:</strong> Identify and merge duplicate records across sources.</li>
+          <li><strong>Enrichment:</strong> Join with reference data (geocode IP addresses, translate product codes to
+            names).</li>
+          <li><strong>Aggregation:</strong> Compute sums, counts, averages per dimension.</li>
+          <li><strong>Business rule application:</strong> Apply domain-specific categorization and filtering.</li>
         </ul>
-      </div>
-      <div class="compare-card neutral">
-        <h4>OLAP (Online Analytical Processing)</h4>
+
+        <h3>Load</h3>
+        <p>Write transformed data to the target store. Strategies:</p>
         <ul>
-          <li>Optimized for complex queries scanning large data</li>
-          <li>High read throughput (aggregate millions of rows)</li>
-          <li>Column-oriented storage (excellent for analytical queries)</li>
-          <li>Denormalized schema (star/snowflake schema)</li>
-          <li>Historical data with time dimension</li>
-          <li>Examples: Snowflake, BigQuery, Redshift, ClickHouse</li>
+          <li><strong>Full load:</strong> Truncate and reload target. Simple, consistent, but expensive for large data.
+          </li>
+          <li><strong>Incremental load:</strong> Only load new or changed records (using a watermark timestamp or CDC).
+            Efficient but requires careful handling of late-arriving data.</li>
+          <li><strong>Upsert (merge):</strong> Update existing records, insert new ones. Maintains target as current
+            state.</li>
         </ul>
-      </div>
-    </div>
 
-    <h3>Star Schema</h3>
-    <p>The star schema organizes a data warehouse into a central fact table (containing quantitative measurements
-      and foreign keys) surrounded by dimension tables (containing descriptive attributes). Queries join the fact
-      table to one or more dimension tables.</p>
+        <p><strong>Modern ELT:</strong> Modern cloud data warehouses (Snowflake, BigQuery) are so powerful that it is
+          often more efficient to load raw data first and transform it within the warehouse. This "ELT" approach
+          (Extract, Load, Transform) allows flexible re-transformation without re-ingestion.</p>
 
-    <pre>
+        <h2>Data Lakes</h2>
+        <p>A data lake is a centralized repository that stores data in its raw, native format at any scale. Unlike a
+          data warehouse (which stores data in a structured, processed form), a data lake accepts any data — structured,
+          semi-structured, and unstructured — without requiring a schema to be defined at write time.</p>
+
+        <h3>Schema on Read vs Schema on Write</h3>
+        <ul>
+          <li><strong>Schema on Write (Data Warehouse):</strong> Data is transformed to match a defined schema before
+            being written. Queries are fast; schema is enforced. Inflexible — schema changes are expensive.</li>
+          <li><strong>Schema on Read (Data Lake):</strong> Raw data is written without transformation. The schema is
+            applied when data is read. Flexible — raw data can be reprocessed with new schemas. Risk of data quality
+            issues if not governed.</li>
+        </ul>
+
+        <h3>Data Swamp</h3>
+        <p>A data lake without governance, documentation, and data quality processes quickly becomes a "data swamp" — a
+          repository of poorly documented, duplicated, inconsistent data that nobody trusts or can effectively use.
+          Prevention requires: data cataloging (Apache Atlas, AWS Glue Data Catalog), data quality checks, clear
+          ownership, and access control.</p>
+
+        <h2>Data Warehousing</h2>
+        <p>A data warehouse is a relational database optimized for analytical queries. It integrates data from multiple
+          source systems, enforces consistent schemas, and provides a query interface optimized for aggregations and
+          scans rather than transactional workloads.</p>
+
+        <h3>OLTP vs OLAP</h3>
+        <div class="compare">
+          <div class="compare-card neutral">
+            <h4>OLTP (Online Transaction Processing)</h4>
+            <ul>
+              <li>Optimized for short, simple transactions</li>
+              <li>High write throughput (thousands of writes/second)</li>
+              <li>Row-oriented storage</li>
+              <li>Normalized schema (3NF)</li>
+              <li>Current data only (no history)</li>
+              <li>Examples: PostgreSQL, MySQL for production apps</li>
+            </ul>
+          </div>
+          <div class="compare-card neutral">
+            <h4>OLAP (Online Analytical Processing)</h4>
+            <ul>
+              <li>Optimized for complex queries scanning large data</li>
+              <li>High read throughput (aggregate millions of rows)</li>
+              <li>Column-oriented storage (excellent for analytical queries)</li>
+              <li>Denormalized schema (star/snowflake schema)</li>
+              <li>Historical data with time dimension</li>
+              <li>Examples: Snowflake, BigQuery, Redshift, ClickHouse</li>
+            </ul>
+          </div>
+        </div>
+
+        <h3>Star Schema</h3>
+        <p>The star schema organizes a data warehouse into a central fact table (containing quantitative measurements
+          and foreign keys) surrounded by dimension tables (containing descriptive attributes). Queries join the fact
+          table to one or more dimension tables.</p>
+
+        <pre>
 -- Fact table: sales transactions
 fact_sales (
     sale_id INT,
@@ -2471,101 +2163,101 @@ WHERE d.year = 2024
 GROUP BY d.quarter, p.category;
 </pre>
 
-    <h2>Data Lakehouse</h2>
-    <p>The Lakehouse architecture combines the flexibility and low cost of a data lake with the reliability, ACID
-      transactions, and performance of a data warehouse. It uses open table formats (Delta Lake, Apache Iceberg,
-      Apache Hudi) to add structure, schema enforcement, and transaction support on top of object storage.</p>
+        <h2>Data Lakehouse</h2>
+        <p>The Lakehouse architecture combines the flexibility and low cost of a data lake with the reliability, ACID
+          transactions, and performance of a data warehouse. It uses open table formats (Delta Lake, Apache Iceberg,
+          Apache Hudi) to add structure, schema enforcement, and transaction support on top of object storage.</p>
 
-    <h3>Key Capabilities</h3>
-    <ul>
-      <li><strong>ACID transactions:</strong> Multiple concurrent writers can commit atomically. Failed jobs do not
-        leave partial data.</li>
-      <li><strong>Schema evolution:</strong> Add, rename, and reorder columns without rewriting data. Schema is
-        stored in metadata, not baked into files.</li>
-      <li><strong>Time travel:</strong> Query historical versions of tables. Roll back bad writes. Audit who changed
-        what.</li>
-      <li><strong>Upserts and deletes:</strong> Efficiently update specific rows (necessary for GDPR
-        right-to-erasure compliance).</li>
-      <li><strong>Unified storage:</strong> Both BI/analytics tools and ML workloads read from the same lakehouse.
-      </li>
-    </ul>
-
-    <h2>Lambda Architecture</h2>
-    <p>Lambda architecture processes data using two parallel paths — a batch layer that provides accurate,
-      comprehensive views of historical data, and a speed layer that provides real-time approximations of recent
-      data — served together through a query layer.</p>
-
-    <h3>Layers</h3>
-    <ul>
-      <li><strong>Batch layer:</strong> Processes the complete historical dataset periodically (nightly). Produces
-        accurate batch views. Uses Hadoop, Spark. High latency, high accuracy.</li>
-      <li><strong>Speed layer:</strong> Processes only recent data (last hour) in real time. Produces real-time
-        views. Uses Spark Streaming, Flink. Low latency, approximate accuracy.</li>
-      <li><strong>Serving layer:</strong> Merges batch and speed views to answer queries. The batch view covers all
-        time up to the last batch run; the speed view covers the gap since then.</li>
-    </ul>
-
-    <h3>Limitations</h3>
-    <ul>
-      <li>Two codebases to maintain — batch logic and stream logic for the same computation</li>
-      <li>Increased operational complexity</li>
-      <li>Introduced when mature stream processing did not exist — largely superseded by Kappa architecture</li>
-    </ul>
-
-    <h2>Kappa Architecture</h2>
-    <p>Kappa architecture simplifies Lambda by removing the batch layer. Instead, it treats "batch" as a special
-      case of streaming — replaying historical events from a log (like Kafka) through the same streaming engine.</p>
-    <div class="compare">
-      <div class="compare-card neutral">
-        <h4>Benefits</h4>
+        <h3>Key Capabilities</h3>
         <ul>
-          <li>Single codebase for all data processing.</li>
-          <li>Simpler operations.</li>
-          <li>Easier consistency guarantees.</li>
+          <li><strong>ACID transactions:</strong> Multiple concurrent writers can commit atomically. Failed jobs do not
+            leave partial data.</li>
+          <li><strong>Schema evolution:</strong> Add, rename, and reorder columns without rewriting data. Schema is
+            stored in metadata, not baked into files.</li>
+          <li><strong>Time travel:</strong> Query historical versions of tables. Roll back bad writes. Audit who changed
+            what.</li>
+          <li><strong>Upserts and deletes:</strong> Efficiently update specific rows (necessary for GDPR
+            right-to-erasure compliance).</li>
+          <li><strong>Unified storage:</strong> Both BI/analytics tools and ML workloads read from the same lakehouse.
+          </li>
         </ul>
-      </div>
-    </div>
 
-    <h2>Message Queues: RabbitMQ vs Kafka</h2>
-    <div class="table-wrap">
-      <table>
-        <thead>
-          <tr>
-            <th>Feature</th>
-            <th>RabbitMQ (Queue)</th>
-            <th>Kafka (Log)</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td><strong>Model</strong></td>
-            <td>Smart Broker / Dumb Consumer.</td>
-            <td>Dumb Broker / Smart Consumer.</td>
-          </tr>
-          <tr>
-            <td><strong>Consumption</strong></td>
-            <td>Push-based.</td>
-            <td>Pull-based.</td>
-          </tr>
-          <tr>
-            <td><strong>Retention</strong></td>
-            <td>Deleted after ACK.</td>
-            <td>Persisted for days/weeks.</td>
-          </tr>
-          <tr>
-            <td><strong>Ordering</strong></td>
-            <td>Hard with multiple consumers.</td>
-            <td>Strict within a partition.</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-    <p>Kappa architecture is a simplification of Lambda architecture that eliminates the batch layer entirely. All
-      data is treated as a stream. Historical reprocessing is handled by replaying the event log (Kafka's log
-      retention) through the stream processing system with a new consumer group.</p>
+        <h2>Lambda Architecture</h2>
+        <p>Lambda architecture processes data using two parallel paths — a batch layer that provides accurate,
+          comprehensive views of historical data, and a speed layer that provides real-time approximations of recent
+          data — served together through a query layer.</p>
 
-    <h3>Reprocessing</h3>
-    <pre>
+        <h3>Layers</h3>
+        <ul>
+          <li><strong>Batch layer:</strong> Processes the complete historical dataset periodically (nightly). Produces
+            accurate batch views. Uses Hadoop, Spark. High latency, high accuracy.</li>
+          <li><strong>Speed layer:</strong> Processes only recent data (last hour) in real time. Produces real-time
+            views. Uses Spark Streaming, Flink. Low latency, approximate accuracy.</li>
+          <li><strong>Serving layer:</strong> Merges batch and speed views to answer queries. The batch view covers all
+            time up to the last batch run; the speed view covers the gap since then.</li>
+        </ul>
+
+        <h3>Limitations</h3>
+        <ul>
+          <li>Two codebases to maintain — batch logic and stream logic for the same computation</li>
+          <li>Increased operational complexity</li>
+          <li>Introduced when mature stream processing did not exist — largely superseded by Kappa architecture</li>
+        </ul>
+
+        <h2>Kappa Architecture</h2>
+        <p>Kappa architecture simplifies Lambda by removing the batch layer. Instead, it treats "batch" as a special
+          case of streaming — replaying historical events from a log (like Kafka) through the same streaming engine.</p>
+        <div class="compare">
+          <div class="compare-card neutral">
+            <h4>Benefits</h4>
+            <ul>
+              <li>Single codebase for all data processing.</li>
+              <li>Simpler operations.</li>
+              <li>Easier consistency guarantees.</li>
+            </ul>
+          </div>
+        </div>
+
+        <h2>Message Queues: RabbitMQ vs Kafka</h2>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Feature</th>
+                <th>RabbitMQ (Queue)</th>
+                <th>Kafka (Log)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Model</strong></td>
+                <td>Smart Broker / Dumb Consumer.</td>
+                <td>Dumb Broker / Smart Consumer.</td>
+              </tr>
+              <tr>
+                <td><strong>Consumption</strong></td>
+                <td>Push-based.</td>
+                <td>Pull-based.</td>
+              </tr>
+              <tr>
+                <td><strong>Retention</strong></td>
+                <td>Deleted after ACK.</td>
+                <td>Persisted for days/weeks.</td>
+              </tr>
+              <tr>
+                <td><strong>Ordering</strong></td>
+                <td>Hard with multiple consumers.</td>
+                <td>Strict within a partition.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p>Kappa architecture is a simplification of Lambda architecture that eliminates the batch layer entirely. All
+          data is treated as a stream. Historical reprocessing is handled by replaying the event log (Kafka's log
+          retention) through the stream processing system with a new consumer group.</p>
+
+        <h3>Reprocessing</h3>
+        <pre>
 # Normal streaming (consumer group: production)
 Kafka topic: events (7-day retention)
 Flink job: reads from events, computes dashboard metrics
@@ -2579,69 +2271,69 @@ Flink job: reads from events, computes dashboard metrics
 6. Decommission old results
 </pre>
 
-    <h3>Kappa vs Lambda</h3>
-    <div class="compare">
-      <div class="compare-card neutral">
-        <h4>Lambda</h4>
+        <h3>Kappa vs Lambda</h3>
+        <div class="compare">
+          <div class="compare-card neutral">
+            <h4>Lambda</h4>
+            <ul>
+              <li>Two separate processing systems (batch + stream)</li>
+              <li>Two codebases to maintain</li>
+              <li>More complex operationally</li>
+              <li>Appropriate when batch algorithms are significantly different from stream algorithms</li>
+            </ul>
+          </div>
+          <div class="compare-card neutral">
+            <h4>Kappa</h4>
+            <ul>
+              <li>Single processing system (stream only)</li>
+              <li>One codebase</li>
+              <li>Simpler operationally</li>
+              <li>Requires log retention long enough for reprocessing</li>
+              <li>Preferred when stream processing can handle all use cases</li>
+            </ul>
+          </div>
+        </div>
+
+        <h2>Stream Processing Engines</h2>
+
+        <h3>Apache Flink</h3>
+        <p>Flink is a stateful stream processing engine with true streaming semantics (not micro-batching). It processes
+          each event individually with sub-second latency, supports event time processing with watermarks for
+          out-of-order data, provides exactly-once processing guarantees via distributed snapshots, and manages large
+          amounts of operator state efficiently in RocksDB.</p>
+
+        <h3>Apache Kafka Streams</h3>
+        <p>Kafka Streams is a library (not a cluster) for building streaming applications on top of Kafka. It runs as
+          threads within your application process — no separate cluster needed. Supports stateful operations
+          (aggregations, joins) backed by local RocksDB stores synchronized to Kafka topics for durability. Excellent
+          for Kafka-centric microservice architectures.</p>
+
+        <h3>Apache Spark Streaming</h3>
+        <p>Spark Streaming (and Structured Streaming in newer Spark versions) processes streams as micro-batches — small
+          batches of data collected over a short interval (500ms–several seconds). Provides a unified API for batch and
+          streaming; the same Spark code runs on both. Structured Streaming provides exactly-once semantics through
+          checkpointing.</p>
+
+        <h3>Stream Processing Concepts</h3>
         <ul>
-          <li>Two separate processing systems (batch + stream)</li>
-          <li>Two codebases to maintain</li>
-          <li>More complex operationally</li>
-          <li>Appropriate when batch algorithms are significantly different from stream algorithms</li>
+          <li><strong>Event time vs processing time:</strong> Event time is when the event occurred; processing time is
+            when it reaches the processor. Late-arriving data can cause incorrect results if processing time is used for
+            windowing.</li>
+          <li><strong>Watermarks:</strong> The stream processor's estimate of the current event time, accounting for
+            expected delay. Events with timestamps earlier than the watermark are considered late and may be dropped or
+            handled specially.</li>
+          <li><strong>Windows:</strong> Group events into time-bounded sets for aggregation. Tumbling windows
+            (non-overlapping, e.g., each 5 minutes), sliding windows (overlapping, e.g., every 1 minute with 5-minute
+            length), session windows (grouped by activity gaps).</li>
+          <li><strong>State backends:</strong> Stateful operations (counts, aggregations, joins) require durable state
+            storage. Flink supports in-memory, RocksDB (local disk), and cloud object storage backends.</li>
         </ul>
       </div>
-      <div class="compare-card neutral">
-        <h4>Kappa</h4>
-        <ul>
-          <li>Single processing system (stream only)</li>
-          <li>One codebase</li>
-          <li>Simpler operationally</li>
-          <li>Requires log retention long enough for reprocessing</li>
-          <li>Preferred when stream processing can handle all use cases</li>
-        </ul>
-      </div>
-    </div>
-
-    <h2>Stream Processing Engines</h2>
-
-    <h3>Apache Flink</h3>
-    <p>Flink is a stateful stream processing engine with true streaming semantics (not micro-batching). It processes
-      each event individually with sub-second latency, supports event time processing with watermarks for
-      out-of-order data, provides exactly-once processing guarantees via distributed snapshots, and manages large
-      amounts of operator state efficiently in RocksDB.</p>
-
-    <h3>Apache Kafka Streams</h3>
-    <p>Kafka Streams is a library (not a cluster) for building streaming applications on top of Kafka. It runs as
-      threads within your application process — no separate cluster needed. Supports stateful operations
-      (aggregations, joins) backed by local RocksDB stores synchronized to Kafka topics for durability. Excellent
-      for Kafka-centric microservice architectures.</p>
-
-    <h3>Apache Spark Streaming</h3>
-    <p>Spark Streaming (and Structured Streaming in newer Spark versions) processes streams as micro-batches — small
-      batches of data collected over a short interval (500ms–several seconds). Provides a unified API for batch and
-      streaming; the same Spark code runs on both. Structured Streaming provides exactly-once semantics through
-      checkpointing.</p>
-
-    <h3>Stream Processing Concepts</h3>
-    <ul>
-      <li><strong>Event time vs processing time:</strong> Event time is when the event occurred; processing time is
-        when it reaches the processor. Late-arriving data can cause incorrect results if processing time is used for
-        windowing.</li>
-      <li><strong>Watermarks:</strong> The stream processor's estimate of the current event time, accounting for
-        expected delay. Events with timestamps earlier than the watermark are considered late and may be dropped or
-        handled specially.</li>
-      <li><strong>Windows:</strong> Group events into time-bounded sets for aggregation. Tumbling windows
-        (non-overlapping, e.g., each 5 minutes), sliding windows (overlapping, e.g., every 1 minute with 5-minute
-        length), session windows (grouped by activity gaps).</li>
-      <li><strong>State backends:</strong> Stateful operations (counts, aggregations, joins) require durable state
-        storage. Flink supports in-memory, RocksDB (local disk), and cloud object storage backends.</li>
-    </ul>
-  </div>
 
 
       <div class="page-nav">
         <a class="page-nav-btn" href="08-data-layer.html">&#8592; Data Layer</a>
-        <a class="page-nav-btn home" href="../system-design-complete.html">&#9776; All Topics</a>
+        <a class="page-nav-btn home" href="01-introduction.html">&#9776; All Topics</a>
         <a class="page-nav-btn" href="10-search-operations.html">Search, Ops & Security &#8594;</a>
       </div>
     </div>

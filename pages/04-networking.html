@@ -30,6 +30,11 @@
       min-height: 100vh;
     }
 
+    .sidebar-toggle {
+      display: none;
+      /* Hidden on desktop */
+    }
+
     .sidebar {
       width: 300px;
       min-width: 300px;
@@ -72,11 +77,55 @@
 
     .nav-module-title {
       padding: 10px 20px 6px;
-      font-size: 0.68rem;
+      font-size: 0.72rem;
       font-weight: 700;
       text-transform: uppercase;
-      letter-spacing: 1px;
+      letter-spacing: 0.5px;
+      color: #7f849c;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      user-select: none;
+      transition: color 0.2s;
+    }
+
+    .nav-module-title:hover {
+      color: #cdd6f4;
+    }
+
+    .nav-module-title::after {
+      content: '▼';
+      font-size: 0.6rem;
       color: #585b70;
+      transition: transform 0.3s ease;
+    }
+
+    /* Hide children by default */
+    .nav-module>*:not(.nav-module-title) {
+      display: none;
+    }
+
+    /* Show children when expanded */
+    .nav-module.expanded>*:not(.nav-module-title) {
+      display: block;
+      animation: slideDown 0.2s ease-out forwards;
+    }
+
+    .nav-module.expanded>.nav-module-title::after {
+      transform: rotate(180deg);
+    }
+
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        transform: translateY(-5px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
 
     .nav-item {
@@ -457,10 +506,43 @@
     }
 
     @media (max-width: 768px) {
+      .layout {
+        flex-direction: column;
+      }
+
       .sidebar {
         width: 100%;
+        min-width: 100%;
         height: auto;
         position: relative;
+        padding-bottom: 0;
+      }
+
+      /* Hide the navigation links by default on mobile */
+      #sidebar-nav-content {
+        display: none;
+        padding-bottom: 20px;
+      }
+
+      /* Show links when the active class is added via JS */
+      #sidebar-nav-content.active {
+        display: block;
+      }
+
+      /* Style the hamburger button */
+      .sidebar-toggle {
+        display: block;
+        background: transparent;
+        border: none;
+        color: #89b4fa;
+        cursor: pointer;
+        padding: 5px;
+      }
+
+      .sidebar-header {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
       }
 
       .main {
@@ -849,7 +931,7 @@
         </details>
         <details class="acc-chapter">
           <summary class="acc-summary">
-            <span class="chap-icon">🏆</span>
+            <span class="chap-icon">📚</span>
             <span class="chap-text">
               <span class="chap-num">Chapter 12</span>
               <span class="chap-label">Case Studies</span>
@@ -858,7 +940,7 @@
             <span class="acc-arrow">›</span>
           </summary>
           <div class="acc-sub">
-              <a class="acc-sub-item" href="12-case-studies.html#case-opentable">Design OpenTable</a>
+              <a class="acc-sub-item" href="../case_studies/open-table.html#case-opentable">Design OpenTable (Deep Dive)</a>
           </div>
         </details>
       </div>
@@ -868,16 +950,16 @@
       <div class="progress-bar-wrap"><div class="progress-bar" id="pb"></div></div>
 
 <div class="section active" id="networking">
-    <h1 class="section-title">Networking Fundamentals</h1>
-    <p class="section-subtitle">Module 4 &nbsp;|&nbsp; OSI Model · IP · TCP · UDP · HTTP/HTTPS · DNS · Checksums</p>
+        <h1 class="section-title">Networking Fundamentals</h1>
+        <p class="section-subtitle">Module 4 &nbsp;|&nbsp; OSI Model · IP · TCP · UDP · HTTP/HTTPS · DNS · Checksums</p>
 
-    <h2>The OSI Model</h2>
-    <p>The Open Systems Interconnection (OSI) model provides a conceptual framework for how network communication
-      works by dividing responsibilities into seven abstraction layers. Each layer serves the layer above it and is
-      served by the layer below.</p>
+        <h2>The OSI Model</h2>
+        <p>The Open Systems Interconnection (OSI) model provides a conceptual framework for how network communication
+          works by dividing responsibilities into seven abstraction layers. Each layer serves the layer above it and is
+          served by the layer below.</p>
 
-    <div class="diagram">
-      <pre class="mermaid">
+        <div class="diagram">
+          <pre class="mermaid">
 flowchart TD
   subgraph Host Layers
     L7[7. Application<br/>HTTP, FTP, DNS]
@@ -906,108 +988,108 @@ flowchart TD
   style L2 fill:#fae8ff,stroke:#d946ef
   style L1 fill:#ffe4e6,stroke:#f43f5e
 </pre>
-      <p class="diagram-caption">The 7 Layers of the OSI Model</p>
-    </div>
+          <p class="diagram-caption">The 7 Layers of the OSI Model</p>
+        </div>
 
-    <div class="table-wrap">
-      <table>
-        <tr>
-          <th>#</th>
-          <th>Layer</th>
-          <th>Function</th>
-          <th>Protocols / Technologies</th>
-          <th>Common failure symptoms</th>
-        </tr>
-        <tr>
-          <td>7</td>
-          <td>Application</td>
-          <td>User-facing services, application data</td>
-          <td>HTTP, HTTPS, DNS, SMTP, FTP, SSH</td>
-          <td>404 Not Found, API errors, timeout</td>
-        </tr>
-        <tr>
-          <td>6</td>
-          <td>Presentation</td>
-          <td>Data encoding, encryption, compression</td>
-          <td>SSL/TLS, JPEG, JSON, XML</td>
-          <td>SSL handshake errors, encoding issues</td>
-        </tr>
-        <tr>
-          <td>5</td>
-          <td>Session</td>
-          <td>Manage connections, synchronization</td>
-          <td>NetBIOS, RPC, sockets</td>
-          <td>Session hijacking, disconnect recovery</td>
-        </tr>
-        <tr>
-          <td>4</td>
-          <td>Transport</td>
-          <td>End-to-end delivery, ports, flow control</td>
-          <td>TCP, UDP, SCTP</td>
-          <td>Port unreachable, connection refused, packet loss</td>
-        </tr>
-        <tr>
-          <td>3</td>
-          <td>Network</td>
-          <td>Logical addressing, routing between networks</td>
-          <td>IP, ICMP, BGP, OSPF</td>
-          <td>Host unreachable, TTL expired, wrong route</td>
-        </tr>
-        <tr>
-          <td>2</td>
-          <td>Data Link</td>
-          <td>Node-to-node transfer, MAC addressing</td>
-          <td>Ethernet, Wi-Fi (802.11), ARP</td>
-          <td>ARP failures, VLAN issues</td>
-        </tr>
-        <tr>
-          <td>1</td>
-          <td>Physical</td>
-          <td>Bits on the wire (electrical, optical signals)</td>
-          <td>Cables, switches, fiber, radio</td>
-          <td>Cable unplugged, signal noise</td>
-        </tr>
-      </table>
-    </div>
+        <div class="table-wrap">
+          <table>
+            <tr>
+              <th>#</th>
+              <th>Layer</th>
+              <th>Function</th>
+              <th>Protocols / Technologies</th>
+              <th>Common failure symptoms</th>
+            </tr>
+            <tr>
+              <td>7</td>
+              <td>Application</td>
+              <td>User-facing services, application data</td>
+              <td>HTTP, HTTPS, DNS, SMTP, FTP, SSH</td>
+              <td>404 Not Found, API errors, timeout</td>
+            </tr>
+            <tr>
+              <td>6</td>
+              <td>Presentation</td>
+              <td>Data encoding, encryption, compression</td>
+              <td>SSL/TLS, JPEG, JSON, XML</td>
+              <td>SSL handshake errors, encoding issues</td>
+            </tr>
+            <tr>
+              <td>5</td>
+              <td>Session</td>
+              <td>Manage connections, synchronization</td>
+              <td>NetBIOS, RPC, sockets</td>
+              <td>Session hijacking, disconnect recovery</td>
+            </tr>
+            <tr>
+              <td>4</td>
+              <td>Transport</td>
+              <td>End-to-end delivery, ports, flow control</td>
+              <td>TCP, UDP, SCTP</td>
+              <td>Port unreachable, connection refused, packet loss</td>
+            </tr>
+            <tr>
+              <td>3</td>
+              <td>Network</td>
+              <td>Logical addressing, routing between networks</td>
+              <td>IP, ICMP, BGP, OSPF</td>
+              <td>Host unreachable, TTL expired, wrong route</td>
+            </tr>
+            <tr>
+              <td>2</td>
+              <td>Data Link</td>
+              <td>Node-to-node transfer, MAC addressing</td>
+              <td>Ethernet, Wi-Fi (802.11), ARP</td>
+              <td>ARP failures, VLAN issues</td>
+            </tr>
+            <tr>
+              <td>1</td>
+              <td>Physical</td>
+              <td>Bits on the wire (electrical, optical signals)</td>
+              <td>Cables, switches, fiber, radio</td>
+              <td>Cable unplugged, signal noise</td>
+            </tr>
+          </table>
+        </div>
 
-    <div class="callout tip">
-      <div class="callout-title">Why This Matters for System Design</div>
-      <p>When debugging network issues, the OSI model helps localize problems. An "HTTP 500" is layer 7. A
-        "Connection refused" is layer 4. A route being unreachable is layer 3. Load balancers operate at layers 4 or
-        7, and the choice has significant performance implications.</p>
-    </div>
+        <div class="callout tip">
+          <div class="callout-title">Why This Matters for System Design</div>
+          <p>When debugging network issues, the OSI model helps localize problems. An "HTTP 500" is layer 7. A
+            "Connection refused" is layer 4. A route being unreachable is layer 3. Load balancers operate at layers 4 or
+            7, and the choice has significant performance implications.</p>
+        </div>
 
-    <h2>IP Address</h2>
-    <p>An IP address is a numerical label assigned to every device on a network for identification and routing.</p>
+        <h2>IP Address</h2>
+        <p>An IP address is a numerical label assigned to every device on a network for identification and routing.</p>
 
-    <h3>IPv4 vs IPv6</h3>
-    <ul>
-      <li><strong>IPv4:</strong> 32-bit address space (~4.3 billion addresses). Written as four octets:
-        <code>192.168.1.1</code>. Exhausted; most new allocations use NAT.
-      </li>
-      <li><strong>IPv6:</strong> 128-bit address space (~3.4 × 10^38 addresses). Written as eight groups of hex:
-        <code>2001:0db8:85a3::8a2e:0370:7334</code>. Eliminates NAT requirement.
-      </li>
-    </ul>
+        <h3>IPv4 vs IPv6</h3>
+        <ul>
+          <li><strong>IPv4:</strong> 32-bit address space (~4.3 billion addresses). Written as four octets:
+            <code>192.168.1.1</code>. Exhausted; most new allocations use NAT.
+          </li>
+          <li><strong>IPv6:</strong> 128-bit address space (~3.4 × 10^38 addresses). Written as eight groups of hex:
+            <code>2001:0db8:85a3::8a2e:0370:7334</code>. Eliminates NAT requirement.
+          </li>
+        </ul>
 
-    <h3>Public vs Private Addresses</h3>
-    <p>Private address ranges (10.x.x.x, 172.16-31.x.x, 192.168.x.x) are used within private networks and are not
-      routable on the internet. Network Address Translation (NAT) maps private addresses to a shared public IP when
-      communicating externally.</p>
+        <h3>Public vs Private Addresses</h3>
+        <p>Private address ranges (10.x.x.x, 172.16-31.x.x, 192.168.x.x) are used within private networks and are not
+          routable on the internet. Network Address Translation (NAT) maps private addresses to a shared public IP when
+          communicating externally.</p>
 
-    <h2>TCP vs UDP</h2>
-    <p>TCP and UDP are the two primary transport-layer protocols. They represent fundamentally different tradeoffs
-      between reliability and speed.</p>
+        <h2>TCP vs UDP</h2>
+        <p>TCP and UDP are the two primary transport-layer protocols. They represent fundamentally different tradeoffs
+          between reliability and speed.</p>
 
-    <h3>TCP — Transmission Control Protocol</h3>
-    <p>TCP provides a reliable, ordered, error-checked byte stream between two endpoints. It achieves this through a
-      three-way handshake, acknowledgments, retransmission of lost packets, flow control (preventing sender from
-      overwhelming receiver), and congestion control (preventing sender from overwhelming the network).</p>
+        <h3>TCP — Transmission Control Protocol</h3>
+        <p>TCP provides a reliable, ordered, error-checked byte stream between two endpoints. It achieves this through a
+          three-way handshake, acknowledgments, retransmission of lost packets, flow control (preventing sender from
+          overwhelming receiver), and congestion control (preventing sender from overwhelming the network).</p>
 
-    <h4>TCP Three-Way Handshake</h4>
+        <h4>TCP Three-Way Handshake</h4>
 
-    <div class="diagram">
-      <pre class="mermaid">
+        <div class="diagram">
+          <pre class="mermaid">
 sequenceDiagram
     participant Client
     participant Server
@@ -1021,165 +1103,165 @@ sequenceDiagram
     
     note over Client,Server: Connection Established - Data Transfer Begins
 </pre>
-      <p class="diagram-caption">TCP Three-Way Handshake</p>
-    </div>
+          <p class="diagram-caption">TCP Three-Way Handshake</p>
+        </div>
 
-    <ol>
-      <li><strong>SYN:</strong> Client sends a segment with the SYN flag and an initial sequence number.</li>
-      <li><strong>SYN-ACK:</strong> Server acknowledges with its own sequence number and the SYN-ACK flags.</li>
-      <li><strong>ACK:</strong> Client acknowledges. Connection is established.</li>
-    </ol>
-    <p>This handshake adds 1 RTT (round-trip time) of latency before any data can be sent. TLS on top of TCP adds
-      another 1–2 RTTs for the TLS handshake.</p>
+        <ol>
+          <li><strong>SYN:</strong> Client sends a segment with the SYN flag and an initial sequence number.</li>
+          <li><strong>SYN-ACK:</strong> Server acknowledges with its own sequence number and the SYN-ACK flags.</li>
+          <li><strong>ACK:</strong> Client acknowledges. Connection is established.</li>
+        </ol>
+        <p>This handshake adds 1 RTT (round-trip time) of latency before any data can be sent. TLS on top of TCP adds
+          another 1–2 RTTs for the TLS handshake.</p>
 
-    <h3>UDP — User Datagram Protocol</h3>
-    <p>UDP sends discrete datagrams without connection setup, acknowledgment, ordering, or retransmission. There is
-      no guarantee of delivery, order, or that packets won't be duplicated. However, UDP has no handshake overhead,
-      no head-of-line blocking, and minimal protocol overhead (8-byte header vs TCP's 20+ bytes).</p>
+        <h3>UDP — User Datagram Protocol</h3>
+        <p>UDP sends discrete datagrams without connection setup, acknowledgment, ordering, or retransmission. There is
+          no guarantee of delivery, order, or that packets won't be duplicated. However, UDP has no handshake overhead,
+          no head-of-line blocking, and minimal protocol overhead (8-byte header vs TCP's 20+ bytes).</p>
 
-    <div class="compare">
-      <div class="compare-card neutral">
-        <h4>TCP — Use When</h4>
-        <ul>
-          <li>Data must arrive complete and in order</li>
-          <li>HTTP/1.1, HTTP/2 web requests</li>
-          <li>Database connections (PostgreSQL, MySQL)</li>
-          <li>Email (SMTP, IMAP)</li>
-          <li>File transfers (FTP, SCP)</li>
-          <li>SSH sessions</li>
-        </ul>
-      </div>
-      <div class="compare-card neutral">
-        <h4>UDP — Use When</h4>
-        <ul>
-          <li>Speed matters more than reliability</li>
-          <li>Video and audio streaming (Zoom, YouTube)</li>
-          <li>Online gaming (position updates)</li>
-          <li>DNS queries (single request/response)</li>
-          <li>DHCP, NTP</li>
-          <li>HTTP/3 (QUIC protocol is UDP-based)</li>
-        </ul>
-      </div>
-    </div>
+        <div class="compare">
+          <div class="compare-card neutral">
+            <h4>TCP — Use When</h4>
+            <ul>
+              <li>Data must arrive complete and in order</li>
+              <li>HTTP/1.1, HTTP/2 web requests</li>
+              <li>Database connections (PostgreSQL, MySQL)</li>
+              <li>Email (SMTP, IMAP)</li>
+              <li>File transfers (FTP, SCP)</li>
+              <li>SSH sessions</li>
+            </ul>
+          </div>
+          <div class="compare-card neutral">
+            <h4>UDP — Use When</h4>
+            <ul>
+              <li>Speed matters more than reliability</li>
+              <li>Video and audio streaming (Zoom, YouTube)</li>
+              <li>Online gaming (position updates)</li>
+              <li>DNS queries (single request/response)</li>
+              <li>DHCP, NTP</li>
+              <li>HTTP/3 (QUIC protocol is UDP-based)</li>
+            </ul>
+          </div>
+        </div>
 
-    <div class="example">
-      <div class="example-label">Real World: Online Gaming</div>
-      <p>A player's position update is sent 60 times per second. If one packet is lost, waiting for TCP
-        retransmission means the game would wait ~100–300ms before progressing — causing visible stutter. Instead,
-        UDP is used: if a position packet is lost, the game simply uses the next one. The latency is acceptable and
-        the loss is invisible.</p>
-      <p>However, in the same game, chat messages use TCP — a chat message that disappears would be a much worse
-        user experience than brief movement lag.</p>
-    </div>
+        <div class="example">
+          <div class="example-label">Real World: Online Gaming</div>
+          <p>A player's position update is sent 60 times per second. If one packet is lost, waiting for TCP
+            retransmission means the game would wait ~100–300ms before progressing — causing visible stutter. Instead,
+            UDP is used: if a position packet is lost, the game simply uses the next one. The latency is acceptable and
+            the loss is invisible.</p>
+          <p>However, in the same game, chat messages use TCP — a chat message that disappears would be a much worse
+            user experience than brief movement lag.</p>
+        </div>
 
-    <h2>HTTP / HTTPS</h2>
-    <p>HTTP (Hypertext Transfer Protocol) is the foundation of data communication on the web. HTTPS is HTTP with TLS
-      encryption layered on top.</p>
+        <h2>HTTP / HTTPS</h2>
+        <p>HTTP (Hypertext Transfer Protocol) is the foundation of data communication on the web. HTTPS is HTTP with TLS
+          encryption layered on top.</p>
 
-    <h3>HTTP/1.1</h3>
-    <p>Introduced persistent connections (keep-alive) to reuse TCP connections across multiple requests. However,
-      each connection can only serve one request at a time — a later request must wait for the earlier one to
-      complete. Workaround: browsers open 6–8 parallel TCP connections per host, which creates overhead.</p>
+        <h3>HTTP/1.1</h3>
+        <p>Introduced persistent connections (keep-alive) to reuse TCP connections across multiple requests. However,
+          each connection can only serve one request at a time — a later request must wait for the earlier one to
+          complete. Workaround: browsers open 6–8 parallel TCP connections per host, which creates overhead.</p>
 
-    <h3>HTTP/2</h3>
-    <p>HTTP/2 introduced request multiplexing over a single TCP connection. Multiple requests and responses can be
-      in-flight simultaneously, interleaved in binary frames. It also includes header compression (HPACK) and
-      optional server push. This significantly reduces the number of TCP connections and eliminates head-of-line
-      blocking at the HTTP layer.</p>
+        <h3>HTTP/2</h3>
+        <p>HTTP/2 introduced request multiplexing over a single TCP connection. Multiple requests and responses can be
+          in-flight simultaneously, interleaved in binary frames. It also includes header compression (HPACK) and
+          optional server push. This significantly reduces the number of TCP connections and eliminates head-of-line
+          blocking at the HTTP layer.</p>
 
-    <h3>HTTP/3 (QUIC)</h3>
-    <p>HTTP/3 replaces TCP with QUIC, a transport protocol built on UDP. QUIC integrates TLS 1.3, provides
-      multiplexing without TCP's head-of-line blocking (a single lost packet blocks all streams in HTTP/2 over TCP,
-      but not in QUIC), and supports 0-RTT connection resumption for repeat clients.</p>
+        <h3>HTTP/3 (QUIC)</h3>
+        <p>HTTP/3 replaces TCP with QUIC, a transport protocol built on UDP. QUIC integrates TLS 1.3, provides
+          multiplexing without TCP's head-of-line blocking (a single lost packet blocks all streams in HTTP/2 over TCP,
+          but not in QUIC), and supports 0-RTT connection resumption for repeat clients.</p>
 
-    <div class="table-wrap">
-      <table>
-        <tr>
-          <th>Feature</th>
-          <th>HTTP/1.1</th>
-          <th>HTTP/2</th>
-          <th>HTTP/3 (QUIC)</th>
-        </tr>
-        <tr>
-          <td>Transport</td>
-          <td>TCP</td>
-          <td>TCP</td>
-          <td>UDP (QUIC)</td>
-        </tr>
-        <tr>
-          <td>Multiplexing</td>
-          <td>No (one req/conn)</td>
-          <td>Yes (single conn)</td>
-          <td>Yes (single conn)</td>
-        </tr>
-        <tr>
-          <td>Header format</td>
-          <td>Plain text</td>
-          <td>Binary + HPACK compression</td>
-          <td>Binary + QPACK compression</td>
-        </tr>
-        <tr>
-          <td>Head-of-line blocking</td>
-          <td>At HTTP level</td>
-          <td>At TCP level</td>
-          <td>Eliminated</td>
-        </tr>
-        <tr>
-          <td>Connection setup</td>
-          <td>1 RTT (TCP)</td>
-          <td>1 RTT (TCP) + TLS</td>
-          <td>0–1 RTT</td>
-        </tr>
-        <tr>
-          <td>Server push</td>
-          <td>No</td>
-          <td>Yes</td>
-          <td>Yes</td>
-        </tr>
-      </table>
-    </div>
+        <div class="table-wrap">
+          <table>
+            <tr>
+              <th>Feature</th>
+              <th>HTTP/1.1</th>
+              <th>HTTP/2</th>
+              <th>HTTP/3 (QUIC)</th>
+            </tr>
+            <tr>
+              <td>Transport</td>
+              <td>TCP</td>
+              <td>TCP</td>
+              <td>UDP (QUIC)</td>
+            </tr>
+            <tr>
+              <td>Multiplexing</td>
+              <td>No (one req/conn)</td>
+              <td>Yes (single conn)</td>
+              <td>Yes (single conn)</td>
+            </tr>
+            <tr>
+              <td>Header format</td>
+              <td>Plain text</td>
+              <td>Binary + HPACK compression</td>
+              <td>Binary + QPACK compression</td>
+            </tr>
+            <tr>
+              <td>Head-of-line blocking</td>
+              <td>At HTTP level</td>
+              <td>At TCP level</td>
+              <td>Eliminated</td>
+            </tr>
+            <tr>
+              <td>Connection setup</td>
+              <td>1 RTT (TCP)</td>
+              <td>1 RTT (TCP) + TLS</td>
+              <td>0–1 RTT</td>
+            </tr>
+            <tr>
+              <td>Server push</td>
+              <td>No</td>
+              <td>Yes</td>
+              <td>Yes</td>
+            </tr>
+          </table>
+        </div>
 
-    <h3>HTTP Status Codes</h3>
-    <div class="table-wrap">
-      <table>
-        <tr>
-          <th>Range</th>
-          <th>Category</th>
-          <th>Common codes</th>
-        </tr>
-        <tr>
-          <td>2xx</td>
-          <td>Success</td>
-          <td>200 OK, 201 Created, 204 No Content</td>
-        </tr>
-        <tr>
-          <td>3xx</td>
-          <td>Redirection</td>
-          <td>301 Moved Permanently, 302 Found, 304 Not Modified</td>
-        </tr>
-        <tr>
-          <td>4xx</td>
-          <td>Client error</td>
-          <td>400 Bad Request, 401 Unauthorized, 403 Forbidden, 404 Not Found, 429 Too Many Requests</td>
-        </tr>
-        <tr>
-          <td>5xx</td>
-          <td>Server error</td>
-          <td>500 Internal Server Error, 502 Bad Gateway, 503 Service Unavailable, 504 Gateway Timeout</td>
-        </tr>
-      </table>
-    </div>
+        <h3>HTTP Status Codes</h3>
+        <div class="table-wrap">
+          <table>
+            <tr>
+              <th>Range</th>
+              <th>Category</th>
+              <th>Common codes</th>
+            </tr>
+            <tr>
+              <td>2xx</td>
+              <td>Success</td>
+              <td>200 OK, 201 Created, 204 No Content</td>
+            </tr>
+            <tr>
+              <td>3xx</td>
+              <td>Redirection</td>
+              <td>301 Moved Permanently, 302 Found, 304 Not Modified</td>
+            </tr>
+            <tr>
+              <td>4xx</td>
+              <td>Client error</td>
+              <td>400 Bad Request, 401 Unauthorized, 403 Forbidden, 404 Not Found, 429 Too Many Requests</td>
+            </tr>
+            <tr>
+              <td>5xx</td>
+              <td>Server error</td>
+              <td>500 Internal Server Error, 502 Bad Gateway, 503 Service Unavailable, 504 Gateway Timeout</td>
+            </tr>
+          </table>
+        </div>
 
-    <h2>Domain Name System (DNS)</h2>
-    <p>DNS is the hierarchical distributed naming system that translates human-readable domain names (e.g.,
-      <code>www.example.com</code>) into IP addresses that computers use to route traffic. It is often called "the
-      phonebook of the internet."
-    </p>
+        <h2>Domain Name System (DNS)</h2>
+        <p>DNS is the hierarchical distributed naming system that translates human-readable domain names (e.g.,
+          <code>www.example.com</code>) into IP addresses that computers use to route traffic. It is often called "the
+          phonebook of the internet."
+        </p>
 
-    <h3>DNS Resolution Process</h3>
+        <h3>DNS Resolution Process</h3>
 
-    <div class="diagram">
-      <pre class="mermaid">
+        <div class="diagram">
+          <pre class="mermaid">
 sequenceDiagram
     actor User
     participant Browser
@@ -1208,248 +1290,248 @@ sequenceDiagram
     
     Browser->>User: Renders Webpage Using IP
 </pre>
-      <p class="diagram-caption">DNS Recursive Resolution Process</p>
-    </div>
+          <p class="diagram-caption">DNS Recursive Resolution Process</p>
+        </div>
 
-    <ol>
-      <li><strong>Browser cache:</strong> Check local cache (TTL-based).</li>
-      <li><strong>OS cache and hosts file:</strong> Check <code>/etc/hosts</code> and OS DNS cache.</li>
-      <li><strong>Recursive resolver:</strong> Query the ISP's or configured recursive resolver.</li>
-      <li><strong>Root nameserver:</strong> Resolver asks root for the TLD nameserver (e.g., who handles
-        <code>.com</code>?).
-      </li>
-      <li><strong>TLD nameserver:</strong> Returns the authoritative nameserver for the domain.</li>
-      <li><strong>Authoritative nameserver:</strong> Returns the actual IP record for the hostname.</li>
-      <li>Response is cached at each layer according to TTL values.</li>
-    </ol>
+        <ol>
+          <li><strong>Browser cache:</strong> Check local cache (TTL-based).</li>
+          <li><strong>OS cache and hosts file:</strong> Check <code>/etc/hosts</code> and OS DNS cache.</li>
+          <li><strong>Recursive resolver:</strong> Query the ISP's or configured recursive resolver.</li>
+          <li><strong>Root nameserver:</strong> Resolver asks root for the TLD nameserver (e.g., who handles
+            <code>.com</code>?).
+          </li>
+          <li><strong>TLD nameserver:</strong> Returns the authoritative nameserver for the domain.</li>
+          <li><strong>Authoritative nameserver:</strong> Returns the actual IP record for the hostname.</li>
+          <li>Response is cached at each layer according to TTL values.</li>
+        </ol>
 
-    <h3>DNS Record Types</h3>
-    <div class="table-wrap">
-      <table>
-        <tr>
-          <th>Record</th>
-          <th>Purpose</th>
-          <th>Example</th>
-        </tr>
-        <tr>
-          <td>A</td>
-          <td>Maps hostname to IPv4 address</td>
-          <td><code>example.com → 93.184.216.34</code></td>
-        </tr>
-        <tr>
-          <td>AAAA</td>
-          <td>Maps hostname to IPv6 address</td>
-          <td><code>example.com → 2606:2800:21f::34</code></td>
-        </tr>
-        <tr>
-          <td>CNAME</td>
-          <td>Alias for another domain</td>
-          <td><code>www.example.com → example.com</code></td>
-        </tr>
-        <tr>
-          <td>MX</td>
-          <td>Mail server for domain</td>
-          <td><code>example.com → mail.example.com</code></td>
-        </tr>
-        <tr>
-          <td>NS</td>
-          <td>Nameservers for domain</td>
-          <td><code>example.com → ns1.example.com</code></td>
-        </tr>
-        <tr>
-          <td>TXT</td>
-          <td>Arbitrary text (SPF, DKIM, verification)</td>
-          <td><code>v=spf1 include:example.com ~all</code></td>
-        </tr>
-        <tr>
-          <td>SRV</td>
-          <td>Service location records</td>
-          <td><code>_https._tcp.example.com → server:443</code></td>
-        </tr>
-        <tr>
-          <td>PTR</td>
-          <td>Reverse DNS (IP to hostname)</td>
-          <td><code>34.216.184.93.in-addr.arpa → example.com</code></td>
-        </tr>
-      </table>
-    </div>
+        <h3>DNS Record Types</h3>
+        <div class="table-wrap">
+          <table>
+            <tr>
+              <th>Record</th>
+              <th>Purpose</th>
+              <th>Example</th>
+            </tr>
+            <tr>
+              <td>A</td>
+              <td>Maps hostname to IPv4 address</td>
+              <td><code>example.com → 93.184.216.34</code></td>
+            </tr>
+            <tr>
+              <td>AAAA</td>
+              <td>Maps hostname to IPv6 address</td>
+              <td><code>example.com → 2606:2800:21f::34</code></td>
+            </tr>
+            <tr>
+              <td>CNAME</td>
+              <td>Alias for another domain</td>
+              <td><code>www.example.com → example.com</code></td>
+            </tr>
+            <tr>
+              <td>MX</td>
+              <td>Mail server for domain</td>
+              <td><code>example.com → mail.example.com</code></td>
+            </tr>
+            <tr>
+              <td>NS</td>
+              <td>Nameservers for domain</td>
+              <td><code>example.com → ns1.example.com</code></td>
+            </tr>
+            <tr>
+              <td>TXT</td>
+              <td>Arbitrary text (SPF, DKIM, verification)</td>
+              <td><code>v=spf1 include:example.com ~all</code></td>
+            </tr>
+            <tr>
+              <td>SRV</td>
+              <td>Service location records</td>
+              <td><code>_https._tcp.example.com → server:443</code></td>
+            </tr>
+            <tr>
+              <td>PTR</td>
+              <td>Reverse DNS (IP to hostname)</td>
+              <td><code>34.216.184.93.in-addr.arpa → example.com</code></td>
+            </tr>
+          </table>
+        </div>
 
-    <h3>TTL and Its Tradeoffs</h3>
-    <p>TTL (Time To Live) controls how long DNS resolvers cache a record. It is measured in seconds.</p>
-    <ul>
-      <li><strong>Long TTL (e.g., 86400s = 1 day):</strong> Fewer DNS queries, lower latency for repeat visitors.
-        However, changes take up to 1 day to propagate globally. Not suitable for failover scenarios.</li>
-      <li><strong>Short TTL (e.g., 60s):</strong> Changes propagate quickly. Good for failover. But high DNS query
-        volume, higher cost, and slightly higher latency for cold clients.</li>
-    </ul>
-    <p>Best practice: Use high TTL normally. 24–48 hours before a planned migration or failover, lower the TTL to
-      60–300 seconds so clients pick up the change quickly.</p>
+        <h3>TTL and Its Tradeoffs</h3>
+        <p>TTL (Time To Live) controls how long DNS resolvers cache a record. It is measured in seconds.</p>
+        <ul>
+          <li><strong>Long TTL (e.g., 86400s = 1 day):</strong> Fewer DNS queries, lower latency for repeat visitors.
+            However, changes take up to 1 day to propagate globally. Not suitable for failover scenarios.</li>
+          <li><strong>Short TTL (e.g., 60s):</strong> Changes propagate quickly. Good for failover. But high DNS query
+            volume, higher cost, and slightly higher latency for cold clients.</li>
+        </ul>
+        <p>Best practice: Use high TTL normally. 24–48 hours before a planned migration or failover, lower the TTL to
+          60–300 seconds so clients pick up the change quickly.</p>
 
-    <h3>DNS Load Balancing</h3>
-    <p>DNS can distribute load by returning multiple A records for the same domain. The DNS resolver or client
-      typically uses one, but over time traffic is distributed. However, DNS load balancing is coarse — it cannot
-      account for server health in real time, and cached records may point to a downed server for the TTL duration.
-    </p>
-    <p><strong>Geolocation DNS</strong> (used by AWS Route 53, Cloudflare) returns different IP addresses based on
-      the geographic location of the requester, routing users to the nearest datacenter.</p>
+        <h3>DNS Load Balancing</h3>
+        <p>DNS can distribute load by returning multiple A records for the same domain. The DNS resolver or client
+          typically uses one, but over time traffic is distributed. However, DNS load balancing is coarse — it cannot
+          account for server health in real time, and cached records may point to a downed server for the TTL duration.
+        </p>
+        <p><strong>Geolocation DNS</strong> (used by AWS Route 53, Cloudflare) returns different IP addresses based on
+          the geographic location of the requester, routing users to the nearest datacenter.</p>
 
-    <h2>Checksums</h2>
-    <p>A checksum is a small fixed-size value computed from data that is used to detect errors in transmission or
-      storage. When data is sent or stored, the checksum is computed and included. On receipt or retrieval, the
-      checksum is recomputed and compared.</p>
-    <ul>
-      <li><strong>Simple checksums (parity bits):</strong> Detect single-bit errors, not suitable for data integrity
-        in storage.</li>
-      <li><strong>CRC (Cyclic Redundancy Check):</strong> Detects burst errors. Used in Ethernet, ZIP, and storage.
-      </li>
-      <li><strong>MD5, SHA-256:</strong> Cryptographic hash functions. Used for file integrity verification, digital
-        signatures, and content-addressable storage. MD5 is broken for security but still used for non-security
-        checksums.</li>
-    </ul>
+        <h2>Checksums</h2>
+        <p>A checksum is a small fixed-size value computed from data that is used to detect errors in transmission or
+          storage. When data is sent or stored, the checksum is computed and included. On receipt or retrieval, the
+          checksum is recomputed and compared.</p>
+        <ul>
+          <li><strong>Simple checksums (parity bits):</strong> Detect single-bit errors, not suitable for data integrity
+            in storage.</li>
+          <li><strong>CRC (Cyclic Redundancy Check):</strong> Detects burst errors. Used in Ethernet, ZIP, and storage.
+          </li>
+          <li><strong>MD5, SHA-256:</strong> Cryptographic hash functions. Used for file integrity verification, digital
+            signatures, and content-addressable storage. MD5 is broken for security but still used for non-security
+            checksums.</li>
+        </ul>
 
-    <div class="example">
-      <div class="example-label">Real World: Amazon S3 ETags</div>
-      <p>When uploading a file to S3, AWS computes and stores an ETag (typically an MD5 hash for small files). When
-        you download the file, you can verify the ETag to detect any corruption that occurred during transfer or
-        storage. This is called end-to-end integrity checking.</p>
-    </div>
-  </div>
+        <div class="example">
+          <div class="example-label">Real World: Amazon S3 ETags</div>
+          <p>When uploading a file to S3, AWS computes and stores an ETag (typically an MD5 hash for small files). When
+            you download the file, you can verify the ETag to detect any corruption that occurred during transfer or
+            storage. This is called end-to-end integrity checking.</p>
+        </div>
+      </div>
 
 <div class="section" id="proxy">
-    <h1 class="section-title">Proxy &amp; Reverse Proxy</h1>
-    <p class="section-subtitle">Module 4 &nbsp;|&nbsp; Traffic Intermediaries: Forward Proxies, Reverse Proxies, and
-      Service Meshes</p>
+        <h1 class="section-title">Proxy &amp; Reverse Proxy</h1>
+        <p class="section-subtitle">Module 4 &nbsp;|&nbsp; Traffic Intermediaries: Forward Proxies, Reverse Proxies, and
+          Service Meshes</p>
 
-    <h2>Forward Proxy vs. Reverse Proxy</h2>
-    <div class="mermaid">
-      flowchart LR
-      subgraph Forward Proxy
-      C1[Client] --> FP[Forward Proxy\ne.g. Squid, VPN]
-      FP --> I[Internet / Server]
-      end
-      subgraph Reverse Proxy
-      C2[Client] --> RP[Reverse Proxy\ne.g. Nginx, Cloudflare]
-      RP --> S1[Server A]
-      RP --> S2[Server B]
-      end
-    </div>
-
-    <div class="compare">
-      <div class="compare-card neutral">
-        <h4>Forward Proxy</h4>
-        <ul>
-          <li>Client-side intermediary — client is aware of it</li>
-          <li><strong>Hides the client's identity</strong> from the destination server</li>
-          <li>Enforces outbound access policies (egress filtering)</li>
-          <li>Caches outbound responses for bandwidth savings</li>
-          <li>Used in: corporate networks, schools, VPNs, Tor</li>
-        </ul>
-        <p><strong>Real-world:</strong> Squid Proxy, Charles Proxy (debug mobile traffic), Privoxy</p>
-      </div>
-      <div class="compare-card neutral">
-        <h4>Reverse Proxy</h4>
-        <ul>
-          <li>Server-side intermediary — client doesn't know backend topology</li>
-          <li><strong>Hides server identity</strong> — clients see one IP/domain</li>
-          <li>SSL/TLS termination (offload crypto from app servers)</li>
-          <li>Load balancing, health checks, failover</li>
-          <li>Static asset caching, compression, DDoS mitigation</li>
-        </ul>
-        <p><strong>Real-world:</strong> Nginx, Cloudflare, AWS ALB, Traefik, HAProxy, Varnish</p>
-      </div>
-    </div>
-
-    <h2>Nginx as a Reverse Proxy: What It Actually Does</h2>
-    <div class="def">
-      <dt>SSL/TLS Termination</dt>
-      <dd>Nginx handles the expensive HTTPS handshake and decryption. Requests flow internally as
-        plain HTTP. This keeps TLS certificates centralized and removes crypto load from app servers.
-        A single Nginx instance can handle ~10,000 TLS connections/sec on commodity hardware.</dd>
-      <dt>Connection Pooling (Keepalive)</dt>
-      <dd>Nginx maintains a pool of persistent connections to upstream app servers (upstream keepalive).
-        Without this, each proxied request requires a new TCP handshake to the backend — 3-way handshake
-        adds ~0.5–2ms per request. With keepalive, the connection is reused: ~0.05ms overhead.</dd>
-      <dt>Request Buffering</dt>
-      <dd>Nginx fully buffers slow client uploads before forwarding to the app server. This prevents
-        "slow client" attacks from tying up app server threads. The app server sees a fast, complete
-        request — not a slow trickle.</dd>
-      <dt>Static File Serving</dt>
-      <dd>Nginx serves static files at ~50–100K RPS from disk with sendfile() syscall (zero-copy, kernel-level).
-        App servers (Node.js, Python) max out at ~5K RPS for static files. Always offload statics to Nginx or CDN.
-      </dd>
-    </div>
-
-    <h2>Service Mesh: The Sidecar Proxy Pattern</h2>
-    <p>In a microservices architecture, a <strong>service mesh</strong> deploys a lightweight reverse proxy
-      (sidecar) beside every service instance. The sidecar handles all network traffic — the app doesn't
-      need to implement retries, mTLS, circuit breaking, or observability itself.</p>
-
-    <div class="mermaid">
-      flowchart LR
-      subgraph Pod A
-      A[Service A] <--> SA[Sidecar\nEnvoy]
-        end
-        subgraph Pod B
-        B[Service B] <--> SB[Sidecar\nEnvoy]
+        <h2>Forward Proxy vs. Reverse Proxy</h2>
+        <div class="mermaid">
+          flowchart LR
+          subgraph Forward Proxy
+          C1[Client] --> FP[Forward Proxy\ne.g. Squid, VPN]
+          FP --> I[Internet / Server]
           end
-          SA <-->|mTLS\nretry\ntracing| SB
-            CP[Control Plane\nIstion / Linkerd] -.->|config| SA
-            CP -.->|config| SB
-    </div>
+          subgraph Reverse Proxy
+          C2[Client] --> RP[Reverse Proxy\ne.g. Nginx, Cloudflare]
+          RP --> S1[Server A]
+          RP --> S2[Server B]
+          end
+        </div>
 
-    <div class="def">
-      <dt>What the sidecar (Envoy) provides:</dt>
-      <dd>
-        <ul>
-          <li><strong>mTLS</strong> — automatic mutual TLS between services (zero trust)</li>
-          <li><strong>Circuit breaking</strong> — stop sending to failing upstreams</li>
-          <li><strong>Retries with jitter</strong> — configurable retry policies</li>
-          <li><strong>Distributed tracing</strong> — propagates trace headers automatically</li>
-          <li><strong>Traffic splitting</strong> — canary/blue-green at the network layer</li>
-        </ul>
-      </dd>
-      <dt>Performance cost of a sidecar:</dt>
-      <dd>Envoy adds ~0.2–0.5ms per hop and ~10–15MB RAM per instance. At Lyft scale (Envoy's origin),
-        this overhead is worth the security and observability gains. At small scale (&lt;20 services),
-        a service mesh may be overkill.</dd>
-      <dt>Real-world: Lyft, Airbnb, Google</dt>
-      <dd>Lyft created Envoy in 2015 because their service-to-service communication had no visibility.
-        Airbnb runs SmartStack (their own service mesh). Google invented gRPC and builds products with
-        their own internal mesh (Traffic Director). Netflix uses Zuul as an edge proxy and Eureka for
-        service discovery — a form of mesh without a dedicated sidecar.</dd>
-    </div>
+        <div class="compare">
+          <div class="compare-card neutral">
+            <h4>Forward Proxy</h4>
+            <ul>
+              <li>Client-side intermediary — client is aware of it</li>
+              <li><strong>Hides the client's identity</strong> from the destination server</li>
+              <li>Enforces outbound access policies (egress filtering)</li>
+              <li>Caches outbound responses for bandwidth savings</li>
+              <li>Used in: corporate networks, schools, VPNs, Tor</li>
+            </ul>
+            <p><strong>Real-world:</strong> Squid Proxy, Charles Proxy (debug mobile traffic), Privoxy</p>
+          </div>
+          <div class="compare-card neutral">
+            <h4>Reverse Proxy</h4>
+            <ul>
+              <li>Server-side intermediary — client doesn't know backend topology</li>
+              <li><strong>Hides server identity</strong> — clients see one IP/domain</li>
+              <li>SSL/TLS termination (offload crypto from app servers)</li>
+              <li>Load balancing, health checks, failover</li>
+              <li>Static asset caching, compression, DDoS mitigation</li>
+            </ul>
+            <p><strong>Real-world:</strong> Nginx, Cloudflare, AWS ALB, Traefik, HAProxy, Varnish</p>
+          </div>
+        </div>
 
-    <h2>Proxy Use Cases in FAANG System Design Interviews</h2>
-    <div class="callout tip">
-      <div class="callout-title">When to mention proxy in your design</div>
-      <ul>
-        <li><strong>Any public-facing API:</strong> mention reverse proxy for TLS termination, rate limiting, and
-          DDoS protection at the edge (Cloudflare/CDN)</li>
-        <li><strong>Microservices:</strong> mention service mesh (Istio/Envoy) for mTLS, circuit breaking, and
-          distributed tracing without app code changes</li>
-        <li><strong>Database connections:</strong> mention a connection proxy (PgBouncer for PostgreSQL, ProxySQL
-          for MySQL) to pool thousands of app connections into tens of DB connections</li>
-        <li><strong>Multi-cloud / egress:</strong> forward proxy for controlling which external APIs services can
-          call</li>
-      </ul>
-    </div>
+        <h2>Nginx as a Reverse Proxy: What It Actually Does</h2>
+        <div class="def">
+          <dt>SSL/TLS Termination</dt>
+          <dd>Nginx handles the expensive HTTPS handshake and decryption. Requests flow internally as
+            plain HTTP. This keeps TLS certificates centralized and removes crypto load from app servers.
+            A single Nginx instance can handle ~10,000 TLS connections/sec on commodity hardware.</dd>
+          <dt>Connection Pooling (Keepalive)</dt>
+          <dd>Nginx maintains a pool of persistent connections to upstream app servers (upstream keepalive).
+            Without this, each proxied request requires a new TCP handshake to the backend — 3-way handshake
+            adds ~0.5–2ms per request. With keepalive, the connection is reused: ~0.05ms overhead.</dd>
+          <dt>Request Buffering</dt>
+          <dd>Nginx fully buffers slow client uploads before forwarding to the app server. This prevents
+            "slow client" attacks from tying up app server threads. The app server sees a fast, complete
+            request — not a slow trickle.</dd>
+          <dt>Static File Serving</dt>
+          <dd>Nginx serves static files at ~50–100K RPS from disk with sendfile() syscall (zero-copy, kernel-level).
+            App servers (Node.js, Python) max out at ~5K RPS for static files. Always offload statics to Nginx or CDN.
+          </dd>
+        </div>
 
-    <div class="def">
-      <dt>PgBouncer — The Database Connection Proxy</dt>
-      <dd>PostgreSQL creates a new OS process per connection (~5–10MB RAM each). A Node.js app with
-        100 instances × 10 connection pool = 1,000 connections = 10GB RAM just for idle connections.
-        PgBouncer sits in front of Postgres and multiplexes thousands of app connections onto ~20–50
-        actual DB connections. Transactions are serialized through the real connections.
-        Shopify runs PgBouncer in front of all their PostgreSQL clusters.
-        <strong>Result:</strong> DB can scale to 10K+ app instances without adding more DB connections.
-      </dd>
-    </div>
-  </div>
+        <h2>Service Mesh: The Sidecar Proxy Pattern</h2>
+        <p>In a microservices architecture, a <strong>service mesh</strong> deploys a lightweight reverse proxy
+          (sidecar) beside every service instance. The sidecar handles all network traffic — the app doesn't
+          need to implement retries, mTLS, circuit breaking, or observability itself.</p>
+
+        <div class="mermaid">
+          flowchart LR
+          subgraph Pod A
+          A[Service A] <--> SA[Sidecar\nEnvoy]
+            end
+            subgraph Pod B
+            B[Service B] <--> SB[Sidecar\nEnvoy]
+              end
+              SA <-->|mTLS\nretry\ntracing| SB
+                CP[Control Plane\nIstion / Linkerd] -.->|config| SA
+                CP -.->|config| SB
+        </div>
+
+        <div class="def">
+          <dt>What the sidecar (Envoy) provides:</dt>
+          <dd>
+            <ul>
+              <li><strong>mTLS</strong> — automatic mutual TLS between services (zero trust)</li>
+              <li><strong>Circuit breaking</strong> — stop sending to failing upstreams</li>
+              <li><strong>Retries with jitter</strong> — configurable retry policies</li>
+              <li><strong>Distributed tracing</strong> — propagates trace headers automatically</li>
+              <li><strong>Traffic splitting</strong> — canary/blue-green at the network layer</li>
+            </ul>
+          </dd>
+          <dt>Performance cost of a sidecar:</dt>
+          <dd>Envoy adds ~0.2–0.5ms per hop and ~10–15MB RAM per instance. At Lyft scale (Envoy's origin),
+            this overhead is worth the security and observability gains. At small scale (&lt;20 services),
+            a service mesh may be overkill.</dd>
+          <dt>Real-world: Lyft, Airbnb, Google</dt>
+          <dd>Lyft created Envoy in 2015 because their service-to-service communication had no visibility.
+            Airbnb runs SmartStack (their own service mesh). Google invented gRPC and builds products with
+            their own internal mesh (Traffic Director). Netflix uses Zuul as an edge proxy and Eureka for
+            service discovery — a form of mesh without a dedicated sidecar.</dd>
+        </div>
+
+        <h2>Proxy Use Cases in FAANG System Design Interviews</h2>
+        <div class="callout tip">
+          <div class="callout-title">When to mention proxy in your design</div>
+          <ul>
+            <li><strong>Any public-facing API:</strong> mention reverse proxy for TLS termination, rate limiting, and
+              DDoS protection at the edge (Cloudflare/CDN)</li>
+            <li><strong>Microservices:</strong> mention service mesh (Istio/Envoy) for mTLS, circuit breaking, and
+              distributed tracing without app code changes</li>
+            <li><strong>Database connections:</strong> mention a connection proxy (PgBouncer for PostgreSQL, ProxySQL
+              for MySQL) to pool thousands of app connections into tens of DB connections</li>
+            <li><strong>Multi-cloud / egress:</strong> forward proxy for controlling which external APIs services can
+              call</li>
+          </ul>
+        </div>
+
+        <div class="def">
+          <dt>PgBouncer — The Database Connection Proxy</dt>
+          <dd>PostgreSQL creates a new OS process per connection (~5–10MB RAM each). A Node.js app with
+            100 instances × 10 connection pool = 1,000 connections = 10GB RAM just for idle connections.
+            PgBouncer sits in front of Postgres and multiplexes thousands of app connections onto ~20–50
+            actual DB connections. Transactions are serialized through the real connections.
+            Shopify runs PgBouncer in front of all their PostgreSQL clusters.
+            <strong>Result:</strong> DB can scale to 10K+ app instances without adding more DB connections.
+          </dd>
+        </div>
+      </div>
 
 
       <div class="page-nav">
         <a class="page-nav-btn" href="03-tradeoffs.html">&#8592; Trade-offs</a>
-        <a class="page-nav-btn home" href="../system-design-complete.html">&#9776; All Topics</a>
+        <a class="page-nav-btn home" href="01-introduction.html">&#9776; All Topics</a>
         <a class="page-nav-btn" href="05-infrastructure.html">Infrastructure &#8594;</a>
       </div>
     </div>

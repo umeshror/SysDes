@@ -1,20 +1,17 @@
 <!DOCTYPE html>
 
 <html lang="en">
-
 <head>
-    <meta charset="utf-8" />
-    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
-    <title>Blind 75 — Coding Interview Patterns</title>
-    <link href="https://fonts.googleapis.com" rel="preconnect" />
-    <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Fira+Code:wght@400;500&amp;display=swap"
-        rel="stylesheet" />
-    <!-- Highlight.js for syntax highlighting -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css" rel="stylesheet" />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
-    <style>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Blind 75 — Coding Interview Patterns</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Fira+Code:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<!-- Highlight.js for syntax highlighting -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<style>
         :root {
             --bg: #f6f8ff;
             --surface: #ffffff;
@@ -849,6 +846,71 @@
             margin-bottom: 6px;
         }
 
+        /* Flow Matrix & Diagram Enhancements */
+        .flow-matrix-container {
+            margin: 24px 0;
+            overflow-x: auto;
+        }
+
+        .flow-matrix-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+            color: #bac2de;
+            background: rgba(30, 30, 46, 0.4);
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .flow-matrix-table th,
+        .flow-matrix-table td {
+            padding: 10px 14px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .flow-matrix-table th {
+            background: rgba(43, 43, 62, 0.6);
+            color: #cdd6f4;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-size: 0.75rem;
+        }
+
+        .flow-matrix-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .flow-matrix-table tr:hover td {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .flow-matrix-table code {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 3px 6px;
+            border-radius: 4px;
+            color: #89dceb;
+            font-family: 'Fira Code', monospace;
+        }
+
+        .diagram-container {
+            margin: 24px 0;
+            padding: 24px;
+            background: rgba(30, 30, 46, 0.4);
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            text-align: center;
+        }
+
+        .diagram-container img,
+        .diagram-container svg {
+            max-width: 100%;
+            height: auto;
+            border-radius: 4px;
+        }
+
         /* Solved button */
         .mark-solved-btn {
             display: inline-flex;
@@ -875,12 +937,52 @@
         .mark-solved-btn.solved {
             background: #64748b;
         }
+
+        /* Page nav */
+        .page-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 28px 0px 48px;
+            border-top: 1px solid rgba(137, 180, 250, .15);
+            margin-top: 24px;
+            gap: 12px;
+        }
+
+        .page-nav-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 22px;
+            background: #1a1a2e;
+            color: #cdd6f4;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: .84rem;
+            font-weight: 600;
+            transition: all .18s;
+            border: 1px solid rgba(137, 180, 250, .15);
+        }
+
+        .page-nav-btn:hover {
+            background: #313244;
+            border-color: rgba(137, 180, 250, .35);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, .2);
+        }
+
+        .page-nav-btn.home {
+            background: linear-gradient(135deg, #1e3a5f, #162d48);
+        }
+
+        .page-nav-btn.home:hover {
+            background: linear-gradient(135deg, #264a78, #1e3a5f);
+        }
     </style>
 </head>
-
 <body>
-    <!-- ── SIDEBAR ────────────────────────────────────────────── -->
-        <nav class="sidebar">
+<!-- ── SIDEBAR ────────────────────────────────────────────── -->
+    <nav class="sidebar">
         <div class="sidebar-header">
             <a href="../index.html">← Back to Home</a>
             <h1>Blind 75</h1>
@@ -1363,21 +1465,15 @@
 <span class="topic-tag">Tree</span><span class="topic-tag">DFS</span><span class="topic-tag">BST</span>
 </div>
 <h1 class="q-title">Lowest Common Ancestor of a BST</h1>
-<p class="q-source"><a href="https://leetcode.com/problems/lowest-common-ancestor-of-a-bst" target="_blank">leetcode.com/problems/lowest-common-ancestor-of-a-bst</a> · Blind 75 · FAANG
-                    favourite</p>
+<p class="q-source"><a href="https://leetcode.com/problems/lowest-common-ancestor-of-a-bst" target="_blank">leetcode.com/problems/lowest-common-ancestor-of-a-bst</a> · Blind 75 · FAANG favourite</p>
 </div>
 <hr class="section-rule"/>
-<div class="problem-statement">
-<h3>Problem Statement</h3>
-<div class="statement-content">Given a BST, find the lowest common ancestor (LCA) of two given nodes p
-                    and q. The LCA is the deepest node that has both p and q as descendants.</div>
-</div>
+<div class="problem-statement"><h3>Problem Statement</h3><div class="statement-content">Given a BST, find the lowest common ancestor (LCA) of two given nodes p and q. The LCA is the deepest node that has both p and q as descendants.</div></div>
 <div class="examples">
 <div class="example-block">
 <div class="example-header">Example 1</div>
 <div class="example-body">
-<div><span class="label">Input: </span><span class="val">root=[6,2,8,0,4,7,9,null,null,3,5],
-                                p=2, q=8</span></div>
+<div><span class="label">Input: </span><span class="val">root=[6,2,8,0,4,7,9,null,null,3,5], p=2, q=8</span></div>
 <div><span class="label">Output: </span><span class="val">6</span></div>
 <div class="explanation">LCA of 2 and 8 is root 6.</div>
 </div>
@@ -1385,35 +1481,18 @@
 <div class="example-block">
 <div class="example-header">Example 2</div>
 <div class="example-body">
-<div><span class="label">Input: </span><span class="val">root=[6,2,8,0,4,7,9,null,null,3,5],
-                                p=2, q=4</span></div>
+<div><span class="label">Input: </span><span class="val">root=[6,2,8,0,4,7,9,null,null,3,5], p=2, q=4</span></div>
 <div><span class="label">Output: </span><span class="val">2</span></div>
 <div class="explanation">LCA of 2 and 4 is 2 since 2 is ancestor of 4.</div>
 </div>
-</div>
-</div>
-<div class="constraints">
-<h4>Constraints</h4>
-<ul>
-<li>2 ≤ nodes ≤ 10<sup>5</sup></li>
-<li>-10<sup>9</sup> ≤ Node.val ≤ 10<sup>9</sup></li>
-<li>All values unique</li>
-<li>p and q exist in the BST</li>
-</ul>
-</div>
+</div></div>
+<div class="constraints"><h4>Constraints</h4><ul><li>2 ≤ nodes ≤ 10<sup>5</sup></li><li>-10<sup>9</sup> ≤ Node.val ≤ 10<sup>9</sup></li><li>All values unique</li><li>p and q exist in the BST</li></ul></div>
 <h2 class="approach-title">Approaches Comparison</h2>
 <table class="compare-table">
-<tr>
-<th>Approach</th>
-<th>Time</th>
-<th>Space</th>
-<th>Notes</th>
-</tr>
+<tr><th>Approach</th><th>Time</th><th>Space</th><th>Notes</th></tr>
 <tr class="optimal-row">
-<td>BST Property Navigation</td>
-<td><code>O(H)</code></td>
-<td><code>O(1)</code></td>
-<td>Use BST ordering to navigate to LCA. Optimal.</td>
+<td>BST Property Navigation</td><td><code>O(H)</code></td>
+<td><code>O(1)</code></td><td>Use BST ordering to navigate to LCA. Optimal.</td>
 </tr>
 </table>
 <h2 class="approach-title">Approach 1 — BST Property <span class="approach-badge badge-optimal">Optimal</span></h2>
@@ -1421,9 +1500,7 @@
 <div class="complexity-pill"><span class="cp-label">Time</span><span class="cp-value">O(H)</span></div>
 <div class="complexity-pill"><span class="cp-label">Space</span><span class="cp-value">O(1)</span></div>
 </div>
-<p class="approach-explanation">If both p and q are less than the current node, LCA is in the left subtree.
-                If both are greater, go right. Otherwise the current node is the LCA (the paths to p and q diverge
-                here).</p>
+<p class="approach-explanation">If both p and q are less than the current node, LCA is in the left subtree. If both are greater, go right. Otherwise the current node is the LCA (the paths to p and q diverge here).</p>
 <div class="code-tabs">
 <div class="tab-buttons"><button class="tab-btn active" onclick="switchTab(this, 'opt-python-q68')">Python</button>
 <button class="tab-btn" onclick="switchTab(this, 'opt-java-q68')">Java</button>
@@ -1431,8 +1508,7 @@
 <button class="tab-btn" onclick="switchTab(this, 'opt-go-q68')">Go</button>
 </div>
 <div class="tab-content active" id="opt-python-q68">
-<div class="code-wrap">
-<pre><code class="language-python">def lowestCommonAncestor(root, p, q):
+<div class="code-wrap"><pre><code class="language-python">def lowestCommonAncestor(root, p, q):
     curr = root
     while curr:
         if p.val &lt; curr.val and q.val &lt; curr.val:
@@ -1440,46 +1516,40 @@
         elif p.val &gt; curr.val and q.val &gt; curr.val:
             curr = curr.right
         else:
-            return curr</code></pre>
-</div>
+            return curr</code></pre></div>
 </div>
 <div class="tab-content" id="opt-java-q68">
-<div class="code-wrap">
-<pre><code class="language-java">// See Python solution above
-// LCA of BST — translate to this language</code></pre>
-</div>
+<div class="code-wrap"><pre><code class="language-java">// See Python solution above
+// LCA of BST — translate to this language</code></pre></div>
 </div>
 <div class="tab-content" id="opt-javascript-q68">
-<div class="code-wrap">
-<pre><code class="language-javascript">// See Python solution above
-// LCA of BST — translate to this language</code></pre>
-</div>
+<div class="code-wrap"><pre><code class="language-javascript">// See Python solution above
+// LCA of BST — translate to this language</code></pre></div>
 </div>
 <div class="tab-content" id="opt-go-q68">
-<div class="code-wrap">
-<pre><code class="language-go">// See Python solution above
-// LCA of BST — translate to this language</code></pre>
-</div>
+<div class="code-wrap"><pre><code class="language-go">// See Python solution above
+// LCA of BST — translate to this language</code></pre></div>
 </div>
 </div>
 <div class="insight" style="margin-top:20px;">
 <div class="insight-title">BST Ordering Eliminates One Side Every Step</div>
-<p>Unlike general binary tree LCA (which requires O(n)), BST's ordering property lets us navigate to the
-                    LCA in O(H) — O(log n) for balanced, O(n) worst case skewed.</p>
+<p>Unlike general binary tree LCA (which requires O(n)), BST's ordering property lets us navigate to the LCA in O(H) — O(log n) for balanced, O(n) worst case skewed.</p>
 </div>
 <div class="interview-tips">
 <h3>Interview Playbook</h3>
-<ol>
-<li><strong>Contrast with general BT LCA:</strong> This problem is O(H) thanks to BST property;
-                        general BT is O(n).</li>
-<li><strong>Companies:</strong> Amazon, Google, Microsoft, Meta.</li>
-</ol>
+<ol><li><strong>Contrast with general BT LCA:</strong> This problem is O(H) thanks to BST property; general BT is O(n).</li><li><strong>Companies:</strong> Amazon, Google, Microsoft, Meta.</li></ol>
 </div>
 <button class="mark-solved-btn" id="solve-q68" onclick="markSolved('q68',this)">Mark as Solved</button>
 </div>
+
+        <div class="page-nav" style="max-width: 960px; margin: 40px auto 0; padding: 20px 48px;">
+            <a class="page-nav-btn" href="37-subtree-of-another-tree.html">&#8592; Subtree of Another Tree</a>
+            <a class="page-nav-btn home" href="../index.html">&#9776; Back to Portfolio</a>
+            <a class="page-nav-btn" href="64-binary-tree-level-order-traversal.html">Binary Tree Level Order Traversal &#8594;</a>
+        </div>
     </div>
 
-    <script>
+<script>
         // Initialize highlight.js
         hljs.highlightAll();
         // Initialize mermaid.js
@@ -1506,7 +1576,19 @@
             document.querySelectorAll('.question-panel').forEach(p => p.classList.remove('active'));
             document.querySelectorAll('.q-item').forEach(i => i.classList.remove('active'));
             const panel = document.getElementById(qId);
-            if (panel) panel.classList.add('active');
+            if (panel) {
+                panel.classList.add('active');
+                if (window.mermaid) {
+                    setTimeout(() => {
+                        try {
+                            const mNodes = Array.from(panel.querySelectorAll('.mermaid:not([data-processed="true"])'));
+                            if (mNodes.length > 0) window.mermaid.run({ nodes: mNodes });
+                        } catch (err) {
+                            console.error('Mermaid run error:', err);
+                        }
+                    }, 50);
+                }
+            }
             if (item) item.classList.add('active');
             document.getElementById('main-panel').scrollTo(0, 0);
         }
@@ -1576,6 +1658,11 @@
                 }
             });
         }
+    </script>
+<script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({ startOnLoad: false, theme: 'dark' });
+        window.mermaid = mermaid;
     </script>
 </body>
 </html>

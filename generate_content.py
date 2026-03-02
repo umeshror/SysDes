@@ -96,6 +96,13 @@ PROBLEMS = {
 }"""
         }
     },
+    "flow_matrix": {
+        "headers": ["Step", "i", "num", "Complement", "In Map?", "Hash Map State", "Action"],
+        "rows": [
+            ["1", "0", "2", "<code>9 - 2 = 7</code>", "No", "<code>{2: 0}</code>", "Store <code>num: i</code>"],
+            ["2", "1", "7", "<code>9 - 7 = 2</code>", "Yes", "<code>{2: 0}</code>", "Return <code>[map[2], 1] &rarr; [0, 1]</code>"]
+        ]
+    },
     "insight_title": "Why One-Pass Works",
     "insight_text": "At each index <code>i</code>, we ask: \"Have I already seen the number that would complete a pair with <code>nums[i]</code>?\" If yes, we return immediately. If no, we record <code>nums[i]</code> for future lookups. Because hash map operations are O(1) average case, the total time is <strong>O(n)</strong>.",
     "tips": [
@@ -201,6 +208,16 @@ PROBLEMS = {
     return longest
 }"""
         }
+    },
+    "flow_matrix": {
+        "headers": ["Iteration (right, char)", "Map State `char: index`", "Left Pointer", "Action & Max Len"],
+        "rows": [
+            ["0, 'a'", "{'a': 0}", "0 (No dupes)", "max(0, 1) = 1"],
+            ["1, 'b'", "{'a': 0, 'b': 1}", "0 (No dupes)", "max(1, 2) = 2"],
+            ["2, 'c'", "{'a': 0, 'b': 1, 'c': 2}", "0 (No dupes)", "max(2, 3) = 3"],
+            ["3, 'a'", "{'a': 3, 'b': 1, 'c': 2}", "max(0, map['a']+1)=1", "max(3, 3) = 3"],
+            ["4, 'b'", "{'a': 3, 'b': 4, 'c': 2}", "max(1, map['b']+1)=2", "max(3, 3) = 3"]
+        ]
     },
     "insight_title": "Why the Map Jump is O(n)",
     "insight_text": "With the basic set approach, the left pointer might slide one-by-one, leading to O(2n) in the worst case. By storing each character's last index in a map and jumping <code>left</code> directly, the right pointer visits each character exactly once. Total: <strong>O(n)</strong>.",
@@ -511,6 +528,29 @@ def generate_panel_html(q_id, data):
     # Interview tips
     tips_html = "".join(f"<li>{t}</li>" for t in data["tips"])
     
+    # Optional Diagram and Flow Matrix
+    diagram_html = ""
+    if "diagram" in data and data["diagram"]:
+        diagram_html = f'''
+            <div class="diagram-container">
+                {data["diagram"]}
+            </div>'''
+
+    flow_html = ""
+    if "flow_matrix" in data and data["flow_matrix"]:
+        fm = data["flow_matrix"]
+        headers = "".join(f"<th>{h}</th>" for h in fm["headers"])
+        rows = ""
+        for r in fm["rows"]:
+            rows += "<tr>" + "".join(f"<td>{c}</td>" for c in r) + "</tr>"
+        flow_html = f'''
+            <div class="flow-matrix-container">
+                <table class="flow-matrix-table">
+                    <thead><tr>{headers}</tr></thead>
+                    <tbody>{rows}</tbody>
+                </table>
+            </div>'''
+            
     return f"""
         <div class="question-panel" id="{q_id}">
             <div class="q-header">
@@ -573,6 +613,9 @@ def generate_panel_html(q_id, data):
                 </div>
 {tab_contents}
             </div>
+
+            {diagram_html}
+            {flow_html}
 
             <div class="insight" style="margin-top: 20px;">
                 <div class="insight-title">{data["insight_title"]}</div>

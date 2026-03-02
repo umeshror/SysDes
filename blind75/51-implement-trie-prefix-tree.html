@@ -1,20 +1,17 @@
 <!DOCTYPE html>
 
 <html lang="en">
-
 <head>
-    <meta charset="utf-8" />
-    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
-    <title>Blind 75 — Coding Interview Patterns</title>
-    <link href="https://fonts.googleapis.com" rel="preconnect" />
-    <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Fira+Code:wght@400;500&amp;display=swap"
-        rel="stylesheet" />
-    <!-- Highlight.js for syntax highlighting -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css" rel="stylesheet" />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
-    <style>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Blind 75 — Coding Interview Patterns</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Fira+Code:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<!-- Highlight.js for syntax highlighting -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<style>
         :root {
             --bg: #f6f8ff;
             --surface: #ffffff;
@@ -849,6 +846,71 @@
             margin-bottom: 6px;
         }
 
+        /* Flow Matrix & Diagram Enhancements */
+        .flow-matrix-container {
+            margin: 24px 0;
+            overflow-x: auto;
+        }
+
+        .flow-matrix-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+            color: #bac2de;
+            background: rgba(30, 30, 46, 0.4);
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .flow-matrix-table th,
+        .flow-matrix-table td {
+            padding: 10px 14px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .flow-matrix-table th {
+            background: rgba(43, 43, 62, 0.6);
+            color: #cdd6f4;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-size: 0.75rem;
+        }
+
+        .flow-matrix-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .flow-matrix-table tr:hover td {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .flow-matrix-table code {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 3px 6px;
+            border-radius: 4px;
+            color: #89dceb;
+            font-family: 'Fira Code', monospace;
+        }
+
+        .diagram-container {
+            margin: 24px 0;
+            padding: 24px;
+            background: rgba(30, 30, 46, 0.4);
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            text-align: center;
+        }
+
+        .diagram-container img,
+        .diagram-container svg {
+            max-width: 100%;
+            height: auto;
+            border-radius: 4px;
+        }
+
         /* Solved button */
         .mark-solved-btn {
             display: inline-flex;
@@ -875,12 +937,52 @@
         .mark-solved-btn.solved {
             background: #64748b;
         }
+
+        /* Page nav */
+        .page-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 28px 0px 48px;
+            border-top: 1px solid rgba(137, 180, 250, .15);
+            margin-top: 24px;
+            gap: 12px;
+        }
+
+        .page-nav-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 22px;
+            background: #1a1a2e;
+            color: #cdd6f4;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: .84rem;
+            font-weight: 600;
+            transition: all .18s;
+            border: 1px solid rgba(137, 180, 250, .15);
+        }
+
+        .page-nav-btn:hover {
+            background: #313244;
+            border-color: rgba(137, 180, 250, .35);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, .2);
+        }
+
+        .page-nav-btn.home {
+            background: linear-gradient(135deg, #1e3a5f, #162d48);
+        }
+
+        .page-nav-btn.home:hover {
+            background: linear-gradient(135deg, #264a78, #1e3a5f);
+        }
     </style>
 </head>
-
 <body>
-    <!-- ── SIDEBAR ────────────────────────────────────────────── -->
-        <nav class="sidebar">
+<!-- ── SIDEBAR ────────────────────────────────────────────── -->
+    <nav class="sidebar">
         <div class="sidebar-header">
             <a href="../index.html">← Back to Home</a>
             <h1>Blind 75</h1>
@@ -1363,59 +1465,34 @@
 <span class="topic-tag">Trie</span><span class="topic-tag">Hash Map</span><span class="topic-tag">Design</span>
 </div>
 <h1 class="q-title">Implement Trie (Prefix Tree)</h1>
-<p class="q-source"><a href="https://leetcode.com/problems/implement-trie-prefix-tree" target="_blank">leetcode.com/problems/implement-trie-prefix-tree</a> · Blind 75 · FAANG
-                    favourite</p>
+<p class="q-source"><a href="https://leetcode.com/problems/implement-trie-prefix-tree" target="_blank">leetcode.com/problems/implement-trie-prefix-tree</a> · Blind 75 · FAANG favourite</p>
 </div>
 <hr class="section-rule"/>
-<div class="problem-statement">
-<h3>Problem Statement</h3>
-<div class="statement-content">Implement a Trie data structure with <code>insert(word)</code>,
-                    <code>search(word)</code>, and <code>startsWith(prefix)</code> methods.
-                </div>
-</div>
+<div class="problem-statement"><h3>Problem Statement</h3><div class="statement-content">Implement a Trie data structure with <code>insert(word)</code>, <code>search(word)</code>, and <code>startsWith(prefix)</code> methods.</div></div>
 <div class="examples">
 <div class="example-block">
 <div class="example-header">Example 1</div>
 <div class="example-body">
-<div><span class="label">Input: </span><span class="val">insert("apple"), search("apple")→true,
-                                search("app")→false, startsWith("app")→true, insert("app"), search("app")→true</span>
-</div>
+<div><span class="label">Input: </span><span class="val">insert("apple"), search("apple")→true, search("app")→false, startsWith("app")→true, insert("app"), search("app")→true</span></div>
 <div><span class="label">Output: </span><span class="val">[null,true,false,true,null,true]</span></div>
 <div class="explanation">Demonstrates insert, search, and prefix matching.</div>
 </div>
-</div>
-</div>
-<div class="constraints">
-<h4>Constraints</h4>
-<ul>
-<li>1 ≤ word.length, prefix.length ≤ 2000</li>
-<li>Only lowercase English letters</li>
-<li>At most 3*10<sup>4</sup> calls</li>
-</ul>
-</div>
+</div></div>
+<div class="constraints"><h4>Constraints</h4><ul><li>1 ≤ word.length, prefix.length ≤ 2000</li><li>Only lowercase English letters</li><li>At most 3*10<sup>4</sup> calls</li></ul></div>
 <h2 class="approach-title">Approaches Comparison</h2>
 <table class="compare-table">
-<tr>
-<th>Approach</th>
-<th>Time</th>
-<th>Space</th>
-<th>Notes</th>
-</tr>
+<tr><th>Approach</th><th>Time</th><th>Space</th><th>Notes</th></tr>
 <tr class="optimal-row">
-<td>Trie with HashMap children</td>
-<td><code>O(m) per ops</code></td>
-<td><code>O(m·n)</code></td>
-<td>m=key length. Standard Trie. Optimal.</td>
+<td>Trie with HashMap children</td><td><code>O(m) per ops</code></td>
+<td><code>O(m·n)</code></td><td>m=key length. Standard Trie. Optimal.</td>
 </tr>
 </table>
 <h2 class="approach-title">Approach 1 — Trie Node with HashMap <span class="approach-badge badge-optimal">Optimal</span></h2>
 <div class="complexity-row">
 <div class="complexity-pill"><span class="cp-label">Time</span><span class="cp-value">O(m)</span></div>
-<div class="complexity-pill"><span class="cp-label">Space</span><span class="cp-value">O(m·n)</span>
+<div class="complexity-pill"><span class="cp-label">Space</span><span class="cp-value">O(m·n)</span></div>
 </div>
-</div>
-<p class="approach-explanation">Each TrieNode has a map of char→TrieNode children and an <code>is_end</code>
-                flag. insert/search/startsWith all traverse the trie character by character.</p>
+<p class="approach-explanation">Each TrieNode has a map of char→TrieNode children and an <code>is_end</code> flag. insert/search/startsWith all traverse the trie character by character.</p>
 <div class="code-tabs">
 <div class="tab-buttons"><button class="tab-btn active" onclick="switchTab(this, 'opt-python-q51')">Python</button>
 <button class="tab-btn" onclick="switchTab(this, 'opt-java-q51')">Java</button>
@@ -1423,8 +1500,7 @@
 <button class="tab-btn" onclick="switchTab(this, 'opt-go-q51')">Go</button>
 </div>
 <div class="tab-content active" id="opt-python-q51">
-<div class="code-wrap">
-<pre><code class="language-python">class TrieNode:
+<div class="code-wrap"><pre><code class="language-python">class TrieNode:
     def __init__(self):
         self.children = {}
         self.is_end = False
@@ -1455,46 +1531,40 @@ class Trie:
             if ch not in node.children:
                 return False
             node = node.children[ch]
-        return True</code></pre>
-</div>
+        return True</code></pre></div>
 </div>
 <div class="tab-content" id="opt-java-q51">
-<div class="code-wrap">
-<pre><code class="language-java">// See Python solution above for the full algorithm
-// Implement Trie — translate line-by-line</code></pre>
-</div>
+<div class="code-wrap"><pre><code class="language-java">// See Python solution above for the full algorithm
+// Implement Trie — translate line-by-line</code></pre></div>
 </div>
 <div class="tab-content" id="opt-javascript-q51">
-<div class="code-wrap">
-<pre><code class="language-javascript">// See Python solution above for the full algorithm
-// Implement Trie — translate line-by-line</code></pre>
-</div>
+<div class="code-wrap"><pre><code class="language-javascript">// See Python solution above for the full algorithm
+// Implement Trie — translate line-by-line</code></pre></div>
 </div>
 <div class="tab-content" id="opt-go-q51">
-<div class="code-wrap">
-<pre><code class="language-go">// See Python solution above for the full algorithm
-// Implement Trie — translate line-by-line</code></pre>
-</div>
+<div class="code-wrap"><pre><code class="language-go">// See Python solution above for the full algorithm
+// Implement Trie — translate line-by-line</code></pre></div>
 </div>
 </div>
 <div class="insight" style="margin-top:20px;">
 <div class="insight-title">Tries Excel at Prefix Queries</div>
-<p>A Trie's key strength: prefix queries and autocomplete in O(m) time (m = prefix length), faster than
-                    hash maps for prefix matching.</p>
+<p>A Trie's key strength: prefix queries and autocomplete in O(m) time (m = prefix length), faster than hash maps for prefix matching.</p>
 </div>
 <div class="interview-tips">
 <h3>Interview Playbook</h3>
-<ol>
-<li><strong>Array vs HashMap children:</strong> If only lowercase ASCII, use array[26] for O(1)
-                        child access.</li>
-<li><strong>Companies:</strong> Amazon, Google, Apple, Microsoft.</li>
-</ol>
+<ol><li><strong>Array vs HashMap children:</strong> If only lowercase ASCII, use array[26] for O(1) child access.</li><li><strong>Companies:</strong> Amazon, Google, Apple, Microsoft.</li></ol>
 </div>
 <button class="mark-solved-btn" id="solve-q51" onclick="markSolved('q51',this)">Mark as Solved</button>
 </div>
+
+        <div class="page-nav" style="max-width: 960px; margin: 40px auto 0; padding: 20px 48px;">
+            <a class="page-nav-btn" href="26-serialize-and-deserialize-binary-tree.html">&#8592; Serialize and Deserialize Binary Tree</a>
+            <a class="page-nav-btn home" href="../index.html">&#9776; Back to Portfolio</a>
+            <a class="page-nav-btn" href="53-design-add-and-search-words-data-structure.html">Design Add and Search Words Data Structure &#8594;</a>
+        </div>
     </div>
 
-    <script>
+<script>
         // Initialize highlight.js
         hljs.highlightAll();
         // Initialize mermaid.js
@@ -1521,7 +1591,19 @@ class Trie:
             document.querySelectorAll('.question-panel').forEach(p => p.classList.remove('active'));
             document.querySelectorAll('.q-item').forEach(i => i.classList.remove('active'));
             const panel = document.getElementById(qId);
-            if (panel) panel.classList.add('active');
+            if (panel) {
+                panel.classList.add('active');
+                if (window.mermaid) {
+                    setTimeout(() => {
+                        try {
+                            const mNodes = Array.from(panel.querySelectorAll('.mermaid:not([data-processed="true"])'));
+                            if (mNodes.length > 0) window.mermaid.run({ nodes: mNodes });
+                        } catch (err) {
+                            console.error('Mermaid run error:', err);
+                        }
+                    }, 50);
+                }
+            }
             if (item) item.classList.add('active');
             document.getElementById('main-panel').scrollTo(0, 0);
         }
@@ -1591,6 +1673,11 @@ class Trie:
                 }
             });
         }
+    </script>
+<script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({ startOnLoad: false, theme: 'dark' });
+        window.mermaid = mermaid;
     </script>
 </body>
 </html>

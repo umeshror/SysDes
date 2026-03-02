@@ -1,20 +1,17 @@
 <!DOCTYPE html>
 
 <html lang="en">
-
 <head>
-    <meta charset="utf-8" />
-    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
-    <title>Blind 75 — Coding Interview Patterns</title>
-    <link href="https://fonts.googleapis.com" rel="preconnect" />
-    <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Fira+Code:wght@400;500&amp;display=swap"
-        rel="stylesheet" />
-    <!-- Highlight.js for syntax highlighting -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css" rel="stylesheet" />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
-    <style>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Blind 75 — Coding Interview Patterns</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Fira+Code:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<!-- Highlight.js for syntax highlighting -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<style>
         :root {
             --bg: #f6f8ff;
             --surface: #ffffff;
@@ -849,6 +846,71 @@
             margin-bottom: 6px;
         }
 
+        /* Flow Matrix & Diagram Enhancements */
+        .flow-matrix-container {
+            margin: 24px 0;
+            overflow-x: auto;
+        }
+
+        .flow-matrix-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+            color: #bac2de;
+            background: rgba(30, 30, 46, 0.4);
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .flow-matrix-table th,
+        .flow-matrix-table td {
+            padding: 10px 14px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .flow-matrix-table th {
+            background: rgba(43, 43, 62, 0.6);
+            color: #cdd6f4;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-size: 0.75rem;
+        }
+
+        .flow-matrix-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .flow-matrix-table tr:hover td {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .flow-matrix-table code {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 3px 6px;
+            border-radius: 4px;
+            color: #89dceb;
+            font-family: 'Fira Code', monospace;
+        }
+
+        .diagram-container {
+            margin: 24px 0;
+            padding: 24px;
+            background: rgba(30, 30, 46, 0.4);
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            text-align: center;
+        }
+
+        .diagram-container img,
+        .diagram-container svg {
+            max-width: 100%;
+            height: auto;
+            border-radius: 4px;
+        }
+
         /* Solved button */
         .mark-solved-btn {
             display: inline-flex;
@@ -875,12 +937,52 @@
         .mark-solved-btn.solved {
             background: #64748b;
         }
+
+        /* Page nav */
+        .page-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 28px 0px 48px;
+            border-top: 1px solid rgba(137, 180, 250, .15);
+            margin-top: 24px;
+            gap: 12px;
+        }
+
+        .page-nav-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 22px;
+            background: #1a1a2e;
+            color: #cdd6f4;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: .84rem;
+            font-weight: 600;
+            transition: all .18s;
+            border: 1px solid rgba(137, 180, 250, .15);
+        }
+
+        .page-nav-btn:hover {
+            background: #313244;
+            border-color: rgba(137, 180, 250, .35);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, .2);
+        }
+
+        .page-nav-btn.home {
+            background: linear-gradient(135deg, #1e3a5f, #162d48);
+        }
+
+        .page-nav-btn.home:hover {
+            background: linear-gradient(135deg, #264a78, #1e3a5f);
+        }
     </style>
 </head>
-
 <body>
-    <!-- ── SIDEBAR ────────────────────────────────────────────── -->
-        <nav class="sidebar">
+<!-- ── SIDEBAR ────────────────────────────────────────────── -->
+    <nav class="sidebar">
         <div class="sidebar-header">
             <a href="../index.html">← Back to Home</a>
             <h1>Blind 75</h1>
@@ -1363,17 +1465,10 @@
 <span class="topic-tag">Array</span><span class="topic-tag">Heap</span><span class="topic-tag">Quickselect</span><span class="topic-tag">Sorting</span>
 </div>
 <h1 class="q-title">Kth Largest Element in an Array</h1>
-<p class="q-source"><a href="https://leetcode.com/problems/kth-largest-element-in-an-array" target="_blank">leetcode.com/problems/kth-largest-element-in-an-array</a> · Blind 75 · FAANG
-                    favourite</p>
+<p class="q-source"><a href="https://leetcode.com/problems/kth-largest-element-in-an-array" target="_blank">leetcode.com/problems/kth-largest-element-in-an-array</a> · Blind 75 · FAANG favourite</p>
 </div>
 <hr class="section-rule"/>
-<div class="problem-statement">
-<h3>Problem Statement</h3>
-<div class="statement-content">Given an integer array <code>nums</code> and an integer k, return the
-                    <code>k</code>th largest element. Note: it is the kth largest in sorted order, not the kth distinct
-                    element.
-                </div>
-</div>
+<div class="problem-statement"><h3>Problem Statement</h3><div class="statement-content">Given an integer array <code>nums</code> and an integer k, return the <code>k</code>th largest element. Note: it is the kth largest in sorted order, not the kth distinct element.</div></div>
 <div class="examples">
 <div class="example-block">
 <div class="example-header">Example 1</div>
@@ -1386,68 +1481,44 @@
 <div class="example-block">
 <div class="example-header">Example 2</div>
 <div class="example-body">
-<div><span class="label">Input: </span><span class="val">nums=[3,2,3,1,2,4,5,5,6], k=4</span>
-</div>
+<div><span class="label">Input: </span><span class="val">nums=[3,2,3,1,2,4,5,5,6], k=4</span></div>
 <div><span class="label">Output: </span><span class="val">4</span></div>
 <div class="explanation">Fourth largest is 4.</div>
 </div>
-</div>
-</div>
-<div class="constraints">
-<h4>Constraints</h4>
-<ul>
-<li>1≤k≤nums.length≤10<sup>5</sup></li>
-<li>-10<sup>4</sup>≤nums[i]≤10<sup>4</sup></li>
-</ul>
-</div>
+</div></div>
+<div class="constraints"><h4>Constraints</h4><ul><li>1≤k≤nums.length≤10<sup>5</sup></li><li>-10<sup>4</sup>≤nums[i]≤10<sup>4</sup></li></ul></div>
 <h2 class="approach-title">Approaches Comparison</h2>
 <table class="compare-table">
+<tr><th>Approach</th><th>Time</th><th>Space</th><th>Notes</th></tr>
 <tr>
-<th>Approach</th>
-<th>Time</th>
-<th>Space</th>
-<th>Notes</th>
-</tr>
-<tr>
-<td>Sort</td>
-<td><code>O(n log n)</code></td>
-<td><code>O(1)</code></td>
-<td>Sort descending, return index k-1.</td>
+<td>Sort</td><td><code>O(n log n)</code></td>
+<td><code>O(1)</code></td><td>Sort descending, return index k-1.</td>
 </tr>
 <tr class="optimal-row">
-<td>Min Heap size k</td>
-<td><code>O(n log k)</code></td>
-<td><code>O(k)</code></td>
-<td>Keep k-element min heap. Optimal.</td>
+<td>Min Heap size k</td><td><code>O(n log k)</code></td>
+<td><code>O(k)</code></td><td>Keep k-element min heap. Optimal.</td>
 </tr>
 <tr class="optimal-row">
-<td>Quickselect</td>
-<td><code>O(n) avg</code></td>
-<td><code>O(1)</code></td>
-<td>Partition-based; O(n²) worst case.</td>
+<td>Quickselect</td><td><code>O(n) avg</code></td>
+<td><code>O(1)</code></td><td>Partition-based; O(n²) worst case.</td>
 </tr>
 </table>
-<h2 class="approach-title">Approach 1 — Sort <span class="approach-badge badge-better">O(n log n)</span>
-</h2>
+<h2 class="approach-title">Approach 1 — Sort <span class="approach-badge badge-better">O(n log n)</span></h2>
 <div class="complexity-row">
-<div class="complexity-pill"><span class="cp-label">Time</span><span class="cp-value">O(n log n)</span>
-</div>
+<div class="complexity-pill"><span class="cp-label">Time</span><span class="cp-value">O(n log n)</span></div>
 <div class="complexity-pill"><span class="cp-label">Space</span><span class="cp-value">O(1)</span></div>
 </div>
 <p class="approach-explanation">Sort descending, return index k-1.</p>
 <div class="warn-box">
 <div class="warn-box-title">⚠ Interviewer will push back</div>
-<p>This is a valid stepping-stone answer. But the problem requires better optimization. Always start by
-                    acknowledging this brute force/suboptimal time complexity before moving to the optimal solution.</p>
+<p>This is a valid stepping-stone answer. But the problem requires better optimization. Always start by acknowledging this brute force/suboptimal time complexity before moving to the optimal solution.</p>
 </div>
 <h2 class="approach-title">Approach 2 — Min Heap of Size k <span class="approach-badge badge-optimal">Optimal</span></h2>
 <div class="complexity-row">
-<div class="complexity-pill"><span class="cp-label">Time</span><span class="cp-value">O(n log k)</span>
-</div>
+<div class="complexity-pill"><span class="cp-label">Time</span><span class="cp-value">O(n log k)</span></div>
 <div class="complexity-pill"><span class="cp-label">Space</span><span class="cp-value">O(k)</span></div>
 </div>
-<p class="approach-explanation">Maintain a min-heap of size k. For each element, push it. If heap size
-                exceeds k, pop the minimum. At the end, the heap's minimum is the k-th largest.</p>
+<p class="approach-explanation">Maintain a min-heap of size k. For each element, push it. If heap size exceeds k, pop the minimum. At the end, the heap's minimum is the k-th largest.</p>
 <div class="code-tabs">
 <div class="tab-buttons"><button class="tab-btn active" onclick="switchTab(this, 'opt-python-q59')">Python</button>
 <button class="tab-btn" onclick="switchTab(this, 'opt-java-q59')">Java</button>
@@ -1455,44 +1526,34 @@
 <button class="tab-btn" onclick="switchTab(this, 'opt-go-q59')">Go</button>
 </div>
 <div class="tab-content active" id="opt-python-q59">
-<div class="code-wrap">
-<pre><code class="language-python">import heapq
+<div class="code-wrap"><pre><code class="language-python">import heapq
 def findKthLargest(nums, k):
     heap = []
     for n in nums:
         heapq.heappush(heap, n)
         if len(heap) &gt; k:
             heapq.heappop(heap)
-    return heap[0]</code></pre>
-</div>
+    return heap[0]</code></pre></div>
 </div>
 <div class="tab-content" id="opt-java-q59">
-<div class="code-wrap">
-<pre><code class="language-java">// See Python solution above — translate to this language
-// Kth Largest Element</code></pre>
-</div>
+<div class="code-wrap"><pre><code class="language-java">// See Python solution above — translate to this language
+// Kth Largest Element</code></pre></div>
 </div>
 <div class="tab-content" id="opt-javascript-q59">
-<div class="code-wrap">
-<pre><code class="language-javascript">// See Python solution above — translate to this language
-// Kth Largest Element</code></pre>
-</div>
+<div class="code-wrap"><pre><code class="language-javascript">// See Python solution above — translate to this language
+// Kth Largest Element</code></pre></div>
 </div>
 <div class="tab-content" id="opt-go-q59">
-<div class="code-wrap">
-<pre><code class="language-go">// See Python solution above — translate to this language
-// Kth Largest Element</code></pre>
-</div>
+<div class="code-wrap"><pre><code class="language-go">// See Python solution above — translate to this language
+// Kth Largest Element</code></pre></div>
 </div>
 </div>
 <h2 class="approach-title">Approach 3 — Min Heap of Size k <span class="approach-badge badge-optimal">Optimal</span></h2>
 <div class="complexity-row">
-<div class="complexity-pill"><span class="cp-label">Time</span><span class="cp-value">O(n log k)</span>
-</div>
+<div class="complexity-pill"><span class="cp-label">Time</span><span class="cp-value">O(n log k)</span></div>
 <div class="complexity-pill"><span class="cp-label">Space</span><span class="cp-value">O(k)</span></div>
 </div>
-<p class="approach-explanation">Maintain a min-heap of size k. For each element, push it. If heap size
-                exceeds k, pop the minimum. At the end, the heap's minimum is the k-th largest.</p>
+<p class="approach-explanation">Maintain a min-heap of size k. For each element, push it. If heap size exceeds k, pop the minimum. At the end, the heap's minimum is the k-th largest.</p>
 <div class="code-tabs">
 <div class="tab-buttons"><button class="tab-btn active" onclick="switchTab(this, 'opt-python-q59')">Python</button>
 <button class="tab-btn" onclick="switchTab(this, 'opt-java-q59')">Java</button>
@@ -1500,54 +1561,47 @@ def findKthLargest(nums, k):
 <button class="tab-btn" onclick="switchTab(this, 'opt-go-q59')">Go</button>
 </div>
 <div class="tab-content active" id="opt-python-q59">
-<div class="code-wrap">
-<pre><code class="language-python">import heapq
+<div class="code-wrap"><pre><code class="language-python">import heapq
 def findKthLargest(nums, k):
     heap = []
     for n in nums:
         heapq.heappush(heap, n)
         if len(heap) &gt; k:
             heapq.heappop(heap)
-    return heap[0]</code></pre>
-</div>
+    return heap[0]</code></pre></div>
 </div>
 <div class="tab-content" id="opt-java-q59">
-<div class="code-wrap">
-<pre><code class="language-java">// See Python solution above — translate to this language
-// Kth Largest Element</code></pre>
-</div>
+<div class="code-wrap"><pre><code class="language-java">// See Python solution above — translate to this language
+// Kth Largest Element</code></pre></div>
 </div>
 <div class="tab-content" id="opt-javascript-q59">
-<div class="code-wrap">
-<pre><code class="language-javascript">// See Python solution above — translate to this language
-// Kth Largest Element</code></pre>
-</div>
+<div class="code-wrap"><pre><code class="language-javascript">// See Python solution above — translate to this language
+// Kth Largest Element</code></pre></div>
 </div>
 <div class="tab-content" id="opt-go-q59">
-<div class="code-wrap">
-<pre><code class="language-go">// See Python solution above — translate to this language
-// Kth Largest Element</code></pre>
-</div>
+<div class="code-wrap"><pre><code class="language-go">// See Python solution above — translate to this language
+// Kth Largest Element</code></pre></div>
 </div>
 </div>
 <div class="insight" style="margin-top:20px;">
 <div class="insight-title">Min Heap of Size k = k-th Largest at Root</div>
-<p>By keeping only k elements in the heap and discarding smaller ones, the smallest element remaining is
-                    the k-th largest overall — at heap[0].</p>
+<p>By keeping only k elements in the heap and discarding smaller ones, the smallest element remaining is the k-th largest overall — at heap[0].</p>
 </div>
 <div class="interview-tips">
 <h3>Interview Playbook</h3>
-<ol>
-<li><strong>Quickselect alternative:</strong> Average O(n) but O(n²) worst case. Use for
-                        time-sensitive scenarios with good pivot selection.</li>
-<li><strong>Companies:</strong> Amazon, Google, Meta, Microsoft.</li>
-</ol>
+<ol><li><strong>Quickselect alternative:</strong> Average O(n) but O(n²) worst case. Use for time-sensitive scenarios with good pivot selection.</li><li><strong>Companies:</strong> Amazon, Google, Meta, Microsoft.</li></ol>
 </div>
 <button class="mark-solved-btn" id="solve-q59" onclick="markSolved('q59',this)">Mark as Solved</button>
 </div>
+
+        <div class="page-nav" style="max-width: 960px; margin: 40px auto 0; padding: 20px 48px;">
+            <a class="page-nav-btn" href="72-meeting-rooms.html">&#8592; Meeting Rooms</a>
+            <a class="page-nav-btn home" href="../index.html">&#9776; Back to Portfolio</a>
+            <a class="page-nav-btn" href="29-rotate-image.html">Rotate Image &#8594;</a>
+        </div>
     </div>
 
-    <script>
+<script>
         // Initialize highlight.js
         hljs.highlightAll();
         // Initialize mermaid.js
@@ -1574,7 +1628,19 @@ def findKthLargest(nums, k):
             document.querySelectorAll('.question-panel').forEach(p => p.classList.remove('active'));
             document.querySelectorAll('.q-item').forEach(i => i.classList.remove('active'));
             const panel = document.getElementById(qId);
-            if (panel) panel.classList.add('active');
+            if (panel) {
+                panel.classList.add('active');
+                if (window.mermaid) {
+                    setTimeout(() => {
+                        try {
+                            const mNodes = Array.from(panel.querySelectorAll('.mermaid:not([data-processed="true"])'));
+                            if (mNodes.length > 0) window.mermaid.run({ nodes: mNodes });
+                        } catch (err) {
+                            console.error('Mermaid run error:', err);
+                        }
+                    }, 50);
+                }
+            }
             if (item) item.classList.add('active');
             document.getElementById('main-panel').scrollTo(0, 0);
         }
@@ -1644,6 +1710,11 @@ def findKthLargest(nums, k):
                 }
             });
         }
+    </script>
+<script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({ startOnLoad: false, theme: 'dark' });
+        window.mermaid = mermaid;
     </script>
 </body>
 </html>

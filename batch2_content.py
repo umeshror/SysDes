@@ -565,6 +565,33 @@ add_problem("q12", {
     return result
 }"""},
     },
+    "diagram": """
+<div class="mermaid">
+graph TD
+    A[Sorted Array] --> B(Fix i)
+    B --> C{left less than right?}
+    C -- Yes --> D(Calculate total)
+    D --> E{total == 0?}
+    E -- Yes --> F[Add to result, move pointers]
+    E -- total less than 0 --> G[left++]
+    E -- total greater than 0 --> H[right--]
+    F --> C
+    G --> C
+    H --> C
+    C -- No --> I(i++)
+</div>
+""",
+    "flow_matrix": {
+        "headers": ["i", "left", "right", "nums[i]", "nums[l]", "nums[r]", "Total", "Action"],
+        "rows": [
+            ["0", "1", "5", "-4", "-1", "2", "-3", "<code>total < 0</code> &rarr; <code>left++</code>"],
+            ["0", "2", "5", "-4", "-1", "2", "-3", "<code>total < 0</code> &rarr; <code>left++</code>"],
+            ["0", "3", "5", "-4", "0", "2", "-2", "<code>total < 0</code> &rarr; <code>left++</code>"],
+            ["0", "4", "5", "-4", "1", "2", "-1", "<code>total < 0</code> &rarr; <code>left++</code>"],
+            ["1", "2", "5", "-1", "-1", "2", "0", "<strong>Match!</strong> Add <code>[-1,-1,2]</code>, <code>left++</code>, <code>right--</code>"],
+            ["1", "3", "4", "-1", "0", "1", "0", "<strong>Match!</strong> Add <code>[-1,0,1]</code>, <code>left++</code>, <code>right--</code>"]
+        ]
+    },
     "insight_title": "Sorting Enables Duplicate Skipping",
     "insight_text": "By sorting first, all duplicates are adjacent and can be skipped with simple equality checks. The two-pointer scan is O(n) for each fixed element, and there are n elements, giving <strong>O(n&sup2;)</strong> total.",
     "tips": [

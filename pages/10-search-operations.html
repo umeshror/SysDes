@@ -30,6 +30,11 @@
       min-height: 100vh;
     }
 
+    .sidebar-toggle {
+      display: none;
+      /* Hidden on desktop */
+    }
+
     .sidebar {
       width: 300px;
       min-width: 300px;
@@ -72,11 +77,55 @@
 
     .nav-module-title {
       padding: 10px 20px 6px;
-      font-size: 0.68rem;
+      font-size: 0.72rem;
       font-weight: 700;
       text-transform: uppercase;
-      letter-spacing: 1px;
+      letter-spacing: 0.5px;
+      color: #7f849c;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      user-select: none;
+      transition: color 0.2s;
+    }
+
+    .nav-module-title:hover {
+      color: #cdd6f4;
+    }
+
+    .nav-module-title::after {
+      content: '▼';
+      font-size: 0.6rem;
       color: #585b70;
+      transition: transform 0.3s ease;
+    }
+
+    /* Hide children by default */
+    .nav-module>*:not(.nav-module-title) {
+      display: none;
+    }
+
+    /* Show children when expanded */
+    .nav-module.expanded>*:not(.nav-module-title) {
+      display: block;
+      animation: slideDown 0.2s ease-out forwards;
+    }
+
+    .nav-module.expanded>.nav-module-title::after {
+      transform: rotate(180deg);
+    }
+
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        transform: translateY(-5px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
 
     .nav-item {
@@ -457,10 +506,43 @@
     }
 
     @media (max-width: 768px) {
+      .layout {
+        flex-direction: column;
+      }
+
       .sidebar {
         width: 100%;
+        min-width: 100%;
         height: auto;
         position: relative;
+        padding-bottom: 0;
+      }
+
+      /* Hide the navigation links by default on mobile */
+      #sidebar-nav-content {
+        display: none;
+        padding-bottom: 20px;
+      }
+
+      /* Show links when the active class is added via JS */
+      #sidebar-nav-content.active {
+        display: block;
+      }
+
+      /* Style the hamburger button */
+      .sidebar-toggle {
+        display: block;
+        background: transparent;
+        border: none;
+        color: #89b4fa;
+        cursor: pointer;
+        padding: 5px;
+      }
+
+      .sidebar-header {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
       }
 
       .main {
@@ -849,7 +931,7 @@
         </details>
         <details class="acc-chapter">
           <summary class="acc-summary">
-            <span class="chap-icon">🏆</span>
+            <span class="chap-icon">📚</span>
             <span class="chap-text">
               <span class="chap-num">Chapter 12</span>
               <span class="chap-label">Case Studies</span>
@@ -858,7 +940,7 @@
             <span class="acc-arrow">›</span>
           </summary>
           <div class="acc-sub">
-              <a class="acc-sub-item" href="12-case-studies.html#case-opentable">Design OpenTable</a>
+              <a class="acc-sub-item" href="../case_studies/open-table.html#case-opentable">Design OpenTable (Deep Dive)</a>
           </div>
         </details>
       </div>
@@ -868,168 +950,169 @@
       <div class="progress-bar-wrap"><div class="progress-bar" id="pb"></div></div>
 
 <div class="section active" id="search">
-    <h1 class="section-title">Search: Full-Text Search, Inverted Indexes &amp; Ranking</h1>
-    <p class="section-subtitle">Module 10 &nbsp;|&nbsp; How Google, Elasticsearch, and Lucene Find Needles in Haystacks
-    </p>
+        <h1 class="section-title">Search: Full-Text Search, Inverted Indexes &amp; Ranking</h1>
+        <p class="section-subtitle">Module 10 &nbsp;|&nbsp; How Google, Elasticsearch, and Lucene Find Needles in
+          Haystacks
+        </p>
 
-    <h2>The Inverted Index: Core Data Structure for Search</h2>
-    <p>A regular database index maps <em>row → content</em>. An inverted index maps <em>term → [documents containing
-        it]</em>.
-      This enables O(1) term lookup regardless of total document count.</p>
+        <h2>The Inverted Index: Core Data Structure for Search</h2>
+        <p>A regular database index maps <em>row → content</em>. An inverted index maps <em>term → [documents containing
+            it]</em>.
+          This enables O(1) term lookup regardless of total document count.</p>
 
-    <div class="mermaid">
-      flowchart LR
-      subgraph Documents
-      D1["Doc 1: 'distributed systems scale'"]
-      D2["Doc 2: 'scale horizontally with sharding'"]
-      D3["Doc 3: 'distributed database internals'"]
-      end
-      subgraph Inverted Index
-      T1["'distributed' → [Doc1, Doc3]"]
-      T2["'scale' → [Doc1, Doc2]"]
-      T3["'sharding' → [Doc2]"]
-      T4["'systems' → [Doc1]"]
-      end
-    </div>
+        <div class="mermaid">
+          flowchart LR
+          subgraph Documents
+          D1["Doc 1: 'distributed systems scale'"]
+          D2["Doc 2: 'scale horizontally with sharding'"]
+          D3["Doc 3: 'distributed database internals'"]
+          end
+          subgraph Inverted Index
+          T1["'distributed' → [Doc1, Doc3]"]
+          T2["'scale' → [Doc1, Doc2]"]
+          T3["'sharding' → [Doc2]"]
+          T4["'systems' → [Doc1]"]
+          end
+        </div>
 
-    <div class="def">
-      <dt>What's stored per posting (beyond just doc ID)</dt>
-      <dd>Full-featured inverted indexes store: <strong>document ID</strong>, <strong>term frequency</strong>
-        (how many times the term appears), <strong>field</strong> (title vs. body), and optionally
-        <strong>term positions</strong> (for phrase queries like "distributed systems" — both words must
-        appear in order). Position storage triples index size but enables exact phrase matching.
-      </dd>
-      <dt>Tokenization &amp; Normalization Pipeline</dt>
-      <dd>Before indexing: "Running Dogs Quickly!" → tokenize → ["Running", "Dogs", "Quickly"]
-        → lowercase → ["running", "dogs", "quickly"]
-        → stop word removal → ["running", "dogs", "quickly"]
-        → stemming → ["run", "dog", "quick"]. A search for "ran" now matches "running" via the stem "run".</dd>
-    </div>
+        <div class="def">
+          <dt>What's stored per posting (beyond just doc ID)</dt>
+          <dd>Full-featured inverted indexes store: <strong>document ID</strong>, <strong>term frequency</strong>
+            (how many times the term appears), <strong>field</strong> (title vs. body), and optionally
+            <strong>term positions</strong> (for phrase queries like "distributed systems" — both words must
+            appear in order). Position storage triples index size but enables exact phrase matching.
+          </dd>
+          <dt>Tokenization &amp; Normalization Pipeline</dt>
+          <dd>Before indexing: "Running Dogs Quickly!" → tokenize → ["Running", "Dogs", "Quickly"]
+            → lowercase → ["running", "dogs", "quickly"]
+            → stop word removal → ["running", "dogs", "quickly"]
+            → stemming → ["run", "dog", "quick"]. A search for "ran" now matches "running" via the stem "run".</dd>
+        </div>
 
-    <h2>TF-IDF and BM25: Relevance Scoring</h2>
-    <div class="def">
-      <dt>TF-IDF (Term Frequency × Inverse Document Frequency)</dt>
-      <dd><strong>TF:</strong> Documents mentioning "database" 20 times are more about databases than documents
-        mentioning it once.
-        <strong>IDF:</strong> "the" appears in every document — not useful. "NoSQL" appears in 1% of documents —
-        very signal.
-        IDF penalizes common terms. Combined: terms that appear often in a document but rarely globally = high
-        relevance.
-      </dd>
-      <dt>BM25 (Best Match 25)</dt>
-      <dd>The de facto standard relevance model (used by Elasticsearch, Solr, Lucene as default since 2015).
-        BM25 improves TF by applying diminishing returns — going from 1 to 2 mentions of a term matters more
-        than going from 100 to 101. Also accounts for document length (shorter documents with the term score
-        higher).
-        Most search engines start with BM25 then layer on ML re-ranking.</dd>
-      <dt>Learning to Rank (FAANG Practice)</dt>
-      <dd>Google, Bing, and LinkedIn use ML models (LambdaMART, neural re-rankers) on top of BM25 initial retrieval.
-        The BM25 score is one feature among hundreds: click-through rate, freshness, authority, personalization
-        signals.
-        In interviews: "BM25 for initial retrieval, then a lightweight ML model for re-ranking the top-K results."
-      </dd>
-    </div>
+        <h2>TF-IDF and BM25: Relevance Scoring</h2>
+        <div class="def">
+          <dt>TF-IDF (Term Frequency × Inverse Document Frequency)</dt>
+          <dd><strong>TF:</strong> Documents mentioning "database" 20 times are more about databases than documents
+            mentioning it once.
+            <strong>IDF:</strong> "the" appears in every document — not useful. "NoSQL" appears in 1% of documents —
+            very signal.
+            IDF penalizes common terms. Combined: terms that appear often in a document but rarely globally = high
+            relevance.
+          </dd>
+          <dt>BM25 (Best Match 25)</dt>
+          <dd>The de facto standard relevance model (used by Elasticsearch, Solr, Lucene as default since 2015).
+            BM25 improves TF by applying diminishing returns — going from 1 to 2 mentions of a term matters more
+            than going from 100 to 101. Also accounts for document length (shorter documents with the term score
+            higher).
+            Most search engines start with BM25 then layer on ML re-ranking.</dd>
+          <dt>Learning to Rank (FAANG Practice)</dt>
+          <dd>Google, Bing, and LinkedIn use ML models (LambdaMART, neural re-rankers) on top of BM25 initial retrieval.
+            The BM25 score is one feature among hundreds: click-through rate, freshness, authority, personalization
+            signals.
+            In interviews: "BM25 for initial retrieval, then a lightweight ML model for re-ranking the top-K results."
+          </dd>
+        </div>
 
-    <h2>Elasticsearch Architecture</h2>
-    <div class="mermaid">
-      flowchart TD
-      Client -->|HTTP REST| ES[Elasticsearch Cluster]
-      subgraph ES [Elasticsearch Cluster]
-      C[Coordinating Node\nroutes queries] --> S1[Shard 1\nPrimary]
-      C --> S2[Shard 2\nPrimary]
-      C --> S3[Shard 3\nPrimary]
-      S1 --> R1[Shard 1\nReplica]
-      S2 --> R2[Shard 2\nReplica]
-      end
-    </div>
+        <h2>Elasticsearch Architecture</h2>
+        <div class="mermaid">
+          flowchart TD
+          Client -->|HTTP REST| ES[Elasticsearch Cluster]
+          subgraph ES [Elasticsearch Cluster]
+          C[Coordinating Node\nroutes queries] --> S1[Shard 1\nPrimary]
+          C --> S2[Shard 2\nPrimary]
+          C --> S3[Shard 3\nPrimary]
+          S1 --> R1[Shard 1\nReplica]
+          S2 --> R2[Shard 2\nReplica]
+          end
+        </div>
 
-    <div class="def">
-      <dt>Shards and Segments</dt>
-      <dd>An Elasticsearch index = multiple shards (each shard is a full Lucene instance). Within a shard,
-        data is stored in immutable <strong>segments</strong>. New documents create new segments; deleted
-        documents are marked in a deletion bitset. Periodic segment merging compacts them.
-        <strong>Never over-shard:</strong> each shard has overhead (~10MB+ heap). Rule: aim for 10–50GB per shard.
-      </dd>
-      <dt>The Near-Real-Time (NRT) Refresh</dt>
-      <dd>New documents are available for search after a "refresh" (default: 1 second). Documents written
-        to the in-memory buffer become visible by writing a new segment and opening it. This is why
-        Elasticsearch search lags are ~1 second, not milliseconds. You can control this with
-        <code>refresh_interval</code> — set to -1 for bulk indexing (max throughput), 1s for live search.
-      </dd>
-      <dt>Twitter/X: Real-time tweet search</dt>
-      <dd>Twitter indexes ~500M tweets/day for search. They use a custom Lucene setup with ~1 second
-        indexing lag. Key insight: new tweets (recency) are prioritized in ranking — most users want
-        the latest tweets, not the most BM25-relevant. Their ranking is: engagement signals (retweets, likes)
-        × time-decay function × personalization × BM25 text score.</dd>
-    </div>
+        <div class="def">
+          <dt>Shards and Segments</dt>
+          <dd>An Elasticsearch index = multiple shards (each shard is a full Lucene instance). Within a shard,
+            data is stored in immutable <strong>segments</strong>. New documents create new segments; deleted
+            documents are marked in a deletion bitset. Periodic segment merging compacts them.
+            <strong>Never over-shard:</strong> each shard has overhead (~10MB+ heap). Rule: aim for 10–50GB per shard.
+          </dd>
+          <dt>The Near-Real-Time (NRT) Refresh</dt>
+          <dd>New documents are available for search after a "refresh" (default: 1 second). Documents written
+            to the in-memory buffer become visible by writing a new segment and opening it. This is why
+            Elasticsearch search lags are ~1 second, not milliseconds. You can control this with
+            <code>refresh_interval</code> — set to -1 for bulk indexing (max throughput), 1s for live search.
+          </dd>
+          <dt>Twitter/X: Real-time tweet search</dt>
+          <dd>Twitter indexes ~500M tweets/day for search. They use a custom Lucene setup with ~1 second
+            indexing lag. Key insight: new tweets (recency) are prioritized in ranking — most users want
+            the latest tweets, not the most BM25-relevant. Their ranking is: engagement signals (retweets, likes)
+            × time-decay function × personalization × BM25 text score.</dd>
+        </div>
 
-    <h2>Search System Design: A Framework</h2>
-    <div class="example">
-      <div class="example-label">FAANG Interview: Design a Search System</div>
-      <ol>
-        <li><strong>Indexing pipeline:</strong> Source data → Kafka → indexing workers → Elasticsearch/Solr.
-          Use change data capture (CDC) from the DB to keep index in sync.</li>
-        <li><strong>Query pipeline:</strong> Client → query parser (tokenize, detect intent) → BM25 retrieval →
-          re-ranking (ML model) → response.</li>
-        <li><strong>Freshness vs. throughput:</strong> Batch re-indexing for historical data; incremental
-          updates via CDC for new/changed content.</li>
-        <li><strong>Relevance tuning:</strong> A/B test ranking models on click-through rate and conversion metrics.
-        </li>
-        <li><strong>Scaling reads:</strong> Multiple replica shards; route queries to replicas. Coordinating node
-          scatter-gathers results from all shards and merges sorted results.</li>
-      </ol>
-    </div>
+        <h2>Search System Design: A Framework</h2>
+        <div class="example">
+          <div class="example-label">FAANG Interview: Design a Search System</div>
+          <ol>
+            <li><strong>Indexing pipeline:</strong> Source data → Kafka → indexing workers → Elasticsearch/Solr.
+              Use change data capture (CDC) from the DB to keep index in sync.</li>
+            <li><strong>Query pipeline:</strong> Client → query parser (tokenize, detect intent) → BM25 retrieval →
+              re-ranking (ML model) → response.</li>
+            <li><strong>Freshness vs. throughput:</strong> Batch re-indexing for historical data; incremental
+              updates via CDC for new/changed content.</li>
+            <li><strong>Relevance tuning:</strong> A/B test ranking models on click-through rate and conversion metrics.
+            </li>
+            <li><strong>Scaling reads:</strong> Multiple replica shards; route queries to replicas. Coordinating node
+              scatter-gathers results from all shards and merges sorted results.</li>
+          </ol>
+        </div>
 
-    <div class="def">
-      <dt>Elasticsearch vs. Algolia vs. OpenSearch vs. Typesense</dt>
-      <dd><strong>Elasticsearch/OpenSearch:</strong> Self-hosted, highly configurable, steep learning curve.
-        Best for log analytics (ELK stack) and complex search requirements.
-        <br><strong>Algolia:</strong> Managed SaaS, optimized for sub-10ms search UX (typo-tolerance built-in).
-        Simple to integrate. Expensive at scale. No self-host option.
-        <br><strong>Typesense:</strong> Open-source Algolia alternative. Fast, simple, good for product search.
-        <br><strong>PostgreSQL FTS:</strong> GIN index + <code>tsvector/tsquery</code>. Good enough for small
-        catalogs (&lt;1M docs). Free. No dedicated search infrastructure.
-      </dd>
-    </div>
-  </div>
+        <div class="def">
+          <dt>Elasticsearch vs. Algolia vs. OpenSearch vs. Typesense</dt>
+          <dd><strong>Elasticsearch/OpenSearch:</strong> Self-hosted, highly configurable, steep learning curve.
+            Best for log analytics (ELK stack) and complex search requirements.
+            <br><strong>Algolia:</strong> Managed SaaS, optimized for sub-10ms search UX (typo-tolerance built-in).
+            Simple to integrate. Expensive at scale. No self-host option.
+            <br><strong>Typesense:</strong> Open-source Algolia alternative. Fast, simple, good for product search.
+            <br><strong>PostgreSQL FTS:</strong> GIN index + <code>tsvector/tsquery</code>. Good enough for small
+            catalogs (&lt;1M docs). Free. No dedicated search infrastructure.
+          </dd>
+        </div>
+      </div>
 
 <div class="section" id="disaster-recovery">
-    <h1 class="section-title">CI/CD & Operations</h1>
-    <p class="section-subtitle">Module 12 &nbsp;|&nbsp; Deployment Strategies · Disaster Recovery (DR) · RTO/RPO</p>
+        <h1 class="section-title">CI/CD & Operations</h1>
+        <p class="section-subtitle">Module 12 &nbsp;|&nbsp; Deployment Strategies · Disaster Recovery (DR) · RTO/RPO</p>
 
-    <h2>Deployment Strategies</h2>
-    <p>Deployment strategies define how new versions of software are rolled out to users while minimizing downtime
-      and risk.</p>
+        <h2>Deployment Strategies</h2>
+        <p>Deployment strategies define how new versions of software are rolled out to users while minimizing downtime
+          and risk.</p>
 
-    <div class="compare three">
-      <div class="compare-card neutral">
-        <h4>Rolling Deployment</h4>
-        <p>Gradually replace old instances with new ones.</p>
-        <ul>
-          <li><strong>Pros:</strong> No downtime, low resources.</li>
-          <li><strong>Cons:</strong> "N+1" version skew during rollout.</li>
-        </ul>
-      </div>
-      <div class="compare-card neutral">
-        <h4>Blue-Green</h4>
-        <p>Two identical environments. Switch traffic at DNS/LB.</p>
-        <ul>
-          <li><strong>Pros:</strong> Instant rollback, zero version skew.</li>
-          <li><strong>Cons:</strong> Double the cost/resources.</li>
-        </ul>
-      </div>
-      <div class="compare-card neutral">
-        <h4>Canary</h4>
-        <p>Roll out to a tiny subset of users first.</p>
-        <ul>
-          <li><strong>Pros:</strong> Test in prod with limited blast radius.</li>
-          <li><strong>Cons:</strong> Complex traffic routing needed.</li>
-        </ul>
-      </div>
-    </div>
+        <div class="compare three">
+          <div class="compare-card neutral">
+            <h4>Rolling Deployment</h4>
+            <p>Gradually replace old instances with new ones.</p>
+            <ul>
+              <li><strong>Pros:</strong> No downtime, low resources.</li>
+              <li><strong>Cons:</strong> "N+1" version skew during rollout.</li>
+            </ul>
+          </div>
+          <div class="compare-card neutral">
+            <h4>Blue-Green</h4>
+            <p>Two identical environments. Switch traffic at DNS/LB.</p>
+            <ul>
+              <li><strong>Pros:</strong> Instant rollback, zero version skew.</li>
+              <li><strong>Cons:</strong> Double the cost/resources.</li>
+            </ul>
+          </div>
+          <div class="compare-card neutral">
+            <h4>Canary</h4>
+            <p>Roll out to a tiny subset of users first.</p>
+            <ul>
+              <li><strong>Pros:</strong> Test in prod with limited blast radius.</li>
+              <li><strong>Cons:</strong> Complex traffic routing needed.</li>
+            </ul>
+          </div>
+        </div>
 
-    <div class="diagram">
-      <pre class="mermaid">
+        <div class="diagram">
+          <pre class="mermaid">
 graph TD
     subgraph Blue-Green
     LB1[Load Balancer] -- Blue/Stable --> V1[Version 1]
@@ -1040,69 +1123,69 @@ graph TD
     LB2 -- 5% --> New[Canary Nodes]
     end
 </pre>
-    </div>
+        </div>
 
-    <div class="callout warn">
-      <div class="callout-title">Real Story: AWS S3 Outage (February 2017)</div>
-      <p>An AWS engineer was debugging S3 and accidentally typed the wrong command, taking down a large portion of
-        S3 in US-EAST-1 for 4 hours. Thousands of websites went offline. Companies with disaster recovery plans
-        (multi-region backups, failover systems) survived with minimal impact. Those without proper DR lost millions
-        in revenue and faced angry customers. The lesson: DR isn't optional.</p>
-    </div>
+        <div class="callout warn">
+          <div class="callout-title">Real Story: AWS S3 Outage (February 2017)</div>
+          <p>An AWS engineer was debugging S3 and accidentally typed the wrong command, taking down a large portion of
+            S3 in US-EAST-1 for 4 hours. Thousands of websites went offline. Companies with disaster recovery plans
+            (multi-region backups, failover systems) survived with minimal impact. Those without proper DR lost millions
+            in revenue and faced angry customers. The lesson: DR isn't optional.</p>
+        </div>
 
-    <h2>What is Disaster Recovery?</h2>
+        <h2>What is Disaster Recovery?</h2>
 
-    <p><strong>Disaster Recovery (DR)</strong> is a set of policies, tools, and procedures to enable the recovery or
-      continuation of vital technology infrastructure and systems following a natural or human-induced disaster.</p>
+        <p><strong>Disaster Recovery (DR)</strong> is a set of policies, tools, and procedures to enable the recovery or
+          continuation of vital technology infrastructure and systems following a natural or human-induced disaster.</p>
 
-    <p><strong>Disasters include:</strong></p>
-    <ul>
-      <li><strong>Infrastructure failures:</strong> Data center fire, power outage, hardware failure</li>
-      <li><strong>Natural disasters:</strong> Earthquakes, floods, hurricanes</li>
-      <li><strong>Cyberattacks:</strong> Ransomware, DDoS, data breach</li>
-      <li><strong>Human error:</strong> Accidental deletion, misconfiguration</li>
-      <li><strong>Software bugs:</strong> Deployment gone wrong, database corruption</li>
-    </ul>
-
-    <h2>Core Concepts: RTO and RPO</h2>
-
-    <p>Two critical metrics define your DR strategy:</p>
-
-    <div class="compare">
-      <div class="compare-card pro">
-        <h4>RTO - Recovery Time Objective</h4>
-        <p><strong>Definition:</strong> Maximum acceptable time to restore service after a disaster</p>
-        <p><strong>Question:</strong> "How long can we afford to be down?"</p>
-        <p><strong>Examples:</strong></p>
+        <p><strong>Disasters include:</strong></p>
         <ul>
-          <li>Banking: RTO = 1 hour</li>
-          <li>E-commerce: RTO = 15 minutes</li>
-          <li>Social media: RTO = 5 minutes</li>
-          <li>Internal tools: RTO = 4 hours</li>
-          <li>Batch processing: RTO = 24 hours</li>
+          <li><strong>Infrastructure failures:</strong> Data center fire, power outage, hardware failure</li>
+          <li><strong>Natural disasters:</strong> Earthquakes, floods, hurricanes</li>
+          <li><strong>Cyberattacks:</strong> Ransomware, DDoS, data breach</li>
+          <li><strong>Human error:</strong> Accidental deletion, misconfiguration</li>
+          <li><strong>Software bugs:</strong> Deployment gone wrong, database corruption</li>
         </ul>
-        <p><strong>Impact:</strong> Lower RTO = Higher cost</p>
-      </div>
 
-      <div class="compare-card con">
-        <h4>RPO - Recovery Point Objective</h4>
-        <p><strong>Definition:</strong> Maximum acceptable amount of data loss measured in time</p>
-        <p><strong>Question:</strong> "How much data can we afford to lose?"</p>
-        <p><strong>Examples:</strong></p>
-        <ul>
-          <li>Financial transactions: RPO = 0 (no data loss)</li>
-          <li>E-commerce orders: RPO = 1 minute</li>
-          <li>User posts: RPO = 5 minutes</li>
-          <li>Analytics data: RPO = 1 hour</li>
-          <li>Logs: RPO = 24 hours</li>
-        </ul>
-        <p><strong>Impact:</strong> Lower RPO = Higher cost</p>
-      </div>
-    </div>
+        <h2>Core Concepts: RTO and RPO</h2>
 
-    <div class="example">
-      <div class="example-label">Understanding RTO and RPO</div>
-      <pre>
+        <p>Two critical metrics define your DR strategy:</p>
+
+        <div class="compare">
+          <div class="compare-card pro">
+            <h4>RTO - Recovery Time Objective</h4>
+            <p><strong>Definition:</strong> Maximum acceptable time to restore service after a disaster</p>
+            <p><strong>Question:</strong> "How long can we afford to be down?"</p>
+            <p><strong>Examples:</strong></p>
+            <ul>
+              <li>Banking: RTO = 1 hour</li>
+              <li>E-commerce: RTO = 15 minutes</li>
+              <li>Social media: RTO = 5 minutes</li>
+              <li>Internal tools: RTO = 4 hours</li>
+              <li>Batch processing: RTO = 24 hours</li>
+            </ul>
+            <p><strong>Impact:</strong> Lower RTO = Higher cost</p>
+          </div>
+
+          <div class="compare-card con">
+            <h4>RPO - Recovery Point Objective</h4>
+            <p><strong>Definition:</strong> Maximum acceptable amount of data loss measured in time</p>
+            <p><strong>Question:</strong> "How much data can we afford to lose?"</p>
+            <p><strong>Examples:</strong></p>
+            <ul>
+              <li>Financial transactions: RPO = 0 (no data loss)</li>
+              <li>E-commerce orders: RPO = 1 minute</li>
+              <li>User posts: RPO = 5 minutes</li>
+              <li>Analytics data: RPO = 1 hour</li>
+              <li>Logs: RPO = 24 hours</li>
+            </ul>
+            <p><strong>Impact:</strong> Lower RPO = Higher cost</p>
+          </div>
+        </div>
+
+        <div class="example">
+          <div class="example-label">Understanding RTO and RPO</div>
+          <pre>
 Timeline of a Disaster:
 
 10:00 AM - Last successful backup
@@ -1118,32 +1201,32 @@ Impact:
 • Revenue loss: $100K/hour × 2 = $200K
 • Data loss: 500 orders need manual recovery
   </pre>
-    </div>
+        </div>
 
-    <h2>The Four Disaster Recovery Strategies</h2>
+        <h2>The Four Disaster Recovery Strategies</h2>
 
-    <h3>1. Backup & Restore (Cheapest, Slowest)</h3>
+        <h3>1. Backup & Restore (Cheapest, Slowest)</h3>
 
-    <p><strong>How it works:</strong></p>
-    <ul>
-      <li>Regular backups stored in cloud (S3, Azure Blob)</li>
-      <li>When disaster strikes, provision new infrastructure</li>
-      <li>Restore data from backups</li>
-      <li>Reconfigure and restart services</li>
-    </ul>
+        <p><strong>How it works:</strong></p>
+        <ul>
+          <li>Regular backups stored in cloud (S3, Azure Blob)</li>
+          <li>When disaster strikes, provision new infrastructure</li>
+          <li>Restore data from backups</li>
+          <li>Reconfigure and restart services</li>
+        </ul>
 
-    <p><strong>Metrics:</strong></p>
-    <ul>
-      <li><strong>RTO:</strong> Hours to days</li>
-      <li><strong>RPO:</strong> Hours (depends on backup frequency)</li>
-      <li><strong>Cost:</strong> 💰 Low ($500-$2K/month)</li>
-    </ul>
+        <p><strong>Metrics:</strong></p>
+        <ul>
+          <li><strong>RTO:</strong> Hours to days</li>
+          <li><strong>RPO:</strong> Hours (depends on backup frequency)</li>
+          <li><strong>Cost:</strong> 💰 Low ($500-$2K/month)</li>
+        </ul>
 
-    <p><strong>Best for:</strong> Non-critical systems, internal tools, development environments</p>
+        <p><strong>Best for:</strong> Non-critical systems, internal tools, development environments</p>
 
-    <div class="example">
-      <div class="example-label">Example: Internal HR System</div>
-      <pre>
+        <div class="example">
+          <div class="example-label">Example: Internal HR System</div>
+          <pre>
 Daily Backup Schedule:
 • 2AM: Full database backup → S3
 • Cost: $50/month for storage
@@ -1159,30 +1242,30 @@ Total RTO: 4 hours
 RPO: 8 hours (lost data since 2AM backup)
 Acceptable: Yes (internal system, not customer-facing)
   </pre>
-    </div>
+        </div>
 
-    <h3>2. Pilot Light (Moderate Cost, Fast)</h3>
+        <h3>2. Pilot Light (Moderate Cost, Fast)</h3>
 
-    <p><strong>How it works:</strong></p>
-    <ul>
-      <li>Core infrastructure always running in secondary region</li>
-      <li>Database replication active (real-time or near-real-time)</li>
-      <li>Application servers off or minimal (scaled to zero)</li>
-      <li>When disaster strikes, scale up application tier quickly</li>
-    </ul>
+        <p><strong>How it works:</strong></p>
+        <ul>
+          <li>Core infrastructure always running in secondary region</li>
+          <li>Database replication active (real-time or near-real-time)</li>
+          <li>Application servers off or minimal (scaled to zero)</li>
+          <li>When disaster strikes, scale up application tier quickly</li>
+        </ul>
 
-    <p><strong>Metrics:</strong></p>
-    <ul>
-      <li><strong>RTO:</strong> ~1 hour</li>
-      <li><strong>RPO:</strong> Minutes (based on replication lag)</li>
-      <li><strong>Cost:</strong> 💰💰 Medium ($5K-$20K/month)</li>
-    </ul>
+        <p><strong>Metrics:</strong></p>
+        <ul>
+          <li><strong>RTO:</strong> ~1 hour</li>
+          <li><strong>RPO:</strong> Minutes (based on replication lag)</li>
+          <li><strong>Cost:</strong> 💰💰 Medium ($5K-$20K/month)</li>
+        </ul>
 
-    <p><strong>Best for:</strong> Business-critical applications that can tolerate short downtime</p>
+        <p><strong>Best for:</strong> Business-critical applications that can tolerate short downtime</p>
 
-    <div class="example">
-      <div class="example-label">Example: E-Commerce Site</div>
-      <pre>
+        <div class="example">
+          <div class="example-label">Example: E-Commerce Site</div>
+          <pre>
 Primary Region (US-EAST):
 • Application: 50 servers running
 • Database: PostgreSQL with 2 replicas
@@ -1211,30 +1294,30 @@ RPO: 5 minutes (replication lag)
 Revenue loss: $100K × 1 = $100K
 Acceptable: Yes (1 hour outage reasonable)
   </pre>
-    </div>
+        </div>
 
-    <h3>3. Warm Standby (High Cost, Very Fast)</h3>
+        <h3>3. Warm Standby (High Cost, Very Fast)</h3>
 
-    <p><strong>How it works:</strong></p>
-    <ul>
-      <li>Scaled-down version of full environment always running</li>
-      <li>Application servers running at minimal capacity</li>
-      <li>Database replication active (synchronous or near-sync)</li>
-      <li>When disaster strikes, scale up to full capacity</li>
-    </ul>
+        <p><strong>How it works:</strong></p>
+        <ul>
+          <li>Scaled-down version of full environment always running</li>
+          <li>Application servers running at minimal capacity</li>
+          <li>Database replication active (synchronous or near-sync)</li>
+          <li>When disaster strikes, scale up to full capacity</li>
+        </ul>
 
-    <p><strong>Metrics:</strong></p>
-    <ul>
-      <li><strong>RTO:</strong> ~15 minutes</li>
-      <li><strong>RPO:</strong> Seconds to minutes</li>
-      <li><strong>Cost:</strong> 💰💰💰 High ($20K-$50K/month)</li>
-    </ul>
+        <p><strong>Metrics:</strong></p>
+        <ul>
+          <li><strong>RTO:</strong> ~15 minutes</li>
+          <li><strong>RPO:</strong> Seconds to minutes</li>
+          <li><strong>Cost:</strong> 💰💰💰 High ($20K-$50K/month)</li>
+        </ul>
 
-    <p><strong>Best for:</strong> Mission-critical applications where 15-min downtime is acceptable</p>
+        <p><strong>Best for:</strong> Mission-critical applications where 15-min downtime is acceptable</p>
 
-    <div class="example">
-      <div class="example-label">Example: Banking Application</div>
-      <pre>
+        <div class="example">
+          <div class="example-label">Example: Banking Application</div>
+          <pre>
 Primary Region:
 • Application: 100 servers
 • Database: 5 replicas
@@ -1262,31 +1345,31 @@ RPO: 1 minute (sync replication lag)
 Revenue loss: $100K × 0.25 = $25K
 Acceptable: Yes (banking can handle brief outage)
   </pre>
-    </div>
+        </div>
 
-    <h3>4. Hot Standby / Active-Active (Highest Cost, Instant)</h3>
+        <h3>4. Hot Standby / Active-Active (Highest Cost, Instant)</h3>
 
-    <p><strong>How it works:</strong></p>
-    <ul>
-      <li>Full production environment in multiple regions</li>
-      <li>Both regions actively serving traffic (active-active)</li>
-      <li>Database replication synchronous or conflict-free (CRDT)</li>
-      <li>When disaster strikes, traffic automatically reroutes</li>
-    </ul>
+        <p><strong>How it works:</strong></p>
+        <ul>
+          <li>Full production environment in multiple regions</li>
+          <li>Both regions actively serving traffic (active-active)</li>
+          <li>Database replication synchronous or conflict-free (CRDT)</li>
+          <li>When disaster strikes, traffic automatically reroutes</li>
+        </ul>
 
-    <p><strong>Metrics:</strong></p>
-    <ul>
-      <li><strong>RTO:</strong> Seconds (automatic failover)</li>
-      <li><strong>RPO:</strong> Near zero (synchronous replication)</li>
-      <li><strong>Cost:</strong> 💰💰💰💰 Very High ($50K-$200K+/month)</li>
-    </ul>
+        <p><strong>Metrics:</strong></p>
+        <ul>
+          <li><strong>RTO:</strong> Seconds (automatic failover)</li>
+          <li><strong>RPO:</strong> Near zero (synchronous replication)</li>
+          <li><strong>Cost:</strong> 💰💰💰💰 Very High ($50K-$200K+/month)</li>
+        </ul>
 
-    <p><strong>Best for:</strong> Ultra-critical applications (financial trading, healthcare, emergency services)
-    </p>
+        <p><strong>Best for:</strong> Ultra-critical applications (financial trading, healthcare, emergency services)
+        </p>
 
-    <div class="example">
-      <div class="example-label">Example: Stock Trading Platform</div>
-      <pre>
+        <div class="example">
+          <div class="example-label">Example: Stock Trading Platform</div>
+          <pre>
 US-EAST Region (Active):
 • Application: 200 servers
 • Database: Multi-master setup
@@ -1314,115 +1397,115 @@ RPO: 0 (synchronous replication)
 Revenue loss: $0 (seamless failover)
 Acceptable: Perfect (trading can't stop)
   </pre>
-    </div>
+        </div>
 
-    <h2>Disaster Recovery Strategy Comparison</h2>
+        <h2>Disaster Recovery Strategy Comparison</h2>
 
-    <table>
-      <tr>
-        <th>Strategy</th>
-        <th>RTO</th>
-        <th>RPO</th>
-        <th>Cost</th>
-        <th>Complexity</th>
-        <th>Best For</th>
-      </tr>
-      <tr>
-        <td><strong>Backup & Restore</strong></td>
-        <td>Hours-Days</td>
-        <td>Hours</td>
-        <td>💰 Low</td>
-        <td>Simple</td>
-        <td>Internal tools</td>
-      </tr>
-      <tr>
-        <td><strong>Pilot Light</strong></td>
-        <td>~1 Hour</td>
-        <td>Minutes</td>
-        <td>💰💰 Medium</td>
-        <td>Moderate</td>
-        <td>E-commerce</td>
-      </tr>
-      <tr>
-        <td><strong>Warm Standby</strong></td>
-        <td>~15 Min</td>
-        <td>Seconds</td>
-        <td>💰💰💰 High</td>
-        <td>Complex</td>
-        <td>Banking</td>
-      </tr>
-      <tr>
-        <td><strong>Hot Standby</strong></td>
-        <td>Seconds</td>
-        <td>Near Zero</td>
-        <td>💰💰💰💰 Very High</td>
-        <td>Very Complex</td>
-        <td>Trading, Healthcare</td>
-      </tr>
-    </table>
+        <table>
+          <tr>
+            <th>Strategy</th>
+            <th>RTO</th>
+            <th>RPO</th>
+            <th>Cost</th>
+            <th>Complexity</th>
+            <th>Best For</th>
+          </tr>
+          <tr>
+            <td><strong>Backup & Restore</strong></td>
+            <td>Hours-Days</td>
+            <td>Hours</td>
+            <td>💰 Low</td>
+            <td>Simple</td>
+            <td>Internal tools</td>
+          </tr>
+          <tr>
+            <td><strong>Pilot Light</strong></td>
+            <td>~1 Hour</td>
+            <td>Minutes</td>
+            <td>💰💰 Medium</td>
+            <td>Moderate</td>
+            <td>E-commerce</td>
+          </tr>
+          <tr>
+            <td><strong>Warm Standby</strong></td>
+            <td>~15 Min</td>
+            <td>Seconds</td>
+            <td>💰💰💰 High</td>
+            <td>Complex</td>
+            <td>Banking</td>
+          </tr>
+          <tr>
+            <td><strong>Hot Standby</strong></td>
+            <td>Seconds</td>
+            <td>Near Zero</td>
+            <td>💰💰💰💰 Very High</td>
+            <td>Very Complex</td>
+            <td>Trading, Healthcare</td>
+          </tr>
+        </table>
 
-    <h2>Backup Strategies</h2>
+        <h2>Backup Strategies</h2>
 
-    <h3>Three Types of Backups</h3>
+        <h3>Three Types of Backups</h3>
 
-    <div class="compare three">
-      <div class="compare-card neutral">
-        <h4>Full Backup</h4>
-        <p>Complete copy of all data</p>
-        <p><strong>Pros:</strong></p>
-        <ul>
-          <li>Simple to restore</li>
-          <li>Self-contained</li>
-          <li>Fast restore</li>
-        </ul>
-        <p><strong>Cons:</strong></p>
-        <ul>
-          <li>Large storage space</li>
-          <li>Slow to create</li>
-          <li>Expensive bandwidth</li>
-        </ul>
-        <p><strong>Schedule:</strong> Weekly</p>
-      </div>
+        <div class="compare three">
+          <div class="compare-card neutral">
+            <h4>Full Backup</h4>
+            <p>Complete copy of all data</p>
+            <p><strong>Pros:</strong></p>
+            <ul>
+              <li>Simple to restore</li>
+              <li>Self-contained</li>
+              <li>Fast restore</li>
+            </ul>
+            <p><strong>Cons:</strong></p>
+            <ul>
+              <li>Large storage space</li>
+              <li>Slow to create</li>
+              <li>Expensive bandwidth</li>
+            </ul>
+            <p><strong>Schedule:</strong> Weekly</p>
+          </div>
 
-      <div class="compare-card neutral">
-        <h4>Incremental Backup</h4>
-        <p>Only data changed since last backup</p>
-        <p><strong>Pros:</strong></p>
-        <ul>
-          <li>Fast to create</li>
-          <li>Small storage</li>
-          <li>Efficient</li>
-        </ul>
-        <p><strong>Cons:</strong></p>
-        <ul>
-          <li>Slow restore (need all increments)</li>
-          <li>Chain dependency</li>
-        </ul>
-        <p><strong>Schedule:</strong> Daily</p>
-      </div>
+          <div class="compare-card neutral">
+            <h4>Incremental Backup</h4>
+            <p>Only data changed since last backup</p>
+            <p><strong>Pros:</strong></p>
+            <ul>
+              <li>Fast to create</li>
+              <li>Small storage</li>
+              <li>Efficient</li>
+            </ul>
+            <p><strong>Cons:</strong></p>
+            <ul>
+              <li>Slow restore (need all increments)</li>
+              <li>Chain dependency</li>
+            </ul>
+            <p><strong>Schedule:</strong> Daily</p>
+          </div>
 
-      <div class="compare-card neutral">
-        <h4>Differential Backup</h4>
-        <p>Changed data since last full backup</p>
-        <p><strong>Pros:</strong></p>
-        <ul>
-          <li>Faster restore than incremental</li>
-          <li>Only need full + latest differential</li>
-        </ul>
-        <p><strong>Cons:</strong></p>
-        <ul>
-          <li>Larger than incremental</li>
-          <li>Grows over time</li>
-        </ul>
-        <p><strong>Schedule:</strong> Daily</p>
-      </div>
-    </div>
+          <div class="compare-card neutral">
+            <h4>Differential Backup</h4>
+            <p>Changed data since last full backup</p>
+            <p><strong>Pros:</strong></p>
+            <ul>
+              <li>Faster restore than incremental</li>
+              <li>Only need full + latest differential</li>
+            </ul>
+            <p><strong>Cons:</strong></p>
+            <ul>
+              <li>Larger than incremental</li>
+              <li>Grows over time</li>
+            </ul>
+            <p><strong>Schedule:</strong> Daily</p>
+          </div>
+        </div>
 
-    <h2>Multi-Region Architecture</h2>
+        <h2>Multi-Region Architecture</h2>
 
-    <div class="example">
-      <div class="example-label">Global DR Setup</div>
-      <pre>
+        <div class="example">
+          <div class="example-label">Global DR Setup</div>
+          <pre>
                     [Global DNS]
                         |
           +-------------+-------------+
@@ -1456,64 +1539,64 @@ US-WEST-2 (Replica, 5min lag)
     ↓ async streaming  
 EU-CENTRAL-1 (Replica, 10min lag)
   </pre>
-    </div>
+        </div>
 
-    <h2>Disaster Recovery Checklist</h2>
+        <h2>Disaster Recovery Checklist</h2>
 
-    <div class="callout tip">
-      <div class="callout-title">Essential DR Components</div>
+        <div class="callout tip">
+          <div class="callout-title">Essential DR Components</div>
 
-      <p><strong>1. Data Backup & Replication</strong></p>
-      <ul>
-        <li>✓ Automated daily backups</li>
-        <li>✓ Store backups in 3 locations (3-2-1 rule: 3 copies, 2 media types, 1 offsite)</li>
-        <li>✓ Continuous replication to secondary region</li>
-        <li>✓ Encrypt all backups (AES-256)</li>
-        <li>✓ Test restore monthly</li>
-        <li>✓ Backup retention: 30 days minimum</li>
-      </ul>
+          <p><strong>1. Data Backup & Replication</strong></p>
+          <ul>
+            <li>✓ Automated daily backups</li>
+            <li>✓ Store backups in 3 locations (3-2-1 rule: 3 copies, 2 media types, 1 offsite)</li>
+            <li>✓ Continuous replication to secondary region</li>
+            <li>✓ Encrypt all backups (AES-256)</li>
+            <li>✓ Test restore monthly</li>
+            <li>✓ Backup retention: 30 days minimum</li>
+          </ul>
 
-      <p><strong>2. Infrastructure as Code</strong></p>
-      <ul>
-        <li>✓ All infrastructure in Terraform/CloudFormation</li>
-        <li>✓ Can rebuild entire environment from code</li>
-        <li>✓ Version controlled in Git</li>
-        <li>✓ Tested regularly</li>
-      </ul>
+          <p><strong>2. Infrastructure as Code</strong></p>
+          <ul>
+            <li>✓ All infrastructure in Terraform/CloudFormation</li>
+            <li>✓ Can rebuild entire environment from code</li>
+            <li>✓ Version controlled in Git</li>
+            <li>✓ Tested regularly</li>
+          </ul>
 
-      <p><strong>3. Documented Runbooks</strong></p>
-      <ul>
-        <li>✓ Step-by-step DR procedures</li>
-        <li>✓ Contact list for key personnel</li>
-        <li>✓ Decision tree for disaster types</li>
-        <li>✓ Rollback procedures</li>
-        <li>✓ Communication templates</li>
-      </ul>
+          <p><strong>3. Documented Runbooks</strong></p>
+          <ul>
+            <li>✓ Step-by-step DR procedures</li>
+            <li>✓ Contact list for key personnel</li>
+            <li>✓ Decision tree for disaster types</li>
+            <li>✓ Rollback procedures</li>
+            <li>✓ Communication templates</li>
+          </ul>
 
-      <p><strong>4. Monitoring & Alerting</strong></p>
-      <ul>
-        <li>✓ Health checks in all regions</li>
-        <li>✓ Alert on backup failures</li>
-        <li>✓ Alert on replication lag >5min</li>
-        <li>✓ 24/7 on-call rotation</li>
-        <li>✓ Automated failover triggers</li>
-      </ul>
+          <p><strong>4. Monitoring & Alerting</strong></p>
+          <ul>
+            <li>✓ Health checks in all regions</li>
+            <li>✓ Alert on backup failures</li>
+            <li>✓ Alert on replication lag >5min</li>
+            <li>✓ 24/7 on-call rotation</li>
+            <li>✓ Automated failover triggers</li>
+          </ul>
 
-      <p><strong>5. Regular Testing</strong></p>
-      <ul>
-        <li>✓ DR drills quarterly</li>
-        <li>✓ Restore test monthly</li>
-        <li>✓ Failover test bi-annually</li>
-        <li>✓ Document lessons learned</li>
-        <li>✓ Update runbooks after each test</li>
-      </ul>
-    </div>
+          <p><strong>5. Regular Testing</strong></p>
+          <ul>
+            <li>✓ DR drills quarterly</li>
+            <li>✓ Restore test monthly</li>
+            <li>✓ Failover test bi-annually</li>
+            <li>✓ Document lessons learned</li>
+            <li>✓ Update runbooks after each test</li>
+          </ul>
+        </div>
 
-    <h2>Cost vs Protection Tradeoff</h2>
+        <h2>Cost vs Protection Tradeoff</h2>
 
-    <div class="example">
-      <div class="example-label">Decision Framework: E-Commerce Site</div>
-      <pre>
+        <div class="example">
+          <div class="example-label">Decision Framework: E-Commerce Site</div>
+          <pre>
 Revenue: $100,000/hour
 Uptime requirement: 99.9% (8.76 hours downtime/year allowed)
 
@@ -1552,80 +1635,80 @@ Option 4: Hot Standby
 DECISION: Pilot Light ($260K/year total)
 Best balance of cost and protection for this business.
   </pre>
-    </div>
+        </div>
 
-    <h2>Common Disasters and Recovery</h2>
+        <h2>Common Disasters and Recovery</h2>
 
-    <table>
-      <tr>
-        <th>Disaster Type</th>
-        <th>Probability</th>
-        <th>Impact</th>
-        <th>Prevention</th>
-        <th>Recovery</th>
-      </tr>
-      <tr>
-        <td>Hardware Failure</td>
-        <td>High (monthly)</td>
-        <td>Low-Medium</td>
-        <td>RAID, redundancy</td>
-        <td>Auto-replace, minutes</td>
-      </tr>
-      <tr>
-        <td>Software Bug</td>
-        <td>High (weekly)</td>
-        <td>Low-High</td>
-        <td>Testing, canary deploys</td>
-        <td>Rollback, 10 minutes</td>
-      </tr>
-      <tr>
-        <td>Human Error</td>
-        <td>Medium (quarterly)</td>
-        <td>Medium-High</td>
-        <td>Access controls, automation</td>
-        <td>Restore backup, 1-4 hours</td>
-      </tr>
-      <tr>
-        <td>DDoS Attack</td>
-        <td>Medium (quarterly)</td>
-        <td>Medium</td>
-        <td>WAF, rate limiting</td>
-        <td>Enable DDoS protection, minutes</td>
-      </tr>
-      <tr>
-        <td>Ransomware</td>
-        <td>Low (yearly)</td>
-        <td>High</td>
-        <td>Backups, access controls</td>
-        <td>Restore from backup, hours-days</td>
-      </tr>
-      <tr>
-        <td>Data Center Outage</td>
-        <td>Low (every few years)</td>
-        <td>Very High</td>
-        <td>Multi-region</td>
-        <td>Failover to secondary region, 15min-1hr</td>
-      </tr>
-      <tr>
-        <td>Natural Disaster</td>
-        <td>Very Low (once per decade)</td>
-        <td>Catastrophic</td>
-        <td>Geographic redundancy</td>
-        <td>Failover to distant region, hours</td>
-      </tr>
-    </table>
+        <table>
+          <tr>
+            <th>Disaster Type</th>
+            <th>Probability</th>
+            <th>Impact</th>
+            <th>Prevention</th>
+            <th>Recovery</th>
+          </tr>
+          <tr>
+            <td>Hardware Failure</td>
+            <td>High (monthly)</td>
+            <td>Low-Medium</td>
+            <td>RAID, redundancy</td>
+            <td>Auto-replace, minutes</td>
+          </tr>
+          <tr>
+            <td>Software Bug</td>
+            <td>High (weekly)</td>
+            <td>Low-High</td>
+            <td>Testing, canary deploys</td>
+            <td>Rollback, 10 minutes</td>
+          </tr>
+          <tr>
+            <td>Human Error</td>
+            <td>Medium (quarterly)</td>
+            <td>Medium-High</td>
+            <td>Access controls, automation</td>
+            <td>Restore backup, 1-4 hours</td>
+          </tr>
+          <tr>
+            <td>DDoS Attack</td>
+            <td>Medium (quarterly)</td>
+            <td>Medium</td>
+            <td>WAF, rate limiting</td>
+            <td>Enable DDoS protection, minutes</td>
+          </tr>
+          <tr>
+            <td>Ransomware</td>
+            <td>Low (yearly)</td>
+            <td>High</td>
+            <td>Backups, access controls</td>
+            <td>Restore from backup, hours-days</td>
+          </tr>
+          <tr>
+            <td>Data Center Outage</td>
+            <td>Low (every few years)</td>
+            <td>Very High</td>
+            <td>Multi-region</td>
+            <td>Failover to secondary region, 15min-1hr</td>
+          </tr>
+          <tr>
+            <td>Natural Disaster</td>
+            <td>Very Low (once per decade)</td>
+            <td>Catastrophic</td>
+            <td>Geographic redundancy</td>
+            <td>Failover to distant region, hours</td>
+          </tr>
+        </table>
 
-    <h2>The 3-2-1 Backup Rule</h2>
+        <h2>The 3-2-1 Backup Rule</h2>
 
-    <ul>
-      <li><strong>3 copies</strong> of your data (original + 2 backups)</li>
-      <li><strong>2 different media types</strong> (e.g., disk + cloud)</li>
-      <li><strong>1 copy offsite</strong> (different geographic location)</li>
-    </ul>
+        <ul>
+          <li><strong>3 copies</strong> of your data (original + 2 backups)</li>
+          <li><strong>2 different media types</strong> (e.g., disk + cloud)</li>
+          <li><strong>1 copy offsite</strong> (different geographic location)</li>
+        </ul>
 
-    <div class="example">
-      <div class="example-label">Example: 3-2-1 Rule Implementation</div>
-      <pre>
+        <div class="example">
+          <div class="example-label">Example: 3-2-1 Rule Implementation</div>
+          <pre>
 1. Original Data:
    • Production database in US-EAST-1
 
@@ -1647,60 +1730,60 @@ Best balance of cost and protection for this business.
 
 Result: Safe from any single point of failure
   </pre>
-    </div>
+        </div>
 
-    <div class="callout warn">
-      <div class="callout-title">Critical Reminder</div>
-      <p><strong>An untested DR plan is no plan at all.</strong></p>
-      <ul>
-        <li>Test your backups monthly - verify you can actually restore</li>
-        <li>Run DR drills quarterly - practice the entire failover procedure</li>
-        <li>Update runbooks after each test - document what worked and what didn't</li>
-        <li>Train your team - everyone should know their role during disaster</li>
-      </ul>
-      <p>The time to discover your backup is corrupted is NOT during a disaster.</p>
-    </div>
+        <div class="callout warn">
+          <div class="callout-title">Critical Reminder</div>
+          <p><strong>An untested DR plan is no plan at all.</strong></p>
+          <ul>
+            <li>Test your backups monthly - verify you can actually restore</li>
+            <li>Run DR drills quarterly - practice the entire failover procedure</li>
+            <li>Update runbooks after each test - document what worked and what didn't</li>
+            <li>Train your team - everyone should know their role during disaster</li>
+          </ul>
+          <p>The time to discover your backup is corrupted is NOT during a disaster.</p>
+        </div>
 
-    <div class="callout info">
-      <div class="callout-title">Key Takeaway</div>
-      <p>Disaster Recovery is about <strong>preparing before disaster strikes</strong>. Choose your DR strategy
-        based on RTO/RPO requirements and budget. The four strategies offer different cost-protection tradeoffs:</p>
-      <ul>
-        <li><strong>Backup & Restore:</strong> Cheapest, slowest (hours downtime)</li>
-        <li><strong>Pilot Light:</strong> Moderate cost, fast recovery (~1 hour)</li>
-        <li><strong>Warm Standby:</strong> Expensive, very fast (~15 minutes)</li>
-        <li><strong>Hot Standby:</strong> Most expensive, instant failover</li>
-      </ul>
-      <p>Remember: Test regularly, automate everything possible, and document thoroughly. Your future self during a
-        disaster will thank you.</p>
-    </div>
+        <div class="callout info">
+          <div class="callout-title">Key Takeaway</div>
+          <p>Disaster Recovery is about <strong>preparing before disaster strikes</strong>. Choose your DR strategy
+            based on RTO/RPO requirements and budget. The four strategies offer different cost-protection tradeoffs:</p>
+          <ul>
+            <li><strong>Backup & Restore:</strong> Cheapest, slowest (hours downtime)</li>
+            <li><strong>Pilot Light:</strong> Moderate cost, fast recovery (~1 hour)</li>
+            <li><strong>Warm Standby:</strong> Expensive, very fast (~15 minutes)</li>
+            <li><strong>Hot Standby:</strong> Most expensive, instant failover</li>
+          </ul>
+          <p>Remember: Test regularly, automate everything possible, and document thoroughly. Your future self during a
+            disaster will thank you.</p>
+        </div>
 
-  </div>
+      </div>
 
 <div class="section" id="observability">
-    <h1 class="section-title">Observability</h1>
-    <p class="section-subtitle">Module 13 &nbsp;|&nbsp; Three Pillars · Logging · Metrics · Distributed Tracing ·
-      Log Aggregation · Correlation IDs · Alerting · Dashboards · Runbooks</p>
+        <h1 class="section-title">Observability</h1>
+        <p class="section-subtitle">Module 13 &nbsp;|&nbsp; Three Pillars · Logging · Metrics · Distributed Tracing ·
+          Log Aggregation · Correlation IDs · Alerting · Dashboards · Runbooks</p>
 
-    <h2>What is Observability?</h2>
-    <p>Observability is the ability to understand the internal state of a system by examining its external outputs.
-      A system is observable if you can answer "why is this broken?" from data alone, without adding new
-      instrumentation after the fact. Observability is built, not added — it requires designing systems to expose
-      their behavior through structured telemetry.</p>
+        <h2>What is Observability?</h2>
+        <p>Observability is the ability to understand the internal state of a system by examining its external outputs.
+          A system is observable if you can answer "why is this broken?" from data alone, without adding new
+          instrumentation after the fact. Observability is built, not added — it requires designing systems to expose
+          their behavior through structured telemetry.</p>
 
-    <h3>Observability vs Monitoring</h3>
-    <p>Monitoring asks "is this thing I already know about working?" — it checks known failure modes against
-      predefined thresholds. Observability asks "what is happening and why?" — it allows investigation of unknown
-      failure modes using arbitrary queries against detailed telemetry.</p>
+        <h3>Observability vs Monitoring</h3>
+        <p>Monitoring asks "is this thing I already know about working?" — it checks known failure modes against
+          predefined thresholds. Observability asks "what is happening and why?" — it allows investigation of unknown
+          failure modes using arbitrary queries against detailed telemetry.</p>
 
-    <h2>Three Pillars of Observability</h2>
+        <h2>Three Pillars of Observability</h2>
 
-    <h3>1. Logs</h3>
-    <p>Logs are discrete, time-stamped records of events that occurred within a system. Each log entry captures what
-      happened, when it happened, and contextual information about the state at that moment.</p>
+        <h3>1. Logs</h3>
+        <p>Logs are discrete, time-stamped records of events that occurred within a system. Each log entry captures what
+          happened, when it happened, and contextual information about the state at that moment.</p>
 
-    <h4>Structured vs Unstructured Logging</h4>
-    <pre>
+        <h4>Structured vs Unstructured Logging</h4>
+        <pre>
 # Unstructured log (hard to query programmatically)
 2024-01-15 10:30:45.123 ERROR User 123 failed to checkout: payment declined
 
@@ -1719,93 +1802,93 @@ Result: Safe from any single point of failure
 }
 </pre>
 
-    <h4>Log Levels</h4>
-    <div class="table-wrap">
-      <table>
-        <tr>
-          <th>Level</th>
-          <th>When to use</th>
-          <th>Production volume</th>
-        </tr>
-        <tr>
-          <td>FATAL</td>
-          <td>Application cannot continue — must terminate</td>
-          <td>Rare (pages on-call immediately)</td>
-        </tr>
-        <tr>
-          <td>ERROR</td>
-          <td>An operation failed; requires investigation</td>
-          <td>Low (alerts on threshold)</td>
-        </tr>
-        <tr>
-          <td>WARN</td>
-          <td>Unexpected situation handled gracefully; may indicate future error</td>
-          <td>Low-medium</td>
-        </tr>
-        <tr>
-          <td>INFO</td>
-          <td>Significant business events (order placed, user registered)</td>
-          <td>Medium</td>
-        </tr>
-        <tr>
-          <td>DEBUG</td>
-          <td>Detailed diagnostic information for development</td>
-          <td>Disabled in production (or sampling)</td>
-        </tr>
-        <tr>
-          <td>TRACE</td>
-          <td>Very granular — method entry/exit, loop iterations</td>
-          <td>Never in production</td>
-        </tr>
-      </table>
-    </div>
+        <h4>Log Levels</h4>
+        <div class="table-wrap">
+          <table>
+            <tr>
+              <th>Level</th>
+              <th>When to use</th>
+              <th>Production volume</th>
+            </tr>
+            <tr>
+              <td>FATAL</td>
+              <td>Application cannot continue — must terminate</td>
+              <td>Rare (pages on-call immediately)</td>
+            </tr>
+            <tr>
+              <td>ERROR</td>
+              <td>An operation failed; requires investigation</td>
+              <td>Low (alerts on threshold)</td>
+            </tr>
+            <tr>
+              <td>WARN</td>
+              <td>Unexpected situation handled gracefully; may indicate future error</td>
+              <td>Low-medium</td>
+            </tr>
+            <tr>
+              <td>INFO</td>
+              <td>Significant business events (order placed, user registered)</td>
+              <td>Medium</td>
+            </tr>
+            <tr>
+              <td>DEBUG</td>
+              <td>Detailed diagnostic information for development</td>
+              <td>Disabled in production (or sampling)</td>
+            </tr>
+            <tr>
+              <td>TRACE</td>
+              <td>Very granular — method entry/exit, loop iterations</td>
+              <td>Never in production</td>
+            </tr>
+          </table>
+        </div>
 
-    <h4>Logging Security Rules</h4>
-    <ul>
-      <li>Never log passwords, PINs, or authentication tokens</li>
-      <li>Never log full credit card numbers or CVVs (PCI compliance)</li>
-      <li>Never log session IDs or API keys (allow impersonation)</li>
-      <li>Mask or truncate sensitive PII based on compliance requirements (GDPR, HIPAA)</li>
-    </ul>
+        <h4>Logging Security Rules</h4>
+        <ul>
+          <li>Never log passwords, PINs, or authentication tokens</li>
+          <li>Never log full credit card numbers or CVVs (PCI compliance)</li>
+          <li>Never log session IDs or API keys (allow impersonation)</li>
+          <li>Mask or truncate sensitive PII based on compliance requirements (GDPR, HIPAA)</li>
+        </ul>
 
-    <h3>2. Metrics</h3>
-    <p>Metrics are numeric measurements collected at regular intervals over time. They are efficient to store and
-      query (as time series) and are the primary tool for alerting and capacity planning.</p>
+        <h3>2. Metrics</h3>
+        <p>Metrics are numeric measurements collected at regular intervals over time. They are efficient to store and
+          query (as time series) and are the primary tool for alerting and capacity planning.</p>
 
-    <h4>Metric Types</h4>
-    <ul>
-      <li><strong>Counter:</strong> Monotonically increasing value. Resets to 0 on restart. Rate of change is
-        meaningful. Example: total HTTP requests, total errors.</li>
-      <li><strong>Gauge:</strong> A value that can go up and down arbitrarily. Example: current active connections,
-        memory usage, queue depth.</li>
-      <li><strong>Histogram:</strong> Samples observations and counts them in configurable buckets, also tracking
-        sum and count. Enables percentile calculation. Example: HTTP request duration in buckets [0.1s, 0.5s, 1s,
-        5s].</li>
-      <li><strong>Summary:</strong> Calculates configurable quantiles client-side. Less flexible than histograms for
-        aggregation across instances.</li>
-    </ul>
+        <h4>Metric Types</h4>
+        <ul>
+          <li><strong>Counter:</strong> Monotonically increasing value. Resets to 0 on restart. Rate of change is
+            meaningful. Example: total HTTP requests, total errors.</li>
+          <li><strong>Gauge:</strong> A value that can go up and down arbitrarily. Example: current active connections,
+            memory usage, queue depth.</li>
+          <li><strong>Histogram:</strong> Samples observations and counts them in configurable buckets, also tracking
+            sum and count. Enables percentile calculation. Example: HTTP request duration in buckets [0.1s, 0.5s, 1s,
+            5s].</li>
+          <li><strong>Summary:</strong> Calculates configurable quantiles client-side. Less flexible than histograms for
+            aggregation across instances.</li>
+        </ul>
 
-    <h4>RED Method (for Services)</h4>
-    <ul>
-      <li><strong>Rate:</strong> Requests per second the service is handling.</li>
-      <li><strong>Errors:</strong> The number or rate of failed requests.</li>
-      <li><strong>Duration:</strong> Distribution of request latencies (p50, p95, p99).</li>
-    </ul>
+        <h4>RED Method (for Services)</h4>
+        <ul>
+          <li><strong>Rate:</strong> Requests per second the service is handling.</li>
+          <li><strong>Errors:</strong> The number or rate of failed requests.</li>
+          <li><strong>Duration:</strong> Distribution of request latencies (p50, p95, p99).</li>
+        </ul>
 
-    <h4>USE Method (for Resources)</h4>
-    <ul>
-      <li><strong>Utilization:</strong> Average time the resource is busy (e.g., CPU %).</li>
-      <li><strong>Saturation:</strong> Amount of work waiting to be served (e.g., CPU run queue length).</li>
-      <li><strong>Errors:</strong> Error events (e.g., disk I/O errors, network packet drops).</li>
-    </ul>
+        <h4>USE Method (for Resources)</h4>
+        <ul>
+          <li><strong>Utilization:</strong> Average time the resource is busy (e.g., CPU %).</li>
+          <li><strong>Saturation:</strong> Amount of work waiting to be served (e.g., CPU run queue length).</li>
+          <li><strong>Errors:</strong> Error events (e.g., disk I/O errors, network packet drops).</li>
+        </ul>
 
-    <h3>3. Distributed Tracing</h3>
-    <p>Distributed tracing tracks the execution path of a request as it flows through multiple services, capturing
-      timing and metadata at each step. A trace represents the entire lifecycle of a request; a span represents one
-      unit of work within that trace.</p>
+        <h3>3. Distributed Tracing</h3>
+        <p>Distributed tracing tracks the execution path of a request as it flows through multiple services, capturing
+          timing and metadata at each step. A trace represents the entire lifecycle of a request; a span represents one
+          unit of work within that trace.</p>
 
-    <h4>Trace Structure</h4>
-    <pre>
+        <h4>Trace Structure</h4>
+        <pre>
 Trace ID: abc-123-xyz
 Total duration: 340ms
 
@@ -1817,21 +1900,21 @@ Total duration: 340ms
      └─ DB Query   [span 6, 85-330ms, parent: span 5] ← slow query
 </pre>
 
-    <p>Looking at this trace, the payment service and specifically its database query is responsible for 260ms of
-      the 340ms total request latency. Without tracing, this would require correlating logs from multiple services
-      and guessing.</p>
+        <p>Looking at this trace, the payment service and specifically its database query is responsible for 260ms of
+          the 340ms total request latency. Without tracing, this would require correlating logs from multiple services
+          and guessing.</p>
 
-    <p><strong>Standards and tools:</strong> OpenTelemetry (open standard for instrumentation), Jaeger, Zipkin, AWS
-      X-Ray, Datadog APM, Honeycomb</p>
+        <p><strong>Standards and tools:</strong> OpenTelemetry (open standard for instrumentation), Jaeger, Zipkin, AWS
+          X-Ray, Datadog APM, Honeycomb</p>
 
-    <h2>Log Aggregation</h2>
-    <p>In a distributed system with dozens or hundreds of services generating logs across many instances, logs must
-      be centrally collected and indexed to be searchable. Log aggregation pipelines collect, parse, and route log
-      data to a central store.</p>
+        <h2>Log Aggregation</h2>
+        <p>In a distributed system with dozens or hundreds of services generating logs across many instances, logs must
+          be centrally collected and indexed to be searchable. Log aggregation pipelines collect, parse, and route log
+          data to a central store.</p>
 
-    <h3>ELK Stack (Elasticsearch, Logstash/Fluentd, Kibana)</h3>
-    <div class="diagram">
-      <pre class="mermaid">
+        <h3>ELK Stack (Elasticsearch, Logstash/Fluentd, Kibana)</h3>
+        <div class="diagram">
+          <pre class="mermaid">
 graph LR
   A[Service A\nlog file] --> F1[Fluentd / Filebeat\nsidecar]
   B[Service B\nlog file] --> F2[Fluentd]
@@ -1844,16 +1927,16 @@ graph LR
   E --> K[Kibana\nSearch and visualize]
   E --> AL[Alerting\nElastAlert]
 </pre>
-      <p class="diagram-caption">ELK stack log aggregation pipeline</p>
-    </div>
+          <p class="diagram-caption">ELK stack log aggregation pipeline</p>
+        </div>
 
-    <h2>Correlation IDs (Request IDs)</h2>
-    <p>A correlation ID (also called trace ID or request ID) is a unique identifier attached to a request at the
-      entry point (API gateway or first service) and propagated to every downstream service call. All log entries
-      related to a single user request share the same correlation ID, enabling reconstruction of the complete
-      request trace from logs across all services.</p>
+        <h2>Correlation IDs (Request IDs)</h2>
+        <p>A correlation ID (also called trace ID or request ID) is a unique identifier attached to a request at the
+          entry point (API gateway or first service) and propagated to every downstream service call. All log entries
+          related to a single user request share the same correlation ID, enabling reconstruction of the complete
+          request trace from logs across all services.</p>
 
-    <pre>
+        <pre>
 # API Gateway — generate if not present
 def handle_request(req):
     correlation_id = req.headers.get('X-Correlation-ID') or str(uuid4())
@@ -1877,25 +1960,25 @@ def handle_request(req):
     return result, {'X-Correlation-ID': correlation_id}
 </pre>
 
-    <h2>Alerting</h2>
-    <p>Alerting is the process of detecting when system behavior deviates from expected norms and notifying the
-      appropriate team. Good alerting finds real problems early without generating noise that trains engineers to
-      ignore alerts.</p>
+        <h2>Alerting</h2>
+        <p>Alerting is the process of detecting when system behavior deviates from expected norms and notifying the
+          appropriate team. Good alerting finds real problems early without generating noise that trains engineers to
+          ignore alerts.</p>
 
-    <h3>Alert Quality Criteria</h3>
-    <ul>
-      <li><strong>Actionable:</strong> The recipient knows what to do. An alert that says "CPU is high" without
-        context about what it means or how to fix it is poor. An alert that says "Checkout service CPU >90% for 10
-        minutes — possible infinite loop in payment retry logic, see runbook #42" is actionable.</li>
-      <li><strong>Urgent:</strong> The alert fires before customers notice. Alert on 95th percentile latency
-        crossing 1 second — do not wait for p50 to cross 5 seconds.</li>
-      <li><strong>Signal-to-noise:</strong> False positives train engineers to ignore alerts. Every alert that pages
-        someone and turns out to be nothing is a step toward alert fatigue.</li>
-      <li><strong>On the right channel:</strong> Not all alerts require waking someone at 3am. Tier alerts: page
-        (immediate, 24/7), ticket (business hours), dashboard (informational).</li>
-    </ul>
+        <h3>Alert Quality Criteria</h3>
+        <ul>
+          <li><strong>Actionable:</strong> The recipient knows what to do. An alert that says "CPU is high" without
+            context about what it means or how to fix it is poor. An alert that says "Checkout service CPU >90% for 10
+            minutes — possible infinite loop in payment retry logic, see runbook #42" is actionable.</li>
+          <li><strong>Urgent:</strong> The alert fires before customers notice. Alert on 95th percentile latency
+            crossing 1 second — do not wait for p50 to cross 5 seconds.</li>
+          <li><strong>Signal-to-noise:</strong> False positives train engineers to ignore alerts. Every alert that pages
+            someone and turns out to be nothing is a step toward alert fatigue.</li>
+          <li><strong>On the right channel:</strong> Not all alerts require waking someone at 3am. Tier alerts: page
+            (immediate, 24/7), ticket (business hours), dashboard (informational).</li>
+        </ul>
 
-    <pre>
+        <pre>
 # Prometheus alerting rule example
 groups:
 - name: checkout_alerts
@@ -1922,211 +2005,212 @@ groups:
       summary: "Checkout p95 latency above 2 seconds"
 </pre>
 
-    <h2>Dashboards</h2>
-    <p>Dashboards are visual interfaces that display key metrics and system health at a glance. They serve different
-      audiences and purposes: on-call dashboards for incident response, business dashboards for stakeholders,
-      engineering dashboards for capacity planning.</p>
+        <h2>Dashboards</h2>
+        <p>Dashboards are visual interfaces that display key metrics and system health at a glance. They serve different
+          audiences and purposes: on-call dashboards for incident response, business dashboards for stakeholders,
+          engineering dashboards for capacity planning.</p>
 
-    <h3>Dashboard Design Principles</h3>
-    <ul>
-      <li><strong>One job per dashboard:</strong> An on-call dashboard should show what is broken and where, not
-        every metric. A capacity planning dashboard shows trends over months.</li>
-      <li><strong>Hierarchical drill-down:</strong> Overview dashboard → service dashboard → specific endpoint or
-        operation.</li>
-      <li><strong>Consistent time ranges:</strong> All panels on a dashboard should share the same time window by
-        default.</li>
-      <li><strong>RED metrics first:</strong> For service dashboards, Rate, Errors, and Duration are the most
-        important panels at the top.</li>
-      <li><strong>Annotate deployments:</strong> Mark deployment events as vertical lines on time series graphs to
-        correlate changes with metric shifts.</li>
-    </ul>
+        <h3>Dashboard Design Principles</h3>
+        <ul>
+          <li><strong>One job per dashboard:</strong> An on-call dashboard should show what is broken and where, not
+            every metric. A capacity planning dashboard shows trends over months.</li>
+          <li><strong>Hierarchical drill-down:</strong> Overview dashboard → service dashboard → specific endpoint or
+            operation.</li>
+          <li><strong>Consistent time ranges:</strong> All panels on a dashboard should share the same time window by
+            default.</li>
+          <li><strong>RED metrics first:</strong> For service dashboards, Rate, Errors, and Duration are the most
+            important panels at the top.</li>
+          <li><strong>Annotate deployments:</strong> Mark deployment events as vertical lines on time series graphs to
+            correlate changes with metric shifts.</li>
+        </ul>
 
-    <h2>Runbooks</h2>
-    <p>A runbook is a documented set of procedures for handling known operational scenarios — typically tied to
-      specific alerts. When an alert fires at 3am, the on-call engineer should be able to follow the runbook without
-      needing deep expertise in the system.</p>
+        <h2>Runbooks</h2>
+        <p>A runbook is a documented set of procedures for handling known operational scenarios — typically tied to
+          specific alerts. When an alert fires at 3am, the on-call engineer should be able to follow the runbook without
+          needing deep expertise in the system.</p>
 
-    <h3>Runbook Structure</h3>
-    <ul>
-      <li><strong>Alert name and trigger condition:</strong> What metric threshold caused this alert to fire.</li>
-      <li><strong>Impact statement:</strong> What users or functionality is affected. Severity and urgency.</li>
-      <li><strong>Immediate mitigation:</strong> Steps to stop the bleeding quickly (restart a service, enable
-        feature flag, scale up).</li>
-      <li><strong>Diagnostic steps:</strong> Ordered investigation procedure — where to look first, second, third.
-        Include specific log queries, dashboard links, CLI commands.</li>
-      <li><strong>Root cause patterns:</strong> Common causes and their specific indicators.</li>
-      <li><strong>Resolution steps:</strong> How to fix each root cause.</li>
-      <li><strong>Escalation path:</strong> Who to contact if you cannot resolve it within X minutes.</li>
-      <li><strong>Post-incident:</strong> What to document, which team to notify, whether to file a bug or
-        post-mortem.</li>
-    </ul>
-  </div>
+        <h3>Runbook Structure</h3>
+        <ul>
+          <li><strong>Alert name and trigger condition:</strong> What metric threshold caused this alert to fire.</li>
+          <li><strong>Impact statement:</strong> What users or functionality is affected. Severity and urgency.</li>
+          <li><strong>Immediate mitigation:</strong> Steps to stop the bleeding quickly (restart a service, enable
+            feature flag, scale up).</li>
+          <li><strong>Diagnostic steps:</strong> Ordered investigation procedure — where to look first, second, third.
+            Include specific log queries, dashboard links, CLI commands.</li>
+          <li><strong>Root cause patterns:</strong> Common causes and their specific indicators.</li>
+          <li><strong>Resolution steps:</strong> How to fix each root cause.</li>
+          <li><strong>Escalation path:</strong> Who to contact if you cannot resolve it within X minutes.</li>
+          <li><strong>Post-incident:</strong> What to document, which team to notify, whether to file a bug or
+            post-mortem.</li>
+        </ul>
+      </div>
 
 <div class="section" id="security">
-    <h1 class="section-title">Security: Encryption, IAM &amp; Zero Trust</h1>
-    <p class="section-subtitle">Module 10 &nbsp;|&nbsp; Securing Systems at Scale — Authentication, Encryption, and
-      Defense in Depth</p>
+        <h1 class="section-title">Security: Encryption, IAM &amp; Zero Trust</h1>
+        <p class="section-subtitle">Module 10 &nbsp;|&nbsp; Securing Systems at Scale — Authentication, Encryption, and
+          Defense in Depth</p>
 
-    <h2>Encryption: In Transit vs. At Rest vs. In Use</h2>
-    <div class="table-wrap">
-      <table>
-        <tr>
-          <th>Type</th>
-          <th>What It Protects</th>
-          <th>How</th>
-          <th>Tools</th>
-        </tr>
-        <tr>
-          <td><strong>In Transit</strong></td>
-          <td>Data moving over network</td>
-          <td>TLS 1.2/1.3 (mandatory), mTLS for service-to-service</td>
-          <td>Let's Encrypt, AWS ACM, Istio mTLS</td>
-        </tr>
-        <tr>
-          <td><strong>At Rest</strong></td>
-          <td>Data stored on disk, in DB, in S3</td>
-          <td>AES-256 server-side encryption (SSE), full-disk encryption</td>
-          <td>AWS KMS, S3-SSE, db-level TDE (Transparent Data Encryption)</td>
-        </tr>
-        <tr>
-          <td><strong>In Use</strong></td>
-          <td>Data while being computed (cutting edge)</td>
-          <td>Homomorphic encryption, trusted execution environments (Intel SGX)</td>
-          <td>AWS Nitro Enclaves, Azure Confidential Computing</td>
-        </tr>
-        <tr>
-          <td><strong>End-to-End (E2E)</strong></td>
-          <td>Data from sender to recipient — not even servers can read</td>
-          <td>Client-side encryption with user-controlled keys</td>
-          <td>Signal Protocol, WhatsApp, iMessage</td>
-        </tr>
-      </table>
-    </div>
+        <h2>Encryption: In Transit vs. At Rest vs. In Use</h2>
+        <div class="table-wrap">
+          <table>
+            <tr>
+              <th>Type</th>
+              <th>What It Protects</th>
+              <th>How</th>
+              <th>Tools</th>
+            </tr>
+            <tr>
+              <td><strong>In Transit</strong></td>
+              <td>Data moving over network</td>
+              <td>TLS 1.2/1.3 (mandatory), mTLS for service-to-service</td>
+              <td>Let's Encrypt, AWS ACM, Istio mTLS</td>
+            </tr>
+            <tr>
+              <td><strong>At Rest</strong></td>
+              <td>Data stored on disk, in DB, in S3</td>
+              <td>AES-256 server-side encryption (SSE), full-disk encryption</td>
+              <td>AWS KMS, S3-SSE, db-level TDE (Transparent Data Encryption)</td>
+            </tr>
+            <tr>
+              <td><strong>In Use</strong></td>
+              <td>Data while being computed (cutting edge)</td>
+              <td>Homomorphic encryption, trusted execution environments (Intel SGX)</td>
+              <td>AWS Nitro Enclaves, Azure Confidential Computing</td>
+            </tr>
+            <tr>
+              <td><strong>End-to-End (E2E)</strong></td>
+              <td>Data from sender to recipient — not even servers can read</td>
+              <td>Client-side encryption with user-controlled keys</td>
+              <td>Signal Protocol, WhatsApp, iMessage</td>
+            </tr>
+          </table>
+        </div>
 
-    <div class="def">
-      <dt>TLS 1.3 vs TLS 1.2</dt>
-      <dd>TLS 1.3 (2018) eliminates the round-trip in the handshake: <strong>1-RTT</strong> instead of
-        2-RTT for new connections, and <strong>0-RTT</strong> session resumption (at slight security cost).
-        It also removes weak ciphers (RC4, SHA-1, RSA key exchange). Google found TLS 1.3 reduced connection
-        setup latency by ~20ms on average. All new systems should require TLS 1.3 minimum.</dd>
-      <dt>Key Management: The Hard Part</dt>
-      <dd>Encrypting data is easy. Managing keys securely at scale is hard. Gold standard: use a
-        Hardware Security Module (HSM) — a tamper-resistant chip that stores root keys and never exposes
-        them. AWS CloudHSM and AWS KMS (backed by HSMs) handle this. Keys should be rotated regularly.
-        Never store encryption keys in the same system as the encrypted data.</dd>
-    </div>
+        <div class="def">
+          <dt>TLS 1.3 vs TLS 1.2</dt>
+          <dd>TLS 1.3 (2018) eliminates the round-trip in the handshake: <strong>1-RTT</strong> instead of
+            2-RTT for new connections, and <strong>0-RTT</strong> session resumption (at slight security cost).
+            It also removes weak ciphers (RC4, SHA-1, RSA key exchange). Google found TLS 1.3 reduced connection
+            setup latency by ~20ms on average. All new systems should require TLS 1.3 minimum.</dd>
+          <dt>Key Management: The Hard Part</dt>
+          <dd>Encrypting data is easy. Managing keys securely at scale is hard. Gold standard: use a
+            Hardware Security Module (HSM) — a tamper-resistant chip that stores root keys and never exposes
+            them. AWS CloudHSM and AWS KMS (backed by HSMs) handle this. Keys should be rotated regularly.
+            Never store encryption keys in the same system as the encrypted data.</dd>
+        </div>
 
-    <h2>Authentication: Passwords → Tokens → Certificates</h2>
-    <div class="mermaid">
-      flowchart LR
-      subgraph Modern Auth Flow
-      U[User] -->|username+password| A[Auth Service]
-      A -->|verify bcrypt hash| DB[(Users DB)]
-      A -->|issue JWT\nAccess + Refresh| U
-      U -->|JWT in Authorization header| API[API Server]
-      API -->|verify signature\nno DB call| Allow[Allow Request]
-      end
-    </div>
+        <h2>Authentication: Passwords → Tokens → Certificates</h2>
+        <div class="mermaid">
+          flowchart LR
+          subgraph Modern Auth Flow
+          U[User] -->|username+password| A[Auth Service]
+          A -->|verify bcrypt hash| DB[(Users DB)]
+          A -->|issue JWT\nAccess + Refresh| U
+          U -->|JWT in Authorization header| API[API Server]
+          API -->|verify signature\nno DB call| Allow[Allow Request]
+          end
+        </div>
 
-    <div class="def">
-      <dt>Password Hashing: bcrypt vs. Argon2</dt>
-      <dd><strong>Never store plain-text passwords. Never use MD5 or SHA-256 alone</strong> (too fast — GPU can crack
-        billions/sec).
-        Use <strong>bcrypt</strong> (work factor 12–14), <strong>scrypt</strong>, or <strong>Argon2id</strong>
-        (winner of Password Hashing Competition 2015).
-        Argon2id is memory-hard — costs GB of RAM to compute, making GPU/ASIC attacks impractical.
-        bcrypt at work_factor=12 takes ~250ms per hash on a server — slow enough to prevent dictionary attacks,
-        fast enough for legitimate logins.</dd>
-      <dt>JWT (JSON Web Tokens) Trade-offs</dt>
-      <dd>JWTs are stateless — the server doesn't need a DB lookup to validate a request. The downside:
-        you can't invalidate a JWT before expiry without a blocklist (which adds a DB lookup back).
-        Mitigation: use short expiry (15 minutes) for access tokens + long-lived refresh tokens
-        (stored in DB, revocable). This is the standard OAuth 2.0 pattern.</dd>
-      <dt>mTLS for Service-to-Service Auth</dt>
-      <dd>In microservices, services must authenticate each other, not just users. mTLS (mutual TLS)
-        requires both client and server to present certificates. A service mesh (Istio) does this
-        automatically via short-lived SPIFFE certificates (rotated every 24 hours). No API keys in config files.
-        This is how Google's BeyondCorp zero-trust network works internally.</dd>
-    </div>
+        <div class="def">
+          <dt>Password Hashing: bcrypt vs. Argon2</dt>
+          <dd><strong>Never store plain-text passwords. Never use MD5 or SHA-256 alone</strong> (too fast — GPU can
+            crack
+            billions/sec).
+            Use <strong>bcrypt</strong> (work factor 12–14), <strong>scrypt</strong>, or <strong>Argon2id</strong>
+            (winner of Password Hashing Competition 2015).
+            Argon2id is memory-hard — costs GB of RAM to compute, making GPU/ASIC attacks impractical.
+            bcrypt at work_factor=12 takes ~250ms per hash on a server — slow enough to prevent dictionary attacks,
+            fast enough for legitimate logins.</dd>
+          <dt>JWT (JSON Web Tokens) Trade-offs</dt>
+          <dd>JWTs are stateless — the server doesn't need a DB lookup to validate a request. The downside:
+            you can't invalidate a JWT before expiry without a blocklist (which adds a DB lookup back).
+            Mitigation: use short expiry (15 minutes) for access tokens + long-lived refresh tokens
+            (stored in DB, revocable). This is the standard OAuth 2.0 pattern.</dd>
+          <dt>mTLS for Service-to-Service Auth</dt>
+          <dd>In microservices, services must authenticate each other, not just users. mTLS (mutual TLS)
+            requires both client and server to present certificates. A service mesh (Istio) does this
+            automatically via short-lived SPIFFE certificates (rotated every 24 hours). No API keys in config files.
+            This is how Google's BeyondCorp zero-trust network works internally.</dd>
+        </div>
 
-    <h2>Authorization: RBAC vs. ABAC vs. ReBAC</h2>
-    <div class="table-wrap">
-      <table>
-        <tr>
-          <th>Model</th>
-          <th>Logic</th>
-          <th>Pros</th>
-          <th>Cons</th>
-          <th>Used By</th>
-        </tr>
-        <tr>
-          <td><strong>RBAC</strong> (Role-Based)</td>
-          <td>User has Role → Role has Permissions</td>
-          <td>Simple, auditable</td>
-          <td>Role explosion at scale (1000s of roles)</td>
-          <td>AWS IAM roles, most enterprise apps</td>
-        </tr>
-        <tr>
-          <td><strong>ABAC</strong> (Attribute-Based)</td>
-          <td>Access decided by user/resource/env attributes</td>
-          <td>Fine-grained, context-aware</td>
-          <td>Complex policies, hard to audit</td>
-          <td>AWS IAM policies, XACML systems</td>
-        </tr>
-        <tr>
-          <td><strong>ReBAC</strong> (Relationship-Based)</td>
-          <td>Access based on graph of relationships</td>
-          <td>Natural for social/sharing models</td>
-          <td>Complex graph queries</td>
-          <td>Google Zanzibar, GitHub, Notion</td>
-        </tr>
-      </table>
-    </div>
+        <h2>Authorization: RBAC vs. ABAC vs. ReBAC</h2>
+        <div class="table-wrap">
+          <table>
+            <tr>
+              <th>Model</th>
+              <th>Logic</th>
+              <th>Pros</th>
+              <th>Cons</th>
+              <th>Used By</th>
+            </tr>
+            <tr>
+              <td><strong>RBAC</strong> (Role-Based)</td>
+              <td>User has Role → Role has Permissions</td>
+              <td>Simple, auditable</td>
+              <td>Role explosion at scale (1000s of roles)</td>
+              <td>AWS IAM roles, most enterprise apps</td>
+            </tr>
+            <tr>
+              <td><strong>ABAC</strong> (Attribute-Based)</td>
+              <td>Access decided by user/resource/env attributes</td>
+              <td>Fine-grained, context-aware</td>
+              <td>Complex policies, hard to audit</td>
+              <td>AWS IAM policies, XACML systems</td>
+            </tr>
+            <tr>
+              <td><strong>ReBAC</strong> (Relationship-Based)</td>
+              <td>Access based on graph of relationships</td>
+              <td>Natural for social/sharing models</td>
+              <td>Complex graph queries</td>
+              <td>Google Zanzibar, GitHub, Notion</td>
+            </tr>
+          </table>
+        </div>
 
-    <div class="def">
-      <dt>Google Zanzibar: The Authorization System Powering Gmail, Drive, Docs</dt>
-      <dd>Google's Zanzibar (published 2019) handles 10 million authorization checks per second globally,
-        with &lt;10ms p95 latency. It stores relationships as tuples: <code>(object, relation, user)</code>
-        — e.g., <code>(doc:42, viewer, user:alice)</code>. Arbitrary graph traversal lets you answer:
-        "Can Alice view Doc 42?" by following relationship chains. Open-source implementations:
-        OpenFGA, SpiceDB, Permify, Cerbos.</dd>
-    </div>
+        <div class="def">
+          <dt>Google Zanzibar: The Authorization System Powering Gmail, Drive, Docs</dt>
+          <dd>Google's Zanzibar (published 2019) handles 10 million authorization checks per second globally,
+            with &lt;10ms p95 latency. It stores relationships as tuples: <code>(object, relation, user)</code>
+            — e.g., <code>(doc:42, viewer, user:alice)</code>. Arbitrary graph traversal lets you answer:
+            "Can Alice view Doc 42?" by following relationship chains. Open-source implementations:
+            OpenFGA, SpiceDB, Permify, Cerbos.</dd>
+        </div>
 
-    <h2>Zero Trust Architecture</h2>
-    <p>Traditional security: <em>"Trust everything inside the network perimeter."</em>
-      Zero Trust: <em>"Never trust; always verify."</em> The network perimeter is dead — endpoints are mobile,
-      services run in shared clouds, insiders can be attackers.</p>
+        <h2>Zero Trust Architecture</h2>
+        <p>Traditional security: <em>"Trust everything inside the network perimeter."</em>
+          Zero Trust: <em>"Never trust; always verify."</em> The network perimeter is dead — endpoints are mobile,
+          services run in shared clouds, insiders can be attackers.</p>
 
-    <div class="mermaid">
-      flowchart LR
-      U[User] -->|1. Identity verification\nMFA + device trust| IDP[Identity Provider\nOkta / CyberArk]
-      IDP -->|2. Short-lived token\nbased on device + identity| PEP[Policy Enforcement\nPoint]
-      PEP -->|3. Check policy| PDP[Policy Decision\nPoint - OPA / Zanzibar]
-      PDP -->|4. Allow/Deny\nminimum privilege| S[Protected Service]
-    </div>
+        <div class="mermaid">
+          flowchart LR
+          U[User] -->|1. Identity verification\nMFA + device trust| IDP[Identity Provider\nOkta / CyberArk]
+          IDP -->|2. Short-lived token\nbased on device + identity| PEP[Policy Enforcement\nPoint]
+          PEP -->|3. Check policy| PDP[Policy Decision\nPoint - OPA / Zanzibar]
+          PDP -->|4. Allow/Deny\nminimum privilege| S[Protected Service]
+        </div>
 
-    <div class="def">
-      <dt>Google BeyondCorp</dt>
-      <dd>Google implemented zero trust internally after the Aurora attacks (2010). All employee access
-        is granted based on device certificate (is this a managed Google laptop?) + user identity
-        (is this the right person?) + policy (does this person's role allow this resource?).
-        No VPN required — engineers access internal tools directly from any network. The model is
-        now the basis for Google Cloud's BeyondCorp Enterprise product.</dd>
-      <dt>OWASP Top 10 and System Design</dt>
-      <dd>When asked about security in a system design interview, cover:
-        (1) <strong>Injection:</strong> parameterized queries, not string concatenation;
-        (2) <strong>Broken Auth:</strong> short-lived tokens, MFA, rate limit login attempts;
-        (3) <strong>Sensitive Data Exposure:</strong> encrypt at rest and in transit, no PII in logs;
-        (4) <strong>SSRF:</strong> validate and whitelist outbound URLs in services that fetch URLs;
-        (5) <strong>Rate limiting + DDoS:</strong> CDN-level (Cloudflare) + application-level (token bucket per
-        IP/user).</dd>
-    </div>
-  </div>
+        <div class="def">
+          <dt>Google BeyondCorp</dt>
+          <dd>Google implemented zero trust internally after the Aurora attacks (2010). All employee access
+            is granted based on device certificate (is this a managed Google laptop?) + user identity
+            (is this the right person?) + policy (does this person's role allow this resource?).
+            No VPN required — engineers access internal tools directly from any network. The model is
+            now the basis for Google Cloud's BeyondCorp Enterprise product.</dd>
+          <dt>OWASP Top 10 and System Design</dt>
+          <dd>When asked about security in a system design interview, cover:
+            (1) <strong>Injection:</strong> parameterized queries, not string concatenation;
+            (2) <strong>Broken Auth:</strong> short-lived tokens, MFA, rate limit login attempts;
+            (3) <strong>Sensitive Data Exposure:</strong> encrypt at rest and in transit, no PII in logs;
+            (4) <strong>SSRF:</strong> validate and whitelist outbound URLs in services that fetch URLs;
+            (5) <strong>Rate limiting + DDoS:</strong> CDN-level (Cloudflare) + application-level (token bucket per
+            IP/user).</dd>
+        </div>
+      </div>
 
 
       <div class="page-nav">
         <a class="page-nav-btn" href="09-distributed-systems.html">&#8592; Distributed Systems</a>
-        <a class="page-nav-btn home" href="../system-design-complete.html">&#9776; All Topics</a>
+        <a class="page-nav-btn home" href="01-introduction.html">&#9776; All Topics</a>
         <a class="page-nav-btn" href="11-interview-framework.html">Interview Framework &#8594;</a>
       </div>
     </div>

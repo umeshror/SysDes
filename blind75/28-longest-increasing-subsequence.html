@@ -1,20 +1,17 @@
 <!DOCTYPE html>
 
 <html lang="en">
-
 <head>
-    <meta charset="utf-8" />
-    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
-    <title>Blind 75 — Coding Interview Patterns</title>
-    <link href="https://fonts.googleapis.com" rel="preconnect" />
-    <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Fira+Code:wght@400;500&amp;display=swap"
-        rel="stylesheet" />
-    <!-- Highlight.js for syntax highlighting -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css" rel="stylesheet" />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
-    <style>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Blind 75 — Coding Interview Patterns</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Fira+Code:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<!-- Highlight.js for syntax highlighting -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<style>
         :root {
             --bg: #f6f8ff;
             --surface: #ffffff;
@@ -849,6 +846,71 @@
             margin-bottom: 6px;
         }
 
+        /* Flow Matrix & Diagram Enhancements */
+        .flow-matrix-container {
+            margin: 24px 0;
+            overflow-x: auto;
+        }
+
+        .flow-matrix-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+            color: #bac2de;
+            background: rgba(30, 30, 46, 0.4);
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .flow-matrix-table th,
+        .flow-matrix-table td {
+            padding: 10px 14px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .flow-matrix-table th {
+            background: rgba(43, 43, 62, 0.6);
+            color: #cdd6f4;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-size: 0.75rem;
+        }
+
+        .flow-matrix-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .flow-matrix-table tr:hover td {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .flow-matrix-table code {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 3px 6px;
+            border-radius: 4px;
+            color: #89dceb;
+            font-family: 'Fira Code', monospace;
+        }
+
+        .diagram-container {
+            margin: 24px 0;
+            padding: 24px;
+            background: rgba(30, 30, 46, 0.4);
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            text-align: center;
+        }
+
+        .diagram-container img,
+        .diagram-container svg {
+            max-width: 100%;
+            height: auto;
+            border-radius: 4px;
+        }
+
         /* Solved button */
         .mark-solved-btn {
             display: inline-flex;
@@ -875,12 +937,52 @@
         .mark-solved-btn.solved {
             background: #64748b;
         }
+
+        /* Page nav */
+        .page-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 28px 0px 48px;
+            border-top: 1px solid rgba(137, 180, 250, .15);
+            margin-top: 24px;
+            gap: 12px;
+        }
+
+        .page-nav-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 22px;
+            background: #1a1a2e;
+            color: #cdd6f4;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: .84rem;
+            font-weight: 600;
+            transition: all .18s;
+            border: 1px solid rgba(137, 180, 250, .15);
+        }
+
+        .page-nav-btn:hover {
+            background: #313244;
+            border-color: rgba(137, 180, 250, .35);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, .2);
+        }
+
+        .page-nav-btn.home {
+            background: linear-gradient(135deg, #1e3a5f, #162d48);
+        }
+
+        .page-nav-btn.home:hover {
+            background: linear-gradient(135deg, #264a78, #1e3a5f);
+        }
     </style>
 </head>
-
 <body>
-    <!-- ── SIDEBAR ────────────────────────────────────────────── -->
-        <nav class="sidebar">
+<!-- ── SIDEBAR ────────────────────────────────────────────── -->
+    <nav class="sidebar">
         <div class="sidebar-header">
             <a href="../index.html">← Back to Home</a>
             <h1>Blind 75</h1>
@@ -1363,22 +1465,15 @@
 <span class="topic-tag">Array</span><span class="topic-tag">Dynamic Programming</span><span class="topic-tag">Binary Search</span>
 </div>
 <h1 class="q-title">Longest Increasing Subsequence</h1>
-<p class="q-source"><a href="https://leetcode.com/problems/longest-increasing-subsequence" target="_blank">leetcode.com/problems/longest-increasing-subsequence</a> · Blind 75 · FAANG
-                    favourite</p>
+<p class="q-source"><a href="https://leetcode.com/problems/longest-increasing-subsequence" target="_blank">leetcode.com/problems/longest-increasing-subsequence</a> · Blind 75 · FAANG favourite</p>
 </div>
 <hr class="section-rule"/>
-<div class="problem-statement">
-<h3>Problem Statement</h3>
-<div class="statement-content">Given an integer array <code>nums</code>, return the length of the
-                    <strong>longest strictly increasing subsequence</strong>.
-                </div>
-</div>
+<div class="problem-statement"><h3>Problem Statement</h3><div class="statement-content">Given an integer array <code>nums</code>, return the length of the <strong>longest strictly increasing subsequence</strong>.</div></div>
 <div class="examples">
 <div class="example-block">
 <div class="example-header">Example 1</div>
 <div class="example-body">
-<div><span class="label">Input: </span><span class="val">nums = [10,9,2,5,3,7,101,18]</span>
-</div>
+<div><span class="label">Input: </span><span class="val">nums = [10,9,2,5,3,7,101,18]</span></div>
 <div><span class="label">Output: </span><span class="val">4</span></div>
 <div class="explanation">LIS is [2,3,7,101].</div>
 </div>
@@ -1398,34 +1493,18 @@
 <div><span class="label">Output: </span><span class="val">1</span></div>
 <div class="explanation">No increasing pair; LIS has length 1.</div>
 </div>
-</div>
-</div>
-<div class="constraints">
-<h4>Constraints</h4>
-<ul>
-<li>1 ≤ nums.length ≤ 2500</li>
-<li>-10<sup>4</sup> ≤ nums[i] ≤ 10<sup>4</sup></li>
-</ul>
-</div>
+</div></div>
+<div class="constraints"><h4>Constraints</h4><ul><li>1 ≤ nums.length ≤ 2500</li><li>-10<sup>4</sup> ≤ nums[i] ≤ 10<sup>4</sup></li></ul></div>
 <h2 class="approach-title">Approaches Comparison</h2>
 <table class="compare-table">
+<tr><th>Approach</th><th>Time</th><th>Space</th><th>Notes</th></tr>
 <tr>
-<th>Approach</th>
-<th>Time</th>
-<th>Space</th>
-<th>Notes</th>
-</tr>
-<tr>
-<td>DP O(n²)</td>
-<td><code>O(n²)</code></td>
-<td><code>O(n)</code></td>
-<td>dp[i] = LIS ending at index i. Standard.</td>
+<td>DP O(n²)</td><td><code>O(n²)</code></td>
+<td><code>O(n)</code></td><td>dp[i] = LIS ending at index i. Standard.</td>
 </tr>
 <tr class="optimal-row">
-<td>Patience Sort + Binary Search</td>
-<td><code>O(n log n)</code></td>
-<td><code>O(n)</code></td>
-<td>Maintain sorted piles. Optimal.</td>
+<td>Patience Sort + Binary Search</td><td><code>O(n log n)</code></td>
+<td><code>O(n)</code></td><td>Maintain sorted piles. Optimal.</td>
 </tr>
 </table>
 <h2 class="approach-title">Approach 1 — DP O(n²) <span class="approach-badge badge-better">O(n²)</span></h2>
@@ -1436,19 +1515,14 @@
 <p class="approach-explanation">dp[i] = LIS ending at index i. Standard.</p>
 <div class="warn-box">
 <div class="warn-box-title">⚠ Interviewer will push back</div>
-<p>This is a valid stepping-stone answer. But the problem requires better optimization. Always start by
-                    acknowledging this brute force/suboptimal time complexity before moving to the optimal solution.</p>
+<p>This is a valid stepping-stone answer. But the problem requires better optimization. Always start by acknowledging this brute force/suboptimal time complexity before moving to the optimal solution.</p>
 </div>
 <h2 class="approach-title">Approach 2 — Patience Sort + Binary Search <span class="approach-badge badge-optimal">Optimal</span></h2>
 <div class="complexity-row">
-<div class="complexity-pill"><span class="cp-label">Time</span><span class="cp-value">O(n log n)</span>
-</div>
+<div class="complexity-pill"><span class="cp-label">Time</span><span class="cp-value">O(n log n)</span></div>
 <div class="complexity-pill"><span class="cp-label">Space</span><span class="cp-value">O(n)</span></div>
 </div>
-<p class="approach-explanation">Maintain a <code>tails</code> array where <code>tails[i]</code> is the
-                smallest tail element of all increasing subsequences of length i+1. For each number, binary search for
-                its position in tails and replace; or append if it's larger than all. The length of tails = LIS length.
-            </p>
+<p class="approach-explanation">Maintain a <code>tails</code> array where <code>tails[i]</code> is the smallest tail element of all increasing subsequences of length i+1. For each number, binary search for its position in tails and replace; or append if it's larger than all. The length of tails = LIS length.</p>
 <div class="code-tabs">
 <div class="tab-buttons"><button class="tab-btn active" onclick="switchTab(this, 'opt-python-q28')">Python</button>
 <button class="tab-btn" onclick="switchTab(this, 'opt-java-q28')">Java</button>
@@ -1456,8 +1530,7 @@
 <button class="tab-btn" onclick="switchTab(this, 'opt-go-q28')">Go</button>
 </div>
 <div class="tab-content active" id="opt-python-q28">
-<div class="code-wrap">
-<pre><code class="language-python">import bisect
+<div class="code-wrap"><pre><code class="language-python">import bisect
 
 def lengthOfLIS(nums):
     tails = []
@@ -1467,61 +1540,52 @@ def lengthOfLIS(nums):
             tails.append(n)
         else:
             tails[idx] = n
-    return len(tails)</code></pre>
-</div>
+    return len(tails)</code></pre></div>
 </div>
 <div class="tab-content" id="opt-java-q28">
-<div class="code-wrap">
-<pre><code class="language-java">public int lengthOfLIS(int[] nums) {
+<div class="code-wrap"><pre><code class="language-java">public int lengthOfLIS(int[] nums) {
     List&lt;Integer&gt; tails=new ArrayList&lt;&gt;();
     for(int n:nums){int lo=0,hi=tails.size();
         while(lo&lt;hi){int m=(lo+hi)/2;if(tails.get(m)&lt;n)lo=m+1;else hi=m;}
         if(lo==tails.size())tails.add(n);else tails.set(lo,n);
     }
     return tails.size();
-}</code></pre>
-</div>
+}</code></pre></div>
 </div>
 <div class="tab-content" id="opt-javascript-q28">
-<div class="code-wrap">
-<pre><code class="language-javascript">var lengthOfLIS = function(nums) {
+<div class="code-wrap"><pre><code class="language-javascript">var lengthOfLIS = function(nums) {
     const tails=[];
     for(const n of nums){
         let lo=0,hi=tails.length;
-        while(lo<hi){const m="(lo+hi)">&gt;1;if(tails[m]<n)lo=m+1;else code="" hi="m;}" if(lo="tails.length)tails.push(n);else" return="" tails.length;="" tails[lo]="n;" }="" };<=""></n)lo=m+1;else></hi){const></code></pre>
-</div>
+        while(lo<hi){const m="(lo+hi)">&gt;1;if(tails[m]<n)lo=m+1;else code="" hi="m;}" if(lo="tails.length)tails.push(n);else" return="" tails.length;="" tails[lo]="n;" }="" };<=""></n)lo=m+1;else></hi){const></code></pre></div>
 </div>
 <div class="tab-content" id="opt-go-q28">
-<div class="code-wrap">
-<pre><code class="language-go">func lengthOfLIS(nums []int) int {
+<div class="code-wrap"><pre><code class="language-go">func lengthOfLIS(nums []int) int {
     tails:=[]int{}
     for _,n:=range nums{
         lo,hi:=0,len(tails)
-        for lo<hi{m:=(lo+hi) 2;if="" code="" if="" len(tails)="" lo="len(tails){tails=append(tails,n)}else{tails[lo]=n}" return="" tails[m]<n{lo="m+1}else{hi=m}}" }="" }<=""></hi{m:=(lo+hi)></code></pre>
-</div>
+        for lo<hi{m:=(lo+hi) 2;if="" code="" if="" len(tails)="" lo="len(tails){tails=append(tails,n)}else{tails[lo]=n}" return="" tails[m]<n{lo="m+1}else{hi=m}}" }="" }<=""></hi{m:=(lo+hi)></code></pre></div>
 </div>
 </div>
 <div class="insight" style="margin-top:20px;">
 <div class="insight-title">tails[] Doesn't Store the Actual LIS</div>
-<p>The tails array may NOT be the actual LIS — it's a construction artifact. However, its length always
-                    equals the LIS length. If you need the actual sequence, use the O(n²) DP approach with backtracking.
-                </p>
+<p>The tails array may NOT be the actual LIS — it's a construction artifact. However, its length always equals the LIS length. If you need the actual sequence, use the O(n²) DP approach with backtracking.</p>
 </div>
 <div class="interview-tips">
 <h3>Interview Playbook</h3>
-<ol>
-<li><strong>Know both approaches:</strong> O(n²) DP is easier to explain and code under pressure;
-                        O(n log n) shows sophistication.</li>
-<li><strong>bisect_left:</strong> Finds the leftmost position where n can be inserted to keep tails
-                        sorted. If equal exists, it replaces it (maintaining strictly increasing invariant).</li>
-<li><strong>Companies:</strong> Google, Amazon, Meta, Microsoft.</li>
-</ol>
+<ol><li><strong>Know both approaches:</strong> O(n²) DP is easier to explain and code under pressure; O(n log n) shows sophistication.</li><li><strong>bisect_left:</strong> Finds the leftmost position where n can be inserted to keep tails sorted. If equal exists, it replaces it (maintaining strictly increasing invariant).</li><li><strong>Companies:</strong> Google, Amazon, Meta, Microsoft.</li></ol>
 </div>
 <button class="mark-solved-btn" id="solve-q28" onclick="markSolved('q28',this)">Mark as Solved</button>
 </div>
+
+        <div class="page-nav" style="max-width: 960px; margin: 40px auto 0; padding: 20px 48px;">
+            <a class="page-nav-btn" href="09-word-break.html">&#8592; Word Break</a>
+            <a class="page-nav-btn home" href="../index.html">&#9776; Back to Portfolio</a>
+            <a class="page-nav-btn" href="38-unique-paths.html">Unique Paths &#8594;</a>
+        </div>
     </div>
 
-    <script>
+<script>
         // Initialize highlight.js
         hljs.highlightAll();
         // Initialize mermaid.js
@@ -1548,7 +1612,19 @@ def lengthOfLIS(nums):
             document.querySelectorAll('.question-panel').forEach(p => p.classList.remove('active'));
             document.querySelectorAll('.q-item').forEach(i => i.classList.remove('active'));
             const panel = document.getElementById(qId);
-            if (panel) panel.classList.add('active');
+            if (panel) {
+                panel.classList.add('active');
+                if (window.mermaid) {
+                    setTimeout(() => {
+                        try {
+                            const mNodes = Array.from(panel.querySelectorAll('.mermaid:not([data-processed="true"])'));
+                            if (mNodes.length > 0) window.mermaid.run({ nodes: mNodes });
+                        } catch (err) {
+                            console.error('Mermaid run error:', err);
+                        }
+                    }, 50);
+                }
+            }
             if (item) item.classList.add('active');
             document.getElementById('main-panel').scrollTo(0, 0);
         }
@@ -1618,6 +1694,11 @@ def lengthOfLIS(nums):
                 }
             });
         }
+    </script>
+<script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({ startOnLoad: false, theme: 'dark' });
+        window.mermaid = mermaid;
     </script>
 </body>
 </html>

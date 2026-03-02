@@ -30,6 +30,11 @@
       min-height: 100vh;
     }
 
+    .sidebar-toggle {
+      display: none;
+      /* Hidden on desktop */
+    }
+
     .sidebar {
       width: 300px;
       min-width: 300px;
@@ -72,11 +77,55 @@
 
     .nav-module-title {
       padding: 10px 20px 6px;
-      font-size: 0.68rem;
+      font-size: 0.72rem;
       font-weight: 700;
       text-transform: uppercase;
-      letter-spacing: 1px;
+      letter-spacing: 0.5px;
+      color: #7f849c;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      user-select: none;
+      transition: color 0.2s;
+    }
+
+    .nav-module-title:hover {
+      color: #cdd6f4;
+    }
+
+    .nav-module-title::after {
+      content: '▼';
+      font-size: 0.6rem;
       color: #585b70;
+      transition: transform 0.3s ease;
+    }
+
+    /* Hide children by default */
+    .nav-module>*:not(.nav-module-title) {
+      display: none;
+    }
+
+    /* Show children when expanded */
+    .nav-module.expanded>*:not(.nav-module-title) {
+      display: block;
+      animation: slideDown 0.2s ease-out forwards;
+    }
+
+    .nav-module.expanded>.nav-module-title::after {
+      transform: rotate(180deg);
+    }
+
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        transform: translateY(-5px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
 
     .nav-item {
@@ -457,10 +506,43 @@
     }
 
     @media (max-width: 768px) {
+      .layout {
+        flex-direction: column;
+      }
+
       .sidebar {
         width: 100%;
+        min-width: 100%;
         height: auto;
         position: relative;
+        padding-bottom: 0;
+      }
+
+      /* Hide the navigation links by default on mobile */
+      #sidebar-nav-content {
+        display: none;
+        padding-bottom: 20px;
+      }
+
+      /* Show links when the active class is added via JS */
+      #sidebar-nav-content.active {
+        display: block;
+      }
+
+      /* Style the hamburger button */
+      .sidebar-toggle {
+        display: block;
+        background: transparent;
+        border: none;
+        color: #89b4fa;
+        cursor: pointer;
+        padding: 5px;
+      }
+
+      .sidebar-header {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
       }
 
       .main {
@@ -849,7 +931,7 @@
         </details>
         <details class="acc-chapter">
           <summary class="acc-summary">
-            <span class="chap-icon">🏆</span>
+            <span class="chap-icon">📚</span>
             <span class="chap-text">
               <span class="chap-num">Chapter 12</span>
               <span class="chap-label">Case Studies</span>
@@ -858,7 +940,7 @@
             <span class="acc-arrow">›</span>
           </summary>
           <div class="acc-sub">
-              <a class="acc-sub-item" href="12-case-studies.html#case-opentable">Design OpenTable</a>
+              <a class="acc-sub-item" href="../case_studies/open-table.html#case-opentable">Design OpenTable (Deep Dive)</a>
           </div>
         </details>
       </div>
@@ -868,75 +950,76 @@
       <div class="progress-bar-wrap"><div class="progress-bar" id="pb"></div></div>
 
 <div class="section active" id="framework">
-    <h1 class="section-title">System Design Interview Framework</h1>
-    <p class="section-subtitle">Module 15 &nbsp;|&nbsp; 4-Step Framework · Clarification · High-Level Design · Deep
-      Dive · Wrap-up</p>
+        <h1 class="section-title">System Design Interview Framework</h1>
+        <p class="section-subtitle">Module 15 &nbsp;|&nbsp; 4-Step Framework · Clarification · High-Level Design · Deep
+          Dive · Wrap-up</p>
 
-    <h2>The 4-Step System Design Framework</h2>
-    <p>A structured approach is critical in a 45-60 minute interview to ensure you cover all necessary ground without
-      getting stuck in the weeds early on.</p>
+        <h2>The 4-Step System Design Framework</h2>
+        <p>A structured approach is critical in a 45-60 minute interview to ensure you cover all necessary ground
+          without
+          getting stuck in the weeds early on.</p>
 
-    <div class="compare four">
-      <div class="compare-card neutral">
-        <h4>1. Clarify & Scope</h4>
-        <p><strong>(5-10 mins)</strong></p>
-        <ul>
-          <li>Identify users and use cases</li>
-          <li>Functional vs. Non-functional requirements</li>
-          <li>Constraints (DAU, storage, latency)</li>
-          <li>"How many users?" / "What's the peak RPS?"</li>
-        </ul>
-      </div>
-      <div class="compare-card neutral">
-        <h4>2. High-Level Design</h4>
-        <p><strong>(10-15 mins)</strong></p>
-        <ul>
-          <li>Sketch core components (LB, API, DB)</li>
-          <li>Define data flow between components</li>
-          <li>Choose the database type (SQL vs. NoSQL)</li>
-          <li>Verify the design meets functional reqs</li>
-        </ul>
-      </div>
-      <div class="compare-card neutral">
-        <h4>3. Deep Dive</h4>
-        <p><strong>(15-25 mins)</strong></p>
-        <ul>
-          <li>Apply scaling patterns (Sharding, Caching)</li>
-          <li>Address failures (Replication, Multi-region)</li>
-          <li>Detail specific APIs or Data Schemas</li>
-          <li>Solve for performance bottlenecks</li>
-        </ul>
-      </div>
-      <div class="compare-card neutral">
-        <h4>4. Wrap Up</h4>
-        <p><strong>(5 mins)</strong></p>
-        <ul>
-          <li>Summarize the final architecture</li>
-          <li>Mention alternative approaches discussed</li>
-          <li>Identify remaining weak points/limitations</li>
-          <li>Suggest monitoring/observability metrics</li>
-        </ul>
-      </div>
-    </div>
+        <div class="compare four">
+          <div class="compare-card neutral">
+            <h4>1. Clarify & Scope</h4>
+            <p><strong>(5-10 mins)</strong></p>
+            <ul>
+              <li>Identify users and use cases</li>
+              <li>Functional vs. Non-functional requirements</li>
+              <li>Constraints (DAU, storage, latency)</li>
+              <li>"How many users?" / "What's the peak RPS?"</li>
+            </ul>
+          </div>
+          <div class="compare-card neutral">
+            <h4>2. High-Level Design</h4>
+            <p><strong>(10-15 mins)</strong></p>
+            <ul>
+              <li>Sketch core components (LB, API, DB)</li>
+              <li>Define data flow between components</li>
+              <li>Choose the database type (SQL vs. NoSQL)</li>
+              <li>Verify the design meets functional reqs</li>
+            </ul>
+          </div>
+          <div class="compare-card neutral">
+            <h4>3. Deep Dive</h4>
+            <p><strong>(15-25 mins)</strong></p>
+            <ul>
+              <li>Apply scaling patterns (Sharding, Caching)</li>
+              <li>Address failures (Replication, Multi-region)</li>
+              <li>Detail specific APIs or Data Schemas</li>
+              <li>Solve for performance bottlenecks</li>
+            </ul>
+          </div>
+          <div class="compare-card neutral">
+            <h4>4. Wrap Up</h4>
+            <p><strong>(5 mins)</strong></p>
+            <ul>
+              <li>Summarize the final architecture</li>
+              <li>Mention alternative approaches discussed</li>
+              <li>Identify remaining weak points/limitations</li>
+              <li>Suggest monitoring/observability metrics</li>
+            </ul>
+          </div>
+        </div>
 
-    <h2>Step 1: Clarification & Scoping</h2>
-    <p>Never start designing immediately. Spend the first 5-10 minutes asking questions to eliminate ambiguity.
-      Interviewer expectations vary, so you must define the world you are building.</p>
+        <h2>Step 1: Clarification & Scoping</h2>
+        <p>Never start designing immediately. Spend the first 5-10 minutes asking questions to eliminate ambiguity.
+          Interviewer expectations vary, so you must define the world you are building.</p>
 
-    <div class="example">
-      <div class="example-label">Example Questions for "Design Twitter"</div>
-      <ul>
-        <li>"Can users follow each other?" (Focus: Social Graph)</li>
-        <li>"Do we need to support images and videos?" (Focus: Asset Storage, CDN)</li>
-        <li>"How many users are active daily?" (Focus: Scale, Throughput)</li>
-        <li>"Is the feed sorted by time or relevance?" (Focus: Ranking service)</li>
-      </ul>
-    </div>
+        <div class="example">
+          <div class="example-label">Example Questions for "Design Twitter"</div>
+          <ul>
+            <li>"Can users follow each other?" (Focus: Social Graph)</li>
+            <li>"Do we need to support images and videos?" (Focus: Asset Storage, CDN)</li>
+            <li>"How many users are active daily?" (Focus: Scale, Throughput)</li>
+            <li>"Is the feed sorted by time or relevance?" (Focus: Ranking service)</li>
+          </ul>
+        </div>
 
-    <h2>Step 2: High-Level Design (Proposing a Skeleton)</h2>
-    <p>Your goal is to get a working end-to-end design on the board. Don't worry about optimization yet.</p>
-    <div class="diagram">
-      <pre class="mermaid">
+        <h2>Step 2: High-Level Design (Proposing a Skeleton)</h2>
+        <p>Your goal is to get a working end-to-end design on the board. Don't worry about optimization yet.</p>
+        <div class="diagram">
+          <pre class="mermaid">
 graph LR
     User[Web/Mobile Client] --> LB[Load Balancer]
     LB --> API[API Gateway]
@@ -945,52 +1028,53 @@ graph LR
     Core --> DB[(Primary Store)]
     Core --> Cache([Read Cache])
 </pre>
-      <p class="diagram-caption">Generic high-level architecture skeleton</p>
-    </div>
+          <p class="diagram-caption">Generic high-level architecture skeleton</p>
+        </div>
 
-    <h2>Step 3: Design Deep Dive (The "Meat" of the Interview)</h2>
-    <p>This is where you show your expertise. The interviewer will usually guide you toward specific bottlenecks.</p>
-    <div class="table-wrap">
-      <table>
-        <tr>
-          <th>Problem</th>
-          <th>Deep Dive Pattern</th>
-        </tr>
-        <tr>
-          <td>Huge write volume</td>
-          <td>LSM-Trees, Sharding, Message Queues (Buffer)</td>
-        </tr>
-        <tr>
-          <td>Huge read volume</td>
-          <td>Caching (Redis), Read Replicas, CDN</td>
-        </tr>
-        <tr>
-          <td>Slow queries</td>
-          <td>Indexing, Denormalization, Materialized Views</td>
-        </tr>
-        <tr>
-          <td>Single point of failure</td>
-          <td>Multi-leader replication, Heartbeats, Failover</td>
-        </tr>
-      </table>
-    </div>
+        <h2>Step 3: Design Deep Dive (The "Meat" of the Interview)</h2>
+        <p>This is where you show your expertise. The interviewer will usually guide you toward specific bottlenecks.
+        </p>
+        <div class="table-wrap">
+          <table>
+            <tr>
+              <th>Problem</th>
+              <th>Deep Dive Pattern</th>
+            </tr>
+            <tr>
+              <td>Huge write volume</td>
+              <td>LSM-Trees, Sharding, Message Queues (Buffer)</td>
+            </tr>
+            <tr>
+              <td>Huge read volume</td>
+              <td>Caching (Redis), Read Replicas, CDN</td>
+            </tr>
+            <tr>
+              <td>Slow queries</td>
+              <td>Indexing, Denormalization, Materialized Views</td>
+            </tr>
+            <tr>
+              <td>Single point of failure</td>
+              <td>Multi-leader replication, Heartbeats, Failover</td>
+            </tr>
+          </table>
+        </div>
 
-    <h2>Step 4: Wrap-up & Trade-offs</h2>
-    <p>End on a strong note by identifying what your design *doesn't* do well. This shows maturity. No system is
-      perfect; every design choice is a trade-off.</p>
-    <div class="callout tip">
-      <div class="callout-title">Pro-Tip: "The Two-Option Approach"</div>
-      <p>When making a big decision (e.g., choosing a DB), present two options, explain the trade-offs of each, and
-        then make a recommendation based on the constraints you established in Step 1.</p>
-    </div>
+        <h2>Step 4: Wrap-up & Trade-offs</h2>
+        <p>End on a strong note by identifying what your design *doesn't* do well. This shows maturity. No system is
+          perfect; every design choice is a trade-off.</p>
+        <div class="callout tip">
+          <div class="callout-title">Pro-Tip: "The Two-Option Approach"</div>
+          <p>When making a big decision (e.g., choosing a DB), present two options, explain the trade-offs of each, and
+            then make a recommendation based on the constraints you established in Step 1.</p>
+        </div>
 
-  </div>
+      </div>
 
 
       <div class="page-nav">
         <a class="page-nav-btn" href="10-search-operations.html">&#8592; Search, Ops & Security</a>
-        <a class="page-nav-btn home" href="../system-design-complete.html">&#9776; All Topics</a>
-        <a class="page-nav-btn" href="12-case-studies.html">Case Studies &#8594;</a>
+        <a class="page-nav-btn home" href="01-introduction.html">&#9776; All Topics</a>
+        <a class="page-nav-btn" href="../case_studies/open-table.html">Case Studies &#8594;</a>
       </div>
     </div>
   </div>

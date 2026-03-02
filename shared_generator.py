@@ -80,6 +80,29 @@ def _generate_panel_html(q_id, d):
                 <p>This is a valid stepping-stone answer. But the problem requires better optimization. Always start by acknowledging this brute force/suboptimal time complexity before moving to the optimal solution.</p>
             </div>"""
 
+    # Optional Diagram and Flow Matrix
+    diagram_html = ""
+    if "diagram" in d and d["diagram"]:
+        diagram_html = f"""
+            <div class="diagram-container">
+                {d["diagram"]}
+            </div>"""
+
+    flow_html = ""
+    if "flow_matrix" in d and d["flow_matrix"]:
+        fm = d["flow_matrix"]
+        headers = "".join(f"<th>{h}</th>" for h in fm["headers"])
+        rows = ""
+        for r in fm["rows"]:
+            rows += "<tr>" + "".join(f"<td>{c}</td>" for c in r) + "</tr>"
+        flow_html = f"""
+            <div class="flow-matrix-container">
+                <table class="flow-matrix-table">
+                    <thead><tr>{headers}</tr></thead>
+                    <tbody>{rows}</tbody>
+                </table>
+            </div>"""
+
     tips_html = "".join(f"<li>{t}</li>" for t in d["tips"])
     return f"""
         <div class="question-panel" id="{q_id}">
@@ -104,6 +127,8 @@ def _generate_panel_html(q_id, d):
             </table>
             
             {approaches_sections}
+            {diagram_html}
+            {flow_html}
             <div class="insight" style="margin-top:20px;">
                 <div class="insight-title">{d["insight_title"]}</div>
                 <p>{d["insight_text"]}</p>

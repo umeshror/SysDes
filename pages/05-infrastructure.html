@@ -30,6 +30,11 @@
       min-height: 100vh;
     }
 
+    .sidebar-toggle {
+      display: none;
+      /* Hidden on desktop */
+    }
+
     .sidebar {
       width: 300px;
       min-width: 300px;
@@ -72,11 +77,55 @@
 
     .nav-module-title {
       padding: 10px 20px 6px;
-      font-size: 0.68rem;
+      font-size: 0.72rem;
       font-weight: 700;
       text-transform: uppercase;
-      letter-spacing: 1px;
+      letter-spacing: 0.5px;
+      color: #7f849c;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      user-select: none;
+      transition: color 0.2s;
+    }
+
+    .nav-module-title:hover {
+      color: #cdd6f4;
+    }
+
+    .nav-module-title::after {
+      content: '▼';
+      font-size: 0.6rem;
       color: #585b70;
+      transition: transform 0.3s ease;
+    }
+
+    /* Hide children by default */
+    .nav-module>*:not(.nav-module-title) {
+      display: none;
+    }
+
+    /* Show children when expanded */
+    .nav-module.expanded>*:not(.nav-module-title) {
+      display: block;
+      animation: slideDown 0.2s ease-out forwards;
+    }
+
+    .nav-module.expanded>.nav-module-title::after {
+      transform: rotate(180deg);
+    }
+
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        transform: translateY(-5px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
 
     .nav-item {
@@ -457,10 +506,43 @@
     }
 
     @media (max-width: 768px) {
+      .layout {
+        flex-direction: column;
+      }
+
       .sidebar {
         width: 100%;
+        min-width: 100%;
         height: auto;
         position: relative;
+        padding-bottom: 0;
+      }
+
+      /* Hide the navigation links by default on mobile */
+      #sidebar-nav-content {
+        display: none;
+        padding-bottom: 20px;
+      }
+
+      /* Show links when the active class is added via JS */
+      #sidebar-nav-content.active {
+        display: block;
+      }
+
+      /* Style the hamburger button */
+      .sidebar-toggle {
+        display: block;
+        background: transparent;
+        border: none;
+        color: #89b4fa;
+        cursor: pointer;
+        padding: 5px;
+      }
+
+      .sidebar-header {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
       }
 
       .main {
@@ -849,7 +931,7 @@
         </details>
         <details class="acc-chapter">
           <summary class="acc-summary">
-            <span class="chap-icon">🏆</span>
+            <span class="chap-icon">📚</span>
             <span class="chap-text">
               <span class="chap-num">Chapter 12</span>
               <span class="chap-label">Case Studies</span>
@@ -858,7 +940,7 @@
             <span class="acc-arrow">›</span>
           </summary>
           <div class="acc-sub">
-              <a class="acc-sub-item" href="12-case-studies.html#case-opentable">Design OpenTable</a>
+              <a class="acc-sub-item" href="../case_studies/open-table.html#case-opentable">Design OpenTable (Deep Dive)</a>
           </div>
         </details>
       </div>
@@ -868,457 +950,461 @@
       <div class="progress-bar-wrap"><div class="progress-bar" id="pb"></div></div>
 
 <div class="section active" id="lb">
-    <h1 class="section-title">Load Balancing</h1>
-    <p class="section-subtitle">Module 5 &nbsp;|&nbsp; Distributing Traffic, Health Checks, and Layer 4 vs Layer 7</p>
+        <h1 class="section-title">Load Balancing</h1>
+        <p class="section-subtitle">Module 5 &nbsp;|&nbsp; Distributing Traffic, Health Checks, and Layer 4 vs Layer 7
+        </p>
 
-    <h2>L4 vs. L7 Load Balancing</h2>
-    <div class="compare">
-      <div class="compare-card neutral">
-        <h4>Layer 4 (Network/Transport)</h4>
-        <ul>
-          <li>Routes based on IP + TCP/UDP port only</li>
-          <li>No inspection of HTTP headers, URL, cookies</li>
-          <li>Extremely fast: &lt;0.1ms overhead, millions of conn/sec</li>
-          <li>Stateful TCP connections — single server per connection</li>
-        </ul>
-        <p><strong>Use:</strong> Raw throughput needs, non-HTTP protocols (gRPC, databases, gaming)</p>
-        <p><strong>Examples:</strong> AWS NLB, HAProxy TCP mode, hardware F5 BIG-IP</p>
+        <h2>L4 vs. L7 Load Balancing</h2>
+        <div class="compare">
+          <div class="compare-card neutral">
+            <h4>Layer 4 (Network/Transport)</h4>
+            <ul>
+              <li>Routes based on IP + TCP/UDP port only</li>
+              <li>No inspection of HTTP headers, URL, cookies</li>
+              <li>Extremely fast: &lt;0.1ms overhead, millions of conn/sec</li>
+              <li>Stateful TCP connections — single server per connection</li>
+            </ul>
+            <p><strong>Use:</strong> Raw throughput needs, non-HTTP protocols (gRPC, databases, gaming)</p>
+            <p><strong>Examples:</strong> AWS NLB, HAProxy TCP mode, hardware F5 BIG-IP</p>
+          </div>
+          <div class="compare-card pro">
+            <h4>Layer 7 (Application)</h4>
+            <ul>
+              <li>Reads HTTP headers, URL paths, cookies, request body</li>
+              <li>Route <code>/api/*</code> to one server group, <code>/static/*</code> to another</li>
+              <li>Sticky sessions via cookie (<code>SERVERID</code>)</li>
+              <li>Header rewriting, request/response transformation</li>
+              <li>WebSocket and HTTP/2 multiplexing aware</li>
+            </ul>
+            <p><strong>Use:</strong> Web apps, microservices, content-based routing, canary deployments</p>
+            <p><strong>Examples:</strong> AWS ALB, Nginx, Envoy, Traefik, HAProxy HTTP mode</p>
+          </div>
+        </div>
+
+        <h2>Load Balancing Algorithms</h2>
+        <div class="mermaid">
+          flowchart LR
+          subgraph Round Robin
+          C1[Request 1] --> S1[Server A]
+          C2[Request 2] --> S2[Server B]
+          C3[Request 3] --> S3[Server C]
+          C4[Request 4] --> S1
+          end
+          subgraph Least Connections
+          C5[New request] --> L{Who has\nfewest active\nconnections?}
+          L -->|"A:10, B:2, C:7"| S2b[Server B\n2 conns]
+          end
+          subgraph Weighted Round Robin
+          C6[4 requests] -->|2 go here| SA[Server A\nweight=2]
+          C6 -->|1 goes here| SB[Server B\nweight=1]
+          C6 -->|1 goes here| SC[Server C\nweight=1]
+          end
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <tr>
+              <th>Algorithm</th>
+              <th>Best For</th>
+              <th>Limitation</th>
+            </tr>
+            <tr>
+              <td>Round Robin</td>
+              <td>Uniform request cost, stateless services</td>
+              <td>Bad if some requests take 100× longer than others</td>
+            </tr>
+            <tr>
+              <td>Weighted Round Robin</td>
+              <td>Heterogeneous hardware (some servers have more CPU)</td>
+              <td>Weights need manual tuning as load changes</td>
+            </tr>
+            <tr>
+              <td>Least Connections</td>
+              <td>Highly variable request duration (file uploads, slow queries)</td>
+              <td>Doesn't account for server CPU/RAM, only connection count</td>
+            </tr>
+            <tr>
+              <td>Least Response Time</td>
+              <td>When response time is the key metric</td>
+              <td>Requires active health probing — small overhead per server</td>
+            </tr>
+            <tr>
+              <td>IP Hash (Sticky)</td>
+              <td>Stateful apps where session state lives on server</td>
+              <td>Hash may be skewed (all users behind one corporate IP)</td>
+            </tr>
+            <tr>
+              <td>Random with Two Choices (P2C)</td>
+              <td>Large distributed clusters, proven theoretically optimal</td>
+              <td>Slightly more complex implementation</td>
+            </tr>
+          </table>
+        </div>
+
+        <div class="callout tip">
+          <div class="callout-title">Power of Two Choices (P2C) — The Modern Standard</div>
+          <p>Pick 2 random servers, route to the one with fewer connections. Theoretically proven to reduce max
+            load from O(log N / log log N) (round robin) to O(log log N) — a dramatic improvement at scale.
+            Used by <strong>Nginx Plus</strong>, <strong>HAProxy</strong> (with random selection), and
+            <strong>most modern service meshes</strong>. Netflix uses a variant they call "Hysteresis" which
+            also weighs recent response latency.
+          </p>
+        </div>
+
+        <h2>Health Checks: Active vs. Passive</h2>
+        <div class="compare">
+          <div class="compare-card neutral">
+            <h4>Active Health Checks</h4>
+            <ul>
+              <li>LB periodically probes each backend (HTTP GET /health every 5s)</li>
+              <li>Detects failure BEFORE a real user request fails</li>
+              <li>Costs some bandwidth and server resources</li>
+              <li>Checks should test <em>real</em> dependencies: DB connection, cache reachability</li>
+            </ul>
+          </div>
+          <div class="compare-card neutral">
+            <h4>Passive Health Checks</h4>
+            <ul>
+              <li>Monitor actual traffic responses for failures (5xx, timeouts)</li>
+              <li>Zero overhead when healthy</li>
+              <li>At least one real user sees the error before the server is marked down</li>
+              <li>Good complement to active checks</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="def">
+          <dt>Health check endpoint best practices</dt>
+          <dd>A good <code>/health</code> endpoint: (1) returns 200 only if all critical dependencies are reachable;
+            (2) returns the check results as JSON for debugging; (3) completes in &lt;500ms; (4) never logs at INFO
+            level
+            (it's called every 5 seconds — logs would drown real application logs).
+            Kubernetes distinguishes <strong>liveness</strong> (is the app running?) from <strong>readiness</strong>
+            (is the app ready to serve traffic?). Never combine these — a slow DB shouldn't kill a pod.</dd>
+          <dt>AWS ALB at FAANG scale</dt>
+          <dd>AWS ALB (Application Load Balancer) handles Layer 7 routing for millions of AWS customers. It auto-scales
+            to handle sudden traffic spikes without any pre-warming (unlike the legacy Classic LB, which needed
+            pre-warming requests). Internally, ALB nodes themselves are behind a Network Load Balancer for
+            multi-AZ distribution. ALB supports: weighted target groups (canary), Lambda as a target (serverless
+            backends),
+            gRPC, and WebSocket protocol upgrades.</dd>
+        </div>
+
+        <h2>Global Load Balancing: DNS-Based vs. Anycast</h2>
+        <div class="mermaid">
+          flowchart LR
+          U[Global Users] --> DNS[DNS-based GSLB\ne.g. Route53 Geolocation]
+          DNS --> R1[us-east-1\nALB]
+          DNS --> R2[eu-west-1\nALB]
+          DNS --> R3[ap-southeast-1\nALB]
+          U --> ANY[Anycast IP\ne.g. Cloudflare]
+          ANY --> E1[NYC edge]
+          ANY --> E2[London edge]
+          ANY --> E3[Singapore edge]
+        </div>
+
+        <div class="def">
+          <dt>DNS-based GSLB (e.g., AWS Route 53)</dt>
+          <dd>Route 53 returns different IPs based on the user's geographic origin. Users in Europe get the EU ALB's IP.
+            Limitation: DNS TTL means failover takes 60–300 seconds (users may have cached the old IP).
+            Use Route 53 Health Checks + low TTL (60s) to speed up failover.</dd>
+          <dt>Anycast (Cloudflare, Akamai)</dt>
+          <dd>All edge PoPs advertise the same IP address. BGP routing directs each user to the nearest PoP
+            automatically.
+            Failover is near-instantaneous — BGP re-converges in seconds when a PoP goes down.
+            DDoS attacks are automatically spread across all PoPs (absorptive capacity).</dd>
+        </div>
       </div>
-      <div class="compare-card pro">
-        <h4>Layer 7 (Application)</h4>
-        <ul>
-          <li>Reads HTTP headers, URL paths, cookies, request body</li>
-          <li>Route <code>/api/*</code> to one server group, <code>/static/*</code> to another</li>
-          <li>Sticky sessions via cookie (<code>SERVERID</code>)</li>
-          <li>Header rewriting, request/response transformation</li>
-          <li>WebSocket and HTTP/2 multiplexing aware</li>
-        </ul>
-        <p><strong>Use:</strong> Web apps, microservices, content-based routing, canary deployments</p>
-        <p><strong>Examples:</strong> AWS ALB, Nginx, Envoy, Traefik, HAProxy HTTP mode</p>
-      </div>
-    </div>
-
-    <h2>Load Balancing Algorithms</h2>
-    <div class="mermaid">
-      flowchart LR
-      subgraph Round Robin
-      C1[Request 1] --> S1[Server A]
-      C2[Request 2] --> S2[Server B]
-      C3[Request 3] --> S3[Server C]
-      C4[Request 4] --> S1
-      end
-      subgraph Least Connections
-      C5[New request] --> L{Who has\nfewest active\nconnections?}
-      L -->|"A:10, B:2, C:7"| S2b[Server B\n2 conns]
-      end
-      subgraph Weighted Round Robin
-      C6[4 requests] -->|2 go here| SA[Server A\nweight=2]
-      C6 -->|1 goes here| SB[Server B\nweight=1]
-      C6 -->|1 goes here| SC[Server C\nweight=1]
-      end
-    </div>
-
-    <div class="table-wrap">
-      <table>
-        <tr>
-          <th>Algorithm</th>
-          <th>Best For</th>
-          <th>Limitation</th>
-        </tr>
-        <tr>
-          <td>Round Robin</td>
-          <td>Uniform request cost, stateless services</td>
-          <td>Bad if some requests take 100× longer than others</td>
-        </tr>
-        <tr>
-          <td>Weighted Round Robin</td>
-          <td>Heterogeneous hardware (some servers have more CPU)</td>
-          <td>Weights need manual tuning as load changes</td>
-        </tr>
-        <tr>
-          <td>Least Connections</td>
-          <td>Highly variable request duration (file uploads, slow queries)</td>
-          <td>Doesn't account for server CPU/RAM, only connection count</td>
-        </tr>
-        <tr>
-          <td>Least Response Time</td>
-          <td>When response time is the key metric</td>
-          <td>Requires active health probing — small overhead per server</td>
-        </tr>
-        <tr>
-          <td>IP Hash (Sticky)</td>
-          <td>Stateful apps where session state lives on server</td>
-          <td>Hash may be skewed (all users behind one corporate IP)</td>
-        </tr>
-        <tr>
-          <td>Random with Two Choices (P2C)</td>
-          <td>Large distributed clusters, proven theoretically optimal</td>
-          <td>Slightly more complex implementation</td>
-        </tr>
-      </table>
-    </div>
-
-    <div class="callout tip">
-      <div class="callout-title">Power of Two Choices (P2C) — The Modern Standard</div>
-      <p>Pick 2 random servers, route to the one with fewer connections. Theoretically proven to reduce max
-        load from O(log N / log log N) (round robin) to O(log log N) — a dramatic improvement at scale.
-        Used by <strong>Nginx Plus</strong>, <strong>HAProxy</strong> (with random selection), and
-        <strong>most modern service meshes</strong>. Netflix uses a variant they call "Hysteresis" which
-        also weighs recent response latency.
-      </p>
-    </div>
-
-    <h2>Health Checks: Active vs. Passive</h2>
-    <div class="compare">
-      <div class="compare-card neutral">
-        <h4>Active Health Checks</h4>
-        <ul>
-          <li>LB periodically probes each backend (HTTP GET /health every 5s)</li>
-          <li>Detects failure BEFORE a real user request fails</li>
-          <li>Costs some bandwidth and server resources</li>
-          <li>Checks should test <em>real</em> dependencies: DB connection, cache reachability</li>
-        </ul>
-      </div>
-      <div class="compare-card neutral">
-        <h4>Passive Health Checks</h4>
-        <ul>
-          <li>Monitor actual traffic responses for failures (5xx, timeouts)</li>
-          <li>Zero overhead when healthy</li>
-          <li>At least one real user sees the error before the server is marked down</li>
-          <li>Good complement to active checks</li>
-        </ul>
-      </div>
-    </div>
-
-    <div class="def">
-      <dt>Health check endpoint best practices</dt>
-      <dd>A good <code>/health</code> endpoint: (1) returns 200 only if all critical dependencies are reachable;
-        (2) returns the check results as JSON for debugging; (3) completes in &lt;500ms; (4) never logs at INFO
-        level
-        (it's called every 5 seconds — logs would drown real application logs).
-        Kubernetes distinguishes <strong>liveness</strong> (is the app running?) from <strong>readiness</strong>
-        (is the app ready to serve traffic?). Never combine these — a slow DB shouldn't kill a pod.</dd>
-      <dt>AWS ALB at FAANG scale</dt>
-      <dd>AWS ALB (Application Load Balancer) handles Layer 7 routing for millions of AWS customers. It auto-scales
-        to handle sudden traffic spikes without any pre-warming (unlike the legacy Classic LB, which needed
-        pre-warming requests). Internally, ALB nodes themselves are behind a Network Load Balancer for
-        multi-AZ distribution. ALB supports: weighted target groups (canary), Lambda as a target (serverless
-        backends),
-        gRPC, and WebSocket protocol upgrades.</dd>
-    </div>
-
-    <h2>Global Load Balancing: DNS-Based vs. Anycast</h2>
-    <div class="mermaid">
-      flowchart LR
-      U[Global Users] --> DNS[DNS-based GSLB\ne.g. Route53 Geolocation]
-      DNS --> R1[us-east-1\nALB]
-      DNS --> R2[eu-west-1\nALB]
-      DNS --> R3[ap-southeast-1\nALB]
-      U --> ANY[Anycast IP\ne.g. Cloudflare]
-      ANY --> E1[NYC edge]
-      ANY --> E2[London edge]
-      ANY --> E3[Singapore edge]
-    </div>
-
-    <div class="def">
-      <dt>DNS-based GSLB (e.g., AWS Route 53)</dt>
-      <dd>Route 53 returns different IPs based on the user's geographic origin. Users in Europe get the EU ALB's IP.
-        Limitation: DNS TTL means failover takes 60–300 seconds (users may have cached the old IP).
-        Use Route 53 Health Checks + low TTL (60s) to speed up failover.</dd>
-      <dt>Anycast (Cloudflare, Akamai)</dt>
-      <dd>All edge PoPs advertise the same IP address. BGP routing directs each user to the nearest PoP automatically.
-        Failover is near-instantaneous — BGP re-converges in seconds when a PoP goes down.
-        DDoS attacks are automatically spread across all PoPs (absorptive capacity).</dd>
-    </div>
-  </div>
 
 <div class="section" id="caching">
-    <h1 class="section-title">Caching Architecture</h1>
-    <p class="section-subtitle">Module 5 &nbsp;|&nbsp; Cache Hierarchies, Eviction Policies, and Cache Stampede
-      Mitigation</p>
+        <h1 class="section-title">Caching Architecture</h1>
+        <p class="section-subtitle">Module 5 &nbsp;|&nbsp; Cache Hierarchies, Eviction Policies, and Cache Stampede
+          Mitigation</p>
 
-    <h2>The Cache Hierarchy at Scale</h2>
-    <div class="mermaid">
-      flowchart LR
-      C([Client]) --> B[Browser Cache\n0ms]
-      B --> CDN[CDN Edge\n10–30ms]
-      CDN --> LMem[In-process Cache\n&lt;0.1ms]
-      LMem --> Redis[Redis / Memcached\n0.5–2ms]
-      Redis --> RR[Read Replica\n2–10ms]
-      RR --> W[(Primary DB)]
-    </div>
+        <h2>The Cache Hierarchy at Scale</h2>
+        <div class="mermaid">
+          flowchart LR
+          C([Client]) --> B[Browser Cache\n0ms]
+          B --> CDN[CDN Edge\n10–30ms]
+          CDN --> LMem[In-process Cache\n&lt;0.1ms]
+          LMem --> Redis[Redis / Memcached\n0.5–2ms]
+          Redis --> RR[Read Replica\n2–10ms]
+          RR --> W[(Primary DB)]
+        </div>
 
-    <div class="callout tip">
-      <div class="callout-title">The 80/20 Rule of Caching</div>
-      <p>In most read workloads, 80% of reads hit 20% of the data (Pareto principle). Caching that 20%
-        (the "hot set") eliminates 80% of your DB load. Identify your hot set with a read-frequency
-        histogram. Start with a small cache (even 1% of your data may be enough to capture 80% of reads).</p>
-    </div>
+        <div class="callout tip">
+          <div class="callout-title">The 80/20 Rule of Caching</div>
+          <p>In most read workloads, 80% of reads hit 20% of the data (Pareto principle). Caching that 20%
+            (the "hot set") eliminates 80% of your DB load. Identify your hot set with a read-frequency
+            histogram. Start with a small cache (even 1% of your data may be enough to capture 80% of reads).</p>
+        </div>
 
-    <h2>Cache Eviction Policies</h2>
-    <div class="table-wrap">
-      <table>
-        <tr>
-          <th>Policy</th>
-          <th>Evicts</th>
-          <th>Implementation</th>
-          <th>Best For</th>
-        </tr>
-        <tr>
-          <td><strong>LRU</strong> (Least Recently Used)</td>
-          <td>Item not accessed most recently</td>
-          <td>Doubly-linked list + hash map; O(1) get/put</td>
-          <td>Most workloads — temporal locality common</td>
-        </tr>
-        <tr>
-          <td><strong>LFU</strong> (Least Frequently Used)</td>
-          <td>Item accessed fewest times</td>
-          <td>Min-heap or frequency buckets</td>
-          <td>Stable popular content (videos, docs)</td>
-        </tr>
-        <tr>
-          <td><strong>TTL</strong> (Time-To-Live)</td>
-          <td>Item after a fixed time window</td>
-          <td>Heap ordered by expiry; passive or active sweep</td>
-          <td>Any time-sensitive data (sessions, API responses)</td>
-        </tr>
-        <tr>
-          <td><strong>SLRU</strong> (Segmented LRU)</td>
-          <td>LRU from probation segment only</td>
-          <td>Two LRU queues: protected + probation</td>
-          <td>Scan-resistant (batch operations shouldn't flush popular items)</td>
-        </tr>
-        <tr>
-          <td><strong>W-TinyLFU</strong> (Window Tiny LFU)</td>
-          <td>Low-frequency items, sketch-based</td>
-          <td>Frequency sketch (Count-Min) + LRU window</td>
-          <td>Production highest hit-rate; used by Caffeine (Java)</td>
-        </tr>
-        <tr>
-          <td><strong>Random</strong></td>
-          <td>Random item</td>
-          <td>O(1) trivial</td>
-          <td>Uniform access patterns (rare); used by CPU TLBs</td>
-        </tr>
-      </table>
-    </div>
+        <h2>Cache Eviction Policies</h2>
+        <div class="table-wrap">
+          <table>
+            <tr>
+              <th>Policy</th>
+              <th>Evicts</th>
+              <th>Implementation</th>
+              <th>Best For</th>
+            </tr>
+            <tr>
+              <td><strong>LRU</strong> (Least Recently Used)</td>
+              <td>Item not accessed most recently</td>
+              <td>Doubly-linked list + hash map; O(1) get/put</td>
+              <td>Most workloads — temporal locality common</td>
+            </tr>
+            <tr>
+              <td><strong>LFU</strong> (Least Frequently Used)</td>
+              <td>Item accessed fewest times</td>
+              <td>Min-heap or frequency buckets</td>
+              <td>Stable popular content (videos, docs)</td>
+            </tr>
+            <tr>
+              <td><strong>TTL</strong> (Time-To-Live)</td>
+              <td>Item after a fixed time window</td>
+              <td>Heap ordered by expiry; passive or active sweep</td>
+              <td>Any time-sensitive data (sessions, API responses)</td>
+            </tr>
+            <tr>
+              <td><strong>SLRU</strong> (Segmented LRU)</td>
+              <td>LRU from probation segment only</td>
+              <td>Two LRU queues: protected + probation</td>
+              <td>Scan-resistant (batch operations shouldn't flush popular items)</td>
+            </tr>
+            <tr>
+              <td><strong>W-TinyLFU</strong> (Window Tiny LFU)</td>
+              <td>Low-frequency items, sketch-based</td>
+              <td>Frequency sketch (Count-Min) + LRU window</td>
+              <td>Production highest hit-rate; used by Caffeine (Java)</td>
+            </tr>
+            <tr>
+              <td><strong>Random</strong></td>
+              <td>Random item</td>
+              <td>O(1) trivial</td>
+              <td>Uniform access patterns (rare); used by CPU TLBs</td>
+            </tr>
+          </table>
+        </div>
 
-    <div class="def">
-      <dt>Why Redis uses LRU (with approximation)</dt>
-      <dd>True LRU on every access requires updating a linked list — expensive at Redis's million ops/sec throughput.
-        Redis uses <strong>approximated LRU</strong>: sample N random keys (default: 5) and evict the one with
-        the oldest last-access time. This gives ~95% of the hit rate of true LRU at a fraction of the CPU cost.
-        Redis 4.0+ introduced LFU policy as an alternative — better for access-pattern-stable datasets.</dd>
-    </div>
+        <div class="def">
+          <dt>Why Redis uses LRU (with approximation)</dt>
+          <dd>True LRU on every access requires updating a linked list — expensive at Redis's million ops/sec
+            throughput.
+            Redis uses <strong>approximated LRU</strong>: sample N random keys (default: 5) and evict the one with
+            the oldest last-access time. This gives ~95% of the hit rate of true LRU at a fraction of the CPU cost.
+            Redis 4.0+ introduced LFU policy as an alternative — better for access-pattern-stable datasets.</dd>
+        </div>
 
-    <h2>Cache Problems and Solutions</h2>
-    <div class="compare">
-      <div class="compare-card con">
-        <h4>Cache Stampede (Dog-Piling)</h4>
-        <p>A cached item expires. Simultaneously, 10,000 requests arrive and all miss the cache. All 10,000 go to
-          the DB simultaneously. The DB is overwhelmed.</p>
-        <p><strong>Solutions:</strong></p>
-        <ul>
-          <li><strong>Probabilistic early recomputation:</strong> Re-cache slightly before expiry with probability
-            proportional to time-to-expiry. One request rebuilds while others still serve the old value.</li>
-          <li><strong>Mutex/lock:</strong> First miss acquires a distributed lock, recomputes, populates cache.
-            Others wait then hit the warm cache.</li>
-          <li><strong>Stale-while-revalidate:</strong> Serve stale data; one background thread recomputes. No
-            stampede possible.</li>
-        </ul>
+        <h2>Cache Problems and Solutions</h2>
+        <div class="compare">
+          <div class="compare-card con">
+            <h4>Cache Stampede (Dog-Piling)</h4>
+            <p>A cached item expires. Simultaneously, 10,000 requests arrive and all miss the cache. All 10,000 go to
+              the DB simultaneously. The DB is overwhelmed.</p>
+            <p><strong>Solutions:</strong></p>
+            <ul>
+              <li><strong>Probabilistic early recomputation:</strong> Re-cache slightly before expiry with probability
+                proportional to time-to-expiry. One request rebuilds while others still serve the old value.</li>
+              <li><strong>Mutex/lock:</strong> First miss acquires a distributed lock, recomputes, populates cache.
+                Others wait then hit the warm cache.</li>
+              <li><strong>Stale-while-revalidate:</strong> Serve stale data; one background thread recomputes. No
+                stampede possible.</li>
+            </ul>
+          </div>
+          <div class="compare-card con">
+            <h4>Cache Penetration</h4>
+            <p>Requests for keys that <strong>never exist</strong> in DB or cache bypass the cache on every request,
+              hammering the DB. Classic DDoS vector: query non-existent user IDs.</p>
+            <p><strong>Solutions:</strong></p>
+            <ul>
+              <li><strong>Cache null results:</strong> Cache <code>user:99999 → NULL</code> with a short TTL. Future
+                misses are cache hits.</li>
+              <li><strong>Bloom Filter:</strong> In-memory probabilistic set membership. If Bloom Filter says
+                "definitely not in DB," skip DB entirely. Instagram uses Bloom Filters for non-existent user
+                lookups.</li>
+            </ul>
+          </div>
+        </div>
+        <div class="compare">
+          <div class="compare-card con">
+            <h4>Cache Avalanche</h4>
+            <p>All cached items expire at the same time (e.g., everything was set with TTL=3600 at 9am → all expire at
+              10am). Massive cache miss simultaneously.</p>
+            <p><strong>Solutions:</strong></p>
+            <ul>
+              <li><strong>Jitter TTL:</strong> <code>TTL = base_ttl + random(0, base_ttl * 0.2)</code>. Spreads expiry
+                across time.</li>
+              <li><strong>Layered TTL:</strong> Different cache tiers with different TTLs prevent all-at-once expiry.
+              </li>
+            </ul>
+          </div>
+          <div class="compare-card neutral">
+            <h4>Cache Coherence</h4>
+            <p>Multiple caching nodes holding different versions of the same data.</p>
+            <p><strong>Solutions:</strong></p>
+            <ul>
+              <li><strong>Write-through:</strong> Update cache and DB atomically on every write.</li>
+              <li><strong>Event-driven invalidation:</strong> Write → Kafka event → cache invalidation subscriber.
+              </li>
+              <li><strong>TTL-based convergence:</strong> Accept brief inconsistency; short TTL bounds staleness.</li>
+            </ul>
+          </div>
+        </div>
+
+        <h2>Redis Deep Dive</h2>
+        <div class="def">
+          <dt>Redis is single-threaded but fast</dt>
+          <dd>Redis processes commands in a single thread (+ I/O threads in Redis 6+). No locking contention.
+            All operations are O(1) or O(N) on data structure size — predictable latency.
+            ~100K–1M ops/sec per node (benchmark: <code>redis-benchmark -n 1000000</code>).
+            Max RAM: limited to server memory. Typical: 16–128GB instances in production.
+            At Twitter: 8,000+ Redis instances managing session data, rate limits, and real-time counters.</dd>
+          <dt>Redis Cluster for horizontal scaling</dt>
+          <dd>Redis Cluster shards keyspace into 16,384 slots across N primary nodes. Each primary has 1+ replicas.
+            Clients use cluster-aware libraries (redis-py, Jedis cluster mode) that route to the correct shard.
+            Resharding is online — no downtime. Redis Cluster handles ~1 million ops/sec across a 6-node cluster
+            (3 primary + 3 replica).</dd>
+          <dt>Redis Persistence: RDB vs. AOF</dt>
+          <dd><strong>RDB (snapshot):</strong> Point-in-time snapshot every N minutes. Fast recovery, smaller files.
+            Data loss: up to N minutes of writes. Good for: cache (some data loss acceptable).
+            <br><strong>AOF (Append-Only File):</strong> Every write command logged. Recovery by replaying log.
+            Can sync every write (fsync=always: zero data loss, low throughput) or every second (fsync=everysec:
+            max 1s loss, high throughput). Good for: session store, pub/sub, durable cache.
+            <br><strong>Hybrid:</strong> AOF + RDB — fast load from RDB, then replay AOF tail. Default in Redis 7+.
+          </dd>
+        </div>
       </div>
-      <div class="compare-card con">
-        <h4>Cache Penetration</h4>
-        <p>Requests for keys that <strong>never exist</strong> in DB or cache bypass the cache on every request,
-          hammering the DB. Classic DDoS vector: query non-existent user IDs.</p>
-        <p><strong>Solutions:</strong></p>
-        <ul>
-          <li><strong>Cache null results:</strong> Cache <code>user:99999 → NULL</code> with a short TTL. Future
-            misses are cache hits.</li>
-          <li><strong>Bloom Filter:</strong> In-memory probabilistic set membership. If Bloom Filter says
-            "definitely not in DB," skip DB entirely. Instagram uses Bloom Filters for non-existent user
-            lookups.</li>
-        </ul>
-      </div>
-    </div>
-    <div class="compare">
-      <div class="compare-card con">
-        <h4>Cache Avalanche</h4>
-        <p>All cached items expire at the same time (e.g., everything was set with TTL=3600 at 9am → all expire at
-          10am). Massive cache miss simultaneously.</p>
-        <p><strong>Solutions:</strong></p>
-        <ul>
-          <li><strong>Jitter TTL:</strong> <code>TTL = base_ttl + random(0, base_ttl * 0.2)</code>. Spreads expiry
-            across time.</li>
-          <li><strong>Layered TTL:</strong> Different cache tiers with different TTLs prevent all-at-once expiry.
-          </li>
-        </ul>
-      </div>
-      <div class="compare-card neutral">
-        <h4>Cache Coherence</h4>
-        <p>Multiple caching nodes holding different versions of the same data.</p>
-        <p><strong>Solutions:</strong></p>
-        <ul>
-          <li><strong>Write-through:</strong> Update cache and DB atomically on every write.</li>
-          <li><strong>Event-driven invalidation:</strong> Write → Kafka event → cache invalidation subscriber.
-          </li>
-          <li><strong>TTL-based convergence:</strong> Accept brief inconsistency; short TTL bounds staleness.</li>
-        </ul>
-      </div>
-    </div>
-
-    <h2>Redis Deep Dive</h2>
-    <div class="def">
-      <dt>Redis is single-threaded but fast</dt>
-      <dd>Redis processes commands in a single thread (+ I/O threads in Redis 6+). No locking contention.
-        All operations are O(1) or O(N) on data structure size — predictable latency.
-        ~100K–1M ops/sec per node (benchmark: <code>redis-benchmark -n 1000000</code>).
-        Max RAM: limited to server memory. Typical: 16–128GB instances in production.
-        At Twitter: 8,000+ Redis instances managing session data, rate limits, and real-time counters.</dd>
-      <dt>Redis Cluster for horizontal scaling</dt>
-      <dd>Redis Cluster shards keyspace into 16,384 slots across N primary nodes. Each primary has 1+ replicas.
-        Clients use cluster-aware libraries (redis-py, Jedis cluster mode) that route to the correct shard.
-        Resharding is online — no downtime. Redis Cluster handles ~1 million ops/sec across a 6-node cluster
-        (3 primary + 3 replica).</dd>
-      <dt>Redis Persistence: RDB vs. AOF</dt>
-      <dd><strong>RDB (snapshot):</strong> Point-in-time snapshot every N minutes. Fast recovery, smaller files.
-        Data loss: up to N minutes of writes. Good for: cache (some data loss acceptable).
-        <br><strong>AOF (Append-Only File):</strong> Every write command logged. Recovery by replaying log.
-        Can sync every write (fsync=always: zero data loss, low throughput) or every second (fsync=everysec:
-        max 1s loss, high throughput). Good for: session store, pub/sub, durable cache.
-        <br><strong>Hybrid:</strong> AOF + RDB — fast load from RDB, then replay AOF tail. Default in Redis 7+.
-      </dd>
-    </div>
-  </div>
 
 <div class="section" id="storage">
-    <h1 class="section-title">Storage Systems</h1>
-    <p class="section-subtitle">Module 5 &nbsp;|&nbsp; Object Storage, Block Storage, File Systems, and Choosing the
-      Right Store</p>
+        <h1 class="section-title">Storage Systems</h1>
+        <p class="section-subtitle">Module 5 &nbsp;|&nbsp; Object Storage, Block Storage, File Systems, and Choosing the
+          Right Store</p>
 
-    <h2>Storage Types at a Glance</h2>
-    <div class="table-wrap">
-      <table>
-        <tr>
-          <th>Type</th>
-          <th>Interface</th>
-          <th>Best For</th>
-          <th>Latency</th>
-          <th>Cost/GB</th>
-          <th>Examples</th>
-        </tr>
-        <tr>
-          <td><strong>Block Storage</strong></td>
-          <td>Raw disk blocks (mount as drive)</td>
-          <td>Databases, VMs, low-latency I/O</td>
-          <td>0.1–1ms (NVMe SSD)</td>
-          <td>High ($0.10–0.25/GB)</td>
-          <td>AWS EBS, GCP Persistent Disk, NetApp</td>
-        </tr>
-        <tr>
-          <td><strong>File Storage (NAS)</strong></td>
-          <td>POSIX filesystem (NFS/SMB)</td>
-          <td>Shared home dirs, content repos, legacy apps</td>
-          <td>1–10ms</td>
-          <td>Medium ($0.05–0.15/GB)</td>
-          <td>AWS EFS, Azure Files, NFS</td>
-        </tr>
-        <tr>
-          <td><strong>Object Storage</strong></td>
-          <td>HTTP REST (PUT/GET/DELETE key)</td>
-          <td>Blobs, images, video, backups, data lake</td>
-          <td>10–200ms (first byte)</td>
-          <td>Low ($0.02–0.05/GB)</td>
-          <td>AWS S3, GCS, Azure Blob, Cloudflare R2</td>
-        </tr>
-        <tr>
-          <td><strong>In-Memory</strong></td>
-          <td>Key-value API</td>
-          <td>Session cache, real-time leaderboards</td>
-          <td>&lt;1ms</td>
-          <td>Very High ($5–20/GB)</td>
-          <td>Redis, Memcached, Apache Ignite</td>
-        </tr>
-      </table>
-    </div>
+        <h2>Storage Types at a Glance</h2>
+        <div class="table-wrap">
+          <table>
+            <tr>
+              <th>Type</th>
+              <th>Interface</th>
+              <th>Best For</th>
+              <th>Latency</th>
+              <th>Cost/GB</th>
+              <th>Examples</th>
+            </tr>
+            <tr>
+              <td><strong>Block Storage</strong></td>
+              <td>Raw disk blocks (mount as drive)</td>
+              <td>Databases, VMs, low-latency I/O</td>
+              <td>0.1–1ms (NVMe SSD)</td>
+              <td>High ($0.10–0.25/GB)</td>
+              <td>AWS EBS, GCP Persistent Disk, NetApp</td>
+            </tr>
+            <tr>
+              <td><strong>File Storage (NAS)</strong></td>
+              <td>POSIX filesystem (NFS/SMB)</td>
+              <td>Shared home dirs, content repos, legacy apps</td>
+              <td>1–10ms</td>
+              <td>Medium ($0.05–0.15/GB)</td>
+              <td>AWS EFS, Azure Files, NFS</td>
+            </tr>
+            <tr>
+              <td><strong>Object Storage</strong></td>
+              <td>HTTP REST (PUT/GET/DELETE key)</td>
+              <td>Blobs, images, video, backups, data lake</td>
+              <td>10–200ms (first byte)</td>
+              <td>Low ($0.02–0.05/GB)</td>
+              <td>AWS S3, GCS, Azure Blob, Cloudflare R2</td>
+            </tr>
+            <tr>
+              <td><strong>In-Memory</strong></td>
+              <td>Key-value API</td>
+              <td>Session cache, real-time leaderboards</td>
+              <td>&lt;1ms</td>
+              <td>Very High ($5–20/GB)</td>
+              <td>Redis, Memcached, Apache Ignite</td>
+            </tr>
+          </table>
+        </div>
 
-    <h2>Object Storage: S3 Architecture &amp; Design Decisions</h2>
-    <p>Amazon S3 is one of the most studied distributed systems. Understanding how it works reveals
-      fundamental distributed storage patterns.</p>
+        <h2>Object Storage: S3 Architecture &amp; Design Decisions</h2>
+        <p>Amazon S3 is one of the most studied distributed systems. Understanding how it works reveals
+          fundamental distributed storage patterns.</p>
 
-    <div class="def">
-      <dt>Key-Value Namespace</dt>
-      <dd>S3 objects are stored by a flat key (e.g., <code>photos/user42/profile.jpg</code>). There are
-        no real directories — the "/" is just part of the key name. S3 partitions the keyspace by prefix
-        hash, so keys with the same prefix go to the same partition. <strong>Implication:</strong> If you
-        name all keys with a date prefix (<code>2024-01-15-image.jpg</code>), all January keys hit the same
-        partition → hot partition. Add a random prefix hash to distribute: <code>a7f3/2024-01-15-image.jpg</code>.
-      </dd>
-      <dt>Durability: 11 Nines (99.999999999%)</dt>
-      <dd>S3 achieves this by storing data in multiple AZs using erasure coding. An object is split into
-        chunks and encoded with parity such that it can be reconstructed even if multiple chunks are lost.
-        This is far cheaper than 3× full replication while providing stronger durability.</dd>
-      <dt>Eventual Consistency (Historically) → Strong Now</dt>
-      <dd>Until 2020, S3 offered only eventual consistency for LIST operations — a PUT followed immediately
-        by GET/LIST might not return the new object. AWS moved S3 to strong read-after-write consistency
-        in December 2020, at no performance cost. A key lesson: eventual consistency can sometimes be
-        eliminated without sacrificing performance if the architecture allows it.</dd>
-      <dt>S3 Pricing Levers</dt>
-      <dd>S3 Standard ($0.023/GB) → S3-IA ($0.0125/GB) → S3 Glacier ($0.004/GB) → S3 Glacier Deep Archive
-        ($0.00099/GB).
-        Lifecycle policies auto-tier objects. Netflix saves ~$20M/year by tiering old content to Glacier.</dd>
-    </div>
+        <div class="def">
+          <dt>Key-Value Namespace</dt>
+          <dd>S3 objects are stored by a flat key (e.g., <code>photos/user42/profile.jpg</code>). There are
+            no real directories — the "/" is just part of the key name. S3 partitions the keyspace by prefix
+            hash, so keys with the same prefix go to the same partition. <strong>Implication:</strong> If you
+            name all keys with a date prefix (<code>2024-01-15-image.jpg</code>), all January keys hit the same
+            partition → hot partition. Add a random prefix hash to distribute: <code>a7f3/2024-01-15-image.jpg</code>.
+          </dd>
+          <dt>Durability: 11 Nines (99.999999999%)</dt>
+          <dd>S3 achieves this by storing data in multiple AZs using erasure coding. An object is split into
+            chunks and encoded with parity such that it can be reconstructed even if multiple chunks are lost.
+            This is far cheaper than 3× full replication while providing stronger durability.</dd>
+          <dt>Eventual Consistency (Historically) → Strong Now</dt>
+          <dd>Until 2020, S3 offered only eventual consistency for LIST operations — a PUT followed immediately
+            by GET/LIST might not return the new object. AWS moved S3 to strong read-after-write consistency
+            in December 2020, at no performance cost. A key lesson: eventual consistency can sometimes be
+            eliminated without sacrificing performance if the architecture allows it.</dd>
+          <dt>S3 Pricing Levers</dt>
+          <dd>S3 Standard ($0.023/GB) → S3-IA ($0.0125/GB) → S3 Glacier ($0.004/GB) → S3 Glacier Deep Archive
+            ($0.00099/GB).
+            Lifecycle policies auto-tier objects. Netflix saves ~$20M/year by tiering old content to Glacier.</dd>
+        </div>
 
-    <h2>Block Storage Internals (EBS)</h2>
-    <div class="mermaid">
-      flowchart LR
-      EC2[EC2 Instance] -->|NVMe over\ntransport| EBS[EBS Volume\nSSD-backed]
-      EBS --> R1[Replica 1\nSame AZ]
-      EBS --> R2[Replica 2\nSame AZ]
-      EBS -.->|Snapshot| S3[(S3 Object Store\nCross-AZ durability)]
-    </div>
+        <h2>Block Storage Internals (EBS)</h2>
+        <div class="mermaid">
+          flowchart LR
+          EC2[EC2 Instance] -->|NVMe over\ntransport| EBS[EBS Volume\nSSD-backed]
+          EBS --> R1[Replica 1\nSame AZ]
+          EBS --> R2[Replica 2\nSame AZ]
+          EBS -.->|Snapshot| S3[(S3 Object Store\nCross-AZ durability)]
+        </div>
 
-    <div class="def">
-      <dt>EBS vs. Instance Store</dt>
-      <dd><strong>EBS:</strong> Network-attached, persistent. Volume survives instance termination. Max: 64TB, 256K
-        IOPS (io2 Block Express). Costs money.
-        <br><strong>Instance Store (ephemeral):</strong> Physically attached NVMe — millions of IOPS with &lt;100μs
-        latency. Wiped on instance stop/terminate. Used for: Kafka broker local logs, database temp files, cache
-        warmer. Free (included in instance price).
-      </dd>
-      <dt>IOPS vs. Throughput on EBS</dt>
-      <dd>IOPS (I/O operations/second) matters for random I/O (OLTP databases — many small reads/writes).
-        Throughput (MB/s) matters for sequential I/O (Kafka, video encoding, log tailing). A gp3 EBS allows
-        you to independently configure both: up to 16,000 IOPS and 1,000 MB/s on the same volume.</dd>
-    </div>
+        <div class="def">
+          <dt>EBS vs. Instance Store</dt>
+          <dd><strong>EBS:</strong> Network-attached, persistent. Volume survives instance termination. Max: 64TB, 256K
+            IOPS (io2 Block Express). Costs money.
+            <br><strong>Instance Store (ephemeral):</strong> Physically attached NVMe — millions of IOPS with &lt;100μs
+            latency. Wiped on instance stop/terminate. Used for: Kafka broker local logs, database temp files, cache
+            warmer. Free (included in instance price).
+          </dd>
+          <dt>IOPS vs. Throughput on EBS</dt>
+          <dd>IOPS (I/O operations/second) matters for random I/O (OLTP databases — many small reads/writes).
+            Throughput (MB/s) matters for sequential I/O (Kafka, video encoding, log tailing). A gp3 EBS allows
+            you to independently configure both: up to 16,000 IOPS and 1,000 MB/s on the same volume.</dd>
+        </div>
 
-    <h2>Choosing the Right Storage</h2>
-    <div class="mermaid">
-      flowchart TD
-      Q1{What type of data?} --> D[Database rows\nindexes]
-      Q1 --> B[Binary blobs\nimages video files]
-      Q1 --> C[Structured logs\napp state]
-      D --> DB[Block Storage\nEBS / local SSD\nMount as DB data dir]
-      B --> OBJ[Object Storage\nS3 / GCS\nHTTP GET by key]
-      C --> MIX{Access pattern?}
-      MIX -->|Sequential read| OBJ2[Object Storage\nor append log]
-      MIX -->|Random access| DB2[Block Storage\nor KV store]
-    </div>
+        <h2>Choosing the Right Storage</h2>
+        <div class="mermaid">
+          flowchart TD
+          Q1{What type of data?} --> D[Database rows\nindexes]
+          Q1 --> B[Binary blobs\nimages video files]
+          Q1 --> C[Structured logs\napp state]
+          D --> DB[Block Storage\nEBS / local SSD\nMount as DB data dir]
+          B --> OBJ[Object Storage\nS3 / GCS\nHTTP GET by key]
+          C --> MIX{Access pattern?}
+          MIX -->|Sequential read| OBJ2[Object Storage\nor append log]
+          MIX -->|Random access| DB2[Block Storage\nor KV store]
+        </div>
 
-    <div class="callout tip">
-      <div class="callout-title">FAANG Design Principle: Separate Compute and Storage</div>
-      <p>Modern cloud-native systems separate compute (stateless, ephemeral) from storage (persistent, separate tier).
-        This enables independent scaling — add more compute without adding more storage, and vice versa.
-        Databricks, Snowflake, and BigQuery all run compute in one layer and store data in S3/GCS — this is
-        the "lakehouse" architecture and is how FAANG handles exabyte-scale analytics without buying dedicated
-        storage hardware.</p>
-    </div>
-  </div>
+        <div class="callout tip">
+          <div class="callout-title">FAANG Design Principle: Separate Compute and Storage</div>
+          <p>Modern cloud-native systems separate compute (stateless, ephemeral) from storage (persistent, separate
+            tier).
+            This enables independent scaling — add more compute without adding more storage, and vice versa.
+            Databricks, Snowflake, and BigQuery all run compute in one layer and store data in S3/GCS — this is
+            the "lakehouse" architecture and is how FAANG handles exabyte-scale analytics without buying dedicated
+            storage hardware.</p>
+        </div>
+      </div>
 
 
       <div class="page-nav">
         <a class="page-nav-btn" href="04-networking.html">&#8592; Networking</a>
-        <a class="page-nav-btn home" href="../system-design-complete.html">&#9776; All Topics</a>
+        <a class="page-nav-btn home" href="01-introduction.html">&#9776; All Topics</a>
         <a class="page-nav-btn" href="06-api-communication.html">API & Communication &#8594;</a>
       </div>
     </div>

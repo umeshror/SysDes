@@ -355,6 +355,15 @@ add_problem("q17", {
     return len(stack)==0
 }"""},
     },
+    "flow_matrix": {
+        "headers": ["Char", "Type", "Stack State", "Action"],
+        "rows": [
+            ["'('", "Open", "<code>['(']</code>", "Push"],
+            ["'['", "Open", "<code>['(', '[']</code>", "Push"],
+            ["']'", "Close", "<code>['(']</code>", "Pop <code>'['</code>, matches <code>']'</code>. Valid."],
+            ["')'", "Close", "<code>[]</code>", "Pop <code>'('</code>, matches <code>')'</code>. Valid!"]
+        ]
+    },
     "insight_title":"Why a Stack is Perfect Here",
     "insight_text":"Parentheses must close in LIFO order — the most recently opened bracket must be closed first. This is exactly what a stack models. Each push/pop is O(1), so total time is <strong>O(n)</strong>.",
     "tips":[

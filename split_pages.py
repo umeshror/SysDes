@@ -99,6 +99,9 @@ PAGES = [
     {"file":"11-interview-framework.html","title":"Interview Framework",
      "module":"Interview Framework","icon":"🎯","num":"11",
      "sections":["framework"],"nav":[("framework","The 4-Step SDI Framework")]},
+    {"file":"../case_studies/open-table.html","title":"Case Studies",
+     "module":"Case Studies","icon":"📚","num":"12",
+     "sections":["case-opentable"],"nav":[("case-opentable","Design OpenTable (Deep Dive)")]},
 ]
 
 # ── Accordion sidebar HTML ────────────────────────────────────────────────────
@@ -341,9 +344,20 @@ for idx, page in enumerate(PAGES):
         sections_html += content + "\n\n"
         first = False
 
-    prev_btn = (f'<a class="page-nav-btn" href="{prev_page}">&#8592; {PAGES[idx-1]["module"]}</a>'
+    is_case_study = page["file"].startswith("../case_studies")
+    def format_link(link):
+        if not link: return ""
+        if is_case_study and not link.startswith("../"):
+            return "../pages/" + link
+        return link
+
+    prev_link = format_link(prev_page)
+    next_link = format_link(next_page)
+    all_topics_link = format_link("01-introduction.html")
+
+    prev_btn = (f'<a class="page-nav-btn" href="{prev_link}">&#8592; {PAGES[idx-1]["module"]}</a>'
                 if prev_page else '<span></span>')
-    next_btn = (f'<a class="page-nav-btn" href="{next_page}">{PAGES[idx+1]["module"]} &#8594;</a>'
+    next_btn = (f'<a class="page-nav-btn" href="{next_link}">{PAGES[idx+1]["module"]} &#8594;</a>'
                 if next_page else '<span></span>')
 
     page_html = f"""<!DOCTYPE html>
@@ -380,7 +394,7 @@ for idx, page in enumerate(PAGES):
 {sections_html}
       <div class="page-nav">
         {prev_btn}
-        <a class="page-nav-btn home" href="../system-design-complete.html">&#9776; All Topics</a>
+        <a class="page-nav-btn home" href="{all_topics_link}">&#9776; All Topics</a>
         {next_btn}
       </div>
     </div>

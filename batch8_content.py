@@ -268,6 +268,29 @@ def levelOrder(root):
             if node.right: q.append(node.right)
         result.append(level)
     return result""", "Binary Tree Level Order Traversal"),
+    "diagram": """
+<div class="mermaid">
+graph TD
+    A((3)) --> B((9))
+    A --> C((20))
+    C --> D((15))
+    C --> E((7))
+    
+    style A fill:#4f46e5,stroke:#333,stroke-width:2px,color:#fff
+    style B fill:#0891b2,stroke:#333,stroke-width:2px,color:#fff
+    style C fill:#0891b2,stroke:#333,stroke-width:2px,color:#fff
+    style D fill:#16a34a,stroke:#333,stroke-width:2px,color:#fff
+    style E fill:#16a34a,stroke:#333,stroke-width:2px,color:#fff
+</div>
+""",
+    "flow_matrix": {
+        "headers": ["Level Iteration", "Queue Start", "Size <code>len(q)</code>", "Nodes Processed", "Level List Generated", "Queue End"],
+        "rows": [
+            ["1", "<code>[3]</code>", "1", "Pop 3 (add 9, 20)", "<code>[3]</code>", "<code>[9, 20]</code>"],
+            ["2", "<code>[9, 20]</code>", "2", "Pop 9, Pop 20 (add 15, 7)", "<code>[9, 20]</code>", "<code>[15, 7]</code>"],
+            ["3", "<code>[15, 7]</code>", "2", "Pop 15, Pop 7", "<code>[15, 7]</code>", "<code>[]</code>"]
+        ]
+    },
     "insight_title":"Snapshot Queue Length Before Inner Loop",
     "insight_text":"Taking <code>len(q)</code> BEFORE the inner loop captures exactly how many nodes are at the current level, since new children are added to the back of the queue during the loop.",
     "tips":["<strong>Captures:</strong> Queue size at the START of each level = number of nodes at that level.",

@@ -106,9 +106,23 @@ for q in questions:
     else:
         panels[q['id']] = f'<div class="question-panel active" id="{q["id"]}"><h2>Content Pending</h2></div>'
 
-for q in questions:
+for idx, q in enumerate(questions):
     sidebar_html = build_sidebar_html(q["id"])
-    main_html = f"""    <div class="main" id="main-panel">\n{panels.get(q['id'], '')}\n    </div>\n"""
+    
+    prev_q = questions[idx-1] if idx > 0 else None
+    next_q = questions[idx+1] if idx < len(questions)-1 else None
+    
+    prev_btn = f'<a class="page-nav-btn" href="{prev_q["file"]}">&#8592; {prev_q["name"]}</a>' if prev_q else '<span></span>'
+    next_btn = f'<a class="page-nav-btn" href="{next_q["file"]}">{next_q["name"]} &#8594;</a>' if next_q else '<span></span>'
+    
+    page_nav_html = f'''
+        <div class="page-nav" style="max-width: 960px; margin: 40px auto 0; padding: 20px 48px;">
+            {prev_btn}
+            <a class="page-nav-btn home" href="../index.html">&#9776; Back to Portfolio</a>
+            {next_btn}
+        </div>'''
+
+    main_html = f"""    <div class="main" id="main-panel">\n{panels.get(q['id'], '')}\n{page_nav_html}\n    </div>\n"""
     
     full_html = head_html + sidebar_html + main_html + script_html
     

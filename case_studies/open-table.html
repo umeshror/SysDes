@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="System Design Reference — Case Studies">
-  <title>🏆 Case Studies — System Design Fundamentals</title>
+  <title>📚 Case Studies — System Design Fundamentals</title>
   <link rel="stylesheet" href="../styles.css">
   <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
   <style>
@@ -28,6 +28,11 @@
     .layout {
       display: flex;
       min-height: 100vh;
+    }
+
+    .sidebar-toggle {
+      display: none;
+      /* Hidden on desktop */
     }
 
     .sidebar {
@@ -72,11 +77,55 @@
 
     .nav-module-title {
       padding: 10px 20px 6px;
-      font-size: 0.68rem;
+      font-size: 0.72rem;
       font-weight: 700;
       text-transform: uppercase;
-      letter-spacing: 1px;
+      letter-spacing: 0.5px;
+      color: #7f849c;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      user-select: none;
+      transition: color 0.2s;
+    }
+
+    .nav-module-title:hover {
+      color: #cdd6f4;
+    }
+
+    .nav-module-title::after {
+      content: '▼';
+      font-size: 0.6rem;
       color: #585b70;
+      transition: transform 0.3s ease;
+    }
+
+    /* Hide children by default */
+    .nav-module>*:not(.nav-module-title) {
+      display: none;
+    }
+
+    /* Show children when expanded */
+    .nav-module.expanded>*:not(.nav-module-title) {
+      display: block;
+      animation: slideDown 0.2s ease-out forwards;
+    }
+
+    .nav-module.expanded>.nav-module-title::after {
+      transform: rotate(180deg);
+    }
+
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        transform: translateY(-5px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
 
     .nav-item {
@@ -457,10 +506,43 @@
     }
 
     @media (max-width: 768px) {
+      .layout {
+        flex-direction: column;
+      }
+
       .sidebar {
         width: 100%;
+        min-width: 100%;
         height: auto;
         position: relative;
+        padding-bottom: 0;
+      }
+
+      /* Hide the navigation links by default on mobile */
+      #sidebar-nav-content {
+        display: none;
+        padding-bottom: 20px;
+      }
+
+      /* Show links when the active class is added via JS */
+      #sidebar-nav-content.active {
+        display: block;
+      }
+
+      /* Style the hamburger button */
+      .sidebar-toggle {
+        display: block;
+        background: transparent;
+        border: none;
+        color: #89b4fa;
+        cursor: pointer;
+        padding: 5px;
+      }
+
+      .sidebar-header {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
       }
 
       .main {
@@ -849,7 +931,7 @@
         </details>
         <details class="acc-chapter" open>
           <summary class="acc-summary">
-            <span class="chap-icon">🏆</span>
+            <span class="chap-icon">📚</span>
             <span class="chap-text">
               <span class="chap-num">Chapter 12</span>
               <span class="chap-label">Case Studies</span>
@@ -858,7 +940,7 @@
             <span class="acc-arrow">›</span>
           </summary>
           <div class="acc-sub">
-              <div class="acc-sub-item active" data-sec="case-opentable">Design OpenTable</div>
+              <div class="acc-sub-item active" data-sec="case-opentable">Design OpenTable (Deep Dive)</div>
           </div>
         </details>
       </div>
@@ -868,169 +950,171 @@
       <div class="progress-bar-wrap"><div class="progress-bar" id="pb"></div></div>
 
 <div class="section active" id="case-opentable">
-    <h1 class="section-title">Design OpenTable</h1>
-    <p class="section-subtitle">Case Study &nbsp;|&nbsp; Global Restaurant Reservation System — Two-sided Marketplace
-    </p>
+        <h1 class="section-title">Design OpenTable</h1>
+        <p class="section-subtitle">Case Study &nbsp;|&nbsp; Global Restaurant Reservation System — Two-sided
+          Marketplace
+        </p>
 
-    <div class="callout" style="border-left-color:#f59e0b; background:rgba(245,158,11,0.06);">
-        <div class="callout-title" style="color:#d97706;">🎯 Interview Signal</div>
-        <p>This is a <strong>two-sided marketplace</strong> with a real-time reservation engine — the same
+        <div class="callout" style="border-left-color:#f59e0b; background:rgba(245,158,11,0.06);">
+          <div class="callout-title" style="color:#d97706;">🎯 Interview Signal</div>
+          <p>This is a <strong>two-sided marketplace</strong> with a real-time reservation engine — the same
             class as Airbnb, Ticketmaster, and OpenSea. The FAANG interviewer is looking for: (1) strong
             consistency for bookings, (2) eventual consistency for search, (3) how you prevent double booking
             at scale, and (4) your ability to reason about hot-partition problems.</p>
-    </div>
+        </div>
 
-    <h2>1. Clarify Requirements</h2>
+        <h2>1. Clarify Requirements</h2>
 
-    <div class="compare">
-        <div class="compare-card neutral">
+        <div class="compare">
+          <div class="compare-card neutral">
             <h4>For Diners (Demand Side)</h4>
             <ul>
-                <li>Search by location, date, time, party size, cuisine, price</li>
-                <li>View real-time available time slots</li>
-                <li>Make / modify / cancel reservations</li>
-                <li>Join waitlist when fully booked</li>
-                <li>Receive confirmation + reminders (email/SMS/push)</li>
-                <li>View booking history, leave reviews</li>
+              <li>Search by location, date, time, party size, cuisine, price</li>
+              <li>View real-time available time slots</li>
+              <li>Make / modify / cancel reservations</li>
+              <li>Join waitlist when fully booked</li>
+              <li>Receive confirmation + reminders (email/SMS/push)</li>
+              <li>View booking history, leave reviews</li>
             </ul>
-        </div>
-        <div class="compare-card neutral">
+          </div>
+          <div class="compare-card neutral">
             <h4>For Restaurants (Supply Side)</h4>
             <ul>
-                <li>Manage floor layout and table inventory</li>
-                <li>Define hours, reservation slots, party-size limits</li>
-                <li>Block time slots for private events</li>
-                <li>Real-time dashboard of upcoming bookings</li>
-                <li>Manage waitlist manually or automatically</li>
+              <li>Manage floor layout and table inventory</li>
+              <li>Define hours, reservation slots, party-size limits</li>
+              <li>Block time slots for private events</li>
+              <li>Real-time dashboard of upcoming bookings</li>
+              <li>Manage waitlist manually or automatically</li>
             </ul>
+          </div>
         </div>
-    </div>
 
-    <div class="def">
-        <dt>Non-functional requirements (state these explicitly in the interview)</dt>
-        <dd>
+        <div class="def">
+          <dt>Non-functional requirements (state these explicitly in the interview)</dt>
+          <dd>
             <strong>Zero double bookings</strong> — strong consistency required for reservation writes.<br>
             <strong>99.99% availability</strong> — no more than ~52 minutes downtime/year.<br>
             <strong>Search &lt;200ms p99</strong> — read latency SLA for restaurant/slot search.<br>
             <strong>Eventually consistent search OK</strong> — stale availability in search results is fine;
             <em>final confirmation always validates against authoritative DB</em>.<br>
             <strong>Multi-region, horizontally scalable.</strong>
-        </dd>
-    </div>
+          </dd>
+        </div>
 
-    <h2>2. Capacity Estimation</h2>
+        <h2>2. Capacity Estimation</h2>
 
-    <div class="table-wrap">
-        <table>
+        <div class="table-wrap">
+          <table>
             <tr>
-                <th>Metric</th>
-                <th>Assumption</th>
-                <th>QPS (avg)</th>
-                <th>QPS (peak 10×)</th>
+              <th>Metric</th>
+              <th>Assumption</th>
+              <th>QPS (avg)</th>
+              <th>QPS (peak 10×)</th>
             </tr>
             <tr>
-                <td>Daily Active Users</td>
-                <td>10M</td>
-                <td>—</td>
-                <td>—</td>
+              <td>Daily Active Users</td>
+              <td>10M</td>
+              <td>—</td>
+              <td>—</td>
             </tr>
             <tr>
-                <td>Restaurant searches</td>
-                <td>10M/day</td>
-                <td>~115 QPS</td>
-                <td>~1,150 QPS</td>
+              <td>Restaurant searches</td>
+              <td>10M/day</td>
+              <td>~115 QPS</td>
+              <td>~1,150 QPS</td>
             </tr>
             <tr>
-                <td>Reservations created</td>
-                <td>1M/day</td>
-                <td>~12 QPS</td>
-                <td>~120 QPS</td>
+              <td>Reservations created</td>
+              <td>1M/day</td>
+              <td>~12 QPS</td>
+              <td>~120 QPS</td>
             </tr>
             <tr>
-                <td>Restaurants</td>
-                <td>100K</td>
-                <td>—</td>
-                <td>—</td>
+              <td>Restaurants</td>
+              <td>100K</td>
+              <td>—</td>
+              <td>—</td>
             </tr>
             <tr>
-                <td>Tables per restaurant</td>
-                <td>20 avg</td>
-                <td>—</td>
-                <td>—</td>
+              <td>Tables per restaurant</td>
+              <td>20 avg</td>
+              <td>—</td>
+              <td>—</td>
             </tr>
             <tr>
-                <td>Availability rows (15-min slots, 14h/day)</td>
-                <td>100K × 56 slots × 365</td>
-                <td>~2B rows/year</td>
-                <td>—</td>
+              <td>Availability rows (15-min slots, 14h/day)</td>
+              <td>100K × 56 slots × 365</td>
+              <td>~2B rows/year</td>
+              <td>—</td>
             </tr>
-        </table>
-    </div>
+          </table>
+        </div>
 
-    <div class="callout tip">
-        <div class="callout-title">Interview insight: search is 10× heavier than writes</div>
-        <p>This shapes your entire architecture: <strong>read path and write path must be separated</strong>.
+        <div class="callout tip">
+          <div class="callout-title">Interview insight: search is 10× heavier than writes</div>
+          <p>This shapes your entire architecture: <strong>read path and write path must be separated</strong>.
             Don't use the same DB for Elasticsearch-style search and for transactional reservation writes.
             The read path can be eventually consistent (cache + Elasticsearch). The write path must be
             strongly consistent (RDBMS with locking).</p>
-    </div>
+        </div>
 
-    <h2>3. High-Level Architecture</h2>
+        <h2>3. High-Level Architecture</h2>
 
-    <div class="mermaid">
-        flowchart TB
-        U([Diner]) --> CDN[CDN / API Gateway]
-        R([Restaurant Admin]) --> CDN
-        CDN --> SS[Search Service\nElasticsearch + Cache]
-        CDN --> RS[Reservation Service\nAvailability Engine]
-        CDN --> US[User Service]
-        CDN --> RestS[Restaurant Service]
-        RS --> AE[Availability Engine\nDB Transactions]
-        AE --> PG[(PostgreSQL\nSharded by restaurant_id)]
-        AE --> Redis[(Redis\nShort-TTL cache)]
-        AE --> KF[Kafka\nEvent Bus]
-        SS --> ES[(Elasticsearch\nGeo + text search)]
-        KF --> NS[Notification Service\nEmail / SMS / Push]
-        KF --> ES
-    </div>
+        <div class="mermaid">
+          flowchart TB
+          U([Diner]) --> CDN[CDN / API Gateway]
+          R([Restaurant Admin]) --> CDN
+          CDN --> SS[Search Service\nElasticsearch + Cache]
+          CDN --> RS[Reservation Service\nAvailability Engine]
+          CDN --> US[User Service]
+          CDN --> RestS[Restaurant Service]
+          RS --> AE[Availability Engine\nDB Transactions]
+          AE --> PG[(PostgreSQL\nSharded by restaurant_id)]
+          AE --> Redis[(Redis\nShort-TTL cache)]
+          AE --> KF[Kafka\nEvent Bus]
+          SS --> ES[(Elasticsearch\nGeo + text search)]
+          KF --> NS[Notification Service\nEmail / SMS / Push]
+          KF --> ES
+        </div>
 
-    <h2>4. Core Design: Availability Engine (The Hardest Part)</h2>
+        <h2>4. Core Design: Availability Engine (The Hardest Part)</h2>
 
-    <div class="callout warn">
-        <div class="callout-title">This is where the interviewer will spend most time</div>
-        <p>The Availability Engine must ensure <strong>no double booking</strong> while handling
+        <div class="callout warn">
+          <div class="callout-title">This is where the interviewer will spend most time</div>
+          <p>The Availability Engine must ensure <strong>no double booking</strong> while handling
             concurrent requests. This is a classic distributed concurrency problem. Walk through
             at least two approaches and explain the tradeoffs.</p>
-    </div>
+        </div>
 
-    <h3>Precomputed Time Slot Model (Recommended)</h3>
-    <p>Divide each restaurant's day into 15-minute slots. Maintain a row per slot
-        tracking available capacity. All reservation writes update this table atomically.</p>
+        <h3>Precomputed Time Slot Model (Recommended)</h3>
+        <p>Divide each restaurant's day into 15-minute slots. Maintain a row per slot
+          tracking available capacity. All reservation writes update this table atomically.</p>
 
-    <div class="mermaid">
-        flowchart LR
-        User --> GW[API Gateway]
-        GW --> R[Reservation Service]
-        R --> H{1. Create HOLD\n2-min TTL}
-        H --> T{2. BEGIN TRANSACTION\nSELECT ... FOR UPDATE\nCheck capacity > 0\nDecrement capacity\nINSERT reservation}
-        T -->|Commit| C[Reservation Confirmed]
-        T -->|Rollback| F[409 Conflict\nNo slot available]
-        C --> K[Emit Kafka event\nreservation.created]
-        K --> N[Notification Service]
-    </div>
+        <div class="mermaid">
+          flowchart LR
+          User --> GW[API Gateway]
+          GW --> R[Reservation Service]
+          R --> H{1. Create HOLD\n2-min TTL}
+          H --> T{2. BEGIN TRANSACTION\nSELECT ... FOR UPDATE\nCheck capacity > 0\nDecrement capacity\nINSERT
+          reservation}
+          T -->|Commit| C[Reservation Confirmed]
+          T -->|Rollback| F[409 Conflict\nNo slot available]
+          C --> K[Emit Kafka event\nreservation.created]
+          K --> N[Notification Service]
+        </div>
 
-    <h3>Double Booking Prevention: Three Approaches</h3>
-    <div class="compare">
-        <div class="compare-card con">
+        <h3>Double Booking Prevention: Three Approaches</h3>
+        <div class="compare">
+          <div class="compare-card con">
             <h4>❌ Compute on the fly (naive)</h4>
             <p>Query all reservations, calculate availability per request.</p>
             <ul>
-                <li>Correct but slow — O(N) table scans</li>
-                <li>Doesn't prevent race condition</li>
-                <li>Won't scale to 120 QPS peak writes</li>
+              <li>Correct but slow — O(N) table scans</li>
+              <li>Doesn't prevent race condition</li>
+              <li>Won't scale to 120 QPS peak writes</li>
             </ul>
-        </div>
-        <div class="compare-card pro">
+          </div>
+          <div class="compare-card pro">
             <h4>✅ Pessimistic locking (recommended)</h4>
             <pre style="margin:0;font-size:.8rem;background:#f8fafc;padding:8px;border-radius:6px;">SELECT * FROM availability
 WHERE restaurant_id = $1
@@ -1039,12 +1123,12 @@ FOR UPDATE;
 -- If capacity > 0: decrement + insert
 -- COMMIT atomically</pre>
             <ul>
-                <li>Guarantees no double booking</li>
-                <li>Row-level lock, not table lock</li>
-                <li>Excellent for moderate write QPS</li>
+              <li>Guarantees no double booking</li>
+              <li>Row-level lock, not table lock</li>
+              <li>Excellent for moderate write QPS</li>
             </ul>
-        </div>
-        <div class="compare-card neutral">
+          </div>
+          <div class="compare-card neutral">
             <h4>⚠️ Optimistic locking (alternative)</h4>
             <pre style="margin:0;font-size:.8rem;background:#f8fafc;padding:8px;border-radius:6px;">UPDATE availability
 SET capacity = capacity - 1,
@@ -1054,231 +1138,231 @@ WHERE restaurant_id = $1
   AND version = $version_read
   AND capacity > 0;</pre>
             <ul>
-                <li>No locks held — better throughput under low contention</li>
-                <li>Retry on version conflict — adds latency under high contention</li>
-                <li>Use for less popular restaurants</li>
+              <li>No locks held — better throughput under low contention</li>
+              <li>Retry on version conflict — adds latency under high contention</li>
+              <li>Use for less popular restaurants</li>
             </ul>
+          </div>
         </div>
-    </div>
 
-    <div class="def">
-        <dt>The 2-minute HOLD pattern</dt>
-        <dd>When a diner clicks "Reserve" but hasn't confirmed yet: create a <strong>soft hold</strong>
+        <div class="def">
+          <dt>The 2-minute HOLD pattern</dt>
+          <dd>When a diner clicks "Reserve" but hasn't confirmed yet: create a <strong>soft hold</strong>
             stored in Redis with a 2-minute TTL. This temporarily decrements shown availability.
             On confirm, run the actual DB transaction. On timeout, the hold expires automatically and
             the slot returns to available. This prevents the "phantom slot" problem where many users see
             the same slot and all try to book simultaneously.</dd>
-        <dt>Hot restaurant problem</dt>
-        <dd>Nobu Saturday 7pm gets 10,000 concurrent requests. With pessimistic locking, all threads
+          <dt>Hot restaurant problem</dt>
+          <dd>Nobu Saturday 7pm gets 10,000 concurrent requests. With pessimistic locking, all threads
             line up for the same row lock — creating a thundering herd. Solutions: (1) a <strong>reservation
-                queue per restaurant</strong> (serialize writes via Kafka partition keyed by restaurant_id);
+              queue per restaurant</strong> (serialize writes via Kafka partition keyed by restaurant_id);
             (2) slot-level partitioning; (3) rate limit per restaurant slot.</dd>
-    </div>
+        </div>
 
-    <h2>5. Data Model</h2>
+        <h2>5. Data Model</h2>
 
-    <div class="table-wrap">
-        <table>
+        <div class="table-wrap">
+          <table>
             <tr>
-                <th>Table</th>
-                <th>Key Fields</th>
-                <th>Notes</th>
+              <th>Table</th>
+              <th>Key Fields</th>
+              <th>Notes</th>
             </tr>
             <tr>
-                <td><strong>restaurants</strong></td>
-                <td>restaurant_id (PK), name, location (PostGIS), timezone, operating_hours</td>
-                <td>Geo-indexed for proximity search</td>
+              <td><strong>restaurants</strong></td>
+              <td>restaurant_id (PK), name, location (PostGIS), timezone, operating_hours</td>
+              <td>Geo-indexed for proximity search</td>
             </tr>
             <tr>
-                <td><strong>tables</strong></td>
-                <td>table_id, restaurant_id, capacity, floor_section</td>
-                <td>Physical inventory</td>
+              <td><strong>tables</strong></td>
+              <td>table_id, restaurant_id, capacity, floor_section</td>
+              <td>Physical inventory</td>
             </tr>
             <tr>
-                <td><strong>availability</strong></td>
-                <td>restaurant_id, time_slot, available_capacity, <strong>version</strong></td>
-                <td>Hot table — sharded by restaurant_id</td>
+              <td><strong>availability</strong></td>
+              <td>restaurant_id, time_slot, available_capacity, <strong>version</strong></td>
+              <td>Hot table — sharded by restaurant_id</td>
             </tr>
             <tr>
-                <td><strong>reservations</strong></td>
-                <td>reservation_id, restaurant_id, user_id, time_slot, party_size, status, created_at</td>
-                <td>Append-mostly; index on (restaurant_id, time_slot)</td>
+              <td><strong>reservations</strong></td>
+              <td>reservation_id, restaurant_id, user_id, time_slot, party_size, status, created_at</td>
+              <td>Append-mostly; index on (restaurant_id, time_slot)</td>
             </tr>
             <tr>
-                <td><strong>waitlist</strong></td>
-                <td>waitlist_id, restaurant_id, time_slot, user_id, priority, created_at</td>
-                <td>Ordered by priority + created_at</td>
+              <td><strong>waitlist</strong></td>
+              <td>waitlist_id, restaurant_id, time_slot, user_id, priority, created_at</td>
+              <td>Ordered by priority + created_at</td>
             </tr>
-        </table>
-    </div>
+          </table>
+        </div>
 
-    <h2>6. Caching Strategy</h2>
-    <div class="def">
-        <dt>Redis (TTL: 30–60s on availability, 5min on search)</dt>
-        <dd>Cache restaurant search results and approximate availability. Short TTL bounds staleness.
+        <h2>6. Caching Strategy</h2>
+        <div class="def">
+          <dt>Redis (TTL: 30–60s on availability, 5min on search)</dt>
+          <dd>Cache restaurant search results and approximate availability. Short TTL bounds staleness.
             <strong>Invalidate immediately on any booking.</strong>
             The final confirmation step always re-validates against the authoritative DB — the cache is
             only used to show "approximately available" in the search UI, never to approve a booking.
-        </dd>
-        <dt>CDN (TTL: 24h on restaurant metadata)</dt>
-        <dd>Restaurant name, photos, cuisine, hours — highly cacheable, changes rarely.
+          </dd>
+          <dt>CDN (TTL: 24h on restaurant metadata)</dt>
+          <dd>Restaurant name, photos, cuisine, hours — highly cacheable, changes rarely.
             Purge on restaurant profile update. This offloads ~90% of read traffic for restaurant detail pages.</dd>
-    </div>
+        </div>
 
-    <h2>7. Sharding Strategy</h2>
-    <div class="def">
-        <dt>Shard by <code>restaurant_id</code></dt>
-        <dd>All data for a given restaurant lives in the same shard: availability, reservations, waitlist.
+        <h2>7. Sharding Strategy</h2>
+        <div class="def">
+          <dt>Shard by <code>restaurant_id</code></dt>
+          <dd>All data for a given restaurant lives in the same shard: availability, reservations, waitlist.
             This makes reservation transactions local to a shard (no cross-shard distributed transactions).
             <strong>Trade-off:</strong> Cross-restaurant analytics (e.g., "top cuisines in NYC") requires
             scatter-gather or a separate analytics replica. Popular restaurants become hot shards — mitigated
             by reserving multiple shards per restaurant or using a secondary hash.
-        </dd>
-    </div>
+          </dd>
+        </div>
 
-    <h2>8. Multi-Region Architecture</h2>
-    <div class="mermaid">
-        flowchart LR
-        subgraph US-East
-        UE[API + Services] --> PG_US[(PostgreSQL\nPrimary)]
-        PG_US --> RR_US[(Read\nReplica)]
-        end
-        subgraph EU-West
-        EU[API + Services] --> RR_EU[(Read\nReplica)]
-        RR_EU -.->|async replication| PG_US
-        end
-        U_US([US Diner]) --> UE
-        U_EU([EU Diner]) --> EU
-        EU -->|booking write| UE
-    </div>
-    <div class="callout tip">
-        <div class="callout-title">Critical: booking writes must route to restaurant's primary region</div>
-        <p>A restaurant in New York has its authoritative DB in us-east-1. A European user booking
+        <h2>8. Multi-Region Architecture</h2>
+        <div class="mermaid">
+          flowchart LR
+          subgraph US-East
+          UE[API + Services] --> PG_US[(PostgreSQL\nPrimary)]
+          PG_US --> RR_US[(Read\nReplica)]
+          end
+          subgraph EU-West
+          EU[API + Services] --> RR_EU[(Read\nReplica)]
+          RR_EU -.->|async replication| PG_US
+          end
+          U_US([US Diner]) --> UE
+          U_EU([EU Diner]) --> EU
+          EU -->|booking write| UE
+        </div>
+        <div class="callout tip">
+          <div class="callout-title">Critical: booking writes must route to restaurant's primary region</div>
+          <p>A restaurant in New York has its authoritative DB in us-east-1. A European user booking
             that restaurant must have their reservation write routed to us-east-1 — even though reads
             can come from an EU read replica. Never allow a booking to commit on an async replica.</p>
-    </div>
+        </div>
 
-    <h2>9. Event-Driven Notification Flow</h2>
-    <div class="def">
-        <dt>Kafka topics</dt>
-        <dd><code>reservation.created</code>, <code>reservation.modified</code>, <code>reservation.cancelled</code>,
+        <h2>9. Event-Driven Notification Flow</h2>
+        <div class="def">
+          <dt>Kafka topics</dt>
+          <dd><code>reservation.created</code>, <code>reservation.modified</code>, <code>reservation.cancelled</code>,
             <code>reservation.reminded</code> (triggered by a scheduler 24h + 2h before slot).<br>
             <strong>Notification Service</strong> consumes and fans out to: Email (SES/SendGrid),
             SMS (Twilio), Push (FCM/APNS). Retry on failure, DLQ for repeated failures.
             Notifications are async and eventually consistent — a 5-second delay in sending a
             confirmation email is fine; a 5-second delay in confirming a booking is not.
-        </dd>
-    </div>
+          </dd>
+        </div>
 
-    <h2>10. Failure Scenarios</h2>
-    <div class="table-wrap">
-        <table>
+        <h2>10. Failure Scenarios</h2>
+        <div class="table-wrap">
+          <table>
             <tr>
-                <th>Failure</th>
-                <th>Impact</th>
-                <th>Mitigation</th>
+              <th>Failure</th>
+              <th>Impact</th>
+              <th>Mitigation</th>
             </tr>
             <tr>
-                <td>Primary DB crashes</td>
-                <td>Writes fail</td>
-                <td>Automatic failover to standby (RDS Multi-AZ, &lt;30s); recent writes from WAL replayed</td>
+              <td>Primary DB crashes</td>
+              <td>Writes fail</td>
+              <td>Automatic failover to standby (RDS Multi-AZ, &lt;30s); recent writes from WAL replayed</td>
             </tr>
             <tr>
-                <td>Redis crashes</td>
-                <td>Cache miss, higher DB load</td>
-                <td>Fall through to DB; system is slower but correct; Redis rebuilt from DB on recovery</td>
+              <td>Redis crashes</td>
+              <td>Cache miss, higher DB load</td>
+              <td>Fall through to DB; system is slower but correct; Redis rebuilt from DB on recovery</td>
             </tr>
             <tr>
-                <td>Notification failure</td>
-                <td>User doesn't get confirmation email</td>
-                <td>Kafka DLQ with exponential backoff retry; separate from booking path (doesn't block reservation)
-                </td>
+              <td>Notification failure</td>
+              <td>User doesn't get confirmation email</td>
+              <td>Kafka DLQ with exponential backoff retry; separate from booking path (doesn't block reservation)
+              </td>
             </tr>
             <tr>
-                <td>Popular restaurant slot contention</td>
-                <td>Lock waits, high latency</td>
-                <td>Per-restaurant write queue (Kafka partition); request serialization; slot partitioning</td>
+              <td>Popular restaurant slot contention</td>
+              <td>Lock waits, high latency</td>
+              <td>Per-restaurant write queue (Kafka partition); request serialization; slot partitioning</td>
             </tr>
             <tr>
-                <td>Elasticsearch down</td>
-                <td>Search fails</td>
-                <td>Fallback to directly querying read replica with degraded ranking; search is not on critical path
-                </td>
+              <td>Elasticsearch down</td>
+              <td>Search fails</td>
+              <td>Fallback to directly querying read replica with degraded ranking; search is not on critical path
+              </td>
             </tr>
-        </table>
-    </div>
+          </table>
+        </div>
 
-    <h2>11. Tradeoffs Summary</h2>
-    <div class="table-wrap">
-        <table>
+        <h2>11. Tradeoffs Summary</h2>
+        <div class="table-wrap">
+          <table>
             <tr>
-                <th>Decision</th>
-                <th>Choice</th>
-                <th>Why</th>
-                <th>Cost</th>
+              <th>Decision</th>
+              <th>Choice</th>
+              <th>Why</th>
+              <th>Cost</th>
             </tr>
             <tr>
-                <td>Consistency for booking</td>
-                <td>Strong (pessimistic lock)</td>
-                <td>Zero double bookings is a hard requirement</td>
-                <td>Lower write throughput, lock contention at peak</td>
+              <td>Consistency for booking</td>
+              <td>Strong (pessimistic lock)</td>
+              <td>Zero double bookings is a hard requirement</td>
+              <td>Lower write throughput, lock contention at peak</td>
             </tr>
             <tr>
-                <td>Consistency for search</td>
-                <td>Eventual (Elasticsearch)</td>
-                <td>Search performance >> search freshness</td>
-                <td>User may briefly see stale availability</td>
+              <td>Consistency for search</td>
+              <td>Eventual (Elasticsearch)</td>
+              <td>Search performance >> search freshness</td>
+              <td>User may briefly see stale availability</td>
             </tr>
             <tr>
-                <td>Slot precomputation</td>
-                <td>Precomputed availability table</td>
-                <td>O(1) availability lookup — critical for read SLA</td>
-                <td>Extra storage, sync complexity with table changes</td>
+              <td>Slot precomputation</td>
+              <td>Precomputed availability table</td>
+              <td>O(1) availability lookup — critical for read SLA</td>
+              <td>Extra storage, sync complexity with table changes</td>
             </tr>
             <tr>
-                <td>Notification delivery</td>
-                <td>Async via Kafka</td>
-                <td>Decoupled, retry-safe, not in booking critical path</td>
-                <td>Eventual delivery — user may wait seconds for email</td>
+              <td>Notification delivery</td>
+              <td>Async via Kafka</td>
+              <td>Decoupled, retry-safe, not in booking critical path</td>
+              <td>Eventual delivery — user may wait seconds for email</td>
             </tr>
             <tr>
-                <td>Sharding key</td>
-                <td><code>restaurant_id</code></td>
-                <td>Transactions stay local to shard, no distributed txns</td>
-                <td>Hot shards for popular restaurants; analytics is harder</td>
+              <td>Sharding key</td>
+              <td><code>restaurant_id</code></td>
+              <td>Transactions stay local to shard, no distributed txns</td>
+              <td>Hot shards for popular restaurants; analytics is harder</td>
             </tr>
             <tr>
-                <td>Multi-region writes</td>
-                <td>Route to restaurant's primary region</td>
-                <td>Avoid split-brain, ensure authoritative availability</td>
-                <td>Higher write latency for cross-region users</td>
+              <td>Multi-region writes</td>
+              <td>Route to restaurant's primary region</td>
+              <td>Avoid split-brain, ensure authoritative availability</td>
+              <td>Higher write latency for cross-region users</td>
             </tr>
-        </table>
-    </div>
+          </table>
+        </div>
 
-    <h2>12. Advanced Topics (Staff-Level Signals)</h2>
-    <div class="def">
-        <dt>Waitlist Auto-Promotion</dt>
-        <dd>When a reservation is cancelled, Kafka event fires → Waitlist Service picks next eligible
+        <h2>12. Advanced Topics (Staff-Level Signals)</h2>
+        <div class="def">
+          <dt>Waitlist Auto-Promotion</dt>
+          <dd>When a reservation is cancelled, Kafka event fires → Waitlist Service picks next eligible
             user → creates soft hold → sends "you have 10 minutes to confirm" push notification.
             Race condition: two waitlist users promoted simultaneously → only first HOLD that converts to
             a confirmed booking wins (same DB transaction pattern).</dd>
-        <dt>Overbooking Model (like airlines)</dt>
-        <dd>Use historical no-show data per restaurant to compute an overbooking coefficient.
+          <dt>Overbooking Model (like airlines)</dt>
+          <dd>Use historical no-show data per restaurant to compute an overbooking coefficient.
             If a restaurant has 15% no-show rate, allow 115% capacity bookings. Requires ML model
             per restaurant per time-of-day, day-of-week. Add this to the conversation if the interviewer
             probes for ML integration.</dd>
-        <dt>Rate limiting and bot protection</dt>
-        <dd>Reservation bots are a real problem (scalpers for trendy restaurants). Token bucket
+          <dt>Rate limiting and bot protection</dt>
+          <dd>Reservation bots are a real problem (scalpers for trendy restaurants). Token bucket
             rate limit per user_id and per IP. Require CAPTCHA after N failed booking attempts.
             Flag suspicious patterns: same user booking 20 restaurants within 1 minute.</dd>
-    </div>
-</div>
+        </div>
+      </div>
 
 
       <div class="page-nav">
-        <a class="page-nav-btn" href="11-interview-framework.html">&#8592; Interview Framework</a>
-        <a class="page-nav-btn home" href="../system-design-complete.html">&#9776; All Topics</a>
+        <a class="page-nav-btn" href="../pages/11-interview-framework.html">&#8592; Interview Framework</a>
+        <a class="page-nav-btn home" href="../pages/01-introduction.html">&#9776; All Topics</a>
         <span></span>
       </div>
     </div>

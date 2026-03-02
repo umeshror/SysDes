@@ -1,20 +1,17 @@
 <!DOCTYPE html>
 
 <html lang="en">
-
 <head>
-    <meta charset="utf-8" />
-    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
-    <title>Blind 75 — Coding Interview Patterns</title>
-    <link href="https://fonts.googleapis.com" rel="preconnect" />
-    <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Fira+Code:wght@400;500&amp;display=swap"
-        rel="stylesheet" />
-    <!-- Highlight.js for syntax highlighting -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css" rel="stylesheet" />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
-    <style>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Blind 75 — Coding Interview Patterns</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Fira+Code:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<!-- Highlight.js for syntax highlighting -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<style>
         :root {
             --bg: #f6f8ff;
             --surface: #ffffff;
@@ -849,6 +846,71 @@
             margin-bottom: 6px;
         }
 
+        /* Flow Matrix & Diagram Enhancements */
+        .flow-matrix-container {
+            margin: 24px 0;
+            overflow-x: auto;
+        }
+
+        .flow-matrix-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+            color: #bac2de;
+            background: rgba(30, 30, 46, 0.4);
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .flow-matrix-table th,
+        .flow-matrix-table td {
+            padding: 10px 14px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .flow-matrix-table th {
+            background: rgba(43, 43, 62, 0.6);
+            color: #cdd6f4;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-size: 0.75rem;
+        }
+
+        .flow-matrix-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .flow-matrix-table tr:hover td {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .flow-matrix-table code {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 3px 6px;
+            border-radius: 4px;
+            color: #89dceb;
+            font-family: 'Fira Code', monospace;
+        }
+
+        .diagram-container {
+            margin: 24px 0;
+            padding: 24px;
+            background: rgba(30, 30, 46, 0.4);
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            text-align: center;
+        }
+
+        .diagram-container img,
+        .diagram-container svg {
+            max-width: 100%;
+            height: auto;
+            border-radius: 4px;
+        }
+
         /* Solved button */
         .mark-solved-btn {
             display: inline-flex;
@@ -875,12 +937,52 @@
         .mark-solved-btn.solved {
             background: #64748b;
         }
+
+        /* Page nav */
+        .page-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 28px 0px 48px;
+            border-top: 1px solid rgba(137, 180, 250, .15);
+            margin-top: 24px;
+            gap: 12px;
+        }
+
+        .page-nav-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 22px;
+            background: #1a1a2e;
+            color: #cdd6f4;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: .84rem;
+            font-weight: 600;
+            transition: all .18s;
+            border: 1px solid rgba(137, 180, 250, .15);
+        }
+
+        .page-nav-btn:hover {
+            background: #313244;
+            border-color: rgba(137, 180, 250, .35);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, .2);
+        }
+
+        .page-nav-btn.home {
+            background: linear-gradient(135deg, #1e3a5f, #162d48);
+        }
+
+        .page-nav-btn.home:hover {
+            background: linear-gradient(135deg, #264a78, #1e3a5f);
+        }
     </style>
 </head>
-
 <body>
-    <!-- ── SIDEBAR ────────────────────────────────────────────── -->
-        <nav class="sidebar">
+<!-- ── SIDEBAR ────────────────────────────────────────────── -->
+    <nav class="sidebar">
         <div class="sidebar-header">
             <a href="../index.html">← Back to Home</a>
             <h1>Blind 75</h1>
@@ -1366,20 +1468,12 @@
 <p class="q-source"><a href="https://leetcode.com/problems/two-sum" target="_blank">leetcode.com/problems/two-sum</a> · Blind 75 · FAANG favourite</p>
 </div>
 <hr class="section-rule"/>
-<div class="problem-statement">
-<h3>Problem Statement</h3>
-<div class="statement-content">Given an array of integers <code>nums</code> and an integer
-                    <code>target</code>, return <em>indices</em> of the two numbers such that they add up to
-                    <code>target</code>. You may assume each input has exactly one solution, and you may not use the
-                    same element twice.
-                </div>
-</div>
+<div class="problem-statement"><h3>Problem Statement</h3><div class="statement-content">Given an array of integers <code>nums</code> and an integer <code>target</code>, return <em>indices</em> of the two numbers such that they add up to <code>target</code>. You may assume each input has exactly one solution, and you may not use the same element twice.</div></div>
 <div class="examples">
 <div class="example-block">
 <div class="example-header">Example 1</div>
 <div class="example-body">
-<div><span class="label">Input: </span><span class="val">nums = [2,7,11,15], target = 9</span>
-</div>
+<div><span class="label">Input: </span><span class="val">nums = [2,7,11,15], target = 9</span></div>
 <div><span class="label">Output: </span><span class="val">[0,1]</span></div>
 <div class="explanation">nums[0] + nums[1] = 2 + 7 = 9.</div>
 </div>
@@ -1399,40 +1493,21 @@
 <div><span class="label">Output: </span><span class="val">[0,1]</span></div>
 <div class="explanation">Both 3s at different indices.</div>
 </div>
-</div>
-</div>
-<div class="constraints">
-<h4>Constraints</h4>
-<ul>
-<li>2 ≤ nums.length ≤ 10<sup>4</sup></li>
-<li>-10<sup>9</sup> ≤ nums[i] ≤ 10<sup>9</sup></li>
-<li>Exactly one valid answer</li>
-<li>You may not use the same element twice</li>
-</ul>
-</div>
+</div></div>
+<div class="constraints"><h4>Constraints</h4><ul><li>2 ≤ nums.length ≤ 10<sup>4</sup></li><li>-10<sup>9</sup> ≤ nums[i] ≤ 10<sup>9</sup></li><li>Exactly one valid answer</li><li>You may not use the same element twice</li></ul></div>
 <h2 class="approach-title">Approaches Comparison</h2>
 <table class="compare-table">
+<tr><th>Approach</th><th>Time</th><th>Space</th><th>Notes</th></tr>
 <tr>
-<th>Approach</th>
-<th>Time</th>
-<th>Space</th>
-<th>Notes</th>
-</tr>
-<tr>
-<td>Brute Force</td>
-<td><code>O(n²)</code></td>
-<td><code>O(1)</code></td>
-<td>Check every pair. Too slow.</td>
+<td>Brute Force</td><td><code>O(n²)</code></td>
+<td><code>O(1)</code></td><td>Check every pair. Too slow.</td>
 </tr>
 <tr class="optimal-row">
-<td>Hash Map (One-Pass)</td>
-<td><code>O(n)</code></td>
-<td><code>O(n)</code></td>
-<td>Store complement in map while iterating. Optimal.</td>
+<td>Hash Map (One-Pass)</td><td><code>O(n)</code></td>
+<td><code>O(n)</code></td><td>Store complement in map while iterating. Optimal.</td>
 </tr>
 </table>
-<h2 class="approach-title">Approach 1 — Brute Force <span class="approach-badge badge-better">O(n²)</span>
-</h2>
+<h2 class="approach-title">Approach 1 — Brute Force <span class="approach-badge badge-better">O(n²)</span></h2>
 <div class="complexity-row">
 <div class="complexity-pill"><span class="cp-label">Time</span><span class="cp-value">O(n²)</span></div>
 <div class="complexity-pill"><span class="cp-label">Space</span><span class="cp-value">O(1)</span></div>
@@ -1440,17 +1515,14 @@
 <p class="approach-explanation">Check every pair. Too slow.</p>
 <div class="warn-box">
 <div class="warn-box-title">⚠ Interviewer will push back</div>
-<p>This is a valid stepping-stone answer. But the problem requires better optimization. Always start by
-                    acknowledging this brute force/suboptimal time complexity before moving to the optimal solution.</p>
+<p>This is a valid stepping-stone answer. But the problem requires better optimization. Always start by acknowledging this brute force/suboptimal time complexity before moving to the optimal solution.</p>
 </div>
 <h2 class="approach-title">Approach 2 — Hash Map — One Pass <span class="approach-badge badge-optimal">Optimal</span></h2>
 <div class="complexity-row">
 <div class="complexity-pill"><span class="cp-label">Time</span><span class="cp-value">O(n)</span></div>
 <div class="complexity-pill"><span class="cp-label">Space</span><span class="cp-value">O(n)</span></div>
 </div>
-<p class="approach-explanation">Iterate through the array. For each element, compute its complement (target
-                - num). If the complement is already in the hash map, return the two indices. Otherwise store num:index
-                in the map.</p>
+<p class="approach-explanation">Iterate through the array. For each element, compute its complement (target - num). If the complement is already in the hash map, return the two indices. Otherwise store num:index in the map.</p>
 <div class="code-tabs">
 <div class="tab-buttons"><button class="tab-btn active" onclick="switchTab(this, 'opt-python-q2')">Python</button>
 <button class="tab-btn" onclick="switchTab(this, 'opt-java-q2')">Java</button>
@@ -1458,19 +1530,16 @@
 <button class="tab-btn" onclick="switchTab(this, 'opt-go-q2')">Go</button>
 </div>
 <div class="tab-content active" id="opt-python-q2">
-<div class="code-wrap">
-<pre><code class="language-python">def twoSum(nums, target):
+<div class="code-wrap"><pre><code class="language-python">def twoSum(nums, target):
     seen = {}
     for i, num in enumerate(nums):
         complement = target - num
         if complement in seen:
             return [seen[complement], i]
-        seen[num] = i</code></pre>
-</div>
+        seen[num] = i</code></pre></div>
 </div>
 <div class="tab-content" id="opt-java-q2">
-<div class="code-wrap">
-<pre><code class="language-java">public int[] twoSum(int[] nums, int target) {
+<div class="code-wrap"><pre><code class="language-java">public int[] twoSum(int[] nums, int target) {
     Map&lt;Integer,Integer&gt; seen = new HashMap&lt;&gt;();
     for (int i = 0; i &lt; nums.length; i++) {
         int complement = target - nums[i];
@@ -1479,55 +1548,54 @@
         seen.put(nums[i], i);
     }
     return new int[]{};
-}</code></pre>
-</div>
+}</code></pre></div>
 </div>
 <div class="tab-content" id="opt-javascript-q2">
-<div class="code-wrap">
-<pre><code class="language-javascript">var twoSum = function(nums, target) {
+<div class="code-wrap"><pre><code class="language-javascript">var twoSum = function(nums, target) {
     const seen = {};
     for (let i = 0; i &lt; nums.length; i++) {
         const comp = target - nums[i];
         if (comp in seen) return [seen[comp], i];
         seen[nums[i]] = i;
     }
-};</code></pre>
-</div>
+};</code></pre></div>
 </div>
 <div class="tab-content" id="opt-go-q2">
-<div class="code-wrap">
-<pre><code class="language-go">func twoSum(nums []int, target int) []int {
+<div class="code-wrap"><pre><code class="language-go">func twoSum(nums []int, target int) []int {
     seen := map[int]int{}
     for i, n := range nums {
         if j, ok := seen[target-n]; ok { return []int{j, i} }
         seen[n] = i
     }
     return nil
-}</code></pre>
+}</code></pre></div>
 </div>
 </div>
+<div class="flow-matrix-container">
+<table class="flow-matrix-table">
+<thead><tr><th>Step</th><th>i</th><th>num</th><th>Complement</th><th>In Map?</th><th>Hash Map State</th><th>Action</th></tr></thead>
+<tbody><tr><td>1</td><td>0</td><td>2</td><td><code>9 - 2 = 7</code></td><td>No</td><td><code>{2: 0}</code></td><td>Store <code>num: i</code></td></tr><tr><td>2</td><td>1</td><td>7</td><td><code>9 - 7 = 2</code></td><td>Yes</td><td><code>{2: 0}</code></td><td>Return <code>[map[2], 1] → [0, 1]</code></td></tr></tbody>
+</table>
 </div>
 <div class="insight" style="margin-top:20px;">
 <div class="insight-title">Why One-Pass Works</div>
-<p>At each index i, we ask: 'Have I already seen the number that would complete a pair with nums[i]?' If
-                    yes, return immediately. If no, record nums[i] for future lookups. Hash map operations are O(1)
-                    average → O(n) total.</p>
+<p>At each index i, we ask: 'Have I already seen the number that would complete a pair with nums[i]?' If yes, return immediately. If no, record nums[i] for future lookups. Hash map operations are O(1) average → O(n) total.</p>
 </div>
 <div class="interview-tips">
 <h3>Interview Playbook</h3>
-<ol>
-<li><strong>Don't jump to two pointers:</strong> Two pointers only work on sorted arrays. For
-                        unsorted, use hash map.</li>
-<li><strong>State the trade-off:</strong> O(n²) time vs O(n) space is the classic time-space
-                        trade-off.</li>
-<li><strong>Companies:</strong> LeetCode #1 — asked at virtually every company.</li>
-</ol>
+<ol><li><strong>Don't jump to two pointers:</strong> Two pointers only work on sorted arrays. For unsorted, use hash map.</li><li><strong>State the trade-off:</strong> O(n²) time vs O(n) space is the classic time-space trade-off.</li><li><strong>Companies:</strong> LeetCode #1 — asked at virtually every company.</li></ol>
 </div>
 <button class="mark-solved-btn" id="solve-q2" onclick="markSolved('q2',this)">Mark as Solved</button>
 </div>
+
+        <div class="page-nav" style="max-width: 960px; margin: 40px auto 0; padding: 20px 48px;">
+            <a class="page-nav-btn" href="70-valid-anagram.html">&#8592; Valid Anagram</a>
+            <a class="page-nav-btn home" href="../index.html">&#9776; Back to Portfolio</a>
+            <a class="page-nav-btn" href="30-group-anagrams.html">Group Anagrams &#8594;</a>
+        </div>
     </div>
 
-    <script>
+<script>
         // Initialize highlight.js
         hljs.highlightAll();
         // Initialize mermaid.js
@@ -1554,7 +1622,19 @@
             document.querySelectorAll('.question-panel').forEach(p => p.classList.remove('active'));
             document.querySelectorAll('.q-item').forEach(i => i.classList.remove('active'));
             const panel = document.getElementById(qId);
-            if (panel) panel.classList.add('active');
+            if (panel) {
+                panel.classList.add('active');
+                if (window.mermaid) {
+                    setTimeout(() => {
+                        try {
+                            const mNodes = Array.from(panel.querySelectorAll('.mermaid:not([data-processed="true"])'));
+                            if (mNodes.length > 0) window.mermaid.run({ nodes: mNodes });
+                        } catch (err) {
+                            console.error('Mermaid run error:', err);
+                        }
+                    }, 50);
+                }
+            }
             if (item) item.classList.add('active');
             document.getElementById('main-panel').scrollTo(0, 0);
         }
@@ -1624,6 +1704,11 @@
                 }
             });
         }
+    </script>
+<script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({ startOnLoad: false, theme: 'dark' });
+        window.mermaid = mermaid;
     </script>
 </body>
 </html>

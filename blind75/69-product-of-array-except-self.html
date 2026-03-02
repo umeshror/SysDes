@@ -1,20 +1,17 @@
 <!DOCTYPE html>
 
 <html lang="en">
-
 <head>
-    <meta charset="utf-8" />
-    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
-    <title>Blind 75 — Coding Interview Patterns</title>
-    <link href="https://fonts.googleapis.com" rel="preconnect" />
-    <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Fira+Code:wght@400;500&amp;display=swap"
-        rel="stylesheet" />
-    <!-- Highlight.js for syntax highlighting -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css" rel="stylesheet" />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
-    <style>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Blind 75 — Coding Interview Patterns</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Fira+Code:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<!-- Highlight.js for syntax highlighting -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<style>
         :root {
             --bg: #f6f8ff;
             --surface: #ffffff;
@@ -849,6 +846,71 @@
             margin-bottom: 6px;
         }
 
+        /* Flow Matrix & Diagram Enhancements */
+        .flow-matrix-container {
+            margin: 24px 0;
+            overflow-x: auto;
+        }
+
+        .flow-matrix-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+            color: #bac2de;
+            background: rgba(30, 30, 46, 0.4);
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .flow-matrix-table th,
+        .flow-matrix-table td {
+            padding: 10px 14px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .flow-matrix-table th {
+            background: rgba(43, 43, 62, 0.6);
+            color: #cdd6f4;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-size: 0.75rem;
+        }
+
+        .flow-matrix-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .flow-matrix-table tr:hover td {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .flow-matrix-table code {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 3px 6px;
+            border-radius: 4px;
+            color: #89dceb;
+            font-family: 'Fira Code', monospace;
+        }
+
+        .diagram-container {
+            margin: 24px 0;
+            padding: 24px;
+            background: rgba(30, 30, 46, 0.4);
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            text-align: center;
+        }
+
+        .diagram-container img,
+        .diagram-container svg {
+            max-width: 100%;
+            height: auto;
+            border-radius: 4px;
+        }
+
         /* Solved button */
         .mark-solved-btn {
             display: inline-flex;
@@ -875,12 +937,52 @@
         .mark-solved-btn.solved {
             background: #64748b;
         }
+
+        /* Page nav */
+        .page-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 28px 0px 48px;
+            border-top: 1px solid rgba(137, 180, 250, .15);
+            margin-top: 24px;
+            gap: 12px;
+        }
+
+        .page-nav-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 22px;
+            background: #1a1a2e;
+            color: #cdd6f4;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: .84rem;
+            font-weight: 600;
+            transition: all .18s;
+            border: 1px solid rgba(137, 180, 250, .15);
+        }
+
+        .page-nav-btn:hover {
+            background: #313244;
+            border-color: rgba(137, 180, 250, .35);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, .2);
+        }
+
+        .page-nav-btn.home {
+            background: linear-gradient(135deg, #1e3a5f, #162d48);
+        }
+
+        .page-nav-btn.home:hover {
+            background: linear-gradient(135deg, #264a78, #1e3a5f);
+        }
     </style>
 </head>
-
 <body>
-    <!-- ── SIDEBAR ────────────────────────────────────────────── -->
-        <nav class="sidebar">
+<!-- ── SIDEBAR ────────────────────────────────────────────── -->
+    <nav class="sidebar">
         <div class="sidebar-header">
             <a href="../index.html">← Back to Home</a>
             <h1>Blind 75</h1>
@@ -1363,17 +1465,10 @@
 <span class="topic-tag">Array</span><span class="topic-tag">Prefix Product</span>
 </div>
 <h1 class="q-title">Product of Array Except Self</h1>
-<p class="q-source"><a href="https://leetcode.com/problems/product-of-array-except-self" target="_blank">leetcode.com/problems/product-of-array-except-self</a> · Blind 75 · FAANG
-                    favourite</p>
+<p class="q-source"><a href="https://leetcode.com/problems/product-of-array-except-self" target="_blank">leetcode.com/problems/product-of-array-except-self</a> · Blind 75 · FAANG favourite</p>
 </div>
 <hr class="section-rule"/>
-<div class="problem-statement">
-<h3>Problem Statement</h3>
-<div class="statement-content">Given an integer array <code>nums</code>, return an array
-                    <code>answer</code> where <code>answer[i]</code> is the product of all elements of <code>nums</code>
-                    except <code>nums[i]</code>. Must run in O(n) time <strong>without division</strong>.
-                </div>
-</div>
+<div class="problem-statement"><h3>Problem Statement</h3><div class="statement-content">Given an integer array <code>nums</code>, return an array <code>answer</code> where <code>answer[i]</code> is the product of all elements of <code>nums</code> except <code>nums[i]</code>. Must run in O(n) time <strong>without division</strong>.</div></div>
 <div class="examples">
 <div class="example-block">
 <div class="example-header">Example 1</div>
@@ -1390,35 +1485,18 @@
 <div><span class="label">Output: </span><span class="val">[0,0,9,0,0]</span></div>
 <div class="explanation">Zero element makes most products 0.</div>
 </div>
-</div>
-</div>
-<div class="constraints">
-<h4>Constraints</h4>
-<ul>
-<li>2 ≤ nums.length ≤ 10<sup>5</sup></li>
-<li>-30 ≤ nums[i] ≤ 30</li>
-<li>Product guaranteed to fit in 32-bit integer</li>
-</ul>
-</div>
+</div></div>
+<div class="constraints"><h4>Constraints</h4><ul><li>2 ≤ nums.length ≤ 10<sup>5</sup></li><li>-30 ≤ nums[i] ≤ 30</li><li>Product guaranteed to fit in 32-bit integer</li></ul></div>
 <h2 class="approach-title">Approaches Comparison</h2>
 <table class="compare-table">
+<tr><th>Approach</th><th>Time</th><th>Space</th><th>Notes</th></tr>
 <tr>
-<th>Approach</th>
-<th>Time</th>
-<th>Space</th>
-<th>Notes</th>
-</tr>
-<tr>
-<td>Division</td>
-<td><code>O(n)</code></td>
-<td><code>O(1)</code></td>
-<td>Total product / nums[i]. Not allowed (and fails on zeros).</td>
+<td>Division</td><td><code>O(n)</code></td>
+<td><code>O(1)</code></td><td>Total product / nums[i]. Not allowed (and fails on zeros).</td>
 </tr>
 <tr class="optimal-row">
-<td>Prefix + Suffix pass</td>
-<td><code>O(n)</code></td>
-<td><code>O(1)</code></td>
-<td>Left product pass then right product pass. Optimal.</td>
+<td>Prefix + Suffix pass</td><td><code>O(n)</code></td>
+<td><code>O(1)</code></td><td>Left product pass then right product pass. Optimal.</td>
 </tr>
 </table>
 <h2 class="approach-title">Approach 1 — Division <span class="approach-badge badge-better">O(n)</span></h2>
@@ -1429,17 +1507,14 @@
 <p class="approach-explanation">Total product / nums[i]. Not allowed (and fails on zeros).</p>
 <div class="warn-box">
 <div class="warn-box-title">⚠ Interviewer will push back</div>
-<p>This is a valid stepping-stone answer. But the problem requires better optimization. Always start by
-                    acknowledging this brute force/suboptimal time complexity before moving to the optimal solution.</p>
+<p>This is a valid stepping-stone answer. But the problem requires better optimization. Always start by acknowledging this brute force/suboptimal time complexity before moving to the optimal solution.</p>
 </div>
 <h2 class="approach-title">Approach 2 — Prefix × Suffix <span class="approach-badge badge-optimal">Optimal</span></h2>
 <div class="complexity-row">
 <div class="complexity-pill"><span class="cp-label">Time</span><span class="cp-value">O(n)</span></div>
 <div class="complexity-pill"><span class="cp-label">Space</span><span class="cp-value">O(1)</span></div>
 </div>
-<p class="approach-explanation">answer[i] = product of all elements to the left × product of all elements to
-                the right. Do two passes: first compute left prefix products into answer array, then multiply in right
-                suffix products using a running value.</p>
+<p class="approach-explanation">answer[i] = product of all elements to the left × product of all elements to the right. Do two passes: first compute left prefix products into answer array, then multiply in right suffix products using a running value.</p>
 <div class="code-tabs">
 <div class="tab-buttons"><button class="tab-btn active" onclick="switchTab(this, 'opt-python-q69')">Python</button>
 <button class="tab-btn" onclick="switchTab(this, 'opt-java-q69')">Java</button>
@@ -1447,8 +1522,7 @@
 <button class="tab-btn" onclick="switchTab(this, 'opt-go-q69')">Go</button>
 </div>
 <div class="tab-content active" id="opt-python-q69">
-<div class="code-wrap">
-<pre><code class="language-python">def productExceptSelf(nums):
+<div class="code-wrap"><pre><code class="language-python">def productExceptSelf(nums):
     n = len(nums)
     answer = [1] * n
     # Left prefix
@@ -1461,48 +1535,40 @@
     for i in range(n - 1, -1, -1):
         answer[i] *= suffix
         suffix *= nums[i]
-    return answer</code></pre>
-</div>
+    return answer</code></pre></div>
 </div>
 <div class="tab-content" id="opt-java-q69">
-<div class="code-wrap">
-<pre><code class="language-java">// See Python solution above
-// Product of Array Except Self — translate to this language</code></pre>
-</div>
+<div class="code-wrap"><pre><code class="language-java">// See Python solution above
+// Product of Array Except Self — translate to this language</code></pre></div>
 </div>
 <div class="tab-content" id="opt-javascript-q69">
-<div class="code-wrap">
-<pre><code class="language-javascript">// See Python solution above
-// Product of Array Except Self — translate to this language</code></pre>
-</div>
+<div class="code-wrap"><pre><code class="language-javascript">// See Python solution above
+// Product of Array Except Self — translate to this language</code></pre></div>
 </div>
 <div class="tab-content" id="opt-go-q69">
-<div class="code-wrap">
-<pre><code class="language-go">// See Python solution above
-// Product of Array Except Self — translate to this language</code></pre>
-</div>
+<div class="code-wrap"><pre><code class="language-go">// See Python solution above
+// Product of Array Except Self — translate to this language</code></pre></div>
 </div>
 </div>
 <div class="insight" style="margin-top:20px;">
 <div class="insight-title">Two O(n) Passes Instead of O(n²)</div>
-<p>answer[i] = left_product[i] × right_product[i]. By computing left prefix in a forward pass and right
-                    suffix in a backward pass — using the answer array itself — we achieve O(1) extra space.</p>
+<p>answer[i] = left_product[i] × right_product[i]. By computing left prefix in a forward pass and right suffix in a backward pass — using the answer array itself — we achieve O(1) extra space.</p>
 </div>
 <div class="interview-tips">
 <h3>Interview Playbook</h3>
-<ol>
-<li><strong>Classic interview problem:</strong> The 'no division' constraint forces the elegant
-                        two-pass solution.</li>
-<li><strong>Zero handling:</strong> This approach handles zeros correctly; division-based doesn't.
-                    </li>
-<li><strong>Companies:</strong> Amazon, Google, Meta, Microsoft, Apple.</li>
-</ol>
+<ol><li><strong>Classic interview problem:</strong> The 'no division' constraint forces the elegant two-pass solution.</li><li><strong>Zero handling:</strong> This approach handles zeros correctly; division-based doesn't.</li><li><strong>Companies:</strong> Amazon, Google, Meta, Microsoft, Apple.</li></ol>
 </div>
 <button class="mark-solved-btn" id="solve-q69" onclick="markSolved('q69',this)">Mark as Solved</button>
 </div>
+
+        <div class="page-nav" style="max-width: 960px; margin: 40px auto 0; padding: 20px 48px;">
+            <a class="page-nav-btn" href="58-top-k-frequent-elements.html">&#8592; Top K Frequent Elements</a>
+            <a class="page-nav-btn home" href="../index.html">&#9776; Back to Portfolio</a>
+            <a class="page-nav-btn" href="15-encode-and-decode-strings.html">Encode and Decode Strings &#8594;</a>
+        </div>
     </div>
 
-    <script>
+<script>
         // Initialize highlight.js
         hljs.highlightAll();
         // Initialize mermaid.js
@@ -1529,7 +1595,19 @@
             document.querySelectorAll('.question-panel').forEach(p => p.classList.remove('active'));
             document.querySelectorAll('.q-item').forEach(i => i.classList.remove('active'));
             const panel = document.getElementById(qId);
-            if (panel) panel.classList.add('active');
+            if (panel) {
+                panel.classList.add('active');
+                if (window.mermaid) {
+                    setTimeout(() => {
+                        try {
+                            const mNodes = Array.from(panel.querySelectorAll('.mermaid:not([data-processed="true"])'));
+                            if (mNodes.length > 0) window.mermaid.run({ nodes: mNodes });
+                        } catch (err) {
+                            console.error('Mermaid run error:', err);
+                        }
+                    }, 50);
+                }
+            }
             if (item) item.classList.add('active');
             document.getElementById('main-panel').scrollTo(0, 0);
         }
@@ -1599,6 +1677,11 @@
                 }
             });
         }
+    </script>
+<script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({ startOnLoad: false, theme: 'dark' });
+        window.mermaid = mermaid;
     </script>
 </body>
 </html>

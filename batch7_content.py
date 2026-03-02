@@ -170,6 +170,16 @@ add_problem("q43", {
     for _ in range(n - 1):
         a, b = b, a + b
     return b""", "Climbing Stairs"),
+    "flow_matrix": {
+        "headers": ["Step (Distance)", "a (prev2)", "b (prev1)", "Next value (a+b)"],
+        "rows": [
+            ["Initial", "1", "1", "-"],
+            ["i = 2", "1", "2", "2"],
+            ["i = 3", "2", "3", "3"],
+            ["i = 4", "3", "5", "5"],
+            ["i = 5", "5", "8", "8"]
+        ]
+    },
     "insight_title":"Climbing Stairs IS Fibonacci",
     "insight_text":"f(1)=1, f(2)=2, f(n)=f(n-1)+f(n-2). Reduce space to O(1) by only keeping the last two values.",
     "tips":["<strong>Recognize the pattern:</strong> Any problem where ways(n) = ways(n-1) + ways(n-2) is Fibonacci.",
@@ -236,6 +246,16 @@ add_problem("q45", {
                 dfs(r, c)
                 count += 1
     return count""", "Number of Islands"),
+    "flow_matrix": {
+        "headers": ["Cell (r, c)", "Grid Condition", "Action", "Total Islands"],
+        "rows": [
+            ["(0, 0)", "'1' (Land)", "Start DFS, mark all connected '1's as '0'", "1"],
+            ["(0, 1)", "'0' (Visited / Water)", "Skip", "1"],
+            ["(1, 0)", "'0' (Visited / Water)", "Skip", "1"],
+            ["(2, 2)", "'1' (Land)", "Start DFS, mark all connected '1's as '0'", "2"],
+            ["(3, 3)", "'1' (Land)", "Start DFS, mark all connected '1's as '0'", "3"]
+        ]
+    },
     "insight_title":"Flood Fill = DFS from Every Unvisited Land Cell",
     "insight_text":"Each cell is visited (and marked '0') at most once across all DFS calls. Total work = O(mn) regardless of the number of islands.",
     "tips":["<strong>Marking cells '0' in-place</strong> avoids needing a separate visited array.",

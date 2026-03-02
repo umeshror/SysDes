@@ -1,20 +1,17 @@
 <!DOCTYPE html>
 
 <html lang="en">
-
 <head>
-    <meta charset="utf-8" />
-    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
-    <title>Blind 75 — Coding Interview Patterns</title>
-    <link href="https://fonts.googleapis.com" rel="preconnect" />
-    <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Fira+Code:wght@400;500&amp;display=swap"
-        rel="stylesheet" />
-    <!-- Highlight.js for syntax highlighting -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css" rel="stylesheet" />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
-    <style>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Blind 75 — Coding Interview Patterns</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Fira+Code:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<!-- Highlight.js for syntax highlighting -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<style>
         :root {
             --bg: #f6f8ff;
             --surface: #ffffff;
@@ -849,6 +846,71 @@
             margin-bottom: 6px;
         }
 
+        /* Flow Matrix & Diagram Enhancements */
+        .flow-matrix-container {
+            margin: 24px 0;
+            overflow-x: auto;
+        }
+
+        .flow-matrix-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+            color: #bac2de;
+            background: rgba(30, 30, 46, 0.4);
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .flow-matrix-table th,
+        .flow-matrix-table td {
+            padding: 10px 14px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .flow-matrix-table th {
+            background: rgba(43, 43, 62, 0.6);
+            color: #cdd6f4;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-size: 0.75rem;
+        }
+
+        .flow-matrix-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .flow-matrix-table tr:hover td {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .flow-matrix-table code {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 3px 6px;
+            border-radius: 4px;
+            color: #89dceb;
+            font-family: 'Fira Code', monospace;
+        }
+
+        .diagram-container {
+            margin: 24px 0;
+            padding: 24px;
+            background: rgba(30, 30, 46, 0.4);
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            text-align: center;
+        }
+
+        .diagram-container img,
+        .diagram-container svg {
+            max-width: 100%;
+            height: auto;
+            border-radius: 4px;
+        }
+
         /* Solved button */
         .mark-solved-btn {
             display: inline-flex;
@@ -875,12 +937,52 @@
         .mark-solved-btn.solved {
             background: #64748b;
         }
+
+        /* Page nav */
+        .page-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 28px 0px 48px;
+            border-top: 1px solid rgba(137, 180, 250, .15);
+            margin-top: 24px;
+            gap: 12px;
+        }
+
+        .page-nav-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 22px;
+            background: #1a1a2e;
+            color: #cdd6f4;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: .84rem;
+            font-weight: 600;
+            transition: all .18s;
+            border: 1px solid rgba(137, 180, 250, .15);
+        }
+
+        .page-nav-btn:hover {
+            background: #313244;
+            border-color: rgba(137, 180, 250, .35);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, .2);
+        }
+
+        .page-nav-btn.home {
+            background: linear-gradient(135deg, #1e3a5f, #162d48);
+        }
+
+        .page-nav-btn.home:hover {
+            background: linear-gradient(135deg, #264a78, #1e3a5f);
+        }
     </style>
 </head>
-
 <body>
-    <!-- ── SIDEBAR ────────────────────────────────────────────── -->
-        <nav class="sidebar">
+<!-- ── SIDEBAR ────────────────────────────────────────────── -->
+    <nav class="sidebar">
         <div class="sidebar-header">
             <a href="../index.html">← Back to Home</a>
             <h1>Blind 75</h1>
@@ -1363,23 +1465,15 @@
 <span class="topic-tag">Graph</span><span class="topic-tag">BFS</span><span class="topic-tag">DFS</span>
 </div>
 <h1 class="q-title">Pacific Atlantic Water Flow</h1>
-<p class="q-source"><a href="https://leetcode.com/problems/pacific-atlantic-water-flow" target="_blank">leetcode.com/problems/pacific-atlantic-water-flow</a> · Blind 75 · FAANG
-                    favourite</p>
+<p class="q-source"><a href="https://leetcode.com/problems/pacific-atlantic-water-flow" target="_blank">leetcode.com/problems/pacific-atlantic-water-flow</a> · Blind 75 · FAANG favourite</p>
 </div>
 <hr class="section-rule"/>
-<div class="problem-statement">
-<h3>Problem Statement</h3>
-<div class="statement-content">Given an <code>m x n</code> matrix of non-negative integers representing
-                    heights, water can flow to adjacent cells with height ≤ current. Find all cells that can flow to
-                    <strong>both</strong> the Pacific (top/left edges) and Atlantic (bottom/right edges) oceans.
-                </div>
-</div>
+<div class="problem-statement"><h3>Problem Statement</h3><div class="statement-content">Given an <code>m x n</code> matrix of non-negative integers representing heights, water can flow to adjacent cells with height ≤ current. Find all cells that can flow to <strong>both</strong> the Pacific (top/left edges) and Atlantic (bottom/right edges) oceans.</div></div>
 <div class="examples">
 <div class="example-block">
 <div class="example-header">Example 1</div>
 <div class="example-body">
-<div><span class="label">Input: </span><span class="val">heights =
-                                [[1,2,2,3,5],[3,2,3,4,4],[2,4,5,3,1],[6,7,1,4,5],[5,1,1,2,4]]</span></div>
+<div><span class="label">Input: </span><span class="val">heights = [[1,2,2,3,5],[3,2,3,4,4],[2,4,5,3,1],[6,7,1,4,5],[5,1,1,2,4]]</span></div>
 <div><span class="label">Output: </span><span class="val">[[0,4],[1,3],[1,4],[2,2],[3,0],[3,1],[4,0]]</span></div>
 <div class="explanation">These 7 cells have paths to both oceans.</div>
 </div>
@@ -1391,58 +1485,36 @@
 <div><span class="label">Output: </span><span class="val">[[0,0]]</span></div>
 <div class="explanation">Single cell touches both oceans.</div>
 </div>
-</div>
-</div>
-<div class="constraints">
-<h4>Constraints</h4>
-<ul>
-<li>1 ≤ m,n ≤ 200</li>
-<li>0 ≤ heights[i][j] ≤ 10<sup>5</sup></li>
-</ul>
-</div>
+</div></div>
+<div class="constraints"><h4>Constraints</h4><ul><li>1 ≤ m,n ≤ 200</li><li>0 ≤ heights[i][j] ≤ 10<sup>5</sup></li></ul></div>
 <h2 class="approach-title">Approaches Comparison</h2>
 <table class="compare-table">
+<tr><th>Approach</th><th>Time</th><th>Space</th><th>Notes</th></tr>
 <tr>
-<th>Approach</th>
-<th>Time</th>
-<th>Space</th>
-<th>Notes</th>
-</tr>
-<tr>
-<td>DFS from each cell</td>
-<td><code>O(m²n²)</code></td>
-<td><code>O(mn)</code></td>
-<td>Too slow for large grids.</td>
+<td>DFS from each cell</td><td><code>O(m²n²)</code></td>
+<td><code>O(mn)</code></td><td>Too slow for large grids.</td>
 </tr>
 <tr class="optimal-row">
-<td>Reverse BFS from ocean borders</td>
-<td><code>O(mn)</code></td>
-<td><code>O(mn)</code></td>
-<td>BFS inward from each ocean. Intersection = answer. Optimal.</td>
+<td>Reverse BFS from ocean borders</td><td><code>O(mn)</code></td>
+<td><code>O(mn)</code></td><td>BFS inward from each ocean. Intersection = answer. Optimal.</td>
 </tr>
 </table>
 <h2 class="approach-title">Approach 1 — DFS from each cell <span class="approach-badge badge-better">O(m²n²)</span></h2>
 <div class="complexity-row">
-<div class="complexity-pill"><span class="cp-label">Time</span><span class="cp-value">O(m²n²)</span>
-</div>
-<div class="complexity-pill"><span class="cp-label">Space</span><span class="cp-value">O(mn)</span>
-</div>
+<div class="complexity-pill"><span class="cp-label">Time</span><span class="cp-value">O(m²n²)</span></div>
+<div class="complexity-pill"><span class="cp-label">Space</span><span class="cp-value">O(mn)</span></div>
 </div>
 <p class="approach-explanation">Too slow for large grids.</p>
 <div class="warn-box">
 <div class="warn-box-title">⚠ Interviewer will push back</div>
-<p>This is a valid stepping-stone answer. But the problem requires better optimization. Always start by
-                    acknowledging this brute force/suboptimal time complexity before moving to the optimal solution.</p>
+<p>This is a valid stepping-stone answer. But the problem requires better optimization. Always start by acknowledging this brute force/suboptimal time complexity before moving to the optimal solution.</p>
 </div>
 <h2 class="approach-title">Approach 2 — Reverse Multi-Source BFS <span class="approach-badge badge-optimal">Optimal</span></h2>
 <div class="complexity-row">
 <div class="complexity-pill"><span class="cp-label">Time</span><span class="cp-value">O(mn)</span></div>
-<div class="complexity-pill"><span class="cp-label">Space</span><span class="cp-value">O(mn)</span>
+<div class="complexity-pill"><span class="cp-label">Space</span><span class="cp-value">O(mn)</span></div>
 </div>
-</div>
-<p class="approach-explanation">Instead of checking if each cell can reach an ocean, reverse the flow: BFS
-                from each ocean's border inward, marking reachable cells. A cell is in the answer only if it's reachable
-                from <em>both</em> BFS traversals.</p>
+<p class="approach-explanation">Instead of checking if each cell can reach an ocean, reverse the flow: BFS from each ocean's border inward, marking reachable cells. A cell is in the answer only if it's reachable from <em>both</em> BFS traversals.</p>
 <div class="code-tabs">
 <div class="tab-buttons"><button class="tab-btn active" onclick="switchTab(this, 'opt-python-q23')">Python</button>
 <button class="tab-btn" onclick="switchTab(this, 'opt-java-q23')">Java</button>
@@ -1450,8 +1522,7 @@
 <button class="tab-btn" onclick="switchTab(this, 'opt-go-q23')">Go</button>
 </div>
 <div class="tab-content active" id="opt-python-q23">
-<div class="code-wrap">
-<pre><code class="language-python">from collections import deque
+<div class="code-wrap"><pre><code class="language-python">from collections import deque
 
 def pacificAtlantic(heights):
     m, n = len(heights), len(heights[0])
@@ -1471,12 +1542,10 @@ def pacificAtlantic(heights):
 
     pacific = [(0,c) for c in range(n)] + [(r,0) for r in range(1,m)]
     atlantic = [(m-1,c) for c in range(n)] + [(r,n-1) for r in range(m-1)]
-    return list(bfs(pacific) &amp; bfs(atlantic))</m></code></pre>
-</div>
+    return list(bfs(pacific) &amp; bfs(atlantic))</m></code></pre></div>
 </div>
 <div class="tab-content" id="opt-java-q23">
-<div class="code-wrap">
-<pre><code class="language-java">public List&lt;List&lt;Integer&gt;&gt; pacificAtlantic(int[][] h) {
+<div class="code-wrap"><pre><code class="language-java">public List&lt;List&lt;Integer&gt;&gt; pacificAtlantic(int[][] h) {
     int m=h.length,n=h[0].length;
     boolean[][] pac=new boolean[m][n],atl=new boolean[m][n];
     Queue&lt;int[]&gt; pq=new LinkedList&lt;&gt;(),aq=new LinkedList&lt;&gt;();
@@ -1491,12 +1560,10 @@ void bfs(int[][] h,Queue&lt;int[]&gt; q,boolean[][] vis,int m,int n){
     int[][]dirs={{0,1},{0,-1},{1,0},{-1,0}};
     while(!q.isEmpty()){int[]cur=q.poll();for(int[]d:dirs){int r=cur[0]+d[0],c=cur[1]+d[1];
         if(r&gt;=0&amp;&amp;r&lt;m&amp;&amp;c&gt;=0&amp;&amp;c&lt;n&amp;&amp;!vis[r][c]&amp;&amp;h[r][c]&gt;=h[cur[0]][cur[1]]){vis[r][c]=true;q.add(new int[]{r,c});}}}
-}</code></pre>
-</div>
+}</code></pre></div>
 </div>
 <div class="tab-content" id="opt-javascript-q23">
-<div class="code-wrap">
-<pre><code class="language-javascript">var pacificAtlantic = function(heights) {
+<div class="code-wrap"><pre><code class="language-javascript">var pacificAtlantic = function(heights) {
     const [m,n]=[heights.length,heights[0].length];
     const bfs=starts=&gt;{const vis=new Set(starts.map(([r,c])=&gt;r*n+c)),q=[...starts];
         while(q.length){const[r,c]=q.shift();for(const[dr,dc]of[[0,1],[0,-1],[1,0],[-1,0]]){const[nr,nc]=[r+dr,c+dc];
@@ -1505,12 +1572,10 @@ void bfs(int[][] h,Queue&lt;int[]&gt; q,boolean[][] vis,int m,int n){
     const pac=bfs([...Array(n).keys()].map(c=&gt;[0,c]).concat([...Array(m).keys()].slice(1).map(r=&gt;[r,0])));
     const atl=bfs([...Array(n).keys()].map(c=&gt;[m-1,c]).concat([...Array(m).keys()].slice(0,m-1).map(r=&gt;[r,n-1])));
     return [...pac].filter(k=&gt;atl.has(k)).map(k=&gt;[Math.floor(k/n),k%n]);
-};</n&&!vis.has(nr*n+nc)&&heights[nr][nc]></m&&nc></code></pre>
-</div>
+};</n&&!vis.has(nr*n+nc)&&heights[nr][nc]></m&&nc></code></pre></div>
 </div>
 <div class="tab-content" id="opt-go-q23">
-<div class="code-wrap">
-<pre><code class="language-go">func pacificAtlantic(heights [][]int) [][]int {
+<div class="code-wrap"><pre><code class="language-go">func pacificAtlantic(heights [][]int) [][]int {
     m,n:=len(heights),len(heights[0]);dirs:=[][2]int{{0,1},{0,-1},{1,0},{-1,0}}
     bfs:=func(starts [][2]int)[][]bool{vis:=make([][]bool,m);for i:=range vis{vis[i]=make([]bool,n)};q:=starts
         for _,s:=range starts{vis[s[0]][s[1]]=true}
@@ -1518,30 +1583,28 @@ void bfs(int[][] h,Queue&lt;int[]&gt; q,boolean[][] vis,int m,int n){
             if r&gt;=0&amp;&amp;r<m&&c>=0&amp;&amp;c<n&&!vis[r][c]&&heights[r][c]>=heights[cur[0]][cur[1]]{vis[r][c]=true;q=append(q,[2]int{r,c})}}}
         return vis}
     pac,atl:=[][2]int{},[][2]int{}
-    for r:=0;r<m;r++{pac=append(pac,[2]int{r,0});atl=append(atl,[2]int{r,n-1})} c:="0;c&lt;n;c++{if" code="" for="" r:="0;r&lt;m;r++{for" res="" return="" vp,va:="bfs(pac),bfs(atl);res:=[][]int{}" vp[r][c]&&va[r][c]{res="append(res,[]int{r,c})}}}" }<=""></m;r++{pac=append(pac,[2]int{r,0});atl=append(atl,[2]int{r,n-1})}></n&&!vis[r][c]&&heights[r][c]></m&&c></code></pre>
-</div>
+    for r:=0;r<m;r++{pac=append(pac,[2]int{r,0});atl=append(atl,[2]int{r,n-1})} c:="0;c&lt;n;c++{if" code="" for="" r:="0;r&lt;m;r++{for" res="" return="" vp,va:="bfs(pac),bfs(atl);res:=[][]int{}" vp[r][c]&&va[r][c]{res="append(res,[]int{r,c})}}}" }<=""></m;r++{pac=append(pac,[2]int{r,0});atl=append(atl,[2]int{r,n-1})}></n&&!vis[r][c]&&heights[r][c]></m&&c></code></pre></div>
 </div>
 </div>
 <div class="insight" style="margin-top:20px;">
 <div class="insight-title">Reverse the Direction of Flow</div>
-<p>Checking flow forward (from cell to ocean) requires O(mn) per cell. Reversing — BFS backwards from
-                    ocean → land — naturally follows the ≥ height rule and covers all cells in O(mn) total.</p>
+<p>Checking flow forward (from cell to ocean) requires O(mn) per cell. Reversing — BFS backwards from ocean → land — naturally follows the ≥ height rule and covers all cells in O(mn) total.</p>
 </div>
 <div class="interview-tips">
 <h3>Interview Playbook</h3>
-<ol>
-<li><strong>Multi-source BFS:</strong> Initialize the queue with all border cells simultaneously.
-                    </li>
-<li><strong>Reverse condition:</strong> When flowing backward from ocean to land, move to neighbor
-                        only if neighbor height ≥ current height.</li>
-<li><strong>Companies:</strong> Amazon, Google, Uber.</li>
-</ol>
+<ol><li><strong>Multi-source BFS:</strong> Initialize the queue with all border cells simultaneously.</li><li><strong>Reverse condition:</strong> When flowing backward from ocean to land, move to neighbor only if neighbor height ≥ current height.</li><li><strong>Companies:</strong> Amazon, Google, Uber.</li></ol>
 </div>
 <button class="mark-solved-btn" id="solve-q23" onclick="markSolved('q23',this)">Mark as Solved</button>
 </div>
+
+        <div class="page-nav" style="max-width: 960px; margin: 40px auto 0; padding: 20px 48px;">
+            <a class="page-nav-btn" href="05-clone-graph.html">&#8592; Clone Graph</a>
+            <a class="page-nav-btn home" href="../index.html">&#9776; Back to Portfolio</a>
+            <a class="page-nav-btn" href="50-course-schedule.html">Course Schedule &#8594;</a>
+        </div>
     </div>
 
-    <script>
+<script>
         // Initialize highlight.js
         hljs.highlightAll();
         // Initialize mermaid.js
@@ -1568,7 +1631,19 @@ void bfs(int[][] h,Queue&lt;int[]&gt; q,boolean[][] vis,int m,int n){
             document.querySelectorAll('.question-panel').forEach(p => p.classList.remove('active'));
             document.querySelectorAll('.q-item').forEach(i => i.classList.remove('active'));
             const panel = document.getElementById(qId);
-            if (panel) panel.classList.add('active');
+            if (panel) {
+                panel.classList.add('active');
+                if (window.mermaid) {
+                    setTimeout(() => {
+                        try {
+                            const mNodes = Array.from(panel.querySelectorAll('.mermaid:not([data-processed="true"])'));
+                            if (mNodes.length > 0) window.mermaid.run({ nodes: mNodes });
+                        } catch (err) {
+                            console.error('Mermaid run error:', err);
+                        }
+                    }, 50);
+                }
+            }
             if (item) item.classList.add('active');
             document.getElementById('main-panel').scrollTo(0, 0);
         }
@@ -1638,6 +1713,11 @@ void bfs(int[][] h,Queue&lt;int[]&gt; q,boolean[][] vis,int m,int n){
                 }
             });
         }
+    </script>
+<script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({ startOnLoad: false, theme: 'dark' });
+        window.mermaid = mermaid;
     </script>
 </body>
 </html>

@@ -98,6 +98,13 @@ add_problem("q2", {
     return nil
 }"""},
     },
+    "flow_matrix": {
+        "headers": ["Step", "i", "num", "Complement", "In Map?", "Hash Map State", "Action"],
+        "rows": [
+            ["1", "0", "2", "<code>9 - 2 = 7</code>", "No", "<code>{2: 0}</code>", "Store <code>num: i</code>"],
+            ["2", "1", "7", "<code>9 - 7 = 2</code>", "Yes", "<code>{2: 0}</code>", "Return <code>[map[2], 1] &rarr; [0, 1]</code>"]
+        ]
+    },
     "insight_title":"Why One-Pass Works",
     "insight_text":"At each index i, we ask: 'Have I already seen the number that would complete a pair with nums[i]?' If yes, return immediately. If no, record nums[i] for future lookups. Hash map operations are O(1) average → O(n) total.",
     "tips":[
@@ -135,6 +142,15 @@ add_problem("q3", {
         char_set.add(s[right])
         max_len = max(max_len, right - left + 1)
     return max_len""", "Longest Substring Without Repeating"),
+    "flow_matrix": {
+        "headers": ["Iteration (right)", "Current Char", "Set State", "Left Pointer", "Action & Max Len"],
+        "rows": [
+            ["0", "'a'", "<code>{'a'}</code>", "0", "max(0, 1) = 1"],
+            ["1", "'b'", "<code>{'a', 'b'}</code>", "0", "max(1, 2) = 2"],
+            ["2", "'c'", "<code>{'a', 'b', 'c'}</code>", "0", "max(2, 3) = 3"],
+            ["3", "'a'", "Duplicate! Remove <code>'a'</code>", "1", "max(3, 3) = 3"]
+        ]
+    },
     "insight_title":"Shrink Only When Necessary",
     "insight_text":"The window shrinks from the left only when a duplicate is found. Each character is added and removed at most once → O(n) total.",
     "tips":["<strong>Optimization:</strong> Use a map of char→last_index to jump left pointer directly instead of shrinking one by one.",
