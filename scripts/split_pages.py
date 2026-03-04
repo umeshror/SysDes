@@ -220,7 +220,7 @@ for idx, page in enumerate(PAGES):
     <nav class="sidebar" style="display:flex;flex-direction:column">
       <div class="sidebar-header">
         <div style="margin-bottom:14px; font-size: 0.9em;">
-          <a href="../index.html" class="back-link">&#8592; Home</a> &nbsp;|&nbsp; <a href="../blind75/index.html" class="back-link">Blind 75</a> &nbsp;|&nbsp; <a href="../top150/index.html" class="back-link">Top 150</a>
+          <a href="../index.html" class="back-link">&#8592; Home</a> &nbsp;|&nbsp; <a href="../blind75/index.html" class="back-link">Blind 75</a> &nbsp;|&nbsp; <a href="../top150/index.html" class="back-link">Top 150</a> &nbsp;|&nbsp; <a href="../patterns/index.html" class="back-link">Patterns</a>
         </div>
         <h1>System Design Fundamentals</h1>
         <p>180+ topics &nbsp;|&nbsp; Complete Reference</p>
