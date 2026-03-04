@@ -507,8 +507,8 @@
 
     <nav class="sidebar" style="display:flex;flex-direction:column">
       <div class="sidebar-header">
-        <div style="margin-bottom:14px">
-          <a href="../index.html" class="back-link">&#8592; Back to Home</a>
+        <div style="margin-bottom:14px; font-size: 0.9em;">
+          <a href="../index.html" class="back-link">&#8592; Home</a> &nbsp;|&nbsp; <a href="../blind75/index.html" class="back-link">Blind 75</a> &nbsp;|&nbsp; <a href="../top150/index.html" class="back-link">Top 150</a>
         </div>
         <h1>System Design Fundamentals</h1>
         <p>180+ topics &nbsp;|&nbsp; Complete Reference</p>
@@ -732,906 +732,906 @@
     <p class="section-subtitle">Module 3 &nbsp;|&nbsp; 25 Comparisons — FAANG Interview Depth</p>
 
     <div class="callout info">
-        <div class="callout-title">How Interviewers Evaluate Trade-off Discussions</div>
-        <p>At L5+/Staff level, you are expected to name the trade-off <em>before</em> being asked, quantify
-            the impact, cite a real-world precedent, and explain when you'd pick each side. The formula:
-            <strong>"We could use X which gives us ____. The cost is ____. Given our constraint of ____, we choose X
-                because ____."</strong>
-        </p>
+      <div class="callout-title">How Interviewers Evaluate Trade-off Discussions</div>
+      <p>At L5+/Staff level, you are expected to name the trade-off <em>before</em> being asked, quantify
+        the impact, cite a real-world precedent, and explain when you'd pick each side. The formula:
+        <strong>"We could use X which gives us ____. The cost is ____. Given our constraint of ____, we choose X
+          because ____."</strong>
+      </p>
     </div>
 
     <h2>1. Strong vs. Eventual Consistency</h2>
     <p>The single most tested trade-off in distributed systems interviews. Consistency defines what a reader
-        sees after a write completes. In a distributed system, getting every node to agree instantly requires
-        coordination overhead — latency, availability loss, or both.</p>
+      sees after a write completes. In a distributed system, getting every node to agree instantly requires
+      coordination overhead — latency, availability loss, or both.</p>
 
     <div class="compare">
-        <div class="compare-card pro">
-            <h4>Strong Consistency</h4>
-            <ul>
-                <li>Every read reflects the latest committed write</li>
-                <li>Implemented via: 2PC, Paxos, Raft, synchronous replication</li>
-                <li>Linearizability = strongest form (operations appear instantaneous)</li>
-            </ul>
-            <p><strong>Cost:</strong> Latency ↑, availability ↓ during partitions (CAP: choose CP)</p>
-            <p><strong>Number:</strong> Spanner's global strong-consistent read adds ~5–15ms due to TrueTime wait</p>
-        </div>
-        <div class="compare-card neutral">
-            <h4>Eventual Consistency</h4>
-            <ul>
-                <li>Writes propagate asynchronously — nodes converge "eventually"</li>
-                <li>Reads may return stale data for a window (replication lag: ms to seconds)</li>
-                <li>Conflict resolution required: LWW, CRDTs, vector clocks</li>
-            </ul>
-            <p><strong>Gain:</strong> Low latency, high availability, horizontal scale (CAP: choose AP)</p>
-            <p><strong>Number:</strong> Cassandra replication lag is typically 1–5ms in same DC, &lt;100ms cross-region
-            </p>
-        </div>
+      <div class="compare-card pro">
+        <h4>Strong Consistency</h4>
+        <ul>
+          <li>Every read reflects the latest committed write</li>
+          <li>Implemented via: 2PC, Paxos, Raft, synchronous replication</li>
+          <li>Linearizability = strongest form (operations appear instantaneous)</li>
+        </ul>
+        <p><strong>Cost:</strong> Latency ↑, availability ↓ during partitions (CAP: choose CP)</p>
+        <p><strong>Number:</strong> Spanner's global strong-consistent read adds ~5–15ms due to TrueTime wait</p>
+      </div>
+      <div class="compare-card neutral">
+        <h4>Eventual Consistency</h4>
+        <ul>
+          <li>Writes propagate asynchronously — nodes converge "eventually"</li>
+          <li>Reads may return stale data for a window (replication lag: ms to seconds)</li>
+          <li>Conflict resolution required: LWW, CRDTs, vector clocks</li>
+        </ul>
+        <p><strong>Gain:</strong> Low latency, high availability, horizontal scale (CAP: choose AP)</p>
+        <p><strong>Number:</strong> Cassandra replication lag is typically 1–5ms in same DC, &lt;100ms cross-region
+        </p>
+      </div>
     </div>
 
     <div class="mermaid">
-        flowchart TD
-        A[Write arrives] --> B{Need all nodes to agree?}
-        B -->|Yes| C[Synchronous replication\nRaft / 2PC / Paxos]
-        B -->|No| D[Async replication\nGossip / Kafka / Bin-log]
-        C --> E[Strong Consistency\n+Linearizable reads\n-Higher latency\n-Unavailable on partition]
-        D --> F[Eventual Consistency\n+Low latency writes\n+Always available\n-Stale reads possible]
-        E --> G{Your workload?}
-        F --> G
-        G -->|Money, auth, inventory| E
-        G -->|Likes, views, feeds| F
+      flowchart TD
+      A[Write arrives] --> B{Need all nodes to agree?}
+      B -->|Yes| C[Synchronous replication\nRaft / 2PC / Paxos]
+      B -->|No| D[Async replication\nGossip / Kafka / Bin-log]
+      C --> E[Strong Consistency\n+Linearizable reads\n-Higher latency\n-Unavailable on partition]
+      D --> F[Eventual Consistency\n+Low latency writes\n+Always available\n-Stale reads possible]
+      E --> G{Your workload?}
+      F --> G
+      G -->|Money, auth, inventory| E
+      G -->|Likes, views, feeds| F
     </div>
 
     <div class="def">
-        <dt>Real-world: Amazon Shopping Cart</dt>
-        <dd>Amazon chose <strong>eventual consistency</strong> for the shopping cart (Dynamo paper, 2007). Showing a
-            user
-            a slightly stale cart is acceptable; being unavailable during checkout is not. Conflicts are resolved by
-            merging
-            carts on next read.</dd>
-        <dt>Real-world: Google Spanner</dt>
-        <dd>Spanner achieves <strong>external consistency</strong> (stronger than linearizability across datacenters)
-            using
-            TrueTime — atomic clocks + GPS receivers in every datacenter. Every commit waits for the uncertainty
-            interval
-            (typically 1–7ms) to pass before returning, ensuring global order.</dd>
-        <dt>Real-world: Meta TAO</dt>
-        <dd>Facebook's TAO graph cache replicates reads to followers with eventual consistency. Read-after-write for the
-            same user is solved by reading from the master for a short window after a write — not full strong
-            consistency,
-            but a practical "consistency for the author" pattern.</dd>
+      <dt>Real-world: Amazon Shopping Cart</dt>
+      <dd>Amazon chose <strong>eventual consistency</strong> for the shopping cart (Dynamo paper, 2007). Showing a
+        user
+        a slightly stale cart is acceptable; being unavailable during checkout is not. Conflicts are resolved by
+        merging
+        carts on next read.</dd>
+      <dt>Real-world: Google Spanner</dt>
+      <dd>Spanner achieves <strong>external consistency</strong> (stronger than linearizability across datacenters)
+        using
+        TrueTime — atomic clocks + GPS receivers in every datacenter. Every commit waits for the uncertainty
+        interval
+        (typically 1–7ms) to pass before returning, ensuring global order.</dd>
+      <dt>Real-world: Meta TAO</dt>
+      <dd>Facebook's TAO graph cache replicates reads to followers with eventual consistency. Read-after-write for the
+        same user is solved by reading from the master for a short window after a write — not full strong
+        consistency,
+        but a practical "consistency for the author" pattern.</dd>
     </div>
 
     <h2>2. Latency vs. Throughput</h2>
     <p>Two distinct performance metrics that are often optimized at each other's expense. Low latency = fast individual
-        requests. High throughput = many requests completed per second.</p>
+      requests. High throughput = many requests completed per second.</p>
 
     <div class="mermaid">
-        flowchart LR
-        subgraph Latency Focus
-        A[Request arrives] --> B[Process immediately\nNo queuing]
-        B --> C[Response: &lt;1ms\nLow RPS ceiling]
-        end
-        subgraph Throughput Focus
-        D[Request arrives] --> E[Buffer in batch\nProcess together]
-        E --> F[Response: 10–100ms\nHigh RPS potential]
-        end
+      flowchart LR
+      subgraph Latency Focus
+      A[Request arrives] --> B[Process immediately\nNo queuing]
+      B --> C[Response: &lt;1ms\nLow RPS ceiling]
+      end
+      subgraph Throughput Focus
+      D[Request arrives] --> E[Buffer in batch\nProcess together]
+      E --> F[Response: 10–100ms\nHigh RPS potential]
+      end
     </div>
 
     <div class="table-wrap">
-        <table>
-            <tr>
-                <th>System</th>
-                <th>Latency p99</th>
-                <th>Throughput</th>
-                <th>Technique</th>
-            </tr>
-            <tr>
-                <td>Redis GET</td>
-                <td>&lt;1ms</td>
-                <td>~1M ops/sec (single node)</td>
-                <td>In-memory, single-threaded event loop</td>
-            </tr>
-            <tr>
-                <td>Kafka produce</td>
-                <td>2–10ms</td>
-                <td>1M+ msgs/sec per broker</td>
-                <td>Sequential disk writes, batching, zero-copy sendfile()</td>
-            </tr>
-            <tr>
-                <td>DynamoDB</td>
-                <td>single-digit ms</td>
-                <td>Unlimited (partition scaling)</td>
-                <td>SSD + consistent hashing + eventual consistency</td>
-            </tr>
-            <tr>
-                <td>PostgreSQL complex query</td>
-                <td>50–500ms</td>
-                <td>Low under write contention</td>
-                <td>MVCC + B-Tree, random I/O</td>
-            </tr>
-        </table>
+      <table>
+        <tr>
+          <th>System</th>
+          <th>Latency p99</th>
+          <th>Throughput</th>
+          <th>Technique</th>
+        </tr>
+        <tr>
+          <td>Redis GET</td>
+          <td>&lt;1ms</td>
+          <td>~1M ops/sec (single node)</td>
+          <td>In-memory, single-threaded event loop</td>
+        </tr>
+        <tr>
+          <td>Kafka produce</td>
+          <td>2–10ms</td>
+          <td>1M+ msgs/sec per broker</td>
+          <td>Sequential disk writes, batching, zero-copy sendfile()</td>
+        </tr>
+        <tr>
+          <td>DynamoDB</td>
+          <td>single-digit ms</td>
+          <td>Unlimited (partition scaling)</td>
+          <td>SSD + consistent hashing + eventual consistency</td>
+        </tr>
+        <tr>
+          <td>PostgreSQL complex query</td>
+          <td>50–500ms</td>
+          <td>Low under write contention</td>
+          <td>MVCC + B-Tree, random I/O</td>
+        </tr>
+      </table>
     </div>
 
     <div class="callout tip">
-        <div class="callout-title">Little's Law in interviews</div>
-        <p><strong>L = λ × W</strong> &mdash; concurrency = arrival rate × avg latency. If your avg latency doubles,
-            you need 2× more threads/connections to maintain the same throughput. This is why p99 latency spikes cause
-            thread pool exhaustion and cascading failures.</p>
+      <div class="callout-title">Little's Law in interviews</div>
+      <p><strong>L = λ × W</strong> &mdash; concurrency = arrival rate × avg latency. If your avg latency doubles,
+        you need 2× more threads/connections to maintain the same throughput. This is why p99 latency spikes cause
+        thread pool exhaustion and cascading failures.</p>
     </div>
 
     <h2>3. ACID vs. BASE</h2>
     <p>Not just a database choice — a statement about what guarantees your system provides to application developers
-        and downstream consumers.</p>
+      and downstream consumers.</p>
 
     <div class="compare">
-        <div class="compare-card neutral">
-            <h4>ACID</h4>
-            <ul>
-                <li><strong>Atomicity:</strong> Commit or rollback — never partial writes</li>
-                <li><strong>Consistency:</strong> DB constraints always satisfied post-txn</li>
-                <li><strong>Isolation:</strong> Concurrent txns don't see each other's dirty state</li>
-                <li><strong>Durability:</strong> Committed data survives crashes (WAL / fsync)</li>
-            </ul>
-            <p><strong>Isolation levels:</strong> READ UNCOMMITTED → READ COMMITTED → REPEATABLE READ → SERIALIZABLE
-                (each adds cost)</p>
-        </div>
-        <div class="compare-card neutral">
-            <h4>BASE</h4>
-            <ul>
-                <li><strong>Basically Available:</strong> System responds even during partial failures</li>
-                <li><strong>Soft State:</strong> Data may expire or be overwritten without explicit action</li>
-                <li><strong>Eventual Consistency:</strong> All replicas converge, given no new writes</li>
-            </ul>
-            <p><strong>Practical implication:</strong> Application must handle "read your own write" anomalies and
-                conflicts</p>
-        </div>
+      <div class="compare-card neutral">
+        <h4>ACID</h4>
+        <ul>
+          <li><strong>Atomicity:</strong> Commit or rollback — never partial writes</li>
+          <li><strong>Consistency:</strong> DB constraints always satisfied post-txn</li>
+          <li><strong>Isolation:</strong> Concurrent txns don't see each other's dirty state</li>
+          <li><strong>Durability:</strong> Committed data survives crashes (WAL / fsync)</li>
+        </ul>
+        <p><strong>Isolation levels:</strong> READ UNCOMMITTED → READ COMMITTED → REPEATABLE READ → SERIALIZABLE
+          (each adds cost)</p>
+      </div>
+      <div class="compare-card neutral">
+        <h4>BASE</h4>
+        <ul>
+          <li><strong>Basically Available:</strong> System responds even during partial failures</li>
+          <li><strong>Soft State:</strong> Data may expire or be overwritten without explicit action</li>
+          <li><strong>Eventual Consistency:</strong> All replicas converge, given no new writes</li>
+        </ul>
+        <p><strong>Practical implication:</strong> Application must handle "read your own write" anomalies and
+          conflicts</p>
+      </div>
     </div>
 
     <div class="def">
-        <dt>War story: Knight Capital (August 2012)</dt>
-        <dd>Knight Capital lost <strong>$440M in 45 minutes</strong> partly because their trading system lacked
-            atomic rollback. A bad deployment activated obsolete code on 7 of 8 servers. Non-atomic deploy +
-            no isolation between old and new logic = disaster. ACID transactionality in deployment (atomic switch)
-            would have helped contain it.</dd>
-        <dt>Interview framing:</dt>
-        <dd>When asked "SQL vs NoSQL?", redirect to ACID vs BASE: <em>"The real question is what consistency
-                guarantees does this read/write path need? If two concurrent writers can conflict, we need ACID
-                isolation.
-                If we can accept stale reads and merge conflicts offline, BASE gives us more scale."</em></dd>
+      <dt>War story: Knight Capital (August 2012)</dt>
+      <dd>Knight Capital lost <strong>$440M in 45 minutes</strong> partly because their trading system lacked
+        atomic rollback. A bad deployment activated obsolete code on 7 of 8 servers. Non-atomic deploy +
+        no isolation between old and new logic = disaster. ACID transactionality in deployment (atomic switch)
+        would have helped contain it.</dd>
+      <dt>Interview framing:</dt>
+      <dd>When asked "SQL vs NoSQL?", redirect to ACID vs BASE: <em>"The real question is what consistency
+          guarantees does this read/write path need? If two concurrent writers can conflict, we need ACID
+          isolation.
+          If we can accept stale reads and merge conflicts offline, BASE gives us more scale."</em></dd>
     </div>
 
     <h2>4. Caching Strategies</h2>
     <div class="table-wrap">
-        <table>
-            <tr>
-                <th>Strategy</th>
-                <th>Read Path</th>
-                <th>Write Path</th>
-                <th>Stale Risk</th>
-                <th>Data Loss Risk</th>
-                <th>Use</th>
-            </tr>
-            <tr>
-                <td><strong>Cache-Aside</strong></td>
-                <td>App checks cache → miss → load from DB → populate cache</td>
-                <td>App writes DB; invalidates or TTLs cache entry</td>
-                <td>Medium (TTL window)</td>
-                <td>None</td>
-                <td>General purpose, most common</td>
-            </tr>
-            <tr>
-                <td><strong>Read-Through</strong></td>
-                <td>Cache fetches from DB on miss automatically</td>
-                <td>App writes DB only</td>
-                <td>Medium</td>
-                <td>None</td>
-                <td>Read-heavy, consistent read path</td>
-            </tr>
-            <tr>
-                <td><strong>Write-Through</strong></td>
-                <td>Normal cache lookup</td>
-                <td>Write to cache + DB synchronously</td>
-                <td>None (always fresh)</td>
-                <td>None</td>
-                <td>When reads must always be fresh after write</td>
-            </tr>
-            <tr>
-                <td><strong>Write-Back</strong></td>
-                <td>Normal cache lookup</td>
-                <td>Write to cache only; async flush to DB</td>
-                <td>None for reads</td>
-                <td>High (unflushed data on crash)</td>
-                <td>Write-heavy where durability is secondary (leaderboards, counters)</td>
-            </tr>
-        </table>
+      <table>
+        <tr>
+          <th>Strategy</th>
+          <th>Read Path</th>
+          <th>Write Path</th>
+          <th>Stale Risk</th>
+          <th>Data Loss Risk</th>
+          <th>Use</th>
+        </tr>
+        <tr>
+          <td><strong>Cache-Aside</strong></td>
+          <td>App checks cache → miss → load from DB → populate cache</td>
+          <td>App writes DB; invalidates or TTLs cache entry</td>
+          <td>Medium (TTL window)</td>
+          <td>None</td>
+          <td>General purpose, most common</td>
+        </tr>
+        <tr>
+          <td><strong>Read-Through</strong></td>
+          <td>Cache fetches from DB on miss automatically</td>
+          <td>App writes DB only</td>
+          <td>Medium</td>
+          <td>None</td>
+          <td>Read-heavy, consistent read path</td>
+        </tr>
+        <tr>
+          <td><strong>Write-Through</strong></td>
+          <td>Normal cache lookup</td>
+          <td>Write to cache + DB synchronously</td>
+          <td>None (always fresh)</td>
+          <td>None</td>
+          <td>When reads must always be fresh after write</td>
+        </tr>
+        <tr>
+          <td><strong>Write-Back</strong></td>
+          <td>Normal cache lookup</td>
+          <td>Write to cache only; async flush to DB</td>
+          <td>None for reads</td>
+          <td>High (unflushed data on crash)</td>
+          <td>Write-heavy where durability is secondary (leaderboards, counters)</td>
+        </tr>
+      </table>
     </div>
 
     <div class="callout warn">
-        <div class="callout-title">Cache Invalidation: The Hardest Problem</div>
-        <p>Phil Karlton: <em>"There are only two hard things in Computer Science: cache invalidation and naming
-                things."</em>
-            Stale cache entries cause subtle, hard-to-reproduce bugs. Prefer: short TTLs for mutable objects,
-            event-driven invalidation with message queues (write to DB → publish event → subscriber invalidates cache),
-            or versioned cache keys (<code>user:42:v7</code> → write new version, old entries expire naturally).</p>
+      <div class="callout-title">Cache Invalidation: The Hardest Problem</div>
+      <p>Phil Karlton: <em>"There are only two hard things in Computer Science: cache invalidation and naming
+          things."</em>
+        Stale cache entries cause subtle, hard-to-reproduce bugs. Prefer: short TTLs for mutable objects,
+        event-driven invalidation with message queues (write to DB → publish event → subscriber invalidates cache),
+        or versioned cache keys (<code>user:42:v7</code> → write new version, old entries expire naturally).</p>
     </div>
 
     <h2>5. Batch vs. Stream Processing</h2>
     <div class="mermaid">
-        flowchart TD
-        Event[New data event] --> Q{Acceptable latency?}
-        Q -->|Hours / Days| B[Batch Processing\nHadoop / Spark Batch\nSimple retry on failure\nHigh throughput]
-        Q -->|Seconds / ms| S[Stream Processing\nFlink / Kafka Streams\nExactly-once semantics\nStateful operators]
-        B --> L[Lambda Architecture\nBatch layer accuracy\n+ Speed layer recency\n= Serving layer merge]
-        S --> L
+      flowchart TD
+      Event[New data event] --> Q{Acceptable latency?}
+      Q -->|Hours / Days| B[Batch Processing\nHadoop / Spark Batch\nSimple retry on failure\nHigh throughput]
+      Q -->|Seconds / ms| S[Stream Processing\nFlink / Kafka Streams\nExactly-once semantics\nStateful operators]
+      B --> L[Lambda Architecture\nBatch layer accuracy\n+ Speed layer recency\n= Serving layer merge]
+      S --> L
     </div>
 
     <div class="def">
-        <dt>Meta's Scuba — Real-time analytics powered by streams</dt>
-        <dd>Meta processes 1TB+ of log data per second into Scuba, a real-time in-memory database.
-            Engineers can query millions of rows within 1 second of them being logged — impossible with batch.</dd>
-        <dt>Netflix Keystone Pipeline</dt>
-        <dd>Netflix routes 2+ trillion events/day through a streaming pipeline built on Kafka and Flink.
-            Used for: real-time A/B test result collection, encoding quality monitoring, CDN health, and personalization
-            signals.</dd>
-        <dt>When batch wins</dt>
-        <dd>ML training, monthly billing, compliance reports, nightly ETL. The simplicity of "just re-run it"
-            on failure is extremely valuable — no exactly-once semantics needed.</dd>
+      <dt>Meta's Scuba — Real-time analytics powered by streams</dt>
+      <dd>Meta processes 1TB+ of log data per second into Scuba, a real-time in-memory database.
+        Engineers can query millions of rows within 1 second of them being logged — impossible with batch.</dd>
+      <dt>Netflix Keystone Pipeline</dt>
+      <dd>Netflix routes 2+ trillion events/day through a streaming pipeline built on Kafka and Flink.
+        Used for: real-time A/B test result collection, encoding quality monitoring, CDN health, and personalization
+        signals.</dd>
+      <dt>When batch wins</dt>
+      <dd>ML training, monthly billing, compliance reports, nightly ETL. The simplicity of "just re-run it"
+        on failure is extremely valuable — no exactly-once semantics needed.</dd>
     </div>
 
     <h2>6. SQL vs. NoSQL</h2>
     <div class="table-wrap">
-        <table>
-            <tr>
-                <th>Dimension</th>
-                <th>SQL (Relational)</th>
-                <th>NoSQL</th>
-            </tr>
-            <tr>
-                <td>Data model</td>
-                <td>Normalized, relational, foreign keys</td>
-                <td>Document, KV, wide-column, graph — pick one</td>
-            </tr>
-            <tr>
-                <td>Schema</td>
-                <td>Strict — DDL migrations required</td>
-                <td>Flexible — add fields without downtime</td>
-            </tr>
-            <tr>
-                <td>Scaling</td>
-                <td>Vertical primary; horizontal via read replicas or sharding add-ons</td>
-                <td>Horizontal, built-in, designed from day 1</td>
-            </tr>
-            <tr>
-                <td>Transactions</td>
-                <td>Full ACID w/ row-level locking</td>
-                <td>Varies: none → bounded → eventual</td>
-            </tr>
-            <tr>
-                <td>Query power</td>
-                <td>Arbitrary JOIN, GROUP BY, window functions, subqueries</td>
-                <td>Only primary key or pre-built indexes — no ad hoc joins</td>
-            </tr>
-            <tr>
-                <td>Write throughput</td>
-                <td>Limited by WAL, locking, and B-Tree insert cost</td>
-                <td>High (LSM-Tree append, wide column partitioning)</td>
-            </tr>
-            <tr>
-                <td>Read patterns</td>
-                <td>Flexible — any column, any condition</td>
-                <td>Must know access patterns at schema design time</td>
-            </tr>
-        </table>
+      <table>
+        <tr>
+          <th>Dimension</th>
+          <th>SQL (Relational)</th>
+          <th>NoSQL</th>
+        </tr>
+        <tr>
+          <td>Data model</td>
+          <td>Normalized, relational, foreign keys</td>
+          <td>Document, KV, wide-column, graph — pick one</td>
+        </tr>
+        <tr>
+          <td>Schema</td>
+          <td>Strict — DDL migrations required</td>
+          <td>Flexible — add fields without downtime</td>
+        </tr>
+        <tr>
+          <td>Scaling</td>
+          <td>Vertical primary; horizontal via read replicas or sharding add-ons</td>
+          <td>Horizontal, built-in, designed from day 1</td>
+        </tr>
+        <tr>
+          <td>Transactions</td>
+          <td>Full ACID w/ row-level locking</td>
+          <td>Varies: none → bounded → eventual</td>
+        </tr>
+        <tr>
+          <td>Query power</td>
+          <td>Arbitrary JOIN, GROUP BY, window functions, subqueries</td>
+          <td>Only primary key or pre-built indexes — no ad hoc joins</td>
+        </tr>
+        <tr>
+          <td>Write throughput</td>
+          <td>Limited by WAL, locking, and B-Tree insert cost</td>
+          <td>High (LSM-Tree append, wide column partitioning)</td>
+        </tr>
+        <tr>
+          <td>Read patterns</td>
+          <td>Flexible — any column, any condition</td>
+          <td>Must know access patterns at schema design time</td>
+        </tr>
+      </table>
     </div>
 
     <div class="callout tip">
-        <div class="callout-title">Polyglot Persistence — The FAANG Answer</div>
-        <p>Don't choose one. Use each database for what it does best:
-            <strong>PostgreSQL</strong> for transactional user data,
-            <strong>Cassandra</strong> for time-series / write-heavy,
-            <strong>Redis</strong> for caching and leaderboards,
-            <strong>Elasticsearch</strong> for full-text search,
-            <strong>Neo4j / Neptune</strong> for graph traversal,
-            <strong>ClickHouse / BigQuery</strong> for analytics.
-            Uber runs 50+ Postgres clusters, 100s of Cassandra clusters, Elasticsearch, and Redis — simultaneously.
-        </p>
+      <div class="callout-title">Polyglot Persistence — The FAANG Answer</div>
+      <p>Don't choose one. Use each database for what it does best:
+        <strong>PostgreSQL</strong> for transactional user data,
+        <strong>Cassandra</strong> for time-series / write-heavy,
+        <strong>Redis</strong> for caching and leaderboards,
+        <strong>Elasticsearch</strong> for full-text search,
+        <strong>Neo4j / Neptune</strong> for graph traversal,
+        <strong>ClickHouse / BigQuery</strong> for analytics.
+        Uber runs 50+ Postgres clusters, 100s of Cassandra clusters, Elasticsearch, and Redis — simultaneously.
+      </p>
     </div>
 
     <h2>7. REST vs. GraphQL vs. gRPC</h2>
     <div class="table-wrap">
-        <table>
-            <tr>
-                <th></th>
-                <th>REST</th>
-                <th>GraphQL</th>
-                <th>gRPC</th>
-            </tr>
-            <tr>
-                <td>Transport</td>
-                <td>HTTP/1.1+</td>
-                <td>HTTP/1.1+</td>
-                <td>HTTP/2 (mandatory)</td>
-            </tr>
-            <tr>
-                <td>Payload</td>
-                <td>JSON (verbose)</td>
-                <td>JSON</td>
-                <td>Protobuf (~5–10× smaller, ~3–5× faster parse)</td>
-            </tr>
-            <tr>
-                <td>Fetching</td>
-                <td>Over-fetch or under-fetch; multiple round trips</td>
-                <td>Exact fields, one request, nested graphs</td>
-                <td>Exact fields via proto schema</td>
-            </tr>
-            <tr>
-                <td>Streaming</td>
-                <td>SSE / Chunked (one-way)</td>
-                <td>Subscriptions over WS</td>
-                <td>Native bi-di streaming built in</td>
-            </tr>
-            <tr>
-                <td>Schema</td>
-                <td>OpenAPI (optional contract)</td>
-                <td>SDL (mandatory, introspectable)</td>
-                <td>.proto (mandatory, compiled)</td>
-            </tr>
-            <tr>
-                <td>Caching</td>
-                <td>HTTP cache out of box (CDN, ETags)</td>
-                <td>Complex — must build per-field caching</td>
-                <td>No HTTP cache — application-level only</td>
-            </tr>
-            <tr>
-                <td>Browser</td>
-                <td>Native</td>
-                <td>Native</td>
-                <td>Needs grpc-web + Envoy proxy</td>
-            </tr>
-            <tr>
-                <td>Best for</td>
-                <td>Public APIs, external consumers, CRUD</td>
-                <td>Complex frontends, mobile (BFF pattern)</td>
-                <td>Internal microservice-to-microservice RPC</td>
-            </tr>
-        </table>
+      <table>
+        <tr>
+          <th></th>
+          <th>REST</th>
+          <th>GraphQL</th>
+          <th>gRPC</th>
+        </tr>
+        <tr>
+          <td>Transport</td>
+          <td>HTTP/1.1+</td>
+          <td>HTTP/1.1+</td>
+          <td>HTTP/2 (mandatory)</td>
+        </tr>
+        <tr>
+          <td>Payload</td>
+          <td>JSON (verbose)</td>
+          <td>JSON</td>
+          <td>Protobuf (~5–10× smaller, ~3–5× faster parse)</td>
+        </tr>
+        <tr>
+          <td>Fetching</td>
+          <td>Over-fetch or under-fetch; multiple round trips</td>
+          <td>Exact fields, one request, nested graphs</td>
+          <td>Exact fields via proto schema</td>
+        </tr>
+        <tr>
+          <td>Streaming</td>
+          <td>SSE / Chunked (one-way)</td>
+          <td>Subscriptions over WS</td>
+          <td>Native bi-di streaming built in</td>
+        </tr>
+        <tr>
+          <td>Schema</td>
+          <td>OpenAPI (optional contract)</td>
+          <td>SDL (mandatory, introspectable)</td>
+          <td>.proto (mandatory, compiled)</td>
+        </tr>
+        <tr>
+          <td>Caching</td>
+          <td>HTTP cache out of box (CDN, ETags)</td>
+          <td>Complex — must build per-field caching</td>
+          <td>No HTTP cache — application-level only</td>
+        </tr>
+        <tr>
+          <td>Browser</td>
+          <td>Native</td>
+          <td>Native</td>
+          <td>Needs grpc-web + Envoy proxy</td>
+        </tr>
+        <tr>
+          <td>Best for</td>
+          <td>Public APIs, external consumers, CRUD</td>
+          <td>Complex frontends, mobile (BFF pattern)</td>
+          <td>Internal microservice-to-microservice RPC</td>
+        </tr>
+      </table>
     </div>
 
     <div class="def">
-        <dt>GitHub's dual API reality</dt>
-        <dd>GitHub REST v3 has been running since 2010. They launched GraphQL v4 in 2016 because the REST API
-            required 300+ round trips for some IDE integrations. GraphQL reduced that to 1. Both still exist — REST for
-            simple scripting and CI tools, GraphQL for rich client integrations.</dd>
-        <dt>Netflix internal gRPC</dt>
-        <dd>Netflix migrated internal service calls to gRPC (from REST+JSON) and achieved 67% reduction in payload
-            bytes and ~10ms latency improvement per hop — meaningful at their scale of billions of internal calls/day.
-        </dd>
+      <dt>GitHub's dual API reality</dt>
+      <dd>GitHub REST v3 has been running since 2010. They launched GraphQL v4 in 2016 because the REST API
+        required 300+ round trips for some IDE integrations. GraphQL reduced that to 1. Both still exist — REST for
+        simple scripting and CI tools, GraphQL for rich client integrations.</dd>
+      <dt>Netflix internal gRPC</dt>
+      <dd>Netflix migrated internal service calls to gRPC (from REST+JSON) and achieved 67% reduction in payload
+        bytes and ~10ms latency improvement per hop — meaningful at their scale of billions of internal calls/day.
+      </dd>
     </div>
 
     <h2>8. Load Balancer vs. API Gateway</h2>
     <div class="mermaid">
-        flowchart LR
-        Client --> LB[Load Balancer\nL4/L7 traffic split\nHealth checks\nTLS termination]
-        LB --> GW[API Gateway\nAuth / JWT validation\nRate limiting\nRequest routing\nTransformation]
-        GW --> S1[Service A]
-        GW --> S2[Service B]
-        GW --> S3[Service C]
+      flowchart LR
+      Client --> LB[Load Balancer\nL4/L7 traffic split\nHealth checks\nTLS termination]
+      LB --> GW[API Gateway\nAuth / JWT validation\nRate limiting\nRequest routing\nTransformation]
+      GW --> S1[Service A]
+      GW --> S2[Service B]
+      GW --> S3[Service C]
     </div>
 
     <p>These are complementary, not alternatives. The LB is an infrastructure concern (where does traffic go?);
-        the API Gateway is a business concern (is this caller allowed, and what should they see?).</p>
+      the API Gateway is a business concern (is this caller allowed, and what should they see?).</p>
 
     <div class="def">
-        <dt>When to skip the API Gateway</dt>
-        <dd>Internal service-to-service calls behind a service mesh (Istio / Linkerd). mTLS, retries, circuit
-            breakers, and telemetry are all handled by the mesh sidecar. Adding an API Gateway on top would just add
-            a latency hop with no benefit.</dd>
-        <dt>Kong at scale</dt>
-        <dd>Kong (open-source API Gateway) processes 1 trillion+ API calls/month for some enterprises. It runs as
-            a cluster of Nginx+LuaJIT processes — a proxy, not a monolith. Each plugin (auth, rate limiting) is a
-            micro-module executed per request in ~0.1ms.</dd>
+      <dt>When to skip the API Gateway</dt>
+      <dd>Internal service-to-service calls behind a service mesh (Istio / Linkerd). mTLS, retries, circuit
+        breakers, and telemetry are all handled by the mesh sidecar. Adding an API Gateway on top would just add
+        a latency hop with no benefit.</dd>
+      <dt>Kong at scale</dt>
+      <dd>Kong (open-source API Gateway) processes 1 trillion+ API calls/month for some enterprises. It runs as
+        a cluster of Nginx+LuaJIT processes — a proxy, not a monolith. Each plugin (auth, rate limiting) is a
+        micro-module executed per request in ~0.1ms.</dd>
     </div>
 
     <h2>9. Caching: Server-Side vs. Client-Side vs. CDN</h2>
     <div class="mermaid">
-        flowchart LR
-        User -->|Static assets| CDN[CDN Edge\nCloudflare / CloudFront\nLatency: 5–20ms\nNo server load]
-        User -->|API requests| App[App Server]
-        App -->|Cache hit| Redis[Redis / Memcached\nLatency: 0.5–2ms\nShared, controlled]
-        App -->|Cache miss| DB[(Database\nLatency: 5–50ms)]
-        Redis -->|Warm cache| App
+      flowchart LR
+      User -->|Static assets| CDN[CDN Edge\nCloudflare / CloudFront\nLatency: 5–20ms\nNo server load]
+      User -->|API requests| App[App Server]
+      App -->|Cache hit| Redis[Redis / Memcached\nLatency: 0.5–2ms\nShared, controlled]
+      App -->|Cache miss| DB[(Database\nLatency: 5–50ms)]
+      Redis -->|Warm cache| App
     </div>
 
     <div class="table-wrap">
-        <table>
-            <tr>
-                <th>Layer</th>
-                <th>Latency</th>
-                <th>Invalidation</th>
-                <th>Sharing</th>
-                <th>Cost of miss</th>
-            </tr>
-            <tr>
-                <td>In-process (JVM heap / local dict)</td>
-                <td>&lt;0.1ms</td>
-                <td>Restart or manual TTL</td>
-                <td>Per instance only</td>
-                <td>Redis lookup</td>
-            </tr>
-            <tr>
-                <td>Redis / Memcached</td>
-                <td>0.5–2ms</td>
-                <td>DEL key / TTL / pub-sub invalidation</td>
-                <td>All app instances</td>
-                <td>DB query</td>
-            </tr>
-            <tr>
-                <td>CDN (Cloudflare, CloudFront)</td>
-                <td>5–30ms global</td>
-                <td>Cache-Control header / manual purge API</td>
-                <td>All users globally</td>
-                <td>Origin request</td>
-            </tr>
-            <tr>
-                <td>Browser cache</td>
-                <td>0ms (disk read)</td>
-                <td>Versioned URLs, ETags, max-age</td>
-                <td>Per user only</td>
-                <td>Server request</td>
-            </tr>
-        </table>
+      <table>
+        <tr>
+          <th>Layer</th>
+          <th>Latency</th>
+          <th>Invalidation</th>
+          <th>Sharing</th>
+          <th>Cost of miss</th>
+        </tr>
+        <tr>
+          <td>In-process (JVM heap / local dict)</td>
+          <td>&lt;0.1ms</td>
+          <td>Restart or manual TTL</td>
+          <td>Per instance only</td>
+          <td>Redis lookup</td>
+        </tr>
+        <tr>
+          <td>Redis / Memcached</td>
+          <td>0.5–2ms</td>
+          <td>DEL key / TTL / pub-sub invalidation</td>
+          <td>All app instances</td>
+          <td>DB query</td>
+        </tr>
+        <tr>
+          <td>CDN (Cloudflare, CloudFront)</td>
+          <td>5–30ms global</td>
+          <td>Cache-Control header / manual purge API</td>
+          <td>All users globally</td>
+          <td>Origin request</td>
+        </tr>
+        <tr>
+          <td>Browser cache</td>
+          <td>0ms (disk read)</td>
+          <td>Versioned URLs, ETags, max-age</td>
+          <td>Per user only</td>
+          <td>Server request</td>
+        </tr>
+      </table>
     </div>
 
     <h2>10. Polling vs. WebSockets vs. SSE</h2>
     <div class="mermaid">
-        sequenceDiagram
-        participant Client
-        participant Server
-        Note over Client,Server: Short Polling
-        Client->>Server: GET /status (every 5s)
-        Server-->>Client: 200 (empty if no change)
-        Note over Client,Server: Long Polling
-        Client->>Server: GET /events (hold connection)
-        Server-->>Client: 200 (only when event ready)
-        Note over Client,Server: WebSocket
-        Client->>Server: HTTP Upgrade
-        Server-->>Client: 101 Switching Protocols
-        Server-->>Client: push event (async, anytime)
-        Client->>Server: send message (async, anytime)
-        Note over Client,Server: SSE
-        Client->>Server: GET /stream
-        Server-->>Client: data: event1
-        Server-->>Client: data: event2
+      sequenceDiagram
+      participant Client
+      participant Server
+      Note over Client,Server: Short Polling
+      Client->>Server: GET /status (every 5s)
+      Server-->>Client: 200 (empty if no change)
+      Note over Client,Server: Long Polling
+      Client->>Server: GET /events (hold connection)
+      Server-->>Client: 200 (only when event ready)
+      Note over Client,Server: WebSocket
+      Client->>Server: HTTP Upgrade
+      Server-->>Client: 101 Switching Protocols
+      Server-->>Client: push event (async, anytime)
+      Client->>Server: send message (async, anytime)
+      Note over Client,Server: SSE
+      Client->>Server: GET /stream
+      Server-->>Client: data: event1
+      Server-->>Client: data: event2
     </div>
 
     <div class="def">
-        <dt>Slack's WebSocket fleet</dt>
-        <dd>Slack maintains millions of persistent WebSocket connections. They run a dedicated "connection server" layer
-            (written in Java) whose sole job is to hold sockets and fan-out messages. It's completely stateless in terms
-            of business logic — it just knows "user X is connected to server Y." Business logic lives in separate
-            services.</dd>
-        <dt>Twitter's SSE for timelines</dt>
-        <dd>Twitter's "live" timeline uses SSE (not WebSockets) because the feed is server→client only. SSE uses
-            plain HTTP — works through proxies, firewalls, and CDNs without special handling. Auto-reconnect is built
-            into the browser spec.</dd>
+      <dt>Slack's WebSocket fleet</dt>
+      <dd>Slack maintains millions of persistent WebSocket connections. They run a dedicated "connection server" layer
+        (written in Java) whose sole job is to hold sockets and fan-out messages. It's completely stateless in terms
+        of business logic — it just knows "user X is connected to server Y." Business logic lives in separate
+        services.</dd>
+      <dt>Twitter's SSE for timelines</dt>
+      <dd>Twitter's "live" timeline uses SSE (not WebSockets) because the feed is server→client only. SSE uses
+        plain HTTP — works through proxies, firewalls, and CDNs without special handling. Auto-reconnect is built
+        into the browser spec.</dd>
     </div>
 
     <h2>11. Stateful vs. Stateless Architecture</h2>
     <div class="compare">
-        <div class="compare-card pro">
-            <h4>Stateless (preferred for scale)</h4>
-            <ul>
-                <li>Request carries all context: JWT, API key, request ID</li>
-                <li>Any instance handles any request — true horizontal scale</li>
-                <li>Blue/green deploy, rolling restart, auto-scale: all trivial</li>
-                <li>Health check = simple HTTP ping, no state to drain</li>
-            </ul>
-        </div>
-        <div class="compare-card neutral">
-            <h4>Stateful (when you need it)</h4>
-            <ul>
-                <li>WebSocket connections — session lives on specific server</li>
-                <li>In-memory game state — microsecond access to mutable data</li>
-                <li>Streaming processors — maintain aggregation windows</li>
-                <li>Must drain connections on shutdown, sticky LB routing</li>
-            </ul>
-        </div>
+      <div class="compare-card pro">
+        <h4>Stateless (preferred for scale)</h4>
+        <ul>
+          <li>Request carries all context: JWT, API key, request ID</li>
+          <li>Any instance handles any request — true horizontal scale</li>
+          <li>Blue/green deploy, rolling restart, auto-scale: all trivial</li>
+          <li>Health check = simple HTTP ping, no state to drain</li>
+        </ul>
+      </div>
+      <div class="compare-card neutral">
+        <h4>Stateful (when you need it)</h4>
+        <ul>
+          <li>WebSocket connections — session lives on specific server</li>
+          <li>In-memory game state — microsecond access to mutable data</li>
+          <li>Streaming processors — maintain aggregation windows</li>
+          <li>Must drain connections on shutdown, sticky LB routing</li>
+        </ul>
+      </div>
     </div>
 
     <div class="callout tip">
-        <div class="callout-title">The Twelve-Factor App Rule #6</div>
-        <p><em>"Processes are stateless and share-nothing."</em> Any data that needs to persist must be stored in
-            a backing service (DB, cache, object store). This is why Lambda functions and containerized microservices
-            scale so cleanly — there's nothing to coordinate between instances.</p>
+      <div class="callout-title">The Twelve-Factor App Rule #6</div>
+      <p><em>"Processes are stateless and share-nothing."</em> Any data that needs to persist must be stored in
+        a backing service (DB, cache, object store). This is why Lambda functions and containerized microservices
+        scale so cleanly — there's nothing to coordinate between instances.</p>
     </div>
 
     <h2>12. Monolith vs. Microservices</h2>
     <div class="mermaid">
-        flowchart TD
-        Q1{Team size?} -->|&lt; 15 engineers| M[Modular Monolith\nFast iteration\nSimple observability\nOne deploy]
-        Q1 -->|&gt; 50 engineers| MS[Microservices\nIndependent deploys\nTeam autonomy\nPolyglot]
-        MS --> Q2{Domain boundaries clear?}
-        Q2 -->|No| W[Warning: Distributed\nMonolith anti-pattern\nWorst of both worlds]
-        Q2 -->|Yes| OK[Proceed with\nservice extraction]
+      flowchart TD
+      Q1{Team size?} -->|&lt; 15 engineers| M[Modular Monolith\nFast iteration\nSimple observability\nOne deploy]
+      Q1 -->|&gt; 50 engineers| MS[Microservices\nIndependent deploys\nTeam autonomy\nPolyglot]
+      MS --> Q2{Domain boundaries clear?}
+      Q2 -->|No| W[Warning: Distributed\nMonolith anti-pattern\nWorst of both worlds]
+      Q2 -->|Yes| OK[Proceed with\nservice extraction]
     </div>
 
     <div class="table-wrap">
-        <table>
-            <tr>
-                <th></th>
-                <th>Modular Monolith</th>
-                <th>Microservices</th>
-            </tr>
-            <tr>
-                <td>Deploy</td>
-                <td>One artifact</td>
-                <td>Dozens of independent pipelines</td>
-            </tr>
-            <tr>
-                <td>Failure blast radius</td>
-                <td>Full app on unhandled exception</td>
-                <td>Circuit-breaker isolates one service</td>
-            </tr>
-            <tr>
-                <td>Observability</td>
-                <td>One log stream, one trace</td>
-                <td>Distributed tracing required (Jaeger, Tempo)</td>
-            </tr>
-            <tr>
-                <td>Data</td>
-                <td>Shared schema — easy joins</td>
-                <td>Separate DBs — eventual consistency between services</td>
-            </tr>
-            <tr>
-                <td>Latency</td>
-                <td>In-process method calls: nanoseconds</td>
-                <td>Network RPC: 0.5–5ms per hop</td>
-            </tr>
-            <tr>
-                <td>Org fit</td>
-                <td>1 team, 1 codebase</td>
-                <td>Conway's Law: each team owns a service</td>
-            </tr>
-        </table>
+      <table>
+        <tr>
+          <th></th>
+          <th>Modular Monolith</th>
+          <th>Microservices</th>
+        </tr>
+        <tr>
+          <td>Deploy</td>
+          <td>One artifact</td>
+          <td>Dozens of independent pipelines</td>
+        </tr>
+        <tr>
+          <td>Failure blast radius</td>
+          <td>Full app on unhandled exception</td>
+          <td>Circuit-breaker isolates one service</td>
+        </tr>
+        <tr>
+          <td>Observability</td>
+          <td>One log stream, one trace</td>
+          <td>Distributed tracing required (Jaeger, Tempo)</td>
+        </tr>
+        <tr>
+          <td>Data</td>
+          <td>Shared schema — easy joins</td>
+          <td>Separate DBs — eventual consistency between services</td>
+        </tr>
+        <tr>
+          <td>Latency</td>
+          <td>In-process method calls: nanoseconds</td>
+          <td>Network RPC: 0.5–5ms per hop</td>
+        </tr>
+        <tr>
+          <td>Org fit</td>
+          <td>1 team, 1 codebase</td>
+          <td>Conway's Law: each team owns a service</td>
+        </tr>
+      </table>
     </div>
 
     <div class="def">
-        <dt>Amazon's "two pizza teams" origin</dt>
-        <dd>Amazon's famous move from monolith to microservices in the early 2000s wasn't primarily technical —
-            it was organizational. Jeff Bezos mandated that teams communicate only via service APIs. This forced
-            clean boundaries and enabled independent deployment. The monolith-to-microservices transition took 4 years.
-        </dd>
-        <dt>The Distributed Monolith anti-pattern</dt>
-        <dd>If your microservices deploy together, share a database, or require synchronous calls through a long
-            chain to complete one user request — you have a distributed monolith. You get all the operational
-            complexity of microservices with none of the scaling benefits. Signs: services can't be deployed
-            independently,
-            one service change requires updates to 5 others.</dd>
+      <dt>Amazon's "two pizza teams" origin</dt>
+      <dd>Amazon's famous move from monolith to microservices in the early 2000s wasn't primarily technical —
+        it was organizational. Jeff Bezos mandated that teams communicate only via service APIs. This forced
+        clean boundaries and enabled independent deployment. The monolith-to-microservices transition took 4 years.
+      </dd>
+      <dt>The Distributed Monolith anti-pattern</dt>
+      <dd>If your microservices deploy together, share a database, or require synchronous calls through a long
+        chain to complete one user request — you have a distributed monolith. You get all the operational
+        complexity of microservices with none of the scaling benefits. Signs: services can't be deployed
+        independently,
+        one service change requires updates to 5 others.</dd>
     </div>
 
     <h2>13. Token Bucket vs. Leaky Bucket (Rate Limiting)</h2>
     <div class="mermaid">
-        flowchart LR
-        subgraph Token Bucket
-        T1[Tokens added at\nrate N/sec] --> T2[Bucket capacity = B\nAllows burst up to B]
-        T2 -->|Token available| T3[Request passes]
-        T2 -->|Empty| T4[Request rejected / queued]
-        end
-        subgraph Leaky Bucket
-        L1[Requests enter\nqueue - FIFO] --> L2[Drains at constant\nrate R/sec]
-        L2 --> L3[Request processed\nSteady smooth output]
-        L1 -->|Queue full| L4[Request dropped\noverflow]
-        end
+      flowchart LR
+      subgraph Token Bucket
+      T1[Tokens added at\nrate N/sec] --> T2[Bucket capacity = B\nAllows burst up to B]
+      T2 -->|Token available| T3[Request passes]
+      T2 -->|Empty| T4[Request rejected / queued]
+      end
+      subgraph Leaky Bucket
+      L1[Requests enter\nqueue - FIFO] --> L2[Drains at constant\nrate R/sec]
+      L2 --> L3[Request processed\nSteady smooth output]
+      L1 -->|Queue full| L4[Request dropped\noverflow]
+      end
     </div>
 
     <div class="def">
-        <dt>Stripe's rate limiting architecture</dt>
-        <dd>Stripe uses a sliding window algorithm in Redis, storing a sorted set of request timestamps per API key.
-            On each request: ZADD (add now), ZREMRANGEBYSCORE (remove old), ZCARD (count). If &gt; limit → reject.
-            The Redis sorted set operation is O(log N) and completes in &lt;1ms. Stripe also uses tiered limits:
-            per-endpoint, per-key, per-IP, and per-account simultaneously.</dd>
-        <dt>Cloudflare's distributed rate limiting</dt>
-        <dd>Cloudflare uses approximate sliding window counters synchronized across PoPs. Each PoP maintains a
-            local counter and syncs periodically. This allows 100Gbps+ of traffic to be rate-limited at the edge
-            without a central coordinator — consistency is sacrificed for availability and scale.</dd>
+      <dt>Stripe's rate limiting architecture</dt>
+      <dd>Stripe uses a sliding window algorithm in Redis, storing a sorted set of request timestamps per API key.
+        On each request: ZADD (add now), ZREMRANGEBYSCORE (remove old), ZCARD (count). If &gt; limit → reject.
+        The Redis sorted set operation is O(log N) and completes in &lt;1ms. Stripe also uses tiered limits:
+        per-endpoint, per-key, per-IP, and per-account simultaneously.</dd>
+      <dt>Cloudflare's distributed rate limiting</dt>
+      <dd>Cloudflare uses approximate sliding window counters synchronized across PoPs. Each PoP maintains a
+        local counter and syncs periodically. This allows 100Gbps+ of traffic to be rate-limited at the edge
+        without a central coordinator — consistency is sacrificed for availability and scale.</dd>
     </div>
 
     <h2>14. Primary-Replica vs. Multi-Primary Replication</h2>
     <div class="mermaid">
-        flowchart TD
-        subgraph Primary-Replica
-        W1[Write] --> P[Primary\nAccepts all writes]
-        P --> R1[Replica 1\nRead only]
-        P --> R2[Replica 2\nRead only]
+      flowchart TD
+      subgraph Primary-Replica
+      W1[Write] --> P[Primary\nAccepts all writes]
+      P --> R1[Replica 1\nRead only]
+      P --> R2[Replica 2\nRead only]
+      end
+      subgraph Multi-Primary
+      W2[Write] --> M1[Primary 1\nAny writes]
+      W3[Write] --> M2[Primary 2\nAny writes]
+      M1 <-->|Conflict resolution\nLWW / CRDT| M2
         end
-        subgraph Multi-Primary
-        W2[Write] --> M1[Primary 1\nAny writes]
-        W3[Write] --> M2[Primary 2\nAny writes]
-        M1 <-->|Conflict resolution\nLWW / CRDT| M2
-            end
     </div>
 
     <div class="def">
-        <dt>MySQL at GitHub scale</dt>
-        <dd>GitHub runs thousands of MySQL instances in primary-replica topology. Each write goes to one primary;
-            replicas serve reads. Replication lag is monitored continuously — if replica lag exceeds ~30 seconds,
-            read traffic is redirected to the primary. Failover is automated via Orchestrator, taking ~30–45 seconds.
-        </dd>
-        <dt>CockroachDB's multi-primary approach</dt>
-        <dd>CockroachDB implements multi-primary replication using Raft consensus per key range (16MB chunks called
-            "ranges"). Each range has a Raft leader that coordinates writes. Conflict resolution is guaranteed by the
-            consensus protocol — no LWW ambiguity. Enables active-active multi-region writes.</dd>
+      <dt>MySQL at GitHub scale</dt>
+      <dd>GitHub runs thousands of MySQL instances in primary-replica topology. Each write goes to one primary;
+        replicas serve reads. Replication lag is monitored continuously — if replica lag exceeds ~30 seconds,
+        read traffic is redirected to the primary. Failover is automated via Orchestrator, taking ~30–45 seconds.
+      </dd>
+      <dt>CockroachDB's multi-primary approach</dt>
+      <dd>CockroachDB implements multi-primary replication using Raft consensus per key range (16MB chunks called
+        "ranges"). Each range has a Raft leader that coordinates writes. Conflict resolution is guaranteed by the
+        consensus protocol — no LWW ambiguity. Enables active-active multi-region writes.</dd>
     </div>
 
     <h2>15. Horizontal vs. Vertical Scaling</h2>
     <div class="compare">
-        <div class="compare-card neutral">
-            <h4>Vertical Scaling (Scale Up)</h4>
-            <ul>
-                <li>Add more CPU, RAM, faster disk to the same machine</li>
-                <li>Simpler — no distributed systems coordination</li>
-                <li>Hard limit: largest available instance (e.g., AWS x2iedn.32xlarge: 4TB RAM)</li>
-                <li>Single point of failure remains</li>
-                <li>Good first step — often cheapest solution</li>
-            </ul>
-        </div>
-        <div class="compare-card pro">
-            <h4>Horizontal Scaling (Scale Out)</h4>
-            <ul>
-                <li>Add more machines; distribute load across them</li>
-                <li>No theoretical upper limit on capacity</li>
-                <li>Enables geographic distribution, fault isolation</li>
-                <li>Requires: load balancing, distributed state management, consensus</li>
-                <li>More complex operationally — worth it at true scale</li>
-            </ul>
-        </div>
+      <div class="compare-card neutral">
+        <h4>Vertical Scaling (Scale Up)</h4>
+        <ul>
+          <li>Add more CPU, RAM, faster disk to the same machine</li>
+          <li>Simpler — no distributed systems coordination</li>
+          <li>Hard limit: largest available instance (e.g., AWS x2iedn.32xlarge: 4TB RAM)</li>
+          <li>Single point of failure remains</li>
+          <li>Good first step — often cheapest solution</li>
+        </ul>
+      </div>
+      <div class="compare-card pro">
+        <h4>Horizontal Scaling (Scale Out)</h4>
+        <ul>
+          <li>Add more machines; distribute load across them</li>
+          <li>No theoretical upper limit on capacity</li>
+          <li>Enables geographic distribution, fault isolation</li>
+          <li>Requires: load balancing, distributed state management, consensus</li>
+          <li>More complex operationally — worth it at true scale</li>
+        </ul>
+      </div>
     </div>
     <div class="def">
-        <dt>Instagram's 2012 peak: vertical first</dt>
-        <dd>Instagram ran on a handful of EC2 instances for their first year (vertical scaling).
-            Only after hitting the wall did they introduce sharding and horizontal scale.
-            <strong>Lesson:</strong> Don't over-engineer. Scale vertically until it's no longer cost-effective,
-            then scale horizontally. "Premature optimization is the root of all evil."
-        </dd>
+      <dt>Instagram's 2012 peak: vertical first</dt>
+      <dd>Instagram ran on a handful of EC2 instances for their first year (vertical scaling).
+        Only after hitting the wall did they introduce sharding and horizontal scale.
+        <strong>Lesson:</strong> Don't over-engineer. Scale vertically until it's no longer cost-effective,
+        then scale horizontally. "Premature optimization is the root of all evil."
+      </dd>
     </div>
 
     <h2>16. Push vs. Pull Architecture</h2>
     <div class="def">
-        <dt>Prometheus (Pull) vs. StatsD (Push)</dt>
-        <dd><strong>Prometheus scrapes</strong> (pulls) metrics from each service's /metrics endpoint every 15s.
-            Services don't need to know about Prometheus. Easy to discover new services, replay historical scrapes.
-            Downside: what if a service dies between scrapes?
-            <br><br>
-            <strong>StatsD pushes</strong> UDP packets from within the application to a StatsD daemon. Low-overhead
-            fire-and-forget. Downside: UDP is lossy, service must know StatsD address.
-            <br><br>
-            Prometheus dominates at FAANG scale (Kubernetes-native). StatsD is common in legacy or non-containerized
-            systems.
-        </dd>
-        <dt>Kafka's pull model for consumers</dt>
-        <dd>Kafka consumers pull at their own pace — this is intentional. Consumers control their offset.
-            A consumer can slow down, go offline, and resume without losing messages (up to retention period).
-            This "backpressure by design" is why Kafka consumers don't get overwhelmed — they simply slow their
-            polling rate when processing is behind.</dd>
+      <dt>Prometheus (Pull) vs. StatsD (Push)</dt>
+      <dd><strong>Prometheus scrapes</strong> (pulls) metrics from each service's /metrics endpoint every 15s.
+        Services don't need to know about Prometheus. Easy to discover new services, replay historical scrapes.
+        Downside: what if a service dies between scrapes?
+        <br><br>
+        <strong>StatsD pushes</strong> UDP packets from within the application to a StatsD daemon. Low-overhead
+        fire-and-forget. Downside: UDP is lossy, service must know StatsD address.
+        <br><br>
+        Prometheus dominates at FAANG scale (Kubernetes-native). StatsD is common in legacy or non-containerized
+        systems.
+      </dd>
+      <dt>Kafka's pull model for consumers</dt>
+      <dd>Kafka consumers pull at their own pace — this is intentional. Consumers control their offset.
+        A consumer can slow down, go offline, and resume without losing messages (up to retention period).
+        This "backpressure by design" is why Kafka consumers don't get overwhelmed — they simply slow their
+        polling rate when processing is behind.</dd>
     </div>
 
     <h2>17. Orchestration vs. Choreography</h2>
     <div class="mermaid">
-        flowchart TD
-        subgraph Orchestration
-        O[Order Service\nOrchestrator] -->|1. Reserve inventory| I[Inventory]
-        O -->|2. Charge payment| P[Payment]
-        O -->|3. Schedule shipping| S[Shipping]
-        O -->|4. Send confirmation| N[Notification]
-        end
-        subgraph Choreography
-        E1[order.placed event] --> I2[Inventory\nlistens & reserves]
-        I2 --> E2[inventory.reserved event]
-        E2 --> P2[Payment\nlistens & charges]
-        P2 --> E3[payment.completed event]
-        E3 --> S2[Shipping\nlistens & schedules]
-        end
+      flowchart TD
+      subgraph Orchestration
+      O[Order Service\nOrchestrator] -->|1. Reserve inventory| I[Inventory]
+      O -->|2. Charge payment| P[Payment]
+      O -->|3. Schedule shipping| S[Shipping]
+      O -->|4. Send confirmation| N[Notification]
+      end
+      subgraph Choreography
+      E1[order.placed event] --> I2[Inventory\nlistens & reserves]
+      I2 --> E2[inventory.reserved event]
+      E2 --> P2[Payment\nlistens & charges]
+      P2 --> E3[payment.completed event]
+      E3 --> S2[Shipping\nlistens & schedules]
+      end
     </div>
 
     <div class="def">
-        <dt>AWS Step Functions (Orchestration)</dt>
-        <dd>Step Functions provides a visual workflow editor and execution history for every state machine run.
-            You can see exactly which step failed, with input/output logged. This makes debugging trivial compared
-            to tracing choreographed events across Kafka topics. Used by Amazon's own order processing pipeline.</dd>
-        <dt>Choreography failure modes</dt>
-        <dd>In choreography, if the Payment service publishes "payment.completed" but the Shipping service's
-            consumer group is down, the event sits in Kafka. When Shipping comes back up, it processes the
-            backlog. This is resilient — but "zombie" or duplicate events require idempotent consumers.
-            Every consumer must handle receiving the same event multiple times without double-processing.</dd>
+      <dt>AWS Step Functions (Orchestration)</dt>
+      <dd>Step Functions provides a visual workflow editor and execution history for every state machine run.
+        You can see exactly which step failed, with input/output logged. This makes debugging trivial compared
+        to tracing choreographed events across Kafka topics. Used by Amazon's own order processing pipeline.</dd>
+      <dt>Choreography failure modes</dt>
+      <dd>In choreography, if the Payment service publishes "payment.completed" but the Shipping service's
+        consumer group is down, the event sits in Kafka. When Shipping comes back up, it processes the
+        backlog. This is resilient — but "zombie" or duplicate events require idempotent consumers.
+        Every consumer must handle receiving the same event multiple times without double-processing.</dd>
     </div>
 
     <h2>18. Data Sharding Strategies</h2>
     <div class="table-wrap">
-        <table>
-            <tr>
-                <th>Strategy</th>
-                <th>How</th>
-                <th>Pros</th>
-                <th>Cons</th>
-                <th>Used by</th>
-            </tr>
-            <tr>
-                <td>Range-based</td>
-                <td>Shard by key range (A–M, N–Z)</td>
-                <td>Range queries efficient</td>
-                <td>Hot shards if data is skewed (e.g., all writes go to "latest" shard)</td>
-                <td>HBase, MongoDB range sharding</td>
-            </tr>
-            <tr>
-                <td>Hash-based</td>
-                <td>hash(key) % N shards</td>
-                <td>Even distribution</td>
-                <td>Range queries require scatter-gather; resharding = full data move</td>
-                <td>Redis Cluster, Cassandra (consistent hash)</td>
-            </tr>
-            <tr>
-                <td>Consistent hashing</td>
-                <td>Key and nodes placed on hash ring; key → nearest node clockwise</td>
-                <td>Adding node moves only 1/N keys</td>
-                <td>More complex; need virtual nodes for even distribution</td>
-                <td>DynamoDB, Cassandra, Chord DHT</td>
-            </tr>
-            <tr>
-                <td>Directory-based</td>
-                <td>Lookup table: key → shard ID</td>
-                <td>Absolute flexibility; easy rebalance</td>
-                <td>Lookup table is a bottleneck / SPOF</td>
-                <td>Some sharded MySQL setups</td>
-            </tr>
-        </table>
+      <table>
+        <tr>
+          <th>Strategy</th>
+          <th>How</th>
+          <th>Pros</th>
+          <th>Cons</th>
+          <th>Used by</th>
+        </tr>
+        <tr>
+          <td>Range-based</td>
+          <td>Shard by key range (A–M, N–Z)</td>
+          <td>Range queries efficient</td>
+          <td>Hot shards if data is skewed (e.g., all writes go to "latest" shard)</td>
+          <td>HBase, MongoDB range sharding</td>
+        </tr>
+        <tr>
+          <td>Hash-based</td>
+          <td>hash(key) % N shards</td>
+          <td>Even distribution</td>
+          <td>Range queries require scatter-gather; resharding = full data move</td>
+          <td>Redis Cluster, Cassandra (consistent hash)</td>
+        </tr>
+        <tr>
+          <td>Consistent hashing</td>
+          <td>Key and nodes placed on hash ring; key → nearest node clockwise</td>
+          <td>Adding node moves only 1/N keys</td>
+          <td>More complex; need virtual nodes for even distribution</td>
+          <td>DynamoDB, Cassandra, Chord DHT</td>
+        </tr>
+        <tr>
+          <td>Directory-based</td>
+          <td>Lookup table: key → shard ID</td>
+          <td>Absolute flexibility; easy rebalance</td>
+          <td>Lookup table is a bottleneck / SPOF</td>
+          <td>Some sharded MySQL setups</td>
+        </tr>
+      </table>
     </div>
 
     <div class="callout warn">
-        <div class="callout-title">Hot Shard Problem</div>
-        <p>If a celebrity (Justin Bieber, Taylor Swift) posts on a social network, all writes/reads for that
-            entity go to one shard. Solutions: (1) add a random suffix to the shard key for hot entities,
-            (2) pre-shard hot keys across multiple shards and aggregate reads, (3) use a separate cache tier
-            for hot entities. Twitter specifically had to redesign their fan-out mechanism for celebrities with
-            100M+ followers.</p>
+      <div class="callout-title">Hot Shard Problem</div>
+      <p>If a celebrity (Justin Bieber, Taylor Swift) posts on a social network, all writes/reads for that
+        entity go to one shard. Solutions: (1) add a random suffix to the shard key for hot entities,
+        (2) pre-shard hot keys across multiple shards and aggregate reads, (3) use a separate cache tier
+        for hot entities. Twitter specifically had to redesign their fan-out mechanism for celebrities with
+        100M+ followers.</p>
     </div>
 
     <h2>19. Stateless Rate Limiting vs. Distributed Rate Limiting</h2>
     <div class="def">
-        <dt>Per-instance rate limiting (stateless)</dt>
-        <dd>Each server tracks its own counters in local memory. Fast (no network call) but approximate —
-            10 servers with 100 RPS limit each = 1000 RPS effectively passes. Acceptable for protecting
-            individual servers from overload, not for API quota enforcement.</dd>
-        <dt>Centralized distributed rate limiting (Redis)</dt>
-        <dd>All servers increment a shared Redis counter. Accurate across the entire fleet. Redis INCR +
-            EXPIRE is atomic — no race conditions. Latency cost: ~0.5ms per request for the Redis round trip.
-            Used by: Stripe, GitHub, Shopify. Redis Cluster scales this to millions of keys/sec.</dd>
-        <dt>Gossip-based (approximate, edge-native)</dt>
-        <dd>Cloudflare's edge rate limiting syncs counters between PoPs via gossip. Each PoP's counter may
-            be slightly stale (by milliseconds). Allows up to ~10% over-limit in exchange for no centralized
-            bottleneck. Tradeoff: accuracy vs. availability and latency.</dd>
+      <dt>Per-instance rate limiting (stateless)</dt>
+      <dd>Each server tracks its own counters in local memory. Fast (no network call) but approximate —
+        10 servers with 100 RPS limit each = 1000 RPS effectively passes. Acceptable for protecting
+        individual servers from overload, not for API quota enforcement.</dd>
+      <dt>Centralized distributed rate limiting (Redis)</dt>
+      <dd>All servers increment a shared Redis counter. Accurate across the entire fleet. Redis INCR +
+        EXPIRE is atomic — no race conditions. Latency cost: ~0.5ms per request for the Redis round trip.
+        Used by: Stripe, GitHub, Shopify. Redis Cluster scales this to millions of keys/sec.</dd>
+      <dt>Gossip-based (approximate, edge-native)</dt>
+      <dd>Cloudflare's edge rate limiting syncs counters between PoPs via gossip. Each PoP's counter may
+        be slightly stale (by milliseconds). Allows up to ~10% over-limit in exchange for no centralized
+        bottleneck. Tradeoff: accuracy vs. availability and latency.</dd>
     </div>
 
     <h2>20–25: At-a-Glance Comparisons</h2>
     <div class="table-wrap">
-        <table>
-            <tr>
-                <th>#</th>
-                <th>Trade-off</th>
-                <th>Choose A when…</th>
-                <th>Choose B when…</th>
-                <th>Key number / fact</th>
-            </tr>
-            <tr>
-                <td>20</td>
-                <td><strong>Compression vs. Deduplication</strong></td>
-                <td>Data is similar but not identical (log lines, API JSON)</td>
-                <td>Many identical files exist (backup, version control)</td>
-                <td>gzip reduces JSON by 60–80%; dedup reduces backup by 70–95%</td>
-            </tr>
-            <tr>
-                <td>21</td>
-                <td><strong>Read-heavy vs. Write-heavy optimization</strong></td>
-                <td>Read-heavy: cache, indexes, read replicas, CDN</td>
-                <td>Write-heavy: LSM-tree, batching, async queues, sharding</td>
-                <td>Most apps: 10:1–100:1 read/write ratio. IoT / logging: inverted</td>
-            </tr>
-            <tr>
-                <td>22</td>
-                <td><strong>Centralized vs. Decentralized coordination</strong></td>
-                <td>Need strict ordering or distributed locks (ZooKeeper, etcd)</td>
-                <td>Need fault-tolerance without SPOF (Cassandra gossip, SWIM)</td>
-                <td>etcd handles 10K writes/sec; gossip scales to 10K+ nodes with O(log N) convergence</td>
-            </tr>
-            <tr>
-                <td>23</td>
-                <td><strong>Synchronous vs. Async communication</strong></td>
-                <td>Response needed now (user-facing reads, auth checks)</td>
-                <td>Response can wait (email send, indexing, billing, analytics)</td>
-                <td>Making a payment sync: ~200ms. Making it async + queue: ~5ms (rest processed offline)</td>
-            </tr>
-            <tr>
-                <td>24</td>
-                <td><strong>Fat client vs. Thin client</strong></td>
-                <td>Offline support needed; client compute available; slow network ok</td>
-                <td>Instant updates needed; any device; security critical</td>
-                <td>Progressive Web Apps bridge the gap: offline-first via Service Worker + server-driven fallback</td>
-            </tr>
-            <tr>
-                <td>25</td>
-                <td><strong>Optimistic vs. Pessimistic locking</strong></td>
-                <td>Low contention — reads vastly outnumber conflicting writes (wiki edits, product pages)</td>
-                <td>High contention — concurrent writes to same row are common (inventory, bank balance)</td>
-                <td>Optimistic locking via version column: no lock held, conflict retry on commit. Pessimistic: SELECT
-                    FOR UPDATE — holds row lock, prevents concurrent writes but blocks readers too</td>
-            </tr>
-        </table>
+      <table>
+        <tr>
+          <th>#</th>
+          <th>Trade-off</th>
+          <th>Choose A when…</th>
+          <th>Choose B when…</th>
+          <th>Key number / fact</th>
+        </tr>
+        <tr>
+          <td>20</td>
+          <td><strong>Compression vs. Deduplication</strong></td>
+          <td>Data is similar but not identical (log lines, API JSON)</td>
+          <td>Many identical files exist (backup, version control)</td>
+          <td>gzip reduces JSON by 60–80%; dedup reduces backup by 70–95%</td>
+        </tr>
+        <tr>
+          <td>21</td>
+          <td><strong>Read-heavy vs. Write-heavy optimization</strong></td>
+          <td>Read-heavy: cache, indexes, read replicas, CDN</td>
+          <td>Write-heavy: LSM-tree, batching, async queues, sharding</td>
+          <td>Most apps: 10:1–100:1 read/write ratio. IoT / logging: inverted</td>
+        </tr>
+        <tr>
+          <td>22</td>
+          <td><strong>Centralized vs. Decentralized coordination</strong></td>
+          <td>Need strict ordering or distributed locks (ZooKeeper, etcd)</td>
+          <td>Need fault-tolerance without SPOF (Cassandra gossip, SWIM)</td>
+          <td>etcd handles 10K writes/sec; gossip scales to 10K+ nodes with O(log N) convergence</td>
+        </tr>
+        <tr>
+          <td>23</td>
+          <td><strong>Synchronous vs. Async communication</strong></td>
+          <td>Response needed now (user-facing reads, auth checks)</td>
+          <td>Response can wait (email send, indexing, billing, analytics)</td>
+          <td>Making a payment sync: ~200ms. Making it async + queue: ~5ms (rest processed offline)</td>
+        </tr>
+        <tr>
+          <td>24</td>
+          <td><strong>Fat client vs. Thin client</strong></td>
+          <td>Offline support needed; client compute available; slow network ok</td>
+          <td>Instant updates needed; any device; security critical</td>
+          <td>Progressive Web Apps bridge the gap: offline-first via Service Worker + server-driven fallback</td>
+        </tr>
+        <tr>
+          <td>25</td>
+          <td><strong>Optimistic vs. Pessimistic locking</strong></td>
+          <td>Low contention — reads vastly outnumber conflicting writes (wiki edits, product pages)</td>
+          <td>High contention — concurrent writes to same row are common (inventory, bank balance)</td>
+          <td>Optimistic locking via version column: no lock held, conflict retry on commit. Pessimistic: SELECT
+            FOR UPDATE — holds row lock, prevents concurrent writes but blocks readers too</td>
+        </tr>
+      </table>
     </div>
 
     <h2>Master Framework: The 5 Trade-off Questions</h2>
     <div class="callout warn">
-        <div class="callout-title">Use this in every system design interview</div>
-        <ol>
-            <li><strong>"What breaks first?"</strong> — Identify the bottleneck: DB writes? Network bandwidth? CPU?
-                Memory? Design for the constraint, not the happy path.</li>
-            <li><strong>"What's the blast radius?"</strong> — If this component fails, what is the worst-case user
-                impact? Design to minimize and isolate blast radius.</li>
-            <li><strong>"What do we give up?"</strong> — Name the specific CAP/PACELC tradeoff. Saying "we use Cassandra
-                for availability" must come with "we give up immediate consistency."</li>
-            <li><strong>"Does this match the scale?"</strong> — A 10-user system doesn't need Kafka. A 10M-user system
-                can't run on a single MySQL. Tailor complexity to actual requirements.</li>
-            <li><strong>"Can we change this later?"</strong> — Data model and public API contracts are expensive to
-                change. Deployment architecture is cheaper. Be conservative where reversibility is low.</li>
-        </ol>
+      <div class="callout-title">Use this in every system design interview</div>
+      <ol>
+        <li><strong>"What breaks first?"</strong> — Identify the bottleneck: DB writes? Network bandwidth? CPU?
+          Memory? Design for the constraint, not the happy path.</li>
+        <li><strong>"What's the blast radius?"</strong> — If this component fails, what is the worst-case user
+          impact? Design to minimize and isolate blast radius.</li>
+        <li><strong>"What do we give up?"</strong> — Name the specific CAP/PACELC tradeoff. Saying "we use Cassandra
+          for availability" must come with "we give up immediate consistency."</li>
+        <li><strong>"Does this match the scale?"</strong> — A 10-user system doesn't need Kafka. A 10M-user system
+          can't run on a single MySQL. Tailor complexity to actual requirements.</li>
+        <li><strong>"Can we change this later?"</strong> — Data model and public API contracts are expensive to
+          change. Deployment architecture is cheaper. Be conservative where reversibility is low.</li>
+      </ol>
     </div>
 
     <div class="table-wrap">
-        <table>
-            <tr>
-                <th>If you need…</th>
-                <th>Choose</th>
-                <th>You give up</th>
-                <th>Real example</th>
-            </tr>
-            <tr>
-                <td>Zero data loss</td>
-                <td>Sync replication, fsync writes, WAL</td>
-                <td>Write latency (+5–20ms per write)</td>
-                <td>PostgreSQL WAL + synchronous_commit=on</td>
-            </tr>
-            <tr>
-                <td>Zero downtime</td>
-                <td>Eventual consistency, AP systems</td>
-                <td>Stale reads during failures</td>
-                <td>DynamoDB, Cassandra</td>
-            </tr>
-            <tr>
-                <td>Infinite write scale</td>
-                <td>Cassandra / Scylla LSM-tree + sharding</td>
-                <td>No JOINs, eventual consistency</td>
-                <td>Apple: 75,000 Cassandra nodes, 10PB+</td>
-            </tr>
-            <tr>
-                <td>Global sub-20ms reads</td>
-                <td>CDN + edge caching</td>
-                <td>Dynamic/personalized content hard to cache</td>
-                <td>Netflix Open Connect CDN</td>
-            </tr>
-            <tr>
-                <td>Cheapest cost per query</td>
-                <td>Read replicas + aggressive caching</td>
-                <td>Replication lag; stale cache</td>
-                <td>Any high-read app: 10:1 cache hit ratio = 10× fewer DB hits</td>
-            </tr>
-            <tr>
-                <td>Developer velocity</td>
-                <td>Monolith, PostgreSQL, REST</td>
-                <td>Independent scaling, tech flexibility</td>
-                <td>Shopify runs on a Rails monolith at $7.5B GMV/day</td>
-            </tr>
-        </table>
+      <table>
+        <tr>
+          <th>If you need…</th>
+          <th>Choose</th>
+          <th>You give up</th>
+          <th>Real example</th>
+        </tr>
+        <tr>
+          <td>Zero data loss</td>
+          <td>Sync replication, fsync writes, WAL</td>
+          <td>Write latency (+5–20ms per write)</td>
+          <td>PostgreSQL WAL + synchronous_commit=on</td>
+        </tr>
+        <tr>
+          <td>Zero downtime</td>
+          <td>Eventual consistency, AP systems</td>
+          <td>Stale reads during failures</td>
+          <td>DynamoDB, Cassandra</td>
+        </tr>
+        <tr>
+          <td>Infinite write scale</td>
+          <td>Cassandra / Scylla LSM-tree + sharding</td>
+          <td>No JOINs, eventual consistency</td>
+          <td>Apple: 75,000 Cassandra nodes, 10PB+</td>
+        </tr>
+        <tr>
+          <td>Global sub-20ms reads</td>
+          <td>CDN + edge caching</td>
+          <td>Dynamic/personalized content hard to cache</td>
+          <td>Netflix Open Connect CDN</td>
+        </tr>
+        <tr>
+          <td>Cheapest cost per query</td>
+          <td>Read replicas + aggressive caching</td>
+          <td>Replication lag; stale cache</td>
+          <td>Any high-read app: 10:1 cache hit ratio = 10× fewer DB hits</td>
+        </tr>
+        <tr>
+          <td>Developer velocity</td>
+          <td>Monolith, PostgreSQL, REST</td>
+          <td>Independent scaling, tech flexibility</td>
+          <td>Shopify runs on a Rails monolith at $7.5B GMV/day</td>
+        </tr>
+      </table>
     </div>
-</div>
+  </div>
 
 
       <div class="page-nav">

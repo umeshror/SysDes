@@ -507,8 +507,8 @@
 
     <nav class="sidebar" style="display:flex;flex-direction:column">
       <div class="sidebar-header">
-        <div style="margin-bottom:14px">
-          <a href="../index.html" class="back-link">&#8592; Back to Home</a>
+        <div style="margin-bottom:14px; font-size: 0.9em;">
+          <a href="../index.html" class="back-link">&#8592; Home</a> &nbsp;|&nbsp; <a href="../blind75/index.html" class="back-link">Blind 75</a> &nbsp;|&nbsp; <a href="../top150/index.html" class="back-link">Top 150</a>
         </div>
         <h1>System Design Fundamentals</h1>
         <p>180+ topics &nbsp;|&nbsp; Complete Reference</p>
@@ -1054,151 +1054,151 @@
 <div class="section" id="cdn">
     <h1 class="section-title">CDN &amp; Edge Computing</h1>
     <p class="section-subtitle">Module 5 &nbsp;|&nbsp; Content Delivery Networks, Edge Caching, and the Speed of Light
-        Problem</p>
+      Problem</p>
 
     <h2>Why CDNs Exist: The Speed of Light Problem</h2>
     <p>Light travels through fiber at ~200,000 km/s. A round trip from New York to London (~6,800 km)
-        takes at minimum <strong>34ms</strong> — just physics, nothing you can optimize away. A user in
-        Sydney querying a server in Virginia adds ~160ms minimum. CDNs solve this by placing content
-        physically close to users.</p>
+      takes at minimum <strong>34ms</strong> — just physics, nothing you can optimize away. A user in
+      Sydney querying a server in Virginia adds ~160ms minimum. CDNs solve this by placing content
+      physically close to users.</p>
 
     <div class="mermaid">
-        flowchart LR
-        subgraph Without CDN
-        U1[User in Sydney] -->|160ms RTT| O[Origin Server\nVirginia]
-        end
-        subgraph With CDN
-        U2[User in Sydney] -->|10ms RTT| E[CDN Edge PoP\nSydney]
-        E -.->|Cache hit:\nno origin call| E
-        E -->|Cache miss\nbackfill once| O2[Origin Server\nVirginia]
-        end
+      flowchart LR
+      subgraph Without CDN
+      U1[User in Sydney] -->|160ms RTT| O[Origin Server\nVirginia]
+      end
+      subgraph With CDN
+      U2[User in Sydney] -->|10ms RTT| E[CDN Edge PoP\nSydney]
+      E -.->|Cache hit:\nno origin call| E
+      E -->|Cache miss\nbackfill once| O2[Origin Server\nVirginia]
+      end
     </div>
 
     <h2>How CDNs Work</h2>
     <div class="def">
-        <dt>Points of Presence (PoPs)</dt>
-        <dd>CDN providers operate hundreds of PoPs globally — data centers with caching servers in
-            major cities. Cloudflare has 300+ PoPs; Akamai has 4,100+. When a user requests content,
-            DNS routes them to the nearest PoP via Anycast routing.</dd>
-        <dt>Anycast DNS Routing</dt>
-        <dd>All CDN PoPs advertise the same IP address. BGP (the internet's routing protocol) automatically
-            routes any request to the topologically nearest PoP — no user-side configuration needed.</dd>
-        <dt>Cache Fill (Origin Pull)</dt>
-        <dd>On a cache miss at the PoP, the CDN fetches from origin, caches the response for the TTL
-            (set by Cache-Control header), and serves future requests from edge. For popular content,
-            subsequent requests never touch origin until TTL expires.</dd>
-        <dt>Cache HIT ratio goal: &gt;95%</dt>
-        <dd>A 95% cache hit ratio means only 5% of requests reach origin. If your origin costs $0.02/request
-            and you serve 1B requests/day, that's $1M/day at origin vs. $50K/day with CDN. Cache ratio depends
-            on URL design (avoid random query strings) and TTL settings.</dd>
+      <dt>Points of Presence (PoPs)</dt>
+      <dd>CDN providers operate hundreds of PoPs globally — data centers with caching servers in
+        major cities. Cloudflare has 300+ PoPs; Akamai has 4,100+. When a user requests content,
+        DNS routes them to the nearest PoP via Anycast routing.</dd>
+      <dt>Anycast DNS Routing</dt>
+      <dd>All CDN PoPs advertise the same IP address. BGP (the internet's routing protocol) automatically
+        routes any request to the topologically nearest PoP — no user-side configuration needed.</dd>
+      <dt>Cache Fill (Origin Pull)</dt>
+      <dd>On a cache miss at the PoP, the CDN fetches from origin, caches the response for the TTL
+        (set by Cache-Control header), and serves future requests from edge. For popular content,
+        subsequent requests never touch origin until TTL expires.</dd>
+      <dt>Cache HIT ratio goal: &gt;95%</dt>
+      <dd>A 95% cache hit ratio means only 5% of requests reach origin. If your origin costs $0.02/request
+        and you serve 1B requests/day, that's $1M/day at origin vs. $50K/day with CDN. Cache ratio depends
+        on URL design (avoid random query strings) and TTL settings.</dd>
     </div>
 
     <h2>What CDNs Can and Can't Cache</h2>
     <div class="table-wrap">
-        <table>
-            <tr>
-                <th>Content Type</th>
-                <th>CDN Cacheable?</th>
-                <th>TTL Strategy</th>
-                <th>Example</th>
-            </tr>
-            <tr>
-                <td>JavaScript / CSS bundles</td>
-                <td>✅ Perfect for CDN</td>
-                <td>1 year (versioned URL: <code>app.a3f2c1.js</code>)</td>
-                <td>Next.js static chunks</td>
-            </tr>
-            <tr>
-                <td>Images / videos</td>
-                <td>✅ Perfect for CDN</td>
-                <td>1 week – 1 year</td>
-                <td>Profile pictures, product images</td>
-            </tr>
-            <tr>
-                <td>Public API responses</td>
-                <td>✅ If truly public</td>
-                <td>5–60 seconds</td>
-                <td>Sports scores, weather, trending lists</td>
-            </tr>
-            <tr>
-                <td>HTML pages (static)</td>
-                <td>✅ With stale-while-revalidate</td>
-                <td>30s with SWR</td>
-                <td>Blog posts, marketing pages</td>
-            </tr>
-            <tr>
-                <td>Authenticated API responses</td>
-                <td>❌ No (user-specific)</td>
-                <td>Never</td>
-                <td>User dashboard, order history</td>
-            </tr>
-            <tr>
-                <td>Payment / checkout</td>
-                <td>❌ Never</td>
-                <td>Never</td>
-                <td>Anything with PCI data</td>
-            </tr>
-        </table>
+      <table>
+        <tr>
+          <th>Content Type</th>
+          <th>CDN Cacheable?</th>
+          <th>TTL Strategy</th>
+          <th>Example</th>
+        </tr>
+        <tr>
+          <td>JavaScript / CSS bundles</td>
+          <td>✅ Perfect for CDN</td>
+          <td>1 year (versioned URL: <code>app.a3f2c1.js</code>)</td>
+          <td>Next.js static chunks</td>
+        </tr>
+        <tr>
+          <td>Images / videos</td>
+          <td>✅ Perfect for CDN</td>
+          <td>1 week – 1 year</td>
+          <td>Profile pictures, product images</td>
+        </tr>
+        <tr>
+          <td>Public API responses</td>
+          <td>✅ If truly public</td>
+          <td>5–60 seconds</td>
+          <td>Sports scores, weather, trending lists</td>
+        </tr>
+        <tr>
+          <td>HTML pages (static)</td>
+          <td>✅ With stale-while-revalidate</td>
+          <td>30s with SWR</td>
+          <td>Blog posts, marketing pages</td>
+        </tr>
+        <tr>
+          <td>Authenticated API responses</td>
+          <td>❌ No (user-specific)</td>
+          <td>Never</td>
+          <td>User dashboard, order history</td>
+        </tr>
+        <tr>
+          <td>Payment / checkout</td>
+          <td>❌ Never</td>
+          <td>Never</td>
+          <td>Anything with PCI data</td>
+        </tr>
+      </table>
     </div>
 
     <h2>CDN Invalidation Strategies</h2>
     <div class="callout warn">
-        <div class="callout-title">Cache Invalidation is the Hard Part</div>
-        <p>Once served, a cached response lives at every PoP for TTL seconds. If you deploy a bug fix,
-            old users see the broken version until TTL expires (or you purge). Strategies:</p>
-        <ul>
-            <li><strong>Versioned URLs (best):</strong> <code>app.a3f2c1.js</code> — old URL is gone, new URL is always
-                fresh. No invalidation needed. Used by all major frontend frameworks.</li>
-            <li><strong>Purge API:</strong> Call CDN's purge endpoint to evict specific URLs immediately. Cloudflare
-                processes purges in &lt;150ms globally. Costs money at high volume.</li>
-            <li><strong>stale-while-revalidate:</strong> Serve stale content immediately; refresh in background. User
-                never waits. Max staleness is bounded.</li>
-            <li><strong>Short TTL:</strong> Accept slightly higher origin load in exchange for near-real-time freshness.
-                30–60 second TTL for dynamic but cacheable content.</li>
-        </ul>
+      <div class="callout-title">Cache Invalidation is the Hard Part</div>
+      <p>Once served, a cached response lives at every PoP for TTL seconds. If you deploy a bug fix,
+        old users see the broken version until TTL expires (or you purge). Strategies:</p>
+      <ul>
+        <li><strong>Versioned URLs (best):</strong> <code>app.a3f2c1.js</code> — old URL is gone, new URL is always
+          fresh. No invalidation needed. Used by all major frontend frameworks.</li>
+        <li><strong>Purge API:</strong> Call CDN's purge endpoint to evict specific URLs immediately. Cloudflare
+          processes purges in &lt;150ms globally. Costs money at high volume.</li>
+        <li><strong>stale-while-revalidate:</strong> Serve stale content immediately; refresh in background. User
+          never waits. Max staleness is bounded.</li>
+        <li><strong>Short TTL:</strong> Accept slightly higher origin load in exchange for near-real-time freshness.
+          30–60 second TTL for dynamic but cacheable content.</li>
+      </ul>
     </div>
 
     <h2>Netflix Open Connect: A CDN Built from Scratch</h2>
     <div class="def">
-        <dt>Scale</dt>
-        <dd>Netflix delivers 15%+ of global internet downstream traffic. At peak, ~700 Gbps from a single
-            large ISP-embedded Open Connect Appliance (OCA). They built their own CDN because commercial CDNs
-            couldn't give them the control, cost structure, or throughput they needed.</dd>
-        <dt>ISP Embedding</dt>
-        <dd>Netflix places OCAs inside ISP data centers and exchanges (free hardware to the ISP). No AWS
-            egress fees, direct fiber to the ISP's network — ultra-low latency for the last mile.
-            The appliance only serves pre-loaded content (files, not requests) pushed to it nightly
-            from Netflix's centralized fill servers.</dd>
-        <dt>Proactive caching</dt>
-        <dd>Netflix predicts what content a region will watch tomorrow (based on viewing trends and
-            release schedules) and pre-populates OCAs overnight. 90%+ cache hit ratio for popular titles
-            before anyone requests them.</dd>
+      <dt>Scale</dt>
+      <dd>Netflix delivers 15%+ of global internet downstream traffic. At peak, ~700 Gbps from a single
+        large ISP-embedded Open Connect Appliance (OCA). They built their own CDN because commercial CDNs
+        couldn't give them the control, cost structure, or throughput they needed.</dd>
+      <dt>ISP Embedding</dt>
+      <dd>Netflix places OCAs inside ISP data centers and exchanges (free hardware to the ISP). No AWS
+        egress fees, direct fiber to the ISP's network — ultra-low latency for the last mile.
+        The appliance only serves pre-loaded content (files, not requests) pushed to it nightly
+        from Netflix's centralized fill servers.</dd>
+      <dt>Proactive caching</dt>
+      <dd>Netflix predicts what content a region will watch tomorrow (based on viewing trends and
+        release schedules) and pre-populates OCAs overnight. 90%+ cache hit ratio for popular titles
+        before anyone requests them.</dd>
     </div>
 
     <h2>Edge Computing: Beyond Caching</h2>
     <p>Modern CDN platforms (Cloudflare Workers, AWS Lambda@Edge, Fastly Compute) let you run code
-        at the edge, not just cache content. This enables:</p>
+      at the edge, not just cache content. This enables:</p>
     <div class="compare">
-        <div class="compare-card neutral">
-            <h4>Traditional CDN</h4>
-            <ul>
-                <li>Cache and serve static assets</li>
-                <li>Configured via rules (no custom logic possible)</li>
-                <li>Origin always needed for dynamic content</li>
-            </ul>
-        </div>
-        <div class="compare-card pro">
-            <h4>Edge Computing (Cloudflare Workers)</h4>
-            <ul>
-                <li>Run JS/WASM at every PoP with &lt;1ms cold start</li>
-                <li>A/B testing at the edge (no origin round trip)</li>
-                <li>Auth token validation without hitting origin</li>
-                <li>Personalised HTML generation at edge latency</li>
-                <li>Image transcoding / resizing on-the-fly</li>
-            </ul>
-        </div>
+      <div class="compare-card neutral">
+        <h4>Traditional CDN</h4>
+        <ul>
+          <li>Cache and serve static assets</li>
+          <li>Configured via rules (no custom logic possible)</li>
+          <li>Origin always needed for dynamic content</li>
+        </ul>
+      </div>
+      <div class="compare-card pro">
+        <h4>Edge Computing (Cloudflare Workers)</h4>
+        <ul>
+          <li>Run JS/WASM at every PoP with &lt;1ms cold start</li>
+          <li>A/B testing at the edge (no origin round trip)</li>
+          <li>Auth token validation without hitting origin</li>
+          <li>Personalised HTML generation at edge latency</li>
+          <li>Image transcoding / resizing on-the-fly</li>
+        </ul>
+      </div>
     </div>
-</div>
+  </div>
 
 <div class="section" id="storage">
     <h1 class="section-title">Storage Systems</h1>
