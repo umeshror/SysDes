@@ -20,7 +20,7 @@ injected = run_injection()
 
 if injected > 0:
     print("\nRebuilding individual pages...")
-    os.system("python3 build_blind75_pages.py")
+    os.system("python3 scripts/build_blind75_pages.py")
     print("\nAll done!")
 else:
     print("Nothing new to inject.")

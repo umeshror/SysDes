@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sliding Window Animation</title>
+    <style>
+        body {
+            background-color: #1a1a2e;
+            color: #cdd6f4;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        .container {
+            text-align: center;
+        }
+
+        h1 {
+            color: #89b4fa;
+            margin-bottom: 2rem;
+            text-shadow: 0 0 10px rgba(137, 180, 250, 0.5);
+        }
+
+        .array-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 2rem;
+            position: relative;
+            padding: 20px;
+        }
+
+        .element {
+            width: 60px;
+            height: 60px;
+            background-color: #313244;
+            border: 2px solid #585b70;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            position: relative;
+            z-index: 10;
+            transition: all 0.3s ease;
+        }
+
+        .element.active {
+            border-color: #a6e3a1;
+            background-color: rgba(166, 227, 161, 0.2);
+            color: #a6e3a1;
+            box-shadow: 0 0 15px rgba(166, 227, 161, 0.5);
+            transform: translateY(-5px);
+        }
+
+        .window {
+            position: absolute;
+            top: 10px;
+            height: 80px;
+            border: 3px dashed #f9e2af;
+            border-radius: 12px;
+            background-color: rgba(249, 226, 175, 0.1);
+            z-index: 5;
+            transition: all 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+            pointer-events: none;
+            box-shadow: 0 0 20px rgba(249, 226, 175, 0.3);
+        }
+
+        .pointers {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            position: absolute;
+            bottom: -30px;
+            left: 0;
+        }
+
+        .pointer {
+            font-size: 1rem;
+            font-weight: bold;
+            transition: all 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+
+        .pointer.left {
+            color: #f38ba8;
+        }
+
+        .pointer.right {
+            color: #89b4fa;
+        }
+
+        .stats {
+            display: flex;
+            gap: 2rem;
+            margin-top: 2rem;
+            font-size: 1.2rem;
+        }
+
+        .stat-box {
+            background-color: #1e1e2e;
+            padding: 10px 20px;
+            border-radius: 8px;
+            border: 1px solid #45475a;
+            min-width: 120px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #eba0ac;
+            margin-top: 5px;
+            display: block;
+        }
+
+        .stat-value.highlight {
+            color: #a6e3a1;
+            text-shadow: 0 0 10px rgba(166, 227, 161, 0.8);
+            transform: scale(1.1);
+            transition: all 0.2s ease;
+        }
+
+        .controls {
+            margin-top: 3rem;
+            display: flex;
+            gap: 1rem;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 1rem;
+            background-color: #89b4fa;
+            color: #11111b;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.2s;
+        }
+
+        button:hover {
+            background-color: #b4befe;
+            transform: translateY(-2px);
+        }
+
+        button:disabled {
+            background-color: #585b70;
+            color: #a6adc8;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .description {
+            margin-top: 1rem;
+            font-size: 1.1rem;
+            color: #bac2de;
+            min-height: 2rem;
+            font-style: italic;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Sliding Window (Max Sum Subarray of Size K=3)</h1>
+
+        <div class="array-container" id="array-container">
+            <!-- Elements will be inserted here by JS -->
+            <div class="window" id="window"></div>
+            <div class="pointers">
+                <div class="pointer left" id="ptr-left">↑ L</div>
+                <div class="pointer right" id="ptr-right">↑ R</div>
+            </div>
+        </div>
+
+        <div class="stats">
+            <div class="stat-box">
+                Current Sum
+                <span class="stat-value" id="current-sum">0</span>
+            </div>
+            <div class="stat-box">
+                Max Sum
+                <span class="stat-value" id="max-sum">-∞</span>
+            </div>
+        </div>
+
+        <div class="description" id="step-description">Click "Start Animation" to begin.</div>
+
+        <div class="controls">
+            <button id="start-btn" onclick="startAnimation()">Start Animation</button>
+            <button id="reset-btn" onclick="resetAnimation()" disabled>Reset</button>
+        </div>
+    </div>
+
+    <script>
+        const array = [2, 1, 5, 1, 3, 2];
+        const K = 3;
+        const container = document.getElementById('array-container');
+        const windowEl = document.getElementById('window');
+        const ptrLeft = document.getElementById('ptr-left');
+        const ptrRight = document.getElementById('ptr-right');
+        const currentSumEl = document.getElementById('current-sum');
+        const maxSumEl = document.getElementById('max-sum');
+        const descEl = document.getElementById('step-description');
+        const startBtn = document.getElementById('start-btn');
+        const resetBtn = document.getElementById('reset-btn');
+
+        const elementWidth = 60;
+        const gap = 10;
+        const padding = 20;
+
+        let left = 0;
+        let right = 0;
+        let windowSum = 0;
+        let maxSum = Number.NEGATIVE_INFINITY;
+        let animationTimeouts = [];
+
+        // Initialize UI
+        function init() {
+            // Clear existing elements (except window and pointers)
+            const elements = container.querySelectorAll('.element');
+            elements.forEach(el => el.remove());
+
+            // Create elements
+            array.forEach((val, i) => {
+                const el = document.createElement('div');
+                el.className = `element`;
+                el.id = `el-${i}`;
+                el.textContent = val;
+                // Insert before the window div to maintain z-index order roughly
+                container.insertBefore(el, windowEl);
+            });
+
+            resetState();
+        }
+
+        function resetState() {
+            // Cancel any ongoing animations
+            animationTimeouts.forEach(clearTimeout);
+            animationTimeouts = [];
+
+            left = 0;
+            right = 0;
+            windowSum = 0;
+            maxSum = Number.NEGATIVE_INFINITY;
+
+            updateUI(true);
+            currentSumEl.textContent = '0';
+            maxSumEl.textContent = '-∞';
+            maxSumEl.classList.remove('highlight');
+            descEl.textContent = 'Click "Start Animation" to begin.';
+
+            // Remove active classes
+            document.querySelectorAll('.element').forEach(el => el.classList.remove('active'));
+
+            startBtn.disabled = false;
+            resetBtn.disabled = true;
+        }
+
+        function getXPos(index) {
+            return padding + index * (elementWidth + gap);
+        }
+
+        function updateUI(instant = false) {
+            // Update window
+            const leftX = getXPos(left);
+            const rightX = getXPos(right);
+            const wWidth = rightX - leftX + elementWidth;
+
+            const transition = instant ? 'none' : 'all 0.5s cubic-bezier(0.25, 1, 0.5, 1)';
+
+            windowEl.style.transition = transition;
+            windowEl.style.left = `${leftX - 10}px`;
+            windowEl.style.width = `${wWidth + 20}px`;
+
+            // Update pointers (fixed visual offsets)
+            ptrLeft.style.transition = transition;
+            ptrRight.style.transition = transition;
+
+            // The pointers div spans the whole container, so we position relative to its parent
+            // But we can just use transforms or absolute left on the pointer elements themselves.
+            // Simpler: just calculate absolute left relative to container start.
+
+            // Pointers are currently inside a flex container, let's pull them out or absolute position them relative to array-container
+            ptrLeft.style.position = 'absolute';
+            ptrLeft.style.bottom = '-30px';
+            ptrLeft.style.left = `${leftX + elementWidth / 2 - 15}px`;
+
+            ptrRight.style.position = 'absolute';
+            ptrRight.style.bottom = '-30px';
+            ptrRight.style.left = `${rightX + elementWidth / 2 - 15}px`;
+
+            // Highlight elements
+            document.querySelectorAll('.element').forEach((el, i) => {
+                if (i >= left && i <= right) {
+                    if (!instant) el.classList.add('active');
+                    else el.classList.remove('active'); // Keep clean initially
+                } else {
+                    el.classList.remove('active');
+                }
+            });
+
+            // Ensure first element is active if we are at start
+            if (left === 0 && right === 0 && windowSum > 0) {
+                document.getElementById(`el-0`).classList.add('active');
+            }
+        }
+
+        function scheduleTask(task, delay) {
+            animationTimeouts.push(setTimeout(task, delay));
+        }
+
+        function startAnimation() {
+            startBtn.disabled = true;
+            resetBtn.disabled = false;
+
+            let time = 0;
+            const stepDelay = 1500;
+
+            for (let r = 0; r < array.length; r++) {
+                // Expand Window
+                scheduleTask(() => {
+                    right = r;
+                    windowSum += array[r];
+                    updateUI();
+                    currentSumEl.textContent = windowSum;
+                    descEl.textContent = `Expand R: Add arr[${r}] (${array[r]}) to window sum.`;
+                }, time);
+                time += stepDelay;
+
+                if (r >= K - 1) {
+                    // Window has hit size K, process it
+                    scheduleTask(() => {
+                        descEl.textContent = `Window size is ${K}. Evaluate max sum.`;
+                        if (windowSum > maxSum) {
+                            maxSum = windowSum;
+                            maxSumEl.textContent = maxSum;
+                            maxSumEl.classList.add('highlight');
+                            setTimeout(() => maxSumEl.classList.remove('highlight'), 500);
+                        }
+                    }, time);
+                    time += stepDelay;
+
+                    // Shrink Window
+                    scheduleTask(() => {
+                        windowSum -= array[left];
+                        descEl.textContent = `Shrink L: Remove arr[${left}] (${array[left]}) from window sum.`;
+                        left++;
+                        updateUI();
+                        currentSumEl.textContent = windowSum;
+                    }, time);
+                    time += stepDelay;
+                }
+            }
+
+            // Final state
+            scheduleTask(() => {
+                descEl.textContent = `Finished! Max Sum found is ${maxSum}.`;
+                windowEl.style.opacity = '0.5';
+            }, time);
+        }
+
+        // Run init on load
+        window.onload = init;
+    </script>
+</body>
+
+</html>

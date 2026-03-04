@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="System Design Reference — Case Studies">
   <title>📚 Case Studies — System Design Fundamentals</title>
-  <link rel="stylesheet" href="../styles.css">
+  <link rel="stylesheet" href="../assets/css/styles.css">
   <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
   <style>
     *,
@@ -28,11 +28,6 @@
     .layout {
       display: flex;
       min-height: 100vh;
-    }
-
-    .sidebar-toggle {
-      display: none;
-      /* Hidden on desktop */
     }
 
     .sidebar {
@@ -77,55 +72,11 @@
 
     .nav-module-title {
       padding: 10px 20px 6px;
-      font-size: 0.72rem;
+      font-size: 0.68rem;
       font-weight: 700;
       text-transform: uppercase;
-      letter-spacing: 0.5px;
-      color: #7f849c;
-      cursor: pointer;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      user-select: none;
-      transition: color 0.2s;
-    }
-
-    .nav-module-title:hover {
-      color: #cdd6f4;
-    }
-
-    .nav-module-title::after {
-      content: '▼';
-      font-size: 0.6rem;
+      letter-spacing: 1px;
       color: #585b70;
-      transition: transform 0.3s ease;
-    }
-
-    /* Hide children by default */
-    .nav-module>*:not(.nav-module-title) {
-      display: none;
-    }
-
-    /* Show children when expanded */
-    .nav-module.expanded>*:not(.nav-module-title) {
-      display: block;
-      animation: slideDown 0.2s ease-out forwards;
-    }
-
-    .nav-module.expanded>.nav-module-title::after {
-      transform: rotate(180deg);
-    }
-
-    @keyframes slideDown {
-      from {
-        opacity: 0;
-        transform: translateY(-5px);
-      }
-
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
     }
 
     .nav-item {
@@ -505,44 +456,29 @@
       margin-top: 48px;
     }
 
-    @media (max-width: 768px) {
-      .layout {
-        flex-direction: column;
-      }
+    /* Chapter 12: Coding Patterns Styles */
+    .pattern-viz {
+      background: #03050d;
+      border: 1px solid #131d35;
+      border-radius: 12px;
+      padding: 15px;
+      margin: 25px 0;
+      min-height: 100px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.5);
+    }
 
+    .pattern-img {
+      display: none;
+    }
+
+    @media (max-width: 768px) {
       .sidebar {
         width: 100%;
-        min-width: 100%;
         height: auto;
         position: relative;
-        padding-bottom: 0;
-      }
-
-      /* Hide the navigation links by default on mobile */
-      #sidebar-nav-content {
-        display: none;
-        padding-bottom: 20px;
-      }
-
-      /* Show links when the active class is added via JS */
-      #sidebar-nav-content.active {
-        display: block;
-      }
-
-      /* Style the hamburger button */
-      .sidebar-toggle {
-        display: block;
-        background: transparent;
-        border: none;
-        color: #89b4fa;
-        cursor: pointer;
-        padding: 5px;
-      }
-
-      .sidebar-header {
-        display: flex;
-        align-items: flex-start;
-        justify-content: space-between;
       }
 
       .main {
@@ -560,183 +496,11 @@
       }
     }
   </style>
+  
+  <link rel="stylesheet" href="../assets/css/system-design-common.css">
+  <script defer src="../assets/js/system-design-common.js"></script>
 
-  <style id="sidebar-improvements">
-    .sidebar { width: 280px; }
-    .main    { margin-left: 280px; }
-
-    /* Header */
-    .sidebar-header {
-      background: linear-gradient(160deg,#1e1e3f 0%,#12122a 100%);
-      border-bottom: 1px solid rgba(137,180,250,0.12);
-    }
-    .sidebar-header h1 { font-size:.9rem; color:#e2e8f9; letter-spacing:.3px; }
-    .sidebar-header p  { font-size:.72rem; color:#6272a4; }
-
-    .back-link {
-      display:inline-flex; align-items:center; gap:6px;
-      font-size:.75rem; color:#89b4fa; text-decoration:none;
-      padding:4px 12px; border:1px solid rgba(137,180,250,.25);
-      border-radius:20px; transition:all .2s;
-    }
-    .back-link:hover { background:rgba(137,180,250,.1); border-color:#89b4fa; }
-
-    /* Accordion wrapper */
-    .sidebar-accordion {
-      overflow-y: auto;
-      flex: 1;
-      padding: 8px 0 24px;
-    }
-
-    /* Accordion chapter */
-    .acc-chapter {
-      border-bottom: 1px solid rgba(137,180,250,0.07);
-    }
-    .acc-chapter[open] { background: rgba(137,180,250,0.04); }
-
-    /* Summary row = clickable chapter header */
-    .acc-summary {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 10px 14px;
-      cursor: pointer;
-      list-style: none;
-      user-select: none;
-      transition: background 0.15s;
-    }
-    .acc-summary::-webkit-details-marker { display: none; }
-    .acc-summary:hover { background: rgba(137,180,250,0.08); }
-    .acc-chapter[open] > .acc-summary { background: rgba(137,180,250,0.1); }
-
-    .chap-icon {
-      font-size: 1rem;
-      flex-shrink: 0;
-      width: 24px;
-      text-align: center;
-    }
-    .chap-text {
-      display: flex;
-      flex-direction: column;
-      gap: 1px;
-      flex: 1;
-      min-width: 0;
-    }
-    .chap-num {
-      font-size: .58rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: .8px;
-      color: #585b70;
-    }
-    .chap-label {
-      font-size: .8rem;
-      color: #a6adc8;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    .acc-chapter[open] .chap-num   { color: #89b4fa; }
-    .acc-chapter[open] .chap-label { color: #cdd6f4; font-weight: 600; }
-
-    .chap-curr {
-      font-size: .45rem;
-      color: #89b4fa;
-      flex-shrink: 0;
-      animation: blink 2s infinite;
-    }
-    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.2} }
-
-    .acc-arrow {
-      font-size: .85rem;
-      color: #585b70;
-      flex-shrink: 0;
-      transition: transform 0.2s;
-    }
-    .acc-chapter[open] .acc-arrow { transform: rotate(90deg); color:#89b4fa; }
-
-    /* Sub-items panel */
-    .acc-sub {
-      padding: 2px 0 6px 0;
-      animation: slideDown .18s ease;
-    }
-    @keyframes slideDown {
-      from { opacity:0; transform:translateY(-6px); }
-      to   { opacity:1; transform:translateY(0); }
-    }
-
-    .acc-sub-item {
-      display: block;
-      padding: 7px 14px 7px 48px;
-      font-size: .78rem;
-      color: #7f849c;
-      cursor: pointer;
-      border-left: 2px solid transparent;
-      text-decoration: none;
-      transition: all 0.14s;
-      line-height: 1.35;
-    }
-    .acc-sub-item:hover {
-      color: #cdd6f4;
-      background: rgba(137,180,250,0.07);
-      border-left-color: rgba(137,180,250,.4);
-    }
-    .acc-sub-item.active {
-      color: #cdd6f4;
-      background: rgba(137,180,250,0.12);
-      border-left-color: #89b4fa;
-      font-weight: 600;
-    }
-
-    /* Page nav */
-    .page-nav {
-      display:flex; justify-content:space-between; align-items:center;
-      padding:28px 40px 48px; border-top:1px solid #e0e4f0;
-      margin-top:24px; gap:12px;
-    }
-    .page-nav-btn {
-      display:inline-flex; align-items:center; gap:8px;
-      padding:10px 22px; background:#1a1a2e; color:#cdd6f4;
-      border-radius:8px; text-decoration:none; font-size:.84rem;
-      font-weight:600; transition:all .18s;
-      border:1px solid rgba(137,180,250,.15);
-    }
-    .page-nav-btn:hover {
-      background:#313244; border-color:rgba(137,180,250,.35);
-      transform:translateY(-1px); box-shadow:0 4px 12px rgba(0,0,0,.2);
-    }
-    .page-nav-btn.home { background:linear-gradient(135deg,#1e3a5f,#162d48); }
-    .page-nav-btn.home:hover { background:linear-gradient(135deg,#264a78,#1e3a5f); }
-
-    @media (max-width:768px) { .sidebar{width:100%} .main{margin-left:0} }
-
-    /* ── Mermaid diagram consistency ── */
-    .mermaid {
-      background: transparent !important;
-      padding: 0 !important;
-    }
-    .mermaid svg {
-      background: transparent !important;
-      max-width: 100%;
-    }
-    /* Override Mermaid's internal background rect (dark in state/sequence diagrams) */
-    .mermaid svg > rect:first-child,
-    .mermaid svg > g:first-child > rect:first-child {
-      fill: transparent !important;
-      stroke: none !important;
-    }
-    /* State diagram node styling */
-    .mermaid .state-note rect,
-    .mermaid .note rect { fill: #fffbdd !important; stroke: #e6d87a !important; }
-    /* Ensure subgraph labels are readable */
-    .mermaid .cluster rect { fill: #f1f5f9 !important; stroke: #cbd5e1 !important; }
-    .mermaid .cluster text { fill: #475569 !important; }
-    /* Entity / node labels */
-    .mermaid .label { color: #1e293b !important; }
-    .mermaid .nodeLabel { color: #1e293b !important; }
-    .mermaid .edgeLabel { background: #fff !important; color: #475569 !important; }
-  </style>
-
+  
 </head>
 <body>
   <div class="layout">
@@ -762,7 +526,7 @@
             <span class="acc-arrow">›</span>
           </summary>
           <div class="acc-sub">
-              <a class="acc-sub-item" href="01-introduction.html#intro">The SDI Process</a>
+              <a class="acc-sub-item" href="../pages/01-introduction.html#intro">The SDI Process</a>
           </div>
         </details>
         <details class="acc-chapter">
@@ -776,10 +540,10 @@
             <span class="acc-arrow">›</span>
           </summary>
           <div class="acc-sub">
-              <a class="acc-sub-item" href="02-core-concepts.html#core">Core Characteristics</a>
-              <a class="acc-sub-item" href="02-core-concepts.html#cap">CAP & PACELC Theorems</a>
-              <a class="acc-sub-item" href="02-core-concepts.html#pacelc">PACELC In Depth</a>
-              <a class="acc-sub-item" href="02-core-concepts.html#hashing">Consistent Hashing</a>
+              <a class="acc-sub-item" href="../pages/02-core-concepts.html#core">Core Characteristics</a>
+              <a class="acc-sub-item" href="../pages/02-core-concepts.html#cap">CAP & PACELC Theorems</a>
+              <a class="acc-sub-item" href="../pages/02-core-concepts.html#pacelc">PACELC In Depth</a>
+              <a class="acc-sub-item" href="../pages/02-core-concepts.html#hashing">Consistent Hashing</a>
           </div>
         </details>
         <details class="acc-chapter">
@@ -793,7 +557,7 @@
             <span class="acc-arrow">›</span>
           </summary>
           <div class="acc-sub">
-              <a class="acc-sub-item" href="03-tradeoffs.html#tradeoffs">Topic-by-Topic Trade-offs</a>
+              <a class="acc-sub-item" href="../pages/03-tradeoffs.html#tradeoffs">Topic-by-Topic Trade-offs</a>
           </div>
         </details>
         <details class="acc-chapter">
@@ -807,8 +571,8 @@
             <span class="acc-arrow">›</span>
           </summary>
           <div class="acc-sub">
-              <a class="acc-sub-item" href="04-networking.html#networking">OSI, TCP/UDP, HTTP, DNS</a>
-              <a class="acc-sub-item" href="04-networking.html#proxy">Proxy & Reverse Proxy</a>
+              <a class="acc-sub-item" href="../pages/04-networking.html#networking">OSI, TCP/UDP, HTTP, DNS</a>
+              <a class="acc-sub-item" href="../pages/04-networking.html#proxy">Proxy & Reverse Proxy</a>
           </div>
         </details>
         <details class="acc-chapter">
@@ -822,10 +586,10 @@
             <span class="acc-arrow">›</span>
           </summary>
           <div class="acc-sub">
-              <a class="acc-sub-item" href="05-infrastructure.html#lb">Load Balancing & Algorithms</a>
-              <a class="acc-sub-item" href="05-infrastructure.html#caching">Caching Strategies</a>
-              <a class="acc-sub-item" href="05-infrastructure.html#cdn">CDN & Distributed Cache</a>
-              <a class="acc-sub-item" href="05-infrastructure.html#storage">Storage Systems</a>
+              <a class="acc-sub-item" href="../pages/05-infrastructure.html#lb">Load Balancing & Algorithms</a>
+              <a class="acc-sub-item" href="../pages/05-infrastructure.html#caching">Caching Strategies</a>
+              <a class="acc-sub-item" href="../pages/05-infrastructure.html#cdn">CDN & Distributed Cache</a>
+              <a class="acc-sub-item" href="../pages/05-infrastructure.html#storage">Storage Systems</a>
           </div>
         </details>
         <details class="acc-chapter">
@@ -839,11 +603,11 @@
             <span class="acc-arrow">›</span>
           </summary>
           <div class="acc-sub">
-              <a class="acc-sub-item" href="06-api-communication.html#api-design">API Design (REST, GraphQL, gRPC)</a>
-              <a class="acc-sub-item" href="06-api-communication.html#api-infra">API Gateway & Rate Limiting</a>
-              <a class="acc-sub-item" href="06-api-communication.html#api-auth">Authentication & Authorization</a>
-              <a class="acc-sub-item" href="06-api-communication.html#realtime">Real-Time Communication</a>
-              <a class="acc-sub-item" href="06-api-communication.html#async">Async Messaging (Queues, Pub/Sub)</a>
+              <a class="acc-sub-item" href="../pages/06-api-communication.html#api-design">API Design (REST, GraphQL, gRPC)</a>
+              <a class="acc-sub-item" href="../pages/06-api-communication.html#api-infra">API Gateway & Rate Limiting</a>
+              <a class="acc-sub-item" href="../pages/06-api-communication.html#api-auth">Authentication & Authorization</a>
+              <a class="acc-sub-item" href="../pages/06-api-communication.html#realtime">Real-Time Communication</a>
+              <a class="acc-sub-item" href="../pages/06-api-communication.html#async">Async Messaging (Queues, Pub/Sub)</a>
           </div>
         </details>
         <details class="acc-chapter">
@@ -857,9 +621,9 @@
             <span class="acc-arrow">›</span>
           </summary>
           <div class="acc-sub">
-              <a class="acc-sub-item" href="07-architecture.html#arch-patterns">Architectural Patterns</a>
-              <a class="acc-sub-item" href="07-architecture.html#microservices">Microservices & Service Mesh</a>
-              <a class="acc-sub-item" href="07-architecture.html#containers">Containers & Orchestration</a>
+              <a class="acc-sub-item" href="../pages/07-architecture.html#arch-patterns">Architectural Patterns</a>
+              <a class="acc-sub-item" href="../pages/07-architecture.html#microservices">Microservices & Service Mesh</a>
+              <a class="acc-sub-item" href="../pages/07-architecture.html#containers">Containers & Orchestration</a>
           </div>
         </details>
         <details class="acc-chapter">
@@ -873,9 +637,9 @@
             <span class="acc-arrow">›</span>
           </summary>
           <div class="acc-sub">
-              <a class="acc-sub-item" href="08-data-layer.html#db-types">Database Types</a>
-              <a class="acc-sub-item" href="08-data-layer.html#db-internals">Database Internals</a>
-              <a class="acc-sub-item" href="08-data-layer.html#db-scaling">Database Scaling</a>
+              <a class="acc-sub-item" href="../pages/08-data-layer.html#db-types">Database Types</a>
+              <a class="acc-sub-item" href="../pages/08-data-layer.html#db-internals">Database Internals</a>
+              <a class="acc-sub-item" href="../pages/08-data-layer.html#db-scaling">Database Scaling</a>
           </div>
         </details>
         <details class="acc-chapter">
@@ -889,13 +653,13 @@
             <span class="acc-arrow">›</span>
           </summary>
           <div class="acc-sub">
-              <a class="acc-sub-item" href="09-distributed-systems.html#db-federation">Database Federation</a>
-              <a class="acc-sub-item" href="09-distributed-systems.html#dist-fundamentals">Challenges & Failures</a>
-              <a class="acc-sub-item" href="09-distributed-systems.html#time-ordering">Time, Ordering & Clocks</a>
-              <a class="acc-sub-item" href="09-distributed-systems.html#consensus">Consensus & Coordination</a>
-              <a class="acc-sub-item" href="09-distributed-systems.html#dist-tx">Distributed Transactions</a>
-              <a class="acc-sub-item" href="09-distributed-systems.html#data-structures">Design Data Structures</a>
-              <a class="acc-sub-item" href="09-distributed-systems.html#big-data">Big Data & Stream Processing</a>
+              <a class="acc-sub-item" href="../pages/09-distributed-systems.html#db-federation">Database Federation</a>
+              <a class="acc-sub-item" href="../pages/09-distributed-systems.html#dist-fundamentals">Challenges & Failures</a>
+              <a class="acc-sub-item" href="../pages/09-distributed-systems.html#time-ordering">Time, Ordering & Clocks</a>
+              <a class="acc-sub-item" href="../pages/09-distributed-systems.html#consensus">Consensus & Coordination</a>
+              <a class="acc-sub-item" href="../pages/09-distributed-systems.html#dist-tx">Distributed Transactions</a>
+              <a class="acc-sub-item" href="../pages/09-distributed-systems.html#data-structures">Design Data Structures</a>
+              <a class="acc-sub-item" href="../pages/09-distributed-systems.html#big-data">Big Data & Stream Processing</a>
           </div>
         </details>
         <details class="acc-chapter">
@@ -909,10 +673,10 @@
             <span class="acc-arrow">›</span>
           </summary>
           <div class="acc-sub">
-              <a class="acc-sub-item" href="10-search-operations.html#search">FTS, Inverted Index, Ranking</a>
-              <a class="acc-sub-item" href="10-search-operations.html#disaster-recovery">Disaster Recovery & Deployments</a>
-              <a class="acc-sub-item" href="10-search-operations.html#observability">Logs, Metrics, Tracing</a>
-              <a class="acc-sub-item" href="10-search-operations.html#security">Encryption, IAM, Zero Trust</a>
+              <a class="acc-sub-item" href="../pages/10-search-operations.html#search">FTS, Inverted Index, Ranking</a>
+              <a class="acc-sub-item" href="../pages/10-search-operations.html#disaster-recovery">Disaster Recovery & Deployments</a>
+              <a class="acc-sub-item" href="../pages/10-search-operations.html#observability">Logs, Metrics, Tracing</a>
+              <a class="acc-sub-item" href="../pages/10-search-operations.html#security">Encryption, IAM, Zero Trust</a>
           </div>
         </details>
         <details class="acc-chapter">
@@ -926,14 +690,28 @@
             <span class="acc-arrow">›</span>
           </summary>
           <div class="acc-sub">
-              <a class="acc-sub-item" href="11-interview-framework.html#framework">The 4-Step SDI Framework</a>
+              <a class="acc-sub-item" href="../pages/11-interview-framework.html#framework">The 4-Step SDI Framework</a>
+          </div>
+        </details>
+        <details class="acc-chapter">
+          <summary class="acc-summary">
+            <span class="chap-icon">🧩</span>
+            <span class="chap-text">
+              <span class="chap-num">Chapter 12</span>
+              <span class="chap-label">Coding Patterns</span>
+            </span>
+            
+            <span class="acc-arrow">›</span>
+          </summary>
+          <div class="acc-sub">
+              <a class="acc-sub-item" href="../pages/12-coding-interview-patterns.html#patterns">20 Essential Patterns</a>
           </div>
         </details>
         <details class="acc-chapter" open>
           <summary class="acc-summary">
             <span class="chap-icon">📚</span>
             <span class="chap-text">
-              <span class="chap-num">Chapter 12</span>
+              <span class="chap-num">Chapter 13</span>
               <span class="chap-label">Case Studies</span>
             </span>
             <span class="chap-curr">●</span>
@@ -950,171 +728,169 @@
       <div class="progress-bar-wrap"><div class="progress-bar" id="pb"></div></div>
 
 <div class="section active" id="case-opentable">
-        <h1 class="section-title">Design OpenTable</h1>
-        <p class="section-subtitle">Case Study &nbsp;|&nbsp; Global Restaurant Reservation System — Two-sided
-          Marketplace
-        </p>
+    <h1 class="section-title">Design OpenTable</h1>
+    <p class="section-subtitle">Case Study &nbsp;|&nbsp; Global Restaurant Reservation System — Two-sided Marketplace
+    </p>
 
-        <div class="callout" style="border-left-color:#f59e0b; background:rgba(245,158,11,0.06);">
-          <div class="callout-title" style="color:#d97706;">🎯 Interview Signal</div>
-          <p>This is a <strong>two-sided marketplace</strong> with a real-time reservation engine — the same
+    <div class="callout" style="border-left-color:#f59e0b; background:rgba(245,158,11,0.06);">
+        <div class="callout-title" style="color:#d97706;">🎯 Interview Signal</div>
+        <p>This is a <strong>two-sided marketplace</strong> with a real-time reservation engine — the same
             class as Airbnb, Ticketmaster, and OpenSea. The FAANG interviewer is looking for: (1) strong
             consistency for bookings, (2) eventual consistency for search, (3) how you prevent double booking
             at scale, and (4) your ability to reason about hot-partition problems.</p>
-        </div>
+    </div>
 
-        <h2>1. Clarify Requirements</h2>
+    <h2>1. Clarify Requirements</h2>
 
-        <div class="compare">
-          <div class="compare-card neutral">
+    <div class="compare">
+        <div class="compare-card neutral">
             <h4>For Diners (Demand Side)</h4>
             <ul>
-              <li>Search by location, date, time, party size, cuisine, price</li>
-              <li>View real-time available time slots</li>
-              <li>Make / modify / cancel reservations</li>
-              <li>Join waitlist when fully booked</li>
-              <li>Receive confirmation + reminders (email/SMS/push)</li>
-              <li>View booking history, leave reviews</li>
+                <li>Search by location, date, time, party size, cuisine, price</li>
+                <li>View real-time available time slots</li>
+                <li>Make / modify / cancel reservations</li>
+                <li>Join waitlist when fully booked</li>
+                <li>Receive confirmation + reminders (email/SMS/push)</li>
+                <li>View booking history, leave reviews</li>
             </ul>
-          </div>
-          <div class="compare-card neutral">
+        </div>
+        <div class="compare-card neutral">
             <h4>For Restaurants (Supply Side)</h4>
             <ul>
-              <li>Manage floor layout and table inventory</li>
-              <li>Define hours, reservation slots, party-size limits</li>
-              <li>Block time slots for private events</li>
-              <li>Real-time dashboard of upcoming bookings</li>
-              <li>Manage waitlist manually or automatically</li>
+                <li>Manage floor layout and table inventory</li>
+                <li>Define hours, reservation slots, party-size limits</li>
+                <li>Block time slots for private events</li>
+                <li>Real-time dashboard of upcoming bookings</li>
+                <li>Manage waitlist manually or automatically</li>
             </ul>
-          </div>
         </div>
+    </div>
 
-        <div class="def">
-          <dt>Non-functional requirements (state these explicitly in the interview)</dt>
-          <dd>
+    <div class="def">
+        <dt>Non-functional requirements (state these explicitly in the interview)</dt>
+        <dd>
             <strong>Zero double bookings</strong> — strong consistency required for reservation writes.<br>
             <strong>99.99% availability</strong> — no more than ~52 minutes downtime/year.<br>
             <strong>Search &lt;200ms p99</strong> — read latency SLA for restaurant/slot search.<br>
             <strong>Eventually consistent search OK</strong> — stale availability in search results is fine;
             <em>final confirmation always validates against authoritative DB</em>.<br>
             <strong>Multi-region, horizontally scalable.</strong>
-          </dd>
-        </div>
+        </dd>
+    </div>
 
-        <h2>2. Capacity Estimation</h2>
+    <h2>2. Capacity Estimation</h2>
 
-        <div class="table-wrap">
-          <table>
+    <div class="table-wrap">
+        <table>
             <tr>
-              <th>Metric</th>
-              <th>Assumption</th>
-              <th>QPS (avg)</th>
-              <th>QPS (peak 10×)</th>
+                <th>Metric</th>
+                <th>Assumption</th>
+                <th>QPS (avg)</th>
+                <th>QPS (peak 10×)</th>
             </tr>
             <tr>
-              <td>Daily Active Users</td>
-              <td>10M</td>
-              <td>—</td>
-              <td>—</td>
+                <td>Daily Active Users</td>
+                <td>10M</td>
+                <td>—</td>
+                <td>—</td>
             </tr>
             <tr>
-              <td>Restaurant searches</td>
-              <td>10M/day</td>
-              <td>~115 QPS</td>
-              <td>~1,150 QPS</td>
+                <td>Restaurant searches</td>
+                <td>10M/day</td>
+                <td>~115 QPS</td>
+                <td>~1,150 QPS</td>
             </tr>
             <tr>
-              <td>Reservations created</td>
-              <td>1M/day</td>
-              <td>~12 QPS</td>
-              <td>~120 QPS</td>
+                <td>Reservations created</td>
+                <td>1M/day</td>
+                <td>~12 QPS</td>
+                <td>~120 QPS</td>
             </tr>
             <tr>
-              <td>Restaurants</td>
-              <td>100K</td>
-              <td>—</td>
-              <td>—</td>
+                <td>Restaurants</td>
+                <td>100K</td>
+                <td>—</td>
+                <td>—</td>
             </tr>
             <tr>
-              <td>Tables per restaurant</td>
-              <td>20 avg</td>
-              <td>—</td>
-              <td>—</td>
+                <td>Tables per restaurant</td>
+                <td>20 avg</td>
+                <td>—</td>
+                <td>—</td>
             </tr>
             <tr>
-              <td>Availability rows (15-min slots, 14h/day)</td>
-              <td>100K × 56 slots × 365</td>
-              <td>~2B rows/year</td>
-              <td>—</td>
+                <td>Availability rows (15-min slots, 14h/day)</td>
+                <td>100K × 56 slots × 365</td>
+                <td>~2B rows/year</td>
+                <td>—</td>
             </tr>
-          </table>
-        </div>
+        </table>
+    </div>
 
-        <div class="callout tip">
-          <div class="callout-title">Interview insight: search is 10× heavier than writes</div>
-          <p>This shapes your entire architecture: <strong>read path and write path must be separated</strong>.
+    <div class="callout tip">
+        <div class="callout-title">Interview insight: search is 10× heavier than writes</div>
+        <p>This shapes your entire architecture: <strong>read path and write path must be separated</strong>.
             Don't use the same DB for Elasticsearch-style search and for transactional reservation writes.
             The read path can be eventually consistent (cache + Elasticsearch). The write path must be
             strongly consistent (RDBMS with locking).</p>
-        </div>
+    </div>
 
-        <h2>3. High-Level Architecture</h2>
+    <h2>3. High-Level Architecture</h2>
 
-        <div class="mermaid">
-          flowchart TB
-          U([Diner]) --> CDN[CDN / API Gateway]
-          R([Restaurant Admin]) --> CDN
-          CDN --> SS[Search Service\nElasticsearch + Cache]
-          CDN --> RS[Reservation Service\nAvailability Engine]
-          CDN --> US[User Service]
-          CDN --> RestS[Restaurant Service]
-          RS --> AE[Availability Engine\nDB Transactions]
-          AE --> PG[(PostgreSQL\nSharded by restaurant_id)]
-          AE --> Redis[(Redis\nShort-TTL cache)]
-          AE --> KF[Kafka\nEvent Bus]
-          SS --> ES[(Elasticsearch\nGeo + text search)]
-          KF --> NS[Notification Service\nEmail / SMS / Push]
-          KF --> ES
-        </div>
+    <div class="mermaid">
+        flowchart TB
+        U([Diner]) --> CDN[CDN / API Gateway]
+        R([Restaurant Admin]) --> CDN
+        CDN --> SS[Search Service\nElasticsearch + Cache]
+        CDN --> RS[Reservation Service\nAvailability Engine]
+        CDN --> US[User Service]
+        CDN --> RestS[Restaurant Service]
+        RS --> AE[Availability Engine\nDB Transactions]
+        AE --> PG[(PostgreSQL\nSharded by restaurant_id)]
+        AE --> Redis[(Redis\nShort-TTL cache)]
+        AE --> KF[Kafka\nEvent Bus]
+        SS --> ES[(Elasticsearch\nGeo + text search)]
+        KF --> NS[Notification Service\nEmail / SMS / Push]
+        KF --> ES
+    </div>
 
-        <h2>4. Core Design: Availability Engine (The Hardest Part)</h2>
+    <h2>4. Core Design: Availability Engine (The Hardest Part)</h2>
 
-        <div class="callout warn">
-          <div class="callout-title">This is where the interviewer will spend most time</div>
-          <p>The Availability Engine must ensure <strong>no double booking</strong> while handling
+    <div class="callout warn">
+        <div class="callout-title">This is where the interviewer will spend most time</div>
+        <p>The Availability Engine must ensure <strong>no double booking</strong> while handling
             concurrent requests. This is a classic distributed concurrency problem. Walk through
             at least two approaches and explain the tradeoffs.</p>
-        </div>
+    </div>
 
-        <h3>Precomputed Time Slot Model (Recommended)</h3>
-        <p>Divide each restaurant's day into 15-minute slots. Maintain a row per slot
-          tracking available capacity. All reservation writes update this table atomically.</p>
+    <h3>Precomputed Time Slot Model (Recommended)</h3>
+    <p>Divide each restaurant's day into 15-minute slots. Maintain a row per slot
+        tracking available capacity. All reservation writes update this table atomically.</p>
 
-        <div class="mermaid">
-          flowchart LR
-          User --> GW[API Gateway]
-          GW --> R[Reservation Service]
-          R --> H{1. Create HOLD\n2-min TTL}
-          H --> T{2. BEGIN TRANSACTION\nSELECT ... FOR UPDATE\nCheck capacity > 0\nDecrement capacity\nINSERT
-          reservation}
-          T -->|Commit| C[Reservation Confirmed]
-          T -->|Rollback| F[409 Conflict\nNo slot available]
-          C --> K[Emit Kafka event\nreservation.created]
-          K --> N[Notification Service]
-        </div>
+    <div class="mermaid">
+        flowchart LR
+        User --> GW[API Gateway]
+        GW --> R[Reservation Service]
+        R --> H{1. Create HOLD\n2-min TTL}
+        H --> T{2. BEGIN TRANSACTION\nSELECT ... FOR UPDATE\nCheck capacity > 0\nDecrement capacity\nINSERT reservation}
+        T -->|Commit| C[Reservation Confirmed]
+        T -->|Rollback| F[409 Conflict\nNo slot available]
+        C --> K[Emit Kafka event\nreservation.created]
+        K --> N[Notification Service]
+    </div>
 
-        <h3>Double Booking Prevention: Three Approaches</h3>
-        <div class="compare">
-          <div class="compare-card con">
+    <h3>Double Booking Prevention: Three Approaches</h3>
+    <div class="compare">
+        <div class="compare-card con">
             <h4>❌ Compute on the fly (naive)</h4>
             <p>Query all reservations, calculate availability per request.</p>
             <ul>
-              <li>Correct but slow — O(N) table scans</li>
-              <li>Doesn't prevent race condition</li>
-              <li>Won't scale to 120 QPS peak writes</li>
+                <li>Correct but slow — O(N) table scans</li>
+                <li>Doesn't prevent race condition</li>
+                <li>Won't scale to 120 QPS peak writes</li>
             </ul>
-          </div>
-          <div class="compare-card pro">
+        </div>
+        <div class="compare-card pro">
             <h4>✅ Pessimistic locking (recommended)</h4>
             <pre style="margin:0;font-size:.8rem;background:#f8fafc;padding:8px;border-radius:6px;">SELECT * FROM availability
 WHERE restaurant_id = $1
@@ -1123,12 +899,12 @@ FOR UPDATE;
 -- If capacity > 0: decrement + insert
 -- COMMIT atomically</pre>
             <ul>
-              <li>Guarantees no double booking</li>
-              <li>Row-level lock, not table lock</li>
-              <li>Excellent for moderate write QPS</li>
+                <li>Guarantees no double booking</li>
+                <li>Row-level lock, not table lock</li>
+                <li>Excellent for moderate write QPS</li>
             </ul>
-          </div>
-          <div class="compare-card neutral">
+        </div>
+        <div class="compare-card neutral">
             <h4>⚠️ Optimistic locking (alternative)</h4>
             <pre style="margin:0;font-size:.8rem;background:#f8fafc;padding:8px;border-radius:6px;">UPDATE availability
 SET capacity = capacity - 1,
@@ -1138,230 +914,230 @@ WHERE restaurant_id = $1
   AND version = $version_read
   AND capacity > 0;</pre>
             <ul>
-              <li>No locks held — better throughput under low contention</li>
-              <li>Retry on version conflict — adds latency under high contention</li>
-              <li>Use for less popular restaurants</li>
+                <li>No locks held — better throughput under low contention</li>
+                <li>Retry on version conflict — adds latency under high contention</li>
+                <li>Use for less popular restaurants</li>
             </ul>
-          </div>
         </div>
+    </div>
 
-        <div class="def">
-          <dt>The 2-minute HOLD pattern</dt>
-          <dd>When a diner clicks "Reserve" but hasn't confirmed yet: create a <strong>soft hold</strong>
+    <div class="def">
+        <dt>The 2-minute HOLD pattern</dt>
+        <dd>When a diner clicks "Reserve" but hasn't confirmed yet: create a <strong>soft hold</strong>
             stored in Redis with a 2-minute TTL. This temporarily decrements shown availability.
             On confirm, run the actual DB transaction. On timeout, the hold expires automatically and
             the slot returns to available. This prevents the "phantom slot" problem where many users see
             the same slot and all try to book simultaneously.</dd>
-          <dt>Hot restaurant problem</dt>
-          <dd>Nobu Saturday 7pm gets 10,000 concurrent requests. With pessimistic locking, all threads
+        <dt>Hot restaurant problem</dt>
+        <dd>Nobu Saturday 7pm gets 10,000 concurrent requests. With pessimistic locking, all threads
             line up for the same row lock — creating a thundering herd. Solutions: (1) a <strong>reservation
-              queue per restaurant</strong> (serialize writes via Kafka partition keyed by restaurant_id);
+                queue per restaurant</strong> (serialize writes via Kafka partition keyed by restaurant_id);
             (2) slot-level partitioning; (3) rate limit per restaurant slot.</dd>
-        </div>
+    </div>
 
-        <h2>5. Data Model</h2>
+    <h2>5. Data Model</h2>
 
-        <div class="table-wrap">
-          <table>
+    <div class="table-wrap">
+        <table>
             <tr>
-              <th>Table</th>
-              <th>Key Fields</th>
-              <th>Notes</th>
+                <th>Table</th>
+                <th>Key Fields</th>
+                <th>Notes</th>
             </tr>
             <tr>
-              <td><strong>restaurants</strong></td>
-              <td>restaurant_id (PK), name, location (PostGIS), timezone, operating_hours</td>
-              <td>Geo-indexed for proximity search</td>
+                <td><strong>restaurants</strong></td>
+                <td>restaurant_id (PK), name, location (PostGIS), timezone, operating_hours</td>
+                <td>Geo-indexed for proximity search</td>
             </tr>
             <tr>
-              <td><strong>tables</strong></td>
-              <td>table_id, restaurant_id, capacity, floor_section</td>
-              <td>Physical inventory</td>
+                <td><strong>tables</strong></td>
+                <td>table_id, restaurant_id, capacity, floor_section</td>
+                <td>Physical inventory</td>
             </tr>
             <tr>
-              <td><strong>availability</strong></td>
-              <td>restaurant_id, time_slot, available_capacity, <strong>version</strong></td>
-              <td>Hot table — sharded by restaurant_id</td>
+                <td><strong>availability</strong></td>
+                <td>restaurant_id, time_slot, available_capacity, <strong>version</strong></td>
+                <td>Hot table — sharded by restaurant_id</td>
             </tr>
             <tr>
-              <td><strong>reservations</strong></td>
-              <td>reservation_id, restaurant_id, user_id, time_slot, party_size, status, created_at</td>
-              <td>Append-mostly; index on (restaurant_id, time_slot)</td>
+                <td><strong>reservations</strong></td>
+                <td>reservation_id, restaurant_id, user_id, time_slot, party_size, status, created_at</td>
+                <td>Append-mostly; index on (restaurant_id, time_slot)</td>
             </tr>
             <tr>
-              <td><strong>waitlist</strong></td>
-              <td>waitlist_id, restaurant_id, time_slot, user_id, priority, created_at</td>
-              <td>Ordered by priority + created_at</td>
+                <td><strong>waitlist</strong></td>
+                <td>waitlist_id, restaurant_id, time_slot, user_id, priority, created_at</td>
+                <td>Ordered by priority + created_at</td>
             </tr>
-          </table>
-        </div>
+        </table>
+    </div>
 
-        <h2>6. Caching Strategy</h2>
-        <div class="def">
-          <dt>Redis (TTL: 30–60s on availability, 5min on search)</dt>
-          <dd>Cache restaurant search results and approximate availability. Short TTL bounds staleness.
+    <h2>6. Caching Strategy</h2>
+    <div class="def">
+        <dt>Redis (TTL: 30–60s on availability, 5min on search)</dt>
+        <dd>Cache restaurant search results and approximate availability. Short TTL bounds staleness.
             <strong>Invalidate immediately on any booking.</strong>
             The final confirmation step always re-validates against the authoritative DB — the cache is
             only used to show "approximately available" in the search UI, never to approve a booking.
-          </dd>
-          <dt>CDN (TTL: 24h on restaurant metadata)</dt>
-          <dd>Restaurant name, photos, cuisine, hours — highly cacheable, changes rarely.
+        </dd>
+        <dt>CDN (TTL: 24h on restaurant metadata)</dt>
+        <dd>Restaurant name, photos, cuisine, hours — highly cacheable, changes rarely.
             Purge on restaurant profile update. This offloads ~90% of read traffic for restaurant detail pages.</dd>
-        </div>
+    </div>
 
-        <h2>7. Sharding Strategy</h2>
-        <div class="def">
-          <dt>Shard by <code>restaurant_id</code></dt>
-          <dd>All data for a given restaurant lives in the same shard: availability, reservations, waitlist.
+    <h2>7. Sharding Strategy</h2>
+    <div class="def">
+        <dt>Shard by <code>restaurant_id</code></dt>
+        <dd>All data for a given restaurant lives in the same shard: availability, reservations, waitlist.
             This makes reservation transactions local to a shard (no cross-shard distributed transactions).
             <strong>Trade-off:</strong> Cross-restaurant analytics (e.g., "top cuisines in NYC") requires
             scatter-gather or a separate analytics replica. Popular restaurants become hot shards — mitigated
             by reserving multiple shards per restaurant or using a secondary hash.
-          </dd>
-        </div>
+        </dd>
+    </div>
 
-        <h2>8. Multi-Region Architecture</h2>
-        <div class="mermaid">
-          flowchart LR
-          subgraph US-East
-          UE[API + Services] --> PG_US[(PostgreSQL\nPrimary)]
-          PG_US --> RR_US[(Read\nReplica)]
-          end
-          subgraph EU-West
-          EU[API + Services] --> RR_EU[(Read\nReplica)]
-          RR_EU -.->|async replication| PG_US
-          end
-          U_US([US Diner]) --> UE
-          U_EU([EU Diner]) --> EU
-          EU -->|booking write| UE
-        </div>
-        <div class="callout tip">
-          <div class="callout-title">Critical: booking writes must route to restaurant's primary region</div>
-          <p>A restaurant in New York has its authoritative DB in us-east-1. A European user booking
+    <h2>8. Multi-Region Architecture</h2>
+    <div class="mermaid">
+        flowchart LR
+        subgraph US-East
+        UE[API + Services] --> PG_US[(PostgreSQL\nPrimary)]
+        PG_US --> RR_US[(Read\nReplica)]
+        end
+        subgraph EU-West
+        EU[API + Services] --> RR_EU[(Read\nReplica)]
+        RR_EU -.->|async replication| PG_US
+        end
+        U_US([US Diner]) --> UE
+        U_EU([EU Diner]) --> EU
+        EU -->|booking write| UE
+    </div>
+    <div class="callout tip">
+        <div class="callout-title">Critical: booking writes must route to restaurant's primary region</div>
+        <p>A restaurant in New York has its authoritative DB in us-east-1. A European user booking
             that restaurant must have their reservation write routed to us-east-1 — even though reads
             can come from an EU read replica. Never allow a booking to commit on an async replica.</p>
-        </div>
+    </div>
 
-        <h2>9. Event-Driven Notification Flow</h2>
-        <div class="def">
-          <dt>Kafka topics</dt>
-          <dd><code>reservation.created</code>, <code>reservation.modified</code>, <code>reservation.cancelled</code>,
+    <h2>9. Event-Driven Notification Flow</h2>
+    <div class="def">
+        <dt>Kafka topics</dt>
+        <dd><code>reservation.created</code>, <code>reservation.modified</code>, <code>reservation.cancelled</code>,
             <code>reservation.reminded</code> (triggered by a scheduler 24h + 2h before slot).<br>
             <strong>Notification Service</strong> consumes and fans out to: Email (SES/SendGrid),
             SMS (Twilio), Push (FCM/APNS). Retry on failure, DLQ for repeated failures.
             Notifications are async and eventually consistent — a 5-second delay in sending a
             confirmation email is fine; a 5-second delay in confirming a booking is not.
-          </dd>
-        </div>
+        </dd>
+    </div>
 
-        <h2>10. Failure Scenarios</h2>
-        <div class="table-wrap">
-          <table>
+    <h2>10. Failure Scenarios</h2>
+    <div class="table-wrap">
+        <table>
             <tr>
-              <th>Failure</th>
-              <th>Impact</th>
-              <th>Mitigation</th>
+                <th>Failure</th>
+                <th>Impact</th>
+                <th>Mitigation</th>
             </tr>
             <tr>
-              <td>Primary DB crashes</td>
-              <td>Writes fail</td>
-              <td>Automatic failover to standby (RDS Multi-AZ, &lt;30s); recent writes from WAL replayed</td>
+                <td>Primary DB crashes</td>
+                <td>Writes fail</td>
+                <td>Automatic failover to standby (RDS Multi-AZ, &lt;30s); recent writes from WAL replayed</td>
             </tr>
             <tr>
-              <td>Redis crashes</td>
-              <td>Cache miss, higher DB load</td>
-              <td>Fall through to DB; system is slower but correct; Redis rebuilt from DB on recovery</td>
+                <td>Redis crashes</td>
+                <td>Cache miss, higher DB load</td>
+                <td>Fall through to DB; system is slower but correct; Redis rebuilt from DB on recovery</td>
             </tr>
             <tr>
-              <td>Notification failure</td>
-              <td>User doesn't get confirmation email</td>
-              <td>Kafka DLQ with exponential backoff retry; separate from booking path (doesn't block reservation)
-              </td>
+                <td>Notification failure</td>
+                <td>User doesn't get confirmation email</td>
+                <td>Kafka DLQ with exponential backoff retry; separate from booking path (doesn't block reservation)
+                </td>
             </tr>
             <tr>
-              <td>Popular restaurant slot contention</td>
-              <td>Lock waits, high latency</td>
-              <td>Per-restaurant write queue (Kafka partition); request serialization; slot partitioning</td>
+                <td>Popular restaurant slot contention</td>
+                <td>Lock waits, high latency</td>
+                <td>Per-restaurant write queue (Kafka partition); request serialization; slot partitioning</td>
             </tr>
             <tr>
-              <td>Elasticsearch down</td>
-              <td>Search fails</td>
-              <td>Fallback to directly querying read replica with degraded ranking; search is not on critical path
-              </td>
+                <td>Elasticsearch down</td>
+                <td>Search fails</td>
+                <td>Fallback to directly querying read replica with degraded ranking; search is not on critical path
+                </td>
             </tr>
-          </table>
-        </div>
+        </table>
+    </div>
 
-        <h2>11. Tradeoffs Summary</h2>
-        <div class="table-wrap">
-          <table>
+    <h2>11. Tradeoffs Summary</h2>
+    <div class="table-wrap">
+        <table>
             <tr>
-              <th>Decision</th>
-              <th>Choice</th>
-              <th>Why</th>
-              <th>Cost</th>
+                <th>Decision</th>
+                <th>Choice</th>
+                <th>Why</th>
+                <th>Cost</th>
             </tr>
             <tr>
-              <td>Consistency for booking</td>
-              <td>Strong (pessimistic lock)</td>
-              <td>Zero double bookings is a hard requirement</td>
-              <td>Lower write throughput, lock contention at peak</td>
+                <td>Consistency for booking</td>
+                <td>Strong (pessimistic lock)</td>
+                <td>Zero double bookings is a hard requirement</td>
+                <td>Lower write throughput, lock contention at peak</td>
             </tr>
             <tr>
-              <td>Consistency for search</td>
-              <td>Eventual (Elasticsearch)</td>
-              <td>Search performance >> search freshness</td>
-              <td>User may briefly see stale availability</td>
+                <td>Consistency for search</td>
+                <td>Eventual (Elasticsearch)</td>
+                <td>Search performance >> search freshness</td>
+                <td>User may briefly see stale availability</td>
             </tr>
             <tr>
-              <td>Slot precomputation</td>
-              <td>Precomputed availability table</td>
-              <td>O(1) availability lookup — critical for read SLA</td>
-              <td>Extra storage, sync complexity with table changes</td>
+                <td>Slot precomputation</td>
+                <td>Precomputed availability table</td>
+                <td>O(1) availability lookup — critical for read SLA</td>
+                <td>Extra storage, sync complexity with table changes</td>
             </tr>
             <tr>
-              <td>Notification delivery</td>
-              <td>Async via Kafka</td>
-              <td>Decoupled, retry-safe, not in booking critical path</td>
-              <td>Eventual delivery — user may wait seconds for email</td>
+                <td>Notification delivery</td>
+                <td>Async via Kafka</td>
+                <td>Decoupled, retry-safe, not in booking critical path</td>
+                <td>Eventual delivery — user may wait seconds for email</td>
             </tr>
             <tr>
-              <td>Sharding key</td>
-              <td><code>restaurant_id</code></td>
-              <td>Transactions stay local to shard, no distributed txns</td>
-              <td>Hot shards for popular restaurants; analytics is harder</td>
+                <td>Sharding key</td>
+                <td><code>restaurant_id</code></td>
+                <td>Transactions stay local to shard, no distributed txns</td>
+                <td>Hot shards for popular restaurants; analytics is harder</td>
             </tr>
             <tr>
-              <td>Multi-region writes</td>
-              <td>Route to restaurant's primary region</td>
-              <td>Avoid split-brain, ensure authoritative availability</td>
-              <td>Higher write latency for cross-region users</td>
+                <td>Multi-region writes</td>
+                <td>Route to restaurant's primary region</td>
+                <td>Avoid split-brain, ensure authoritative availability</td>
+                <td>Higher write latency for cross-region users</td>
             </tr>
-          </table>
-        </div>
+        </table>
+    </div>
 
-        <h2>12. Advanced Topics (Staff-Level Signals)</h2>
-        <div class="def">
-          <dt>Waitlist Auto-Promotion</dt>
-          <dd>When a reservation is cancelled, Kafka event fires → Waitlist Service picks next eligible
+    <h2>12. Advanced Topics (Staff-Level Signals)</h2>
+    <div class="def">
+        <dt>Waitlist Auto-Promotion</dt>
+        <dd>When a reservation is cancelled, Kafka event fires → Waitlist Service picks next eligible
             user → creates soft hold → sends "you have 10 minutes to confirm" push notification.
             Race condition: two waitlist users promoted simultaneously → only first HOLD that converts to
             a confirmed booking wins (same DB transaction pattern).</dd>
-          <dt>Overbooking Model (like airlines)</dt>
-          <dd>Use historical no-show data per restaurant to compute an overbooking coefficient.
+        <dt>Overbooking Model (like airlines)</dt>
+        <dd>Use historical no-show data per restaurant to compute an overbooking coefficient.
             If a restaurant has 15% no-show rate, allow 115% capacity bookings. Requires ML model
             per restaurant per time-of-day, day-of-week. Add this to the conversation if the interviewer
             probes for ML integration.</dd>
-          <dt>Rate limiting and bot protection</dt>
-          <dd>Reservation bots are a real problem (scalpers for trendy restaurants). Token bucket
+        <dt>Rate limiting and bot protection</dt>
+        <dd>Reservation bots are a real problem (scalpers for trendy restaurants). Token bucket
             rate limit per user_id and per IP. Require CAPTCHA after N failed booking attempts.
             Flag suspicious patterns: same user booking 20 restaurants within 1 minute.</dd>
-        </div>
-      </div>
+    </div>
+</div>
 
 
       <div class="page-nav">
-        <a class="page-nav-btn" href="../pages/11-interview-framework.html">&#8592; Interview Framework</a>
+        <a class="page-nav-btn" href="../pages/12-coding-interview-patterns.html">&#8592; Coding Patterns</a>
         <a class="page-nav-btn home" href="../pages/01-introduction.html">&#9776; All Topics</a>
         <span></span>
       </div>
@@ -1371,95 +1147,13 @@ WHERE restaurant_id = $1
   <button id="back-to-top" title="Back to top" aria-label="Back to top">&#8593;</button>
 
   <script>
-    mermaid.initialize({
-      startOnLoad: false,
-      theme: 'default',
-      themeVariables: {
-        primaryColor: '#e8f4fd',
-        primaryTextColor: '#1e293b',
-        primaryBorderColor: '#93c5fd',
-        lineColor: '#64748b',
-        secondaryColor: '#f0fdf4',
-        tertiaryColor: '#faf5ff',
-        background: '#ffffff',
-        mainBkg: '#f8fafc',
-        nodeBorder: '#cbd5e1',
-        clusterBkg: '#f1f5f9',
-        titleColor: '#1e293b',
-        edgeLabelBackground: '#ffffff',
-        attributeBackgroundColorEven: '#f8fafc',
-        attributeBackgroundColorOdd: '#f1f5f9'
-      },
-      flowchart: { useMaxWidth: true, htmlLabels: true, curve: 'basis' },
-      sequence: { useMaxWidth: true },
-      stateDiagram: { useMaxWidth: true },
-      securityLevel: 'loose'
-    });
-
-    // ── Section switching (same-page nav items only) ──
-    const pageSections = document.querySelectorAll('.section');
-    const subItems     = document.querySelectorAll('.acc-sub-item[data-sec]');
-    const pb           = document.getElementById('pb');
-
-    function showSection(id) {
-      pageSections.forEach(s => s.classList.remove('active'));
-      subItems.forEach(n => n.classList.remove('active'));
-      const target = document.getElementById(id);
-      if (target) {
-        target.classList.add('active');
-        const diags = target.querySelectorAll('.mermaid:not([data-processed])');
-        if (diags.length) mermaid.run({ nodes: diags });
-        // Scroll content area to top, NOT the whole window
-        const main = document.querySelector('.main');
-        if (main) main.scrollTo(0, 0);
-      }
-      const item = document.querySelector(`.acc-sub-item[data-sec="${id}"]`);
-      if (item) item.classList.add('active');
-      updateProgress(id);
+    if (typeof mermaid !== 'undefined') {
+        mermaid.initialize({
+          startOnLoad: false,
+          theme: 'default',
+          securityLevel: 'loose'
+        });
     }
-
-    function updateProgress(activeId) {
-      const ids = Array.from(subItems).map(n => n.dataset.sec);
-      const idx = ids.indexOf(activeId);
-      const pct = idx >= 0 ? Math.round(((idx + 1) / ids.length) * 100) : 0;
-      pb.style.width = pct + '%';
-    }
-
-    subItems.forEach(item => {
-      item.addEventListener('click', () => {
-        if (item.dataset.sec) showSection(item.dataset.sec);
-      });
-    });
-
-    // On load: check URL hash for deep link from another page
-    const hash = window.location.hash.slice(1);
-    if (hash && document.getElementById(hash)) {
-      showSection(hash);
-    } else if (subItems.length) {
-      showSection(subItems[0].dataset.sec);
-    }
-
-    // Scroll progress
-    const mainEl = document.querySelector('.main');
-    if (mainEl) {
-      mainEl.style.overflowY = 'auto';
-      mainEl.style.height = '100vh';
-      mainEl.addEventListener('scroll', () => {
-        const scrolled = mainEl.scrollTop + mainEl.clientHeight;
-        const total = mainEl.scrollHeight;
-        if (total > 0) pb.style.width = Math.min(100, Math.round((scrolled / total) * 100)) + '%';
-      });
-    }
-
-    const bttBtn = document.getElementById('back-to-top');
-    (mainEl || window).addEventListener('scroll', () => {
-      const top = mainEl ? mainEl.scrollTop : window.scrollY;
-      bttBtn.classList.toggle('visible', top > 500);
-    });
-    bttBtn.addEventListener('click', () => {
-      if (mainEl) mainEl.scrollTo({top:0,behavior:'smooth'});
-      else window.scrollTo({top:0,behavior:'smooth'});
-    });
   </script>
 </body>
 </html>

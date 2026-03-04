@@ -5,186 +5,502 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="System Design Reference — Data Layer">
   <title>🗄️ Data Layer — System Design Fundamentals</title>
-  <link rel="stylesheet" href="../styles.css">
+  <link rel="stylesheet" href="../assets/css/styles.css">
   <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
-  <link rel="stylesheet" href="../system-design.css">
-
-  <style id="sidebar-improvements">
-    .sidebar { width: 280px; }
-    .main    { margin-left: 280px; }
-
-    /* Header */
-    .sidebar-header {
-      background: linear-gradient(160deg,#1e1e3f 0%,#12122a 100%);
-      border-bottom: 1px solid rgba(137,180,250,0.12);
+  <style>
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
     }
-    .sidebar-header h1 { font-size:.9rem; color:#e2e8f9; letter-spacing:.3px; }
-    .sidebar-header p  { font-size:.72rem; color:#6272a4; }
 
-    .back-link {
-      display:inline-flex; align-items:center; gap:6px;
-      font-size:.75rem; color:#89b4fa; text-decoration:none;
-      padding:4px 12px; border:1px solid rgba(137,180,250,.25);
-      border-radius:20px; transition:all .2s;
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      font-size: 15px;
+      line-height: 1.7;
+      color: #1a1a2e;
+      background: #f4f6f9;
     }
-    .back-link:hover { background:rgba(137,180,250,.1); border-color:#89b4fa; }
 
-    /* Accordion wrapper */
-    .sidebar-accordion {
+    /* ---- Layout ---- */
+    .layout {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    .sidebar {
+      width: 300px;
+      min-width: 300px;
+      background: #1a1a2e;
+      color: #cdd6f4;
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 100vh;
       overflow-y: auto;
-      flex: 1;
-      padding: 8px 0 24px;
+      z-index: 100;
+      padding-bottom: 40px;
     }
 
-    /* Accordion chapter */
-    .acc-chapter {
-      border-bottom: 1px solid rgba(137,180,250,0.07);
+    .sidebar-header {
+      padding: 24px 20px 16px;
+      border-bottom: 1px solid #2d2d4e;
+      position: sticky;
+      top: 0;
+      background: #1a1a2e;
+      z-index: 1;
     }
-    .acc-chapter[open] { background: rgba(137,180,250,0.04); }
 
-    /* Summary row = clickable chapter header */
-    .acc-summary {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 10px 14px;
-      cursor: pointer;
-      list-style: none;
-      user-select: none;
-      transition: background 0.15s;
-    }
-    .acc-summary::-webkit-details-marker { display: none; }
-    .acc-summary:hover { background: rgba(137,180,250,0.08); }
-    .acc-chapter[open] > .acc-summary { background: rgba(137,180,250,0.1); }
-
-    .chap-icon {
+    .sidebar-header h1 {
       font-size: 1rem;
-      flex-shrink: 0;
-      width: 24px;
-      text-align: center;
+      font-weight: 700;
+      color: #89b4fa;
+      letter-spacing: 0.3px;
+      margin-bottom: 4px;
     }
-    .chap-text {
-      display: flex;
-      flex-direction: column;
-      gap: 1px;
-      flex: 1;
-      min-width: 0;
+
+    .sidebar-header p {
+      font-size: 0.75rem;
+      color: #6c7086;
     }
-    .chap-num {
-      font-size: .58rem;
+
+    .nav-module {
+      margin: 6px 0;
+    }
+
+    .nav-module-title {
+      padding: 10px 20px 6px;
+      font-size: 0.68rem;
       font-weight: 700;
       text-transform: uppercase;
-      letter-spacing: .8px;
+      letter-spacing: 1px;
       color: #585b70;
     }
-    .chap-label {
-      font-size: .8rem;
-      color: #a6adc8;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    .acc-chapter[open] .chap-num   { color: #89b4fa; }
-    .acc-chapter[open] .chap-label { color: #cdd6f4; font-weight: 600; }
 
-    .chap-curr {
-      font-size: .45rem;
-      color: #89b4fa;
-      flex-shrink: 0;
-      animation: blink 2s infinite;
-    }
-    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.2} }
-
-    .acc-arrow {
-      font-size: .85rem;
-      color: #585b70;
-      flex-shrink: 0;
-      transition: transform 0.2s;
-    }
-    .acc-chapter[open] .acc-arrow { transform: rotate(90deg); color:#89b4fa; }
-
-    /* Sub-items panel */
-    .acc-sub {
-      padding: 2px 0 6px 0;
-      animation: slideDown .18s ease;
-    }
-    @keyframes slideDown {
-      from { opacity:0; transform:translateY(-6px); }
-      to   { opacity:1; transform:translateY(0); }
-    }
-
-    .acc-sub-item {
+    .nav-item {
       display: block;
-      padding: 7px 14px 7px 48px;
-      font-size: .78rem;
-      color: #7f849c;
+      padding: 7px 20px 7px 28px;
+      font-size: 0.82rem;
+      color: #a6adc8;
       cursor: pointer;
-      border-left: 2px solid transparent;
-      text-decoration: none;
-      transition: all 0.14s;
-      line-height: 1.35;
+      border-left: 3px solid transparent;
+      transition: all 0.15s;
     }
-    .acc-sub-item:hover {
+
+    .nav-item:hover {
+      background: #252540;
       color: #cdd6f4;
-      background: rgba(137,180,250,0.07);
-      border-left-color: rgba(137,180,250,.4);
     }
-    .acc-sub-item.active {
-      color: #cdd6f4;
-      background: rgba(137,180,250,0.12);
+
+    .nav-item.active {
+      background: #1e2050;
       border-left-color: #89b4fa;
+      color: #89b4fa;
       font-weight: 600;
     }
 
-    /* Page nav */
-    .page-nav {
-      display:flex; justify-content:space-between; align-items:center;
-      padding:28px 40px 48px; border-top:1px solid #e0e4f0;
-      margin-top:24px; gap:12px;
+    /* ---- Main content ---- */
+    .main {
+      margin-left: 300px;
+      flex: 1;
+      padding: 0;
     }
-    .page-nav-btn {
-      display:inline-flex; align-items:center; gap:8px;
-      padding:10px 22px; background:#1a1a2e; color:#cdd6f4;
-      border-radius:8px; text-decoration:none; font-size:.84rem;
-      font-weight:600; transition:all .18s;
-      border:1px solid rgba(137,180,250,.15);
-    }
-    .page-nav-btn:hover {
-      background:#313244; border-color:rgba(137,180,250,.35);
-      transform:translateY(-1px); box-shadow:0 4px 12px rgba(0,0,0,.2);
-    }
-    .page-nav-btn.home { background:linear-gradient(135deg,#1e3a5f,#162d48); }
-    .page-nav-btn.home:hover { background:linear-gradient(135deg,#264a78,#1e3a5f); }
 
-    @media (max-width:768px) { .sidebar{width:100%} .main{margin-left:0} }
+    .progress-bar-wrap {
+      position: fixed;
+      top: 0;
+      left: 300px;
+      right: 0;
+      height: 3px;
+      background: #2d2d4e;
+      z-index: 200;
+    }
 
-    /* ── Mermaid diagram consistency ── */
-    .mermaid {
-      background: transparent !important;
-      padding: 0 !important;
+    .progress-bar {
+      height: 100%;
+      background: linear-gradient(90deg, #89b4fa, #b4befe);
+      transition: width 0.3s;
+      width: 0%;
     }
-    .mermaid svg {
-      background: transparent !important;
-      max-width: 100%;
+
+    .section {
+      display: none;
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 48px 48px 80px;
     }
-    /* Override Mermaid's internal background rect (dark in state/sequence diagrams) */
-    .mermaid svg > rect:first-child,
-    .mermaid svg > g:first-child > rect:first-child {
-      fill: transparent !important;
-      stroke: none !important;
+
+    .section.active {
+      display: block;
+      animation: fadein 0.25s ease;
     }
-    /* State diagram node styling */
-    .mermaid .state-note rect,
-    .mermaid .note rect { fill: #fffbdd !important; stroke: #e6d87a !important; }
-    /* Ensure subgraph labels are readable */
-    .mermaid .cluster rect { fill: #f1f5f9 !important; stroke: #cbd5e1 !important; }
-    .mermaid .cluster text { fill: #475569 !important; }
-    /* Entity / node labels */
-    .mermaid .label { color: #1e293b !important; }
-    .mermaid .nodeLabel { color: #1e293b !important; }
-    .mermaid .edgeLabel { background: #fff !important; color: #475569 !important; }
+
+    @keyframes fadein {
+      from {
+        opacity: 0;
+        transform: translateY(8px);
+      }
+
+      to {
+        opacity: 1;
+        transform: none;
+      }
+    }
+
+    /* ---- Typography ---- */
+    .section-title {
+      font-size: 1.9rem;
+      font-weight: 800;
+      color: #1a1a2e;
+      margin-bottom: 6px;
+      padding-bottom: 14px;
+      border-bottom: 3px solid #89b4fa;
+    }
+
+    .section-subtitle {
+      font-size: 0.85rem;
+      color: #6c7086;
+      margin-bottom: 36px;
+    }
+
+    h2 {
+      font-size: 1.45rem;
+      font-weight: 700;
+      color: #1a1a2e;
+      margin: 44px 0 14px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid #e0e4f0;
+    }
+
+    h3 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #2d2d4e;
+      margin: 30px 0 10px;
+    }
+
+    h4 {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #3d3d6e;
+      margin: 22px 0 8px;
+    }
+
+    p {
+      margin-bottom: 12px;
+      color: #333355;
+    }
+
+    ul,
+    ol {
+      margin: 8px 0 14px 22px;
+    }
+
+    li {
+      margin-bottom: 5px;
+      color: #333355;
+    }
+
+    li strong {
+      color: #1a1a2e;
+    }
+
+    /* ---- Callout boxes ---- */
+    .callout {
+      border-radius: 6px;
+      padding: 18px 22px;
+      margin: 20px 0;
+      font-size: 0.9rem;
+    }
+
+    .callout-title {
+      font-weight: 700;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 6px;
+    }
+
+    .callout.info {
+      background: #eff6ff;
+      border-left: 4px solid #3b82f6;
+    }
+
+    .callout.info .callout-title {
+      color: #1d4ed8;
+    }
+
+    .callout.warn {
+      background: #fffbeb;
+      border-left: 4px solid #f59e0b;
+    }
+
+    .callout.warn .callout-title {
+      color: #b45309;
+    }
+
+    .callout.tip {
+      background: #f0fdf4;
+      border-left: 4px solid #22c55e;
+    }
+
+    .callout.tip .callout-title {
+      color: #15803d;
+    }
+
+    .callout.danger {
+      background: #fff1f2;
+      border-left: 4px solid #f43f5e;
+    }
+
+    .callout.danger .callout-title {
+      color: #be123c;
+    }
+
+    /* ---- Example / Real World ---- */
+    .example {
+      background: #f8faff;
+      border: 1px solid #dde3f5;
+      border-radius: 8px;
+      padding: 20px 24px;
+      margin: 20px 0;
+    }
+
+    .example-label {
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: #6c7086;
+      margin-bottom: 8px;
+    }
+
+    .example h4 {
+      margin-top: 0;
+    }
+
+    /* ---- Code blocks ---- */
+    pre,
+    code {
+      font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
+    }
+
+    pre {
+      background: #1e1e2e;
+      color: #cdd6f4;
+      padding: 20px 24px;
+      border-radius: 8px;
+      overflow-x: auto;
+      margin: 16px 0;
+      font-size: 0.84rem;
+      line-height: 1.6;
+    }
+
+    code {
+      background: #eef0f8;
+      color: #1a1a2e;
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-size: 0.85em;
+    }
+
+    pre code {
+      background: transparent;
+      color: inherit;
+      padding: 0;
+      border-radius: 0;
+      font-size: inherit;
+    }
+
+    /* ---- Tables ---- */
+    .table-wrap {
+      overflow-x: auto;
+      margin: 20px 0;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.88rem;
+    }
+
+    th {
+      background: #1a1a2e;
+      color: #cdd6f4;
+      padding: 10px 14px;
+      text-align: left;
+      font-weight: 600;
+      font-size: 0.82rem;
+      letter-spacing: 0.3px;
+    }
+
+    td {
+      padding: 9px 14px;
+      border-bottom: 1px solid #e8ebf5;
+      vertical-align: top;
+    }
+
+    tr:nth-child(even) td {
+      background: #f8f9fe;
+    }
+
+    /* ---- Comparison grid ---- */
+    .compare {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin: 20px 0;
+    }
+
+    .compare.three {
+      grid-template-columns: 1fr 1fr 1fr;
+    }
+
+    .compare.four {
+      grid-template-columns: 1fr 1fr 1fr 1fr;
+    }
+
+    .compare-card {
+      background: white;
+      border: 1px solid #e0e4f0;
+      border-radius: 8px;
+      padding: 18px 20px;
+    }
+
+    .compare-card h4 {
+      margin-top: 0;
+    }
+
+    .compare-card.pro {
+      border-top: 3px solid #22c55e;
+    }
+
+    .compare-card.con {
+      border-top: 3px solid #f43f5e;
+    }
+
+    .compare-card.neutral {
+      border-top: 3px solid #3b82f6;
+    }
+
+    /* ---- Diagram wrapper ---- */
+    .diagram {
+      background: white;
+      border: 1px solid #e0e4f0;
+      border-radius: 8px;
+      padding: 20px;
+      margin: 20px 0;
+      overflow-x: auto;
+      text-align: center;
+    }
+
+    .diagram-caption {
+      font-size: 0.78rem;
+      color: #6c7086;
+      text-align: center;
+      margin-top: 8px;
+    }
+
+    /* ---- Tags ---- */
+    .tag {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.4px;
+      margin: 0 4px 4px 0;
+    }
+
+    .tag-interview {
+      background: #fef3c7;
+      color: #92400e;
+    }
+
+    .tag-critical {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    .tag-concept {
+      background: #ede9fe;
+      color: #5b21b6;
+    }
+
+    .tag-realworld {
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    /* ---- Definition list ---- */
+    .def {
+      margin: 12px 0 16px 0;
+    }
+
+    .def dt {
+      font-weight: 700;
+      color: #1a1a2e;
+      margin-bottom: 3px;
+    }
+
+    .def dd {
+      margin-left: 20px;
+      color: #333355;
+      margin-bottom: 10px;
+    }
+
+    /* ---- Subsection separator ---- */
+    .subsection {
+      margin-top: 48px;
+    }
+
+    /* Chapter 12: Coding Patterns Styles */
+    .pattern-viz {
+      background: #03050d;
+      border: 1px solid #131d35;
+      border-radius: 12px;
+      padding: 15px;
+      margin: 25px 0;
+      min-height: 100px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.5);
+    }
+
+    .pattern-img {
+      display: none;
+    }
+
+    @media (max-width: 768px) {
+      .sidebar {
+        width: 100%;
+        height: auto;
+        position: relative;
+      }
+
+      .main {
+        margin-left: 0;
+      }
+
+      .section {
+        padding: 24px 20px;
+      }
+
+      .compare,
+      .compare.three,
+      .compare.four {
+        grid-template-columns: 1fr;
+      }
+    }
   </style>
+  
+  <link rel="stylesheet" href="../assets/css/system-design-common.css">
+  <script defer src="../assets/js/system-design-common.js"></script>
 
+  
 </head>
 <body>
   <div class="layout">
@@ -379,9 +695,23 @@
         </details>
         <details class="acc-chapter">
           <summary class="acc-summary">
-            <span class="chap-icon">📚</span>
+            <span class="chap-icon">🧩</span>
             <span class="chap-text">
               <span class="chap-num">Chapter 12</span>
+              <span class="chap-label">Coding Patterns</span>
+            </span>
+            
+            <span class="acc-arrow">›</span>
+          </summary>
+          <div class="acc-sub">
+              <a class="acc-sub-item" href="12-coding-interview-patterns.html#patterns">20 Essential Patterns</a>
+          </div>
+        </details>
+        <details class="acc-chapter">
+          <summary class="acc-summary">
+            <span class="chap-icon">📚</span>
+            <span class="chap-text">
+              <span class="chap-num">Chapter 13</span>
               <span class="chap-label">Case Studies</span>
             </span>
             
@@ -398,139 +728,139 @@
       <div class="progress-bar-wrap"><div class="progress-bar" id="pb"></div></div>
 
 <div class="section active" id="db-types">
-        <h1 class="section-title">Database Types</h1>
-        <p class="section-subtitle">Module 8 &nbsp;|&nbsp; Database Types · SQL vs NoSQL · ACID · Relational · Document
-          · Key-Value · Wide Column · Graph · Time Series · Search · Vector</p>
+    <h1 class="section-title">Database Types</h1>
+    <p class="section-subtitle">Module 8 &nbsp;|&nbsp; Database Types · SQL vs NoSQL · ACID · Relational · Document
+      · Key-Value · Wide Column · Graph · Time Series · Search · Vector</p>
 
-        <h2>SQL vs NoSQL</h2>
+    <h2>SQL vs NoSQL</h2>
 
-        <div class="compare">
-          <div class="compare-card neutral">
-            <h4>SQL (Relational Databases)</h4>
-            <ul>
-              <li><strong>Structure:</strong> Tables with rows and columns; strict schema enforced on write</li>
-              <li><strong>Query language:</strong> SQL — declarative, standardized, extremely expressive for joins and
-                aggregations</li>
-              <li><strong>Relationships:</strong> First-class support via foreign keys, joins, and referential integrity
-              </li>
-              <li><strong>Transactions:</strong> Full ACID guarantees</li>
-              <li><strong>Scaling:</strong> Vertical (primary); horizontal sharding is possible but complex</li>
-              <li><strong>Examples:</strong> PostgreSQL, MySQL, Oracle, SQL Server, SQLite</li>
-              <li><strong>Best for:</strong> Financial systems, e-commerce, ERP, any domain requiring complex joins and
-                strong consistency</li>
-            </ul>
-          </div>
-          <div class="compare-card neutral">
-            <h4>NoSQL (Non-Relational Databases)</h4>
-            <ul>
-              <li><strong>Structure:</strong> Varies: documents, key-value pairs, wide columns, graphs</li>
-              <li><strong>Query language:</strong> Database-specific APIs; no universal standard</li>
-              <li><strong>Relationships:</strong> Denormalized; relationships modeled through embedding or
-                application-level joins</li>
-              <li><strong>Transactions:</strong> Varies: many offer at-least-document ACID; distributed ACID is limited
-              </li>
-              <li><strong>Scaling:</strong> Designed for horizontal scaling from the ground up</li>
-              <li><strong>Examples:</strong> MongoDB, Cassandra, Redis, DynamoDB, Neo4j</li>
-              <li><strong>Best for:</strong> High-write workloads, flexible schemas, global distribution, specialized
-                access patterns</li>
-            </ul>
-          </div>
-        </div>
+    <div class="compare">
+      <div class="compare-card neutral">
+        <h4>SQL (Relational Databases)</h4>
+        <ul>
+          <li><strong>Structure:</strong> Tables with rows and columns; strict schema enforced on write</li>
+          <li><strong>Query language:</strong> SQL — declarative, standardized, extremely expressive for joins and
+            aggregations</li>
+          <li><strong>Relationships:</strong> First-class support via foreign keys, joins, and referential integrity
+          </li>
+          <li><strong>Transactions:</strong> Full ACID guarantees</li>
+          <li><strong>Scaling:</strong> Vertical (primary); horizontal sharding is possible but complex</li>
+          <li><strong>Examples:</strong> PostgreSQL, MySQL, Oracle, SQL Server, SQLite</li>
+          <li><strong>Best for:</strong> Financial systems, e-commerce, ERP, any domain requiring complex joins and
+            strong consistency</li>
+        </ul>
+      </div>
+      <div class="compare-card neutral">
+        <h4>NoSQL (Non-Relational Databases)</h4>
+        <ul>
+          <li><strong>Structure:</strong> Varies: documents, key-value pairs, wide columns, graphs</li>
+          <li><strong>Query language:</strong> Database-specific APIs; no universal standard</li>
+          <li><strong>Relationships:</strong> Denormalized; relationships modeled through embedding or
+            application-level joins</li>
+          <li><strong>Transactions:</strong> Varies: many offer at-least-document ACID; distributed ACID is limited
+          </li>
+          <li><strong>Scaling:</strong> Designed for horizontal scaling from the ground up</li>
+          <li><strong>Examples:</strong> MongoDB, Cassandra, Redis, DynamoDB, Neo4j</li>
+          <li><strong>Best for:</strong> High-write workloads, flexible schemas, global distribution, specialized
+            access patterns</li>
+        </ul>
+      </div>
+    </div>
 
-        <h2>ACID Transactions</h2>
-        <p>ACID is an acronym describing the properties that guarantee database transactions are processed reliably,
-          particularly in the event of errors, power failures, and concurrent access.</p>
+    <h2>ACID Transactions</h2>
+    <p>ACID is an acronym describing the properties that guarantee database transactions are processed reliably,
+      particularly in the event of errors, power failures, and concurrent access.</p>
 
-        <dl class="def">
-          <dt>Atomicity</dt>
-          <dd>A transaction is treated as a single unit. Either all of its operations succeed and are committed, or none
-            of them are. There is no partial success. If a transaction transfers money and the debit succeeds but the
-            credit fails, atomicity ensures the debit is rolled back.</dd>
-          <dt>Consistency</dt>
-          <dd>A transaction brings the database from one valid state to another valid state. All integrity constraints
-            (foreign keys, unique constraints, check constraints) are satisfied both before and after the transaction. A
-            transaction that would violate a constraint is rejected entirely.</dd>
-          <dt>Isolation</dt>
-          <dd>Concurrent transactions execute as if they were executed serially. The intermediate state of a transaction
-            is not visible to other transactions. The level of isolation can be tuned (Read Uncommitted, Read Committed,
-            Repeatable Read, Serializable) to balance correctness and performance.</dd>
-          <dt>Durability</dt>
-          <dd>Once a transaction is committed, it remains committed even in the event of a system failure. The database
-            uses write-ahead logging (WAL) and checkpointing to ensure committed data is persisted to durable storage
-            and can be recovered after a crash.</dd>
-        </dl>
+    <dl class="def">
+      <dt>Atomicity</dt>
+      <dd>A transaction is treated as a single unit. Either all of its operations succeed and are committed, or none
+        of them are. There is no partial success. If a transaction transfers money and the debit succeeds but the
+        credit fails, atomicity ensures the debit is rolled back.</dd>
+      <dt>Consistency</dt>
+      <dd>A transaction brings the database from one valid state to another valid state. All integrity constraints
+        (foreign keys, unique constraints, check constraints) are satisfied both before and after the transaction. A
+        transaction that would violate a constraint is rejected entirely.</dd>
+      <dt>Isolation</dt>
+      <dd>Concurrent transactions execute as if they were executed serially. The intermediate state of a transaction
+        is not visible to other transactions. The level of isolation can be tuned (Read Uncommitted, Read Committed,
+        Repeatable Read, Serializable) to balance correctness and performance.</dd>
+      <dt>Durability</dt>
+      <dd>Once a transaction is committed, it remains committed even in the event of a system failure. The database
+        uses write-ahead logging (WAL) and checkpointing to ensure committed data is persisted to durable storage
+        and can be recovered after a crash.</dd>
+    </dl>
 
-        <div class="example">
-          <div class="example-label">Bank Transfer: All Four Properties</div>
-          <pre>
+    <div class="example">
+      <div class="example-label">Bank Transfer: All Four Properties</div>
+      <pre>
 BEGIN;
   UPDATE accounts SET balance = balance - 500 WHERE id = 'alice';
   UPDATE accounts SET balance = balance + 500 WHERE id = 'bob';
 COMMIT;
   </pre>
-          <ul>
-            <li><strong>Atomicity:</strong> If the server crashes after the first UPDATE, the transaction is rolled back
-              — Alice is not debited without Bob being credited.</li>
-            <li><strong>Consistency:</strong> Total money in system is preserved (500 moved, not created or destroyed).
-              Constraint: balance &gt;= 0 prevents overdraft.</li>
-            <li><strong>Isolation:</strong> A concurrent query checking Alice's balance sees either the original amount
-              or the post-transfer amount, never the intermediate state.</li>
-            <li><strong>Durability:</strong> After COMMIT returns, the transfer persists even if the server immediately
-              loses power.</li>
-          </ul>
-        </div>
+      <ul>
+        <li><strong>Atomicity:</strong> If the server crashes after the first UPDATE, the transaction is rolled back
+          — Alice is not debited without Bob being credited.</li>
+        <li><strong>Consistency:</strong> Total money in system is preserved (500 moved, not created or destroyed).
+          Constraint: balance &gt;= 0 prevents overdraft.</li>
+        <li><strong>Isolation:</strong> A concurrent query checking Alice's balance sees either the original amount
+          or the post-transfer amount, never the intermediate state.</li>
+        <li><strong>Durability:</strong> After COMMIT returns, the transfer persists even if the server immediately
+          loses power.</li>
+      </ul>
+    </div>
 
-        <h2>Relational Databases</h2>
-        <p>Relational databases organize data into tables of rows and columns. Relations between entities are expressed
-          through foreign keys. SQL provides a powerful declarative query language for selecting, joining, filtering,
-          and aggregating data.</p>
+    <h2>Relational Databases</h2>
+    <p>Relational databases organize data into tables of rows and columns. Relations between entities are expressed
+      through foreign keys. SQL provides a powerful declarative query language for selecting, joining, filtering,
+      and aggregating data.</p>
 
-        <h3>Strengths</h3>
-        <ul>
-          <li>Full ACID transactions, including multi-table transactions</li>
-          <li>Complex queries using JOINs, subqueries, window functions, CTEs</li>
-          <li>Referential integrity enforced by the database itself</li>
-          <li>Mature tooling, extensive operational knowledge, decades of battle-testing</li>
-          <li>Schema validation prevents bad data from entering the system</li>
-        </ul>
+    <h3>Strengths</h3>
+    <ul>
+      <li>Full ACID transactions, including multi-table transactions</li>
+      <li>Complex queries using JOINs, subqueries, window functions, CTEs</li>
+      <li>Referential integrity enforced by the database itself</li>
+      <li>Mature tooling, extensive operational knowledge, decades of battle-testing</li>
+      <li>Schema validation prevents bad data from entering the system</li>
+    </ul>
 
-        <h3>Limitations</h3>
-        <ul>
-          <li>Horizontal scaling is complex — sharding requires application changes and sacrifices some SQL features
-          </li>
-          <li>Schema migrations on large tables require careful coordination (ALTER TABLE on 500M row table is
-            dangerous)</li>
-          <li>Object-relational impedance mismatch: mapping object graphs to relational tables requires effort (solved
-            partially by ORMs)</li>
-        </ul>
+    <h3>Limitations</h3>
+    <ul>
+      <li>Horizontal scaling is complex — sharding requires application changes and sacrifices some SQL features
+      </li>
+      <li>Schema migrations on large tables require careful coordination (ALTER TABLE on 500M row table is
+        dangerous)</li>
+      <li>Object-relational impedance mismatch: mapping object graphs to relational tables requires effort (solved
+        partially by ORMs)</li>
+    </ul>
 
-        <h3>Key Systems</h3>
-        <ul>
-          <li><strong>PostgreSQL:</strong> Most feature-rich open-source RDBMS. Excellent for complex queries, JSON
-            support (JSONB), full-text search, geospatial (PostGIS). Default choice for new projects.</li>
-          <li><strong>MySQL:</strong> Dominant in web applications (LAMP stack). InnoDB storage engine provides full
-            ACID. Slightly simpler but less feature-rich than PostgreSQL.</li>
-          <li><strong>Google Spanner:</strong> Globally distributed relational database with external consistency
-            (effectively linearizable transactions across datacenters). Achieves CAP "CP with very high availability"
-            through GPS clock synchronization (TrueTime).</li>
-        </ul>
+    <h3>Key Systems</h3>
+    <ul>
+      <li><strong>PostgreSQL:</strong> Most feature-rich open-source RDBMS. Excellent for complex queries, JSON
+        support (JSONB), full-text search, geospatial (PostGIS). Default choice for new projects.</li>
+      <li><strong>MySQL:</strong> Dominant in web applications (LAMP stack). InnoDB storage engine provides full
+        ACID. Slightly simpler but less feature-rich than PostgreSQL.</li>
+      <li><strong>Google Spanner:</strong> Globally distributed relational database with external consistency
+        (effectively linearizable transactions across datacenters). Achieves CAP "CP with very high availability"
+        through GPS clock synchronization (TrueTime).</li>
+    </ul>
 
-        <h2>Document Databases</h2>
-        <p>Document databases store semi-structured data as documents (typically JSON or BSON). Each document is
-          self-contained and can have a different structure. Documents are grouped in collections (analogous to tables).
-          Documents can contain nested objects and arrays, allowing rich object graphs to be stored without joins.</p>
+    <h2>Document Databases</h2>
+    <p>Document databases store semi-structured data as documents (typically JSON or BSON). Each document is
+      self-contained and can have a different structure. Documents are grouped in collections (analogous to tables).
+      Documents can contain nested objects and arrays, allowing rich object graphs to be stored without joins.</p>
 
-        <h3>When to Use</h3>
-        <ul>
-          <li>Data has variable attributes per record (different product types have different fields)</li>
-          <li>The natural representation is a document (blog post with metadata, e-commerce product with variants)</li>
-          <li>Rapid schema evolution is needed</li>
-          <li>The entire document is typically accessed together</li>
-        </ul>
+    <h3>When to Use</h3>
+    <ul>
+      <li>Data has variable attributes per record (different product types have different fields)</li>
+      <li>The natural representation is a document (blog post with metadata, e-commerce product with variants)</li>
+      <li>Rapid schema evolution is needed</li>
+      <li>The entire document is typically accessed together</li>
+    </ul>
 
-        <div class="example">
-          <div class="example-label">MongoDB Document Example</div>
-          <pre>
+    <div class="example">
+      <div class="example-label">MongoDB Document Example</div>
+      <pre>
 {
   "_id": "prod-789",
   "name": "Wireless Headphones",
@@ -548,95 +878,95 @@ COMMIT;
   "tags": ["audio", "wireless", "bluetooth"]
 }
   </pre>
-          <p>This document stores a product and all its variants in one unit. Reading a product page requires a single
-            document fetch, no joins.</p>
-        </div>
+      <p>This document stores a product and all its variants in one unit. Reading a product page requires a single
+        document fetch, no joins.</p>
+    </div>
 
-        <h2>Key-Value Stores</h2>
-        <p>Key-value stores provide the simplest data model: every value is stored and retrieved by a unique key. They
-          are extremely fast (O(1) average read/write) and horizontally scalable, but offer limited query capabilities.
-        </p>
+    <h2>Key-Value Stores</h2>
+    <p>Key-value stores provide the simplest data model: every value is stored and retrieved by a unique key. They
+      are extremely fast (O(1) average read/write) and horizontally scalable, but offer limited query capabilities.
+    </p>
 
-        <h3>Use Cases</h3>
-        <ul>
-          <li><strong>Caching:</strong> Redis and Memcached are the canonical choices. Store expensive query results,
-            API responses, computed values.</li>
-          <li><strong>Session management:</strong> Store user sessions keyed by session ID. TTL ensures automatic
-            cleanup.</li>
-          <li><strong>Rate limiting:</strong> Atomic increment operations in Redis allow efficient rate limit counters.
-          </li>
-          <li><strong>Configuration and feature flags:</strong> Store and quickly retrieve configuration keyed by
-            service or feature name.</li>
-          <li><strong>Distributed locks:</strong> Redis' SETNX (set if not exists) provides atomic lock acquisition.
-          </li>
-        </ul>
+    <h3>Use Cases</h3>
+    <ul>
+      <li><strong>Caching:</strong> Redis and Memcached are the canonical choices. Store expensive query results,
+        API responses, computed values.</li>
+      <li><strong>Session management:</strong> Store user sessions keyed by session ID. TTL ensures automatic
+        cleanup.</li>
+      <li><strong>Rate limiting:</strong> Atomic increment operations in Redis allow efficient rate limit counters.
+      </li>
+      <li><strong>Configuration and feature flags:</strong> Store and quickly retrieve configuration keyed by
+        service or feature name.</li>
+      <li><strong>Distributed locks:</strong> Redis' SETNX (set if not exists) provides atomic lock acquisition.
+      </li>
+    </ul>
 
-        <h3>Redis Data Structures</h3>
-        <p>Unlike Memcached (which is a pure string cache), Redis provides rich data types that enable sophisticated
-          patterns without application-side logic:</p>
-        <div class="table-wrap">
-          <table>
-            <tr>
-              <th>Type</th>
-              <th>Operations</th>
-              <th>Use case</th>
-            </tr>
-            <tr>
-              <td>String</td>
-              <td>GET, SET, INCR, APPEND</td>
-              <td>Simple caching, counters</td>
-            </tr>
-            <tr>
-              <td>Hash</td>
-              <td>HGET, HSET, HMGET, HGETALL</td>
-              <td>User profiles, object fields</td>
-            </tr>
-            <tr>
-              <td>List</td>
-              <td>LPUSH, RPUSH, LPOP, LRANGE</td>
-              <td>Message queues, activity feeds</td>
-            </tr>
-            <tr>
-              <td>Set</td>
-              <td>SADD, SMEMBERS, SINTER, SUNION</td>
-              <td>Tags, unique visitors, friend lists</td>
-            </tr>
-            <tr>
-              <td>Sorted Set (ZSet)</td>
-              <td>ZADD, ZRANGE, ZRANK, ZSCORE</td>
-              <td>Leaderboards, priority queues</td>
-            </tr>
-            <tr>
-              <td>Bitmap</td>
-              <td>SETBIT, GETBIT, BITCOUNT</td>
-              <td>Daily active users (one bit per user)</td>
-            </tr>
-            <tr>
-              <td>HyperLogLog</td>
-              <td>PFADD, PFCOUNT</td>
-              <td>Cardinality estimation (unique visitors)</td>
-            </tr>
-            <tr>
-              <td>Stream</td>
-              <td>XADD, XREAD, XACK</td>
-              <td>Event log, message streaming</td>
-            </tr>
-          </table>
-        </div>
+    <h3>Redis Data Structures</h3>
+    <p>Unlike Memcached (which is a pure string cache), Redis provides rich data types that enable sophisticated
+      patterns without application-side logic:</p>
+    <div class="table-wrap">
+      <table>
+        <tr>
+          <th>Type</th>
+          <th>Operations</th>
+          <th>Use case</th>
+        </tr>
+        <tr>
+          <td>String</td>
+          <td>GET, SET, INCR, APPEND</td>
+          <td>Simple caching, counters</td>
+        </tr>
+        <tr>
+          <td>Hash</td>
+          <td>HGET, HSET, HMGET, HGETALL</td>
+          <td>User profiles, object fields</td>
+        </tr>
+        <tr>
+          <td>List</td>
+          <td>LPUSH, RPUSH, LPOP, LRANGE</td>
+          <td>Message queues, activity feeds</td>
+        </tr>
+        <tr>
+          <td>Set</td>
+          <td>SADD, SMEMBERS, SINTER, SUNION</td>
+          <td>Tags, unique visitors, friend lists</td>
+        </tr>
+        <tr>
+          <td>Sorted Set (ZSet)</td>
+          <td>ZADD, ZRANGE, ZRANK, ZSCORE</td>
+          <td>Leaderboards, priority queues</td>
+        </tr>
+        <tr>
+          <td>Bitmap</td>
+          <td>SETBIT, GETBIT, BITCOUNT</td>
+          <td>Daily active users (one bit per user)</td>
+        </tr>
+        <tr>
+          <td>HyperLogLog</td>
+          <td>PFADD, PFCOUNT</td>
+          <td>Cardinality estimation (unique visitors)</td>
+        </tr>
+        <tr>
+          <td>Stream</td>
+          <td>XADD, XREAD, XACK</td>
+          <td>Event log, message streaming</td>
+        </tr>
+      </table>
+    </div>
 
-        <h2>Wide-Column Databases</h2>
-        <p>Wide-column databases (also called column-family databases) organize data by rows, where each row can have a
-          different set of columns. Columns are stored together on disk, making range queries on column families very
-          efficient. They are designed for massive write throughput and horizontal scalability.</p>
+    <h2>Wide-Column Databases</h2>
+    <p>Wide-column databases (also called column-family databases) organize data by rows, where each row can have a
+      different set of columns. Columns are stored together on disk, making range queries on column families very
+      efficient. They are designed for massive write throughput and horizontal scalability.</p>
 
-        <h3>Data Model</h3>
-        <p>Data is organized as: keyspace → table → partition key → clustering key → column values. The partition key
-          determines which node stores the row. The clustering key determines the ordering of rows within a partition.
-        </p>
+    <h3>Data Model</h3>
+    <p>Data is organized as: keyspace → table → partition key → clustering key → column values. The partition key
+      determines which node stores the row. The clustering key determines the ordering of rows within a partition.
+    </p>
 
-        <div class="example">
-          <div class="example-label">Cassandra: Time-series user events</div>
-          <pre>
+    <div class="example">
+      <div class="example-label">Cassandra: Time-series user events</div>
+      <pre>
 CREATE TABLE user_events (
     user_id   UUID,
     event_time TIMESTAMP,
@@ -651,69 +981,69 @@ WHERE user_id = 'abc123'
   AND event_time &gt; '2024-01-01'
 LIMIT 50;
   </pre>
-          <p>All events for user 'abc123' are stored on the same partition (same node), making the range query a
-            single-node sequential scan — extremely fast.</p>
-        </div>
+      <p>All events for user 'abc123' are stored on the same partition (same node), making the range query a
+        single-node sequential scan — extremely fast.</p>
+    </div>
 
-        <h3>When to Use</h3>
-        <ul>
-          <li>Very high write throughput (millions of writes per second)</li>
-          <li>Time-series or append-only data</li>
-          <li>Global distribution with multi-region writes</li>
-          <li>Read patterns are known and involve partition + range scans</li>
-        </ul>
+    <h3>When to Use</h3>
+    <ul>
+      <li>Very high write throughput (millions of writes per second)</li>
+      <li>Time-series or append-only data</li>
+      <li>Global distribution with multi-region writes</li>
+      <li>Read patterns are known and involve partition + range scans</li>
+    </ul>
 
-        <h2>Graph Databases</h2>
-        <p>Graph databases store data as nodes (entities) and edges (relationships), with properties on both. They are
-          optimized for traversing relationships — queries that require following many hops between connected data. In
-          relational databases, the same query would require multiple expensive JOIN operations.</p>
+    <h2>Graph Databases</h2>
+    <p>Graph databases store data as nodes (entities) and edges (relationships), with properties on both. They are
+      optimized for traversing relationships — queries that require following many hops between connected data. In
+      relational databases, the same query would require multiple expensive JOIN operations.</p>
 
-        <h3>Strengths</h3>
-        <ul>
-          <li>Relationship traversal is O(number of edges traversed), not O(table size)</li>
-          <li>Natural modeling for highly connected domains</li>
-          <li>Pattern matching on relationship structures</li>
-        </ul>
+    <h3>Strengths</h3>
+    <ul>
+      <li>Relationship traversal is O(number of edges traversed), not O(table size)</li>
+      <li>Natural modeling for highly connected domains</li>
+      <li>Pattern matching on relationship structures</li>
+    </ul>
 
-        <div class="example">
-          <div class="example-label">Neo4j Cypher: Shortest path between people</div>
-          <pre>
+    <div class="example">
+      <div class="example-label">Neo4j Cypher: Shortest path between people</div>
+      <pre>
 MATCH path = shortestPath(
   (alice:Person {name: 'Alice'})-[:KNOWS*]-(bob:Person {name: 'Bob'})
 )
 RETURN path, length(path) AS degrees_of_separation
   </pre>
-          <p>Finding the shortest path in a social graph. Equivalent SQL would require recursive CTEs and is often
-            impractical for large graphs.</p>
-        </div>
+      <p>Finding the shortest path in a social graph. Equivalent SQL would require recursive CTEs and is often
+        impractical for large graphs.</p>
+    </div>
 
-        <h3>Use Cases</h3>
-        <ul>
-          <li>Social networks (friends-of-friends, recommendations)</li>
-          <li>Fraud detection (detect suspicious transaction patterns)</li>
-          <li>Knowledge graphs (entity relationships, ontologies)</li>
-          <li>Network and IT operations (dependency graphs)</li>
-          <li>Recommendation engines</li>
-        </ul>
+    <h3>Use Cases</h3>
+    <ul>
+      <li>Social networks (friends-of-friends, recommendations)</li>
+      <li>Fraud detection (detect suspicious transaction patterns)</li>
+      <li>Knowledge graphs (entity relationships, ontologies)</li>
+      <li>Network and IT operations (dependency graphs)</li>
+      <li>Recommendation engines</li>
+    </ul>
 
-        <h2>Time Series Databases</h2>
-        <p>Time series databases are optimized for storing and querying sequences of time-stamped data points. They
-          provide efficient compression of timestamped numeric data, built-in time-based aggregation functions, and are
-          designed for extremely high write throughput of append-only data.</p>
+    <h2>Time Series Databases</h2>
+    <p>Time series databases are optimized for storing and querying sequences of time-stamped data points. They
+      provide efficient compression of timestamped numeric data, built-in time-based aggregation functions, and are
+      designed for extremely high write throughput of append-only data.</p>
 
-        <h3>Key Features</h3>
-        <ul>
-          <li><strong>Automatic rollup and downsampling:</strong> Aggregate raw data into hourly/daily summaries to
-            reduce storage.</li>
-          <li><strong>Retention policies:</strong> Automatically delete old raw data while keeping downsampled
-            summaries.</li>
-          <li><strong>Efficient range queries:</strong> Query data between two timestamps efficiently.</li>
-          <li><strong>High write throughput:</strong> Handle millions of data points per second.</li>
-        </ul>
+    <h3>Key Features</h3>
+    <ul>
+      <li><strong>Automatic rollup and downsampling:</strong> Aggregate raw data into hourly/daily summaries to
+        reduce storage.</li>
+      <li><strong>Retention policies:</strong> Automatically delete old raw data while keeping downsampled
+        summaries.</li>
+      <li><strong>Efficient range queries:</strong> Query data between two timestamps efficiently.</li>
+      <li><strong>High write throughput:</strong> Handle millions of data points per second.</li>
+    </ul>
 
-        <div class="example">
-          <div class="example-label">InfluxDB: IoT sensor query</div>
-          <pre>
+    <div class="example">
+      <div class="example-label">InfluxDB: IoT sensor query</div>
+      <pre>
 -- Average temperature per 5-minute window over last 24 hours
 SELECT MEAN("temperature") AS avg_temp
 FROM "sensor_readings"
@@ -721,317 +1051,316 @@ WHERE "sensor_id" = 'sensor_001'
   AND time &gt;= now() - 24h
 GROUP BY time(5m)
   </pre>
-        </div>
+    </div>
 
-        <p><strong>Examples:</strong> InfluxDB, TimescaleDB (PostgreSQL extension), Prometheus (optimized for metrics),
-          Apache Druid, QuestDB</p>
+    <p><strong>Examples:</strong> InfluxDB, TimescaleDB (PostgreSQL extension), Prometheus (optimized for metrics),
+      Apache Druid, QuestDB</p>
 
-        <h2>Full-Text Search Engines</h2>
-        <p>Full-text search engines are optimized for searching within text content — handling natural language, fuzzy
-          matching, relevance ranking, and stemming. They are not primary databases; they are used alongside relational
-          or document databases to provide rich search capabilities.</p>
+    <h2>Full-Text Search Engines</h2>
+    <p>Full-text search engines are optimized for searching within text content — handling natural language, fuzzy
+      matching, relevance ranking, and stemming. They are not primary databases; they are used alongside relational
+      or document databases to provide rich search capabilities.</p>
 
-        <h3>How They Work</h3>
-        <p>Text is tokenized, normalized (lowercased, stemmed), and stored in an inverted index: a mapping from each
-          unique term to the list of documents containing it. Queries look up terms in the index and compute relevance
-          scores (TF-IDF, BM25) to rank results.</p>
+    <h3>How They Work</h3>
+    <p>Text is tokenized, normalized (lowercased, stemmed), and stored in an inverted index: a mapping from each
+      unique term to the list of documents containing it. Queries look up terms in the index and compute relevance
+      scores (TF-IDF, BM25) to rank results.</p>
 
-        <h3>Capabilities</h3>
-        <ul>
-          <li>Full-text search with relevance ranking</li>
-          <li>Fuzzy matching (handles typos: "seach" → "search")</li>
-          <li>Faceted search (filter and count by category, price range, etc.)</li>
-          <li>Autocomplete and type-ahead</li>
-          <li>Geospatial search</li>
-          <li>Log analysis (Elasticsearch as part of ELK stack)</li>
-        </ul>
+    <h3>Capabilities</h3>
+    <ul>
+      <li>Full-text search with relevance ranking</li>
+      <li>Fuzzy matching (handles typos: "seach" → "search")</li>
+      <li>Faceted search (filter and count by category, price range, etc.)</li>
+      <li>Autocomplete and type-ahead</li>
+      <li>Geospatial search</li>
+      <li>Log analysis (Elasticsearch as part of ELK stack)</li>
+    </ul>
 
-        <p><strong>Examples:</strong> Elasticsearch, Apache Solr, Typesense, Meilisearch, Algolia (managed)</p>
+    <p><strong>Examples:</strong> Elasticsearch, Apache Solr, Typesense, Meilisearch, Algolia (managed)</p>
 
-        <h2>Vector Databases</h2>
-        <p>Vector databases store high-dimensional numerical vectors (embeddings produced by machine learning models)
-          and support efficient approximate nearest-neighbor (ANN) search — finding vectors most similar to a query
-          vector.</p>
+    <h2>Vector Databases</h2>
+    <p>Vector databases store high-dimensional numerical vectors (embeddings produced by machine learning models)
+      and support efficient approximate nearest-neighbor (ANN) search — finding vectors most similar to a query
+      vector.</p>
 
-        <h3>Why They Matter</h3>
-        <p>Modern ML models (BERT, GPT, CLIP, Stable Diffusion) encode semantic meaning into vectors. Searching by
-          vector similarity enables semantic search ("find documents about financial risk" even if those exact words
-          don't appear), image similarity, recommendation systems, and retrieval-augmented generation (RAG) for LLMs.
-        </p>
+    <h3>Why They Matter</h3>
+    <p>Modern ML models (BERT, GPT, CLIP, Stable Diffusion) encode semantic meaning into vectors. Searching by
+      vector similarity enables semantic search ("find documents about financial risk" even if those exact words
+      don't appear), image similarity, recommendation systems, and retrieval-augmented generation (RAG) for LLMs.
+    </p>
 
-        <h3>Indexing Algorithms</h3>
-        <ul>
-          <li><strong>HNSW (Hierarchical Navigable Small World):</strong> Builds a multilayer graph structure. O(log n)
-            query time. High memory usage. Best accuracy/speed tradeoff. Used by Pinecone, Weaviate, Qdrant.</li>
-          <li><strong>IVF (Inverted File Index):</strong> Clusters vectors; searches only nearby clusters. Lower memory.
-            Used by Faiss.</li>
-          <li><strong>ANNOY:</strong> Tree-based index built by Spotify. Low latency, read-optimized.</li>
-        </ul>
+    <h3>Indexing Algorithms</h3>
+    <ul>
+      <li><strong>HNSW (Hierarchical Navigable Small World):</strong> Builds a multilayer graph structure. O(log n)
+        query time. High memory usage. Best accuracy/speed tradeoff. Used by Pinecone, Weaviate, Qdrant.</li>
+      <li><strong>IVF (Inverted File Index):</strong> Clusters vectors; searches only nearby clusters. Lower memory.
+        Used by Faiss.</li>
+      <li><strong>ANNOY:</strong> Tree-based index built by Spotify. Low latency, read-optimized.</li>
+    </ul>
 
-        <p><strong>Examples:</strong> Pinecone, Weaviate, Qdrant, Chroma, Milvus, pgvector (PostgreSQL extension)</p>
-      </div>
+    <p><strong>Examples:</strong> Pinecone, Weaviate, Qdrant, Chroma, Milvus, pgvector (PostgreSQL extension)</p>
+  </div>
 
 <div class="section" id="db-internals">
-        <h1 class="section-title">Database Internals</h1>
-        <p class="section-subtitle">Module 8 &nbsp;|&nbsp; How Databases Actually Store, Index, and Retrieve Your Data
-        </p>
+    <h1 class="section-title">Database Internals</h1>
+    <p class="section-subtitle">Module 8 &nbsp;|&nbsp; How Databases Actually Store, Index, and Retrieve Your Data</p>
 
-        <h2>B-Tree vs. LSM-Tree: The Fundamental Storage Engine Divide</h2>
-        <div class="compare">
-          <div class="compare-card neutral">
-            <h4>B-Tree (Read-Optimized)</h4>
-            <ul>
-              <li>Data stored in balanced tree of fixed-size pages (~4KB–16KB each)</li>
-              <li>In-place updates — modify existing page on disk</li>
-              <li>Read: O(log N) — follow pointers from root to leaf</li>
-              <li>Write: O(log N) — but may trigger page splits + WAL write</li>
-              <li>Random I/O pattern — reads scattered across disk</li>
-            </ul>
-            <p><strong>Used by:</strong> PostgreSQL, MySQL (InnoDB), SQLite, Oracle, SQL Server</p>
-            <p><strong>Sweet spot:</strong> Read-heavy OLTP, under ~10K writes/sec per node</p>
-          </div>
-          <div class="compare-card pro">
-            <h4>LSM-Tree (Write-Optimized)</h4>
-            <ul>
-              <li>All writes go to memory (MemTable), then sequential SSTable files</li>
-              <li>No in-place updates — appends only, compaction merges periodically</li>
-              <li>Write: O(1) amortized — always sequential, ultra-high throughput</li>
-              <li>Read: more expensive — must check MemTable + multiple SSTables</li>
-              <li>Uses Bloom Filters to avoid reading SSTables that don't contain the key</li>
-            </ul>
-            <p><strong>Used by:</strong> Cassandra, RocksDB, LevelDB, HBase, InfluxDB, Kafka log</p>
-            <p><strong>Sweet spot:</strong> Write-heavy workloads, time-series, IoT, &gt;100K writes/sec</p>
-          </div>
-        </div>
-
-        <div class="mermaid">
-          flowchart TD
-          subgraph LSM-Tree Write Path
-          W[Write] --> M[MemTable\nin-memory sorted]
-          M -->|flush when full| L0[SSTable L0\n~2MB sorted file]
-          L0 -->|compaction| L1[SSTable L1\n~20MB files]
-          L1 -->|compaction| L2[SSTable L2\nlarger files]
-          end
-          subgraph Read Path
-          R[Read key X] --> BF{Bloom Filter\nin memory}
-          BF -->|"Maybe (10% FP)"| Check[Check SSTable\nfor key X]
-          BF -->|"Definitely NOT"| Skip[Skip SSTable\nskip disk I/O]
-          end
-        </div>
-
-        <h2>Write-Ahead Log (WAL): The Crash Recovery Backbone</h2>
-        <div class="def">
-          <dt>What is the WAL?</dt>
-          <dd>Before any data page is modified, the change is written to a sequential append-only log (the WAL).
-            On crash, the database replays the WAL to recover to a consistent state. The WAL is why databases
-            can guarantee durability (the 'D' in ACID) even without fsync on every data page write.</dd>
-          <dt>Why sequential writes are critical</dt>
-          <dd>Sequential HDD writes: ~100–200 MB/s. Random HDD writes: ~0.5–1 MB/s (100–400× slower).
-            By making the WAL sequential (always append to one file), PostgreSQL achieves predictable, fast
-            durability writes regardless of the random I/O needed for the actual B-Tree pages.</dd>
-          <dt>WAL and Replication</dt>
-          <dd>PostgreSQL streaming replication works by shipping WAL records to replicas in real time.
-            The replica replays the WAL, stay in sync. This is how you get a hot standby with &lt;1 second
-            replication lag. WAL decoding (logical replication) lets you also stream changes to Kafka for
-            change data capture (CDC).</dd>
-        </div>
-
-        <h2>Indexes Deep Dive</h2>
-        <div class="table-wrap">
-          <table>
-            <tr>
-              <th>Index Type</th>
-              <th>Structure</th>
-              <th>Best For</th>
-              <th>Cost</th>
-            </tr>
-            <tr>
-              <td><strong>B-Tree Index</strong></td>
-              <td>Balanced tree</td>
-              <td>Equality, range queries, ORDER BY</td>
-              <td>O(log N) lookup, maintains sorted order</td>
-            </tr>
-            <tr>
-              <td><strong>Hash Index</strong></td>
-              <td>Hash map</td>
-              <td>Exact equality ONLY (=)</td>
-              <td>O(1) lookup — faster than B-Tree for equality</td>
-            </tr>
-            <tr>
-              <td><strong>GiST / SP-GiST</strong></td>
-              <td>Generalized search tree</td>
-              <td>Geometric, full-text, custom types</td>
-              <td>Variable</td>
-            </tr>
-            <tr>
-              <td><strong>GIN (Inverted)</strong></td>
-              <td>Token → [row_ids] map</td>
-              <td>Full-text search, JSONB containment, arrays</td>
-              <td>Slow to build, fast to query</td>
-            </tr>
-            <tr>
-              <td><strong>BRIN</strong></td>
-              <td>Block range min/max</td>
-              <td>Monotonically increasing data (timestamps, IDs)</td>
-              <td>Tiny size, fast build, coarse filtering</td>
-            </tr>
-            <tr>
-              <td><strong>Covering Index</strong></td>
-              <td>B-Tree with included columns</td>
-              <td>Index-only scan (no heap access)</td>
-              <td>Larger index, eliminates table lookup</td>
-            </tr>
-            <tr>
-              <td><strong>Partial Index</strong></td>
-              <td>B-Tree on filtered rows</td>
-              <td>WHERE clause on subset (active users, unprocessed jobs)</td>
-              <td>Much smaller, faster for targeted queries</td>
-            </tr>
-          </table>
-        </div>
-
-        <div class="callout tip">
-          <div class="callout-title">The Composite Index Column Order Rule</div>
-          <p>For a composite index on <code>(A, B, C)</code>: PostgreSQL can use it for queries on <code>A</code>,
-            <code>A + B</code>, <code>A + B + C</code> — but NOT on <code>B</code> alone or <code>B + C</code> alone.
-            Put the <strong>most selective</strong> and <strong>most commonly filtered</strong> column first.
-            For range queries, put the equality columns before range columns in the index.
-          </p>
-        </div>
-
-        <h2>MVCC: How Databases Handle Concurrent Reads and Writes</h2>
-        <p><strong>Multi-Version Concurrency Control (MVCC)</strong> is how PostgreSQL, MySQL InnoDB, and Oracle
-          allow readers to never block writers and writers to never block readers. Each row keeps multiple versions.
-          Each transaction sees a snapshot of the DB at its start — no row-level read locks needed.</p>
-
-        <div class="def">
-          <dt>How PostgreSQL MVCC works</dt>
-          <dd>Every row has a <code>xmin</code> (transaction that created it) and <code>xmax</code> (transaction
-            that deleted/updated it). A SELECT sees all rows where <code>xmin &lt;= my_txn_id &lt; xmax</code>.
-            Updates create a NEW row version; the old version stays for in-flight transactions.
-            VACUUM periodically reclaims old row versions (dead tuples). High update load + delayed VACUUM
-            = table bloat.</dd>
-          <dt>Transaction Isolation Levels and What They Prevent</dt>
-          <dd>
-            <table style="width:100%;font-size:.8rem;border-collapse:collapse">
-              <tr style="background:rgba(137,180,250,.1)">
-                <th>Level</th>
-                <th>Dirty Read</th>
-                <th>Non-Repeatable Read</th>
-                <th>Phantom Read</th>
-              </tr>
-              <tr>
-                <td>READ UNCOMMITTED</td>
-                <td>❌ Possible</td>
-                <td>❌ Possible</td>
-                <td>❌ Possible</td>
-              </tr>
-              <tr>
-                <td>READ COMMITTED (default)</td>
-                <td>✅ Protected</td>
-                <td>❌ Possible</td>
-                <td>❌ Possible</td>
-              </tr>
-              <tr>
-                <td>REPEATABLE READ</td>
-                <td>✅ Protected</td>
-                <td>✅ Protected</td>
-                <td>❌ Possible</td>
-              </tr>
-              <tr>
-                <td>SERIALIZABLE</td>
-                <td>✅ Protected</td>
-                <td>✅ Protected</td>
-                <td>✅ Protected</td>
-              </tr>
-            </table>
-            Most apps run READ COMMITTED. SERIALIZABLE is correct but costly — watch for performance at scale.
-          </dd>
-        </div>
-
-        <h2>Query Execution: What EXPLAIN ANALYZE Tells You</h2>
-        <div class="callout info">
-          <div class="callout-title">How to Read a Query Plan</div>
-          <p>Run <code>EXPLAIN (ANALYZE, BUFFERS) SELECT ...</code> in PostgreSQL. Look for:</p>
-          <ul>
-            <li><strong>Seq Scan</strong> on large table → missing index. Add one.</li>
-            <li><strong>Nested Loop</strong> with large outer set → consider Hash Join if both sides are large.</li>
-            <li><strong>High buffer hits</strong> from shared_buffers → good (data is cached in RAM). High disk reads →
-              increase shared_buffers or add RAM.</li>
-            <li><strong>Rows estimate vs. actual huge mismatch</strong> → stale statistics. Run <code>ANALYZE</code>.
-            </li>
-          </ul>
-        </div>
-
-        <div class="def">
-          <dt>Real-world: Shopify's database optimizations</dt>
-          <dd>Shopify runs one of the largest Rails+MySQL stacks in the world (~$7.5B GMV/day through a monolith).
-            Key lessons: (1) every query must have an index — no full-table scans in production; (2) use covering
-            indexes to avoid secondary row lookups (index-only scans); (3) use pt-query-digest to identify the
-            top 10 slow queries — fix those before adding hardware; (4) aggressively denormalize read-heavy tables
-            with background jobs to maintain derived data.</dd>
-        </div>
+    <h2>B-Tree vs. LSM-Tree: The Fundamental Storage Engine Divide</h2>
+    <div class="compare">
+      <div class="compare-card neutral">
+        <h4>B-Tree (Read-Optimized)</h4>
+        <ul>
+          <li>Data stored in balanced tree of fixed-size pages (~4KB–16KB each)</li>
+          <li>In-place updates — modify existing page on disk</li>
+          <li>Read: O(log N) — follow pointers from root to leaf</li>
+          <li>Write: O(log N) — but may trigger page splits + WAL write</li>
+          <li>Random I/O pattern — reads scattered across disk</li>
+        </ul>
+        <p><strong>Used by:</strong> PostgreSQL, MySQL (InnoDB), SQLite, Oracle, SQL Server</p>
+        <p><strong>Sweet spot:</strong> Read-heavy OLTP, under ~10K writes/sec per node</p>
       </div>
+      <div class="compare-card pro">
+        <h4>LSM-Tree (Write-Optimized)</h4>
+        <ul>
+          <li>All writes go to memory (MemTable), then sequential SSTable files</li>
+          <li>No in-place updates — appends only, compaction merges periodically</li>
+          <li>Write: O(1) amortized — always sequential, ultra-high throughput</li>
+          <li>Read: more expensive — must check MemTable + multiple SSTables</li>
+          <li>Uses Bloom Filters to avoid reading SSTables that don't contain the key</li>
+        </ul>
+        <p><strong>Used by:</strong> Cassandra, RocksDB, LevelDB, HBase, InfluxDB, Kafka log</p>
+        <p><strong>Sweet spot:</strong> Write-heavy workloads, time-series, IoT, &gt;100K writes/sec</p>
+      </div>
+    </div>
+
+    <div class="mermaid">
+      flowchart TD
+      subgraph LSM-Tree Write Path
+      W[Write] --> M[MemTable\nin-memory sorted]
+      M -->|flush when full| L0[SSTable L0\n~2MB sorted file]
+      L0 -->|compaction| L1[SSTable L1\n~20MB files]
+      L1 -->|compaction| L2[SSTable L2\nlarger files]
+      end
+      subgraph Read Path
+      R[Read key X] --> BF{Bloom Filter\nin memory}
+      BF -->|"Maybe (10% FP)"| Check[Check SSTable\nfor key X]
+      BF -->|"Definitely NOT"| Skip[Skip SSTable\nskip disk I/O]
+      end
+    </div>
+
+    <h2>Write-Ahead Log (WAL): The Crash Recovery Backbone</h2>
+    <div class="def">
+      <dt>What is the WAL?</dt>
+      <dd>Before any data page is modified, the change is written to a sequential append-only log (the WAL).
+        On crash, the database replays the WAL to recover to a consistent state. The WAL is why databases
+        can guarantee durability (the 'D' in ACID) even without fsync on every data page write.</dd>
+      <dt>Why sequential writes are critical</dt>
+      <dd>Sequential HDD writes: ~100–200 MB/s. Random HDD writes: ~0.5–1 MB/s (100–400× slower).
+        By making the WAL sequential (always append to one file), PostgreSQL achieves predictable, fast
+        durability writes regardless of the random I/O needed for the actual B-Tree pages.</dd>
+      <dt>WAL and Replication</dt>
+      <dd>PostgreSQL streaming replication works by shipping WAL records to replicas in real time.
+        The replica replays the WAL, stay in sync. This is how you get a hot standby with &lt;1 second
+        replication lag. WAL decoding (logical replication) lets you also stream changes to Kafka for
+        change data capture (CDC).</dd>
+    </div>
+
+    <h2>Indexes Deep Dive</h2>
+    <div class="table-wrap">
+      <table>
+        <tr>
+          <th>Index Type</th>
+          <th>Structure</th>
+          <th>Best For</th>
+          <th>Cost</th>
+        </tr>
+        <tr>
+          <td><strong>B-Tree Index</strong></td>
+          <td>Balanced tree</td>
+          <td>Equality, range queries, ORDER BY</td>
+          <td>O(log N) lookup, maintains sorted order</td>
+        </tr>
+        <tr>
+          <td><strong>Hash Index</strong></td>
+          <td>Hash map</td>
+          <td>Exact equality ONLY (=)</td>
+          <td>O(1) lookup — faster than B-Tree for equality</td>
+        </tr>
+        <tr>
+          <td><strong>GiST / SP-GiST</strong></td>
+          <td>Generalized search tree</td>
+          <td>Geometric, full-text, custom types</td>
+          <td>Variable</td>
+        </tr>
+        <tr>
+          <td><strong>GIN (Inverted)</strong></td>
+          <td>Token → [row_ids] map</td>
+          <td>Full-text search, JSONB containment, arrays</td>
+          <td>Slow to build, fast to query</td>
+        </tr>
+        <tr>
+          <td><strong>BRIN</strong></td>
+          <td>Block range min/max</td>
+          <td>Monotonically increasing data (timestamps, IDs)</td>
+          <td>Tiny size, fast build, coarse filtering</td>
+        </tr>
+        <tr>
+          <td><strong>Covering Index</strong></td>
+          <td>B-Tree with included columns</td>
+          <td>Index-only scan (no heap access)</td>
+          <td>Larger index, eliminates table lookup</td>
+        </tr>
+        <tr>
+          <td><strong>Partial Index</strong></td>
+          <td>B-Tree on filtered rows</td>
+          <td>WHERE clause on subset (active users, unprocessed jobs)</td>
+          <td>Much smaller, faster for targeted queries</td>
+        </tr>
+      </table>
+    </div>
+
+    <div class="callout tip">
+      <div class="callout-title">The Composite Index Column Order Rule</div>
+      <p>For a composite index on <code>(A, B, C)</code>: PostgreSQL can use it for queries on <code>A</code>,
+        <code>A + B</code>, <code>A + B + C</code> — but NOT on <code>B</code> alone or <code>B + C</code> alone.
+        Put the <strong>most selective</strong> and <strong>most commonly filtered</strong> column first.
+        For range queries, put the equality columns before range columns in the index.
+      </p>
+    </div>
+
+    <h2>MVCC: How Databases Handle Concurrent Reads and Writes</h2>
+    <p><strong>Multi-Version Concurrency Control (MVCC)</strong> is how PostgreSQL, MySQL InnoDB, and Oracle
+      allow readers to never block writers and writers to never block readers. Each row keeps multiple versions.
+      Each transaction sees a snapshot of the DB at its start — no row-level read locks needed.</p>
+
+    <div class="def">
+      <dt>How PostgreSQL MVCC works</dt>
+      <dd>Every row has a <code>xmin</code> (transaction that created it) and <code>xmax</code> (transaction
+        that deleted/updated it). A SELECT sees all rows where <code>xmin &lt;= my_txn_id &lt; xmax</code>.
+        Updates create a NEW row version; the old version stays for in-flight transactions.
+        VACUUM periodically reclaims old row versions (dead tuples). High update load + delayed VACUUM
+        = table bloat.</dd>
+      <dt>Transaction Isolation Levels and What They Prevent</dt>
+      <dd>
+        <table style="width:100%;font-size:.8rem;border-collapse:collapse">
+          <tr style="background:rgba(137,180,250,.1)">
+            <th>Level</th>
+            <th>Dirty Read</th>
+            <th>Non-Repeatable Read</th>
+            <th>Phantom Read</th>
+          </tr>
+          <tr>
+            <td>READ UNCOMMITTED</td>
+            <td>❌ Possible</td>
+            <td>❌ Possible</td>
+            <td>❌ Possible</td>
+          </tr>
+          <tr>
+            <td>READ COMMITTED (default)</td>
+            <td>✅ Protected</td>
+            <td>❌ Possible</td>
+            <td>❌ Possible</td>
+          </tr>
+          <tr>
+            <td>REPEATABLE READ</td>
+            <td>✅ Protected</td>
+            <td>✅ Protected</td>
+            <td>❌ Possible</td>
+          </tr>
+          <tr>
+            <td>SERIALIZABLE</td>
+            <td>✅ Protected</td>
+            <td>✅ Protected</td>
+            <td>✅ Protected</td>
+          </tr>
+        </table>
+        Most apps run READ COMMITTED. SERIALIZABLE is correct but costly — watch for performance at scale.
+      </dd>
+    </div>
+
+    <h2>Query Execution: What EXPLAIN ANALYZE Tells You</h2>
+    <div class="callout info">
+      <div class="callout-title">How to Read a Query Plan</div>
+      <p>Run <code>EXPLAIN (ANALYZE, BUFFERS) SELECT ...</code> in PostgreSQL. Look for:</p>
+      <ul>
+        <li><strong>Seq Scan</strong> on large table → missing index. Add one.</li>
+        <li><strong>Nested Loop</strong> with large outer set → consider Hash Join if both sides are large.</li>
+        <li><strong>High buffer hits</strong> from shared_buffers → good (data is cached in RAM). High disk reads →
+          increase shared_buffers or add RAM.</li>
+        <li><strong>Rows estimate vs. actual huge mismatch</strong> → stale statistics. Run <code>ANALYZE</code>.
+        </li>
+      </ul>
+    </div>
+
+    <div class="def">
+      <dt>Real-world: Shopify's database optimizations</dt>
+      <dd>Shopify runs one of the largest Rails+MySQL stacks in the world (~$7.5B GMV/day through a monolith).
+        Key lessons: (1) every query must have an index — no full-table scans in production; (2) use covering
+        indexes to avoid secondary row lookups (index-only scans); (3) use pt-query-digest to identify the
+        top 10 slow queries — fix those before adding hardware; (4) aggressively denormalize read-heavy tables
+        with background jobs to maintain derived data.</dd>
+    </div>
+  </div>
 
 <div class="section" id="db-scaling">
-        <h1 class="section-title">Database Scaling Techniques</h1>
-        <p class="section-subtitle">Module 8 &nbsp;|&nbsp; Indexing · Query Optimization · Read Replicas ·
-          Denormalization · Materialized Views · Connection Pooling · Vertical Partitioning · Sharding · Sharding vs
-          Partitioning · Data Compression</p>
+    <h1 class="section-title">Database Scaling Techniques</h1>
+    <p class="section-subtitle">Module 8 &nbsp;|&nbsp; Indexing · Query Optimization · Read Replicas ·
+      Denormalization · Materialized Views · Connection Pooling · Vertical Partitioning · Sharding · Sharding vs
+      Partitioning · Data Compression</p>
 
-        <h2>Indexing</h2>
-        <p>An index is a separate data structure (typically a B+ tree) that maintains a sorted copy of one or more
-          columns, enabling the database to locate rows without scanning the entire table.</p>
+    <h2>Indexing</h2>
+    <p>An index is a separate data structure (typically a B+ tree) that maintains a sorted copy of one or more
+      columns, enabling the database to locate rows without scanning the entire table.</p>
 
-        <h3>How Indexes Improve Query Performance</h3>
-        <p>Without an index on <code>email</code>, finding a user requires scanning every row in the table — O(n). With
-          a B+ tree index, the lookup is O(log n), and for a table with 100 million rows, this can mean the difference
-          between 100 million disk reads and 3–4 disk reads.</p>
+    <h3>How Indexes Improve Query Performance</h3>
+    <p>Without an index on <code>email</code>, finding a user requires scanning every row in the table — O(n). With
+      a B+ tree index, the lookup is O(log n), and for a table with 100 million rows, this can mean the difference
+      between 100 million disk reads and 3–4 disk reads.</p>
 
-        <h3>Types of Indexes</h3>
-        <ul>
-          <li><strong>B+ tree index (default):</strong> Good for equality (<code>=</code>), range (<code>&gt;</code>,
-            <code>&lt;</code>, <code>BETWEEN</code>), prefix (<code>LIKE 'abc%'</code>), and ORDER BY queries.
-          </li>
-          <li><strong>Hash index:</strong> O(1) equality lookups. Cannot support range queries. Useful for exact-match
-            lookups like session ID lookups.</li>
-          <li><strong>Composite index:</strong> Index on multiple columns <code>(a, b, c)</code>. Can satisfy queries on
-            <code>a</code>, <code>a,b</code>, or <code>a,b,c</code> but not <code>b</code> alone (leftmost prefix rule).
-          </li>
-          <li><strong>Covering index:</strong> An index that contains all columns needed to satisfy a query, so the
-            database never needs to access the table rows (index-only scan).</li>
-          <li><strong>Partial index:</strong> Index only rows matching a condition. Example: index only active users.
-            Smaller and faster than full index for selective queries.</li>
-          <li><strong>GIN/GiST index (PostgreSQL):</strong> For full-text search, JSONB, arrays, and geospatial data.
-          </li>
-        </ul>
+    <h3>Types of Indexes</h3>
+    <ul>
+      <li><strong>B+ tree index (default):</strong> Good for equality (<code>=</code>), range (<code>&gt;</code>,
+        <code>&lt;</code>, <code>BETWEEN</code>), prefix (<code>LIKE 'abc%'</code>), and ORDER BY queries.
+      </li>
+      <li><strong>Hash index:</strong> O(1) equality lookups. Cannot support range queries. Useful for exact-match
+        lookups like session ID lookups.</li>
+      <li><strong>Composite index:</strong> Index on multiple columns <code>(a, b, c)</code>. Can satisfy queries on
+        <code>a</code>, <code>a,b</code>, or <code>a,b,c</code> but not <code>b</code> alone (leftmost prefix rule).
+      </li>
+      <li><strong>Covering index:</strong> An index that contains all columns needed to satisfy a query, so the
+        database never needs to access the table rows (index-only scan).</li>
+      <li><strong>Partial index:</strong> Index only rows matching a condition. Example: index only active users.
+        Smaller and faster than full index for selective queries.</li>
+      <li><strong>GIN/GiST index (PostgreSQL):</strong> For full-text search, JSONB, arrays, and geospatial data.
+      </li>
+    </ul>
 
-        <h3>Index Tradeoffs</h3>
-        <ul>
-          <li>Each index increases write time (insert, update, delete must update all indexes on affected columns).</li>
-          <li>Indexes consume storage (often 10–30% of table size per index).</li>
-          <li>Too many indexes cause query planner confusion and slow writes more than they help reads.</li>
-        </ul>
+    <h3>Index Tradeoffs</h3>
+    <ul>
+      <li>Each index increases write time (insert, update, delete must update all indexes on affected columns).</li>
+      <li>Indexes consume storage (often 10–30% of table size per index).</li>
+      <li>Too many indexes cause query planner confusion and slow writes more than they help reads.</li>
+    </ul>
 
-        <div class="callout tip">
-          <div class="callout-title">Index Selection Guidelines</div>
-          <ul>
-            <li>Always index foreign key columns (prevents full table scans on joins)</li>
-            <li>Index columns used in WHERE clauses of frequent queries</li>
-            <li>Index columns used in ORDER BY or GROUP BY</li>
-            <li>Do not index columns with low cardinality (e.g., boolean, status with 3 values) unless used as part of a
-              selective composite index</li>
-            <li>Use EXPLAIN / EXPLAIN ANALYZE to verify queries actually use indexes</li>
-          </ul>
-        </div>
+    <div class="callout tip">
+      <div class="callout-title">Index Selection Guidelines</div>
+      <ul>
+        <li>Always index foreign key columns (prevents full table scans on joins)</li>
+        <li>Index columns used in WHERE clauses of frequent queries</li>
+        <li>Index columns used in ORDER BY or GROUP BY</li>
+        <li>Do not index columns with low cardinality (e.g., boolean, status with 3 values) unless used as part of a
+          selective composite index</li>
+        <li>Use EXPLAIN / EXPLAIN ANALYZE to verify queries actually use indexes</li>
+      </ul>
+    </div>
 
-        <h2>Query Optimization</h2>
-        <p>Query optimization involves rewriting queries to use indexes efficiently, avoiding common anti-patterns, and
-          ensuring the query planner has accurate statistics to generate optimal execution plans.</p>
+    <h2>Query Optimization</h2>
+    <p>Query optimization involves rewriting queries to use indexes efficiently, avoiding common anti-patterns, and
+      ensuring the query planner has accurate statistics to generate optimal execution plans.</p>
 
-        <h3>Common Anti-Patterns and Fixes</h3>
+    <h3>Common Anti-Patterns and Fixes</h3>
 
-        <pre>
+    <pre>
 -- ANTI-PATTERN: Function on indexed column (breaks index use)
 SELECT * FROM orders WHERE YEAR(created_at) = 2024;
 
@@ -1040,7 +1369,7 @@ SELECT * FROM orders
 WHERE created_at >= '2024-01-01' AND created_at < '2025-01-01';
 </pre>
 
-        <pre>
+    <pre>
 -- ANTI-PATTERN: N+1 queries (query per row)
 users = db.query("SELECT * FROM users LIMIT 100")
 for user in users:
@@ -1054,7 +1383,7 @@ LEFT JOIN orders o ON u.id = o.user_id
 LIMIT 100;
 </pre>
 
-        <pre>
+    <pre>
 -- ANTI-PATTERN: SELECT * (fetches unused columns, wider rows)
 SELECT * FROM products;
 
@@ -1062,7 +1391,7 @@ SELECT * FROM products;
 SELECT id, name, price, stock FROM products;
 </pre>
 
-        <pre>
+    <pre>
 -- ANTI-PATTERN: Implicit type conversion breaks index
 SELECT * FROM users WHERE id = '12345';  -- id is INT, comparing to VARCHAR
 
@@ -1070,53 +1399,53 @@ SELECT * FROM users WHERE id = '12345';  -- id is INT, comparing to VARCHAR
 SELECT * FROM users WHERE id = 12345;
 </pre>
 
-        <h3>EXPLAIN Plans</h3>
-        <p>Use <code>EXPLAIN ANALYZE</code> in PostgreSQL or <code>EXPLAIN</code> in MySQL to see the query execution
-          plan. Key things to look for:</p>
-        <ul>
-          <li><strong>Seq Scan:</strong> Full table scan — typically bad on large tables. Indicates missing index or
-            non-selective condition.</li>
-          <li><strong>Index Scan:</strong> Uses B-tree index. Good.</li>
-          <li><strong>Index Only Scan:</strong> Fully covered by index. Best case.</li>
-          <li><strong>Nested Loop vs Hash Join vs Merge Join:</strong> Different join algorithms with different
-            performance characteristics.</li>
-          <li><strong>Actual rows vs Estimated rows:</strong> Large discrepancy means stale statistics — run ANALYZE to
-            update.</li>
-        </ul>
+    <h3>EXPLAIN Plans</h3>
+    <p>Use <code>EXPLAIN ANALYZE</code> in PostgreSQL or <code>EXPLAIN</code> in MySQL to see the query execution
+      plan. Key things to look for:</p>
+    <ul>
+      <li><strong>Seq Scan:</strong> Full table scan — typically bad on large tables. Indicates missing index or
+        non-selective condition.</li>
+      <li><strong>Index Scan:</strong> Uses B-tree index. Good.</li>
+      <li><strong>Index Only Scan:</strong> Fully covered by index. Best case.</li>
+      <li><strong>Nested Loop vs Hash Join vs Merge Join:</strong> Different join algorithms with different
+        performance characteristics.</li>
+      <li><strong>Actual rows vs Estimated rows:</strong> Large discrepancy means stale statistics — run ANALYZE to
+        update.</li>
+    </ul>
 
-        <h2>Read Replicas</h2>
-        <p>Read replicas are copies of the primary database that receive a continuous stream of changes from the primary
-          and can serve read queries. Since most applications are read-heavy (often 90%+ reads), distributing read
-          traffic across multiple replicas dramatically increases read capacity without affecting write performance.</p>
+    <h2>Read Replicas</h2>
+    <p>Read replicas are copies of the primary database that receive a continuous stream of changes from the primary
+      and can serve read queries. Since most applications are read-heavy (often 90%+ reads), distributing read
+      traffic across multiple replicas dramatically increases read capacity without affecting write performance.</p>
 
-        <h3>Replication Process</h3>
-        <ol>
-          <li>Application writes to the primary.</li>
-          <li>Primary writes to its WAL.</li>
-          <li>WAL changes are streamed to replicas (streaming replication).</li>
-          <li>Replicas apply the WAL changes to their local copy.</li>
-          <li>Read queries are directed to replicas by the application or a read-aware connection pool.</li>
-        </ol>
+    <h3>Replication Process</h3>
+    <ol>
+      <li>Application writes to the primary.</li>
+      <li>Primary writes to its WAL.</li>
+      <li>WAL changes are streamed to replicas (streaming replication).</li>
+      <li>Replicas apply the WAL changes to their local copy.</li>
+      <li>Read queries are directed to replicas by the application or a read-aware connection pool.</li>
+    </ol>
 
-        <h3>Replication Lag</h3>
-        <p>Replicas are typically slightly behind the primary (seconds to milliseconds under normal load). Applications
-          must account for this:</p>
-        <ul>
-          <li>Reads that must reflect the most recent writes should go to the primary.</li>
-          <li>Reads tolerant of slight staleness (user list, product catalog) can go to replicas.</li>
-          <li>After writing, a subsequent read may see stale data if routed to a replica. Pattern: route reads to
-            primary for a short window after a user's own writes.</li>
-        </ul>
+    <h3>Replication Lag</h3>
+    <p>Replicas are typically slightly behind the primary (seconds to milliseconds under normal load). Applications
+      must account for this:</p>
+    <ul>
+      <li>Reads that must reflect the most recent writes should go to the primary.</li>
+      <li>Reads tolerant of slight staleness (user list, product catalog) can go to replicas.</li>
+      <li>After writing, a subsequent read may see stale data if routed to a replica. Pattern: route reads to
+        primary for a short window after a user's own writes.</li>
+    </ul>
 
-        <h2>Denormalization</h2>
-        <p>Normalization eliminates redundancy to ensure data integrity. Denormalization deliberately introduces
-          redundancy to reduce the number of joins required for common queries, trading write complexity for read
-          performance.</p>
+    <h2>Denormalization</h2>
+    <p>Normalization eliminates redundancy to ensure data integrity. Denormalization deliberately introduces
+      redundancy to reduce the number of joins required for common queries, trading write complexity for read
+      performance.</p>
 
-        <div class="compare">
-          <div class="compare-card neutral">
-            <h4>Normalized Schema</h4>
-            <pre>
+    <div class="compare">
+      <div class="compare-card neutral">
+        <h4>Normalized Schema</h4>
+        <pre>
 orders      (order_id, user_id, product_id, amount)
 users       (user_id, name, email)
 products    (product_id, title, category)
@@ -1127,10 +1456,10 @@ FROM orders o
 JOIN users u ON o.user_id = u.id
 JOIN products p ON o.product_id = p.id;
     </pre>
-          </div>
-          <div class="compare-card neutral">
-            <h4>Denormalized Schema</h4>
-            <pre>
+      </div>
+      <div class="compare-card neutral">
+        <h4>Denormalized Schema</h4>
+        <pre>
 orders (
   order_id,
   user_id,    user_name,    -- duplicated
@@ -1141,16 +1470,16 @@ orders (
 -- No joins needed:
 SELECT * FROM orders WHERE order_id = 123;
     </pre>
-            <p>Tradeoff: if a user changes their name, all their orders must be updated too.</p>
-          </div>
-        </div>
+        <p>Tradeoff: if a user changes their name, all their orders must be updated too.</p>
+      </div>
+    </div>
 
-        <h2>Materialized Views</h2>
-        <p>A materialized view is a pre-computed, physically stored result of a query. Unlike a regular (virtual) view
-          which re-executes the query on each access, a materialized view stores the results and must be explicitly or
-          automatically refreshed when the underlying data changes.</p>
+    <h2>Materialized Views</h2>
+    <p>A materialized view is a pre-computed, physically stored result of a query. Unlike a regular (virtual) view
+      which re-executes the query on each access, a materialized view stores the results and must be explicitly or
+      automatically refreshed when the underlying data changes.</p>
 
-        <pre>
+    <pre>
 -- Create materialized view: daily revenue by product category
 CREATE MATERIALIZED VIEW daily_revenue AS
 SELECT
@@ -1173,36 +1502,36 @@ WHERE day = '2024-01-15';
 REFRESH MATERIALIZED VIEW CONCURRENTLY daily_revenue;
 </pre>
 
-        <p><strong>Use cases:</strong> Analytics dashboards, aggregate reports, denormalized join results. Not suitable
-          for data that must be absolutely real-time.</p>
+    <p><strong>Use cases:</strong> Analytics dashboards, aggregate reports, denormalized join results. Not suitable
+      for data that must be absolutely real-time.</p>
 
-        <h2>Connection Pooling</h2>
-        <p>Establishing a database connection is expensive: it involves TCP handshake, authentication, session
-          initialization, and memory allocation on the database server. Under high traffic, creating a new connection
-          per request wastes time and exhausts database connection limits.</p>
+    <h2>Connection Pooling</h2>
+    <p>Establishing a database connection is expensive: it involves TCP handshake, authentication, session
+      initialization, and memory allocation on the database server. Under high traffic, creating a new connection
+      per request wastes time and exhausts database connection limits.</p>
 
-        <p>A connection pool maintains a pool of open, pre-established connections. When an application request needs a
-          database connection, it borrows one from the pool, uses it, and returns it. Other requests can reuse the same
-          physical connection.</p>
+    <p>A connection pool maintains a pool of open, pre-established connections. When an application request needs a
+      database connection, it borrows one from the pool, uses it, and returns it. Other requests can reuse the same
+      physical connection.</p>
 
-        <h3>Pool Configuration</h3>
-        <ul>
-          <li><strong>Pool size:</strong> Too small → requests queue waiting for connections. Too large → database
-            overloaded with concurrent queries. Typical rule: pool size = (core_count × 2) + effective_spindle_count per
-            application server.</li>
-          <li><strong>Maximum wait time:</strong> If no connection is available within this time, return an error rather
-            than waiting indefinitely.</li>
-          <li><strong>Health checking:</strong> Test idle connections before handing them to callers.</li>
-        </ul>
+    <h3>Pool Configuration</h3>
+    <ul>
+      <li><strong>Pool size:</strong> Too small → requests queue waiting for connections. Too large → database
+        overloaded with concurrent queries. Typical rule: pool size = (core_count × 2) + effective_spindle_count per
+        application server.</li>
+      <li><strong>Maximum wait time:</strong> If no connection is available within this time, return an error rather
+        than waiting indefinitely.</li>
+      <li><strong>Health checking:</strong> Test idle connections before handing them to callers.</li>
+    </ul>
 
-        <p><strong>Tools:</strong> PgBouncer (PostgreSQL), ProxySQL (MySQL), HikariCP (Java), asyncpg pool (Python),
-          ActiveRecord connection pool (Ruby on Rails)</p>
+    <p><strong>Tools:</strong> PgBouncer (PostgreSQL), ProxySQL (MySQL), HikariCP (Java), asyncpg pool (Python),
+      ActiveRecord connection pool (Ruby on Rails)</p>
 
-        <h2>Vertical Partitioning</h2>
-        <p>Vertical partitioning splits a table by columns — separating "hot" (frequently accessed) columns from "cold"
-          (rarely accessed or large) columns into separate tables, joined by the primary key.</p>
+    <h2>Vertical Partitioning</h2>
+    <p>Vertical partitioning splits a table by columns — separating "hot" (frequently accessed) columns from "cold"
+      (rarely accessed or large) columns into separate tables, joined by the primary key.</p>
 
-        <pre>
+    <pre>
 -- Before: one wide table
 users (
     id, name, email, password_hash,  -- Hot: accessed on every login
@@ -1216,118 +1545,118 @@ users_core (id, name, email, password_hash)   -- Fits in cache, fast
 users_profile (user_id, bio, full_resume, raw_settings)  -- Loaded on demand
 </pre>
 
-        <p><strong>Benefits:</strong> Narrower rows fit more records per page, improving cache efficiency and scan
-          speed. Frequently accessed core data does not need to be loaded alongside large cold data.</p>
+    <p><strong>Benefits:</strong> Narrower rows fit more records per page, improving cache efficiency and scan
+      speed. Frequently accessed core data does not need to be loaded alongside large cold data.</p>
 
-        <h2>Sharding</h2>
-        <p>Sharding (horizontal partitioning) distributes rows of a table across multiple independent database instances
-          (shards), each owning a subset of the data. Each shard is a fully functional, independent database with its
-          own CPU, memory, disk, and connection pool.</p>
+    <h2>Sharding</h2>
+    <p>Sharding (horizontal partitioning) distributes rows of a table across multiple independent database instances
+      (shards), each owning a subset of the data. Each shard is a fully functional, independent database with its
+      own CPU, memory, disk, and connection pool.</p>
 
-        <h3>Sharding Strategies</h3>
-        <ul>
-          <li><strong>Range-based sharding:</strong> Partition by value ranges (user_id 1–1,000,000 → Shard 1;
-            1,000,001–2,000,000 → Shard 2). Simple, supports range queries within a shard. Risk: uneven distribution if
-            data is not uniformly distributed across the range.</li>
-          <li><strong>Hash-based sharding:</strong> <code>shard = hash(shard_key) % num_shards</code>. Uniform
-            distribution. Consistent hashing variant minimizes remapping when shard count changes. Range queries across
-            shards are inefficient.</li>
-          <li><strong>Directory-based sharding:</strong> A separate lookup service maps entity IDs to shard numbers.
-            Most flexible (can move entities between shards). Requires an additional lookup per request.</li>
-          <li><strong>Geo-based sharding:</strong> Route data by geographic region. Users in EU → EU shard (for data
-            residency compliance). Users in US → US shard.</li>
-        </ul>
+    <h3>Sharding Strategies</h3>
+    <ul>
+      <li><strong>Range-based sharding:</strong> Partition by value ranges (user_id 1–1,000,000 → Shard 1;
+        1,000,001–2,000,000 → Shard 2). Simple, supports range queries within a shard. Risk: uneven distribution if
+        data is not uniformly distributed across the range.</li>
+      <li><strong>Hash-based sharding:</strong> <code>shard = hash(shard_key) % num_shards</code>. Uniform
+        distribution. Consistent hashing variant minimizes remapping when shard count changes. Range queries across
+        shards are inefficient.</li>
+      <li><strong>Directory-based sharding:</strong> A separate lookup service maps entity IDs to shard numbers.
+        Most flexible (can move entities between shards). Requires an additional lookup per request.</li>
+      <li><strong>Geo-based sharding:</strong> Route data by geographic region. Users in EU → EU shard (for data
+        residency compliance). Users in US → US shard.</li>
+    </ul>
 
-        <h3>Choosing the Shard Key</h3>
-        <p>The shard key is the most important architectural decision in a sharded system. A good shard key:</p>
-        <ul>
-          <li>Has high cardinality (many distinct values)</li>
-          <li>Distributes data and traffic evenly across shards (avoids hotspots)</li>
-          <li>Aligns with your most common query patterns (queries against the shard key are single-shard)</li>
-          <li>Rarely changes (changing the shard key requires re-sharding)</li>
-        </ul>
+    <h3>Choosing the Shard Key</h3>
+    <p>The shard key is the most important architectural decision in a sharded system. A good shard key:</p>
+    <ul>
+      <li>Has high cardinality (many distinct values)</li>
+      <li>Distributes data and traffic evenly across shards (avoids hotspots)</li>
+      <li>Aligns with your most common query patterns (queries against the shard key are single-shard)</li>
+      <li>Rarely changes (changing the shard key requires re-sharding)</li>
+    </ul>
 
-        <div class="example">
-          <div class="example-label">Instagram sharding strategy</div>
-          <p>Instagram shards by <code>user_id</code>. This means all of a user's data (posts, likes, followers) lives
-            on the same shard, making per-user queries single-shard. The shard key is computed using the lower 13 bits
-            of the user ID after masking.</p>
-        </div>
+    <div class="example">
+      <div class="example-label">Instagram sharding strategy</div>
+      <p>Instagram shards by <code>user_id</code>. This means all of a user's data (posts, likes, followers) lives
+        on the same shard, making per-user queries single-shard. The shard key is computed using the lower 13 bits
+        of the user ID after masking.</p>
+    </div>
 
-        <h3>Challenges of Sharding</h3>
-        <ul>
-          <li><strong>Cross-shard queries:</strong> Queries that need data from multiple shards must be executed on each
-            relevant shard and the results merged by the application — expensive and complex.</li>
-          <li><strong>Cross-shard joins:</strong> Joins across shards are not supported by the database — must be
-            performed application-side.</li>
-          <li><strong>Cross-shard transactions:</strong> Two-phase commit is required for atomic transactions spanning
-            multiple shards, adding latency and complexity.</li>
-          <li><strong>Resharding:</strong> When a shard is full, adding new shards requires migrating data — a complex,
-            slow, and risky operation.</li>
-          <li><strong>Hotspots:</strong> If one shard key value receives disproportionate traffic (e.g., a celebrity
-            user), that shard becomes a bottleneck. Mitigations: virtual sharding, prefix injection to distribute
-            writes.</li>
-        </ul>
+    <h3>Challenges of Sharding</h3>
+    <ul>
+      <li><strong>Cross-shard queries:</strong> Queries that need data from multiple shards must be executed on each
+        relevant shard and the results merged by the application — expensive and complex.</li>
+      <li><strong>Cross-shard joins:</strong> Joins across shards are not supported by the database — must be
+        performed application-side.</li>
+      <li><strong>Cross-shard transactions:</strong> Two-phase commit is required for atomic transactions spanning
+        multiple shards, adding latency and complexity.</li>
+      <li><strong>Resharding:</strong> When a shard is full, adding new shards requires migrating data — a complex,
+        slow, and risky operation.</li>
+      <li><strong>Hotspots:</strong> If one shard key value receives disproportionate traffic (e.g., a celebrity
+        user), that shard becomes a bottleneck. Mitigations: virtual sharding, prefix injection to distribute
+        writes.</li>
+    </ul>
 
-        <h2>Sharding vs Partitioning</h2>
-        <div class="table-wrap">
-          <table>
-            <tr>
-              <th>Aspect</th>
-              <th>Partitioning</th>
-              <th>Sharding</th>
-            </tr>
-            <tr>
-              <td>Scope</td>
-              <td>Within a single database instance</td>
-              <td>Across multiple database instances</td>
-            </tr>
-            <tr>
-              <td>Management</td>
-              <td>Database handles partition routing transparently</td>
-              <td>Application must route queries to correct shard</td>
-            </tr>
-            <tr>
-              <td>Goal</td>
-              <td>Performance (pruning), manageability, archival</td>
-              <td>Scalability beyond single-instance limits</td>
-            </tr>
-            <tr>
-              <td>Joins</td>
-              <td>Cross-partition joins supported natively</td>
-              <td>Cross-shard joins are application-level</td>
-            </tr>
-            <tr>
-              <td>Transactions</td>
-              <td>Full ACID within instance</td>
-              <td>Cross-shard transactions require distributed protocol</td>
-            </tr>
-            <tr>
-              <td>Example</td>
-              <td>PostgreSQL table partitioned by created_at date</td>
-              <td>User data split across 16 separate PostgreSQL instances</td>
-            </tr>
-          </table>
-        </div>
+    <h2>Sharding vs Partitioning</h2>
+    <div class="table-wrap">
+      <table>
+        <tr>
+          <th>Aspect</th>
+          <th>Partitioning</th>
+          <th>Sharding</th>
+        </tr>
+        <tr>
+          <td>Scope</td>
+          <td>Within a single database instance</td>
+          <td>Across multiple database instances</td>
+        </tr>
+        <tr>
+          <td>Management</td>
+          <td>Database handles partition routing transparently</td>
+          <td>Application must route queries to correct shard</td>
+        </tr>
+        <tr>
+          <td>Goal</td>
+          <td>Performance (pruning), manageability, archival</td>
+          <td>Scalability beyond single-instance limits</td>
+        </tr>
+        <tr>
+          <td>Joins</td>
+          <td>Cross-partition joins supported natively</td>
+          <td>Cross-shard joins are application-level</td>
+        </tr>
+        <tr>
+          <td>Transactions</td>
+          <td>Full ACID within instance</td>
+          <td>Cross-shard transactions require distributed protocol</td>
+        </tr>
+        <tr>
+          <td>Example</td>
+          <td>PostgreSQL table partitioned by created_at date</td>
+          <td>User data split across 16 separate PostgreSQL instances</td>
+        </tr>
+      </table>
+    </div>
 
-        <h2>Data Compression</h2>
-        <p>Data compression reduces the on-disk size of database files, which reduces storage cost, increases effective
-          cache size (compressed data fits more in buffer pool), and reduces I/O bandwidth requirements — which can
-          actually improve performance despite the CPU cost of decompression.</p>
+    <h2>Data Compression</h2>
+    <p>Data compression reduces the on-disk size of database files, which reduces storage cost, increases effective
+      cache size (compressed data fits more in buffer pool), and reduces I/O bandwidth requirements — which can
+      actually improve performance despite the CPU cost of decompression.</p>
 
-        <h3>Compression Types</h3>
-        <ul>
-          <li><strong>Row-level compression:</strong> Each row is compressed individually. Low CPU overhead. Moderate
-            compression ratio.</li>
-          <li><strong>Page-level compression:</strong> Entire database pages (8KB–32KB) are compressed as a unit. Better
-            compression ratio than row-level due to cross-row pattern matching.</li>
-          <li><strong>Column-store compression:</strong> Columnar databases (Redshift, BigQuery) store all values of a
-            column together. Since values within a column are often similar, compression ratios of 10:1 to 20:1 are
-            common (vs 2:1–4:1 for row stores).</li>
-          <li><strong>Dictionary encoding:</strong> Store repeated string values as integer codes. One row per unique
-            string. Extremely effective for low-cardinality string columns.</li>
-        </ul>
-      </div>
+    <h3>Compression Types</h3>
+    <ul>
+      <li><strong>Row-level compression:</strong> Each row is compressed individually. Low CPU overhead. Moderate
+        compression ratio.</li>
+      <li><strong>Page-level compression:</strong> Entire database pages (8KB–32KB) are compressed as a unit. Better
+        compression ratio than row-level due to cross-row pattern matching.</li>
+      <li><strong>Column-store compression:</strong> Columnar databases (Redshift, BigQuery) store all values of a
+        column together. Since values within a column are often similar, compression ratios of 10:1 to 20:1 are
+        common (vs 2:1–4:1 for row stores).</li>
+      <li><strong>Dictionary encoding:</strong> Store repeated string values as integer codes. One row per unique
+        string. Extremely effective for low-cardinality string columns.</li>
+    </ul>
+  </div>
 
 
       <div class="page-nav">
@@ -1341,95 +1670,13 @@ users_profile (user_id, bio, full_resume, raw_settings)  -- Loaded on demand
   <button id="back-to-top" title="Back to top" aria-label="Back to top">&#8593;</button>
 
   <script>
-    mermaid.initialize({
-      startOnLoad: false,
-      theme: 'default',
-      themeVariables: {
-        primaryColor: '#e8f4fd',
-        primaryTextColor: '#1e293b',
-        primaryBorderColor: '#93c5fd',
-        lineColor: '#64748b',
-        secondaryColor: '#f0fdf4',
-        tertiaryColor: '#faf5ff',
-        background: '#ffffff',
-        mainBkg: '#f8fafc',
-        nodeBorder: '#cbd5e1',
-        clusterBkg: '#f1f5f9',
-        titleColor: '#1e293b',
-        edgeLabelBackground: '#ffffff',
-        attributeBackgroundColorEven: '#f8fafc',
-        attributeBackgroundColorOdd: '#f1f5f9'
-      },
-      flowchart: { useMaxWidth: true, htmlLabels: true, curve: 'basis' },
-      sequence: { useMaxWidth: true },
-      stateDiagram: { useMaxWidth: true },
-      securityLevel: 'loose'
-    });
-
-    // ── Section switching (same-page nav items only) ──
-    const pageSections = document.querySelectorAll('.section');
-    const subItems     = document.querySelectorAll('.acc-sub-item[data-sec]');
-    const pb           = document.getElementById('pb');
-
-    function showSection(id) {
-      pageSections.forEach(s => s.classList.remove('active'));
-      subItems.forEach(n => n.classList.remove('active'));
-      const target = document.getElementById(id);
-      if (target) {
-        target.classList.add('active');
-        const diags = target.querySelectorAll('.mermaid:not([data-processed])');
-        if (diags.length) mermaid.run({ nodes: diags });
-        // Scroll content area to top, NOT the whole window
-        const main = document.querySelector('.main');
-        if (main) main.scrollTo(0, 0);
-      }
-      const item = document.querySelector(`.acc-sub-item[data-sec="${id}"]`);
-      if (item) item.classList.add('active');
-      updateProgress(id);
+    if (typeof mermaid !== 'undefined') {
+        mermaid.initialize({
+          startOnLoad: false,
+          theme: 'default',
+          securityLevel: 'loose'
+        });
     }
-
-    function updateProgress(activeId) {
-      const ids = Array.from(subItems).map(n => n.dataset.sec);
-      const idx = ids.indexOf(activeId);
-      const pct = idx >= 0 ? Math.round(((idx + 1) / ids.length) * 100) : 0;
-      pb.style.width = pct + '%';
-    }
-
-    subItems.forEach(item => {
-      item.addEventListener('click', () => {
-        if (item.dataset.sec) showSection(item.dataset.sec);
-      });
-    });
-
-    // On load: check URL hash for deep link from another page
-    const hash = window.location.hash.slice(1);
-    if (hash && document.getElementById(hash)) {
-      showSection(hash);
-    } else if (subItems.length) {
-      showSection(subItems[0].dataset.sec);
-    }
-
-    // Scroll progress
-    const mainEl = document.querySelector('.main');
-    if (mainEl) {
-      mainEl.style.overflowY = 'auto';
-      mainEl.style.height = '100vh';
-      mainEl.addEventListener('scroll', () => {
-        const scrolled = mainEl.scrollTop + mainEl.clientHeight;
-        const total = mainEl.scrollHeight;
-        if (total > 0) pb.style.width = Math.min(100, Math.round((scrolled / total) * 100)) + '%';
-      });
-    }
-
-    const bttBtn = document.getElementById('back-to-top');
-    (mainEl || window).addEventListener('scroll', () => {
-      const top = mainEl ? mainEl.scrollTop : window.scrollY;
-      bttBtn.classList.toggle('visible', top > 500);
-    });
-    bttBtn.addEventListener('click', () => {
-      if (mainEl) mainEl.scrollTo({top:0,behavior:'smooth'});
-      else window.scrollTo({top:0,behavior:'smooth'});
-    });
   </script>
 </body>
 </html>

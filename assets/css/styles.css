@@ -60,6 +60,11 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+code,
+pre {
+  font-variant-ligatures: none;
+}
+
 /* ─── Layout ─────────────────────────────────────────────── */
 .container {
   max-width: 1100px;

@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Two Pointers Animation</title>
+    <style>
+        body {
+            background-color: #1a1a2e;
+            color: #cdd6f4;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        .container {
+            text-align: center;
+        }
+
+        h1 {
+            color: #89b4fa;
+            margin-bottom: 2rem;
+            text-shadow: 0 0 10px rgba(137, 180, 250, 0.5);
+        }
+
+        .array-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 2rem;
+            position: relative;
+            padding: 20px;
+        }
+
+        .element {
+            width: 60px;
+            height: 60px;
+            background-color: #313244;
+            border: 2px solid #585b70;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            position: relative;
+            z-index: 10;
+            transition: all 0.3s ease;
+        }
+
+        .element.active-left {
+            border-color: #f38ba8;
+            background-color: rgba(243, 139, 168, 0.2);
+            color: #f38ba8;
+            box-shadow: 0 0 15px rgba(243, 139, 168, 0.5);
+            transform: translateY(-5px);
+        }
+
+        .element.active-right {
+            border-color: #89b4fa;
+            background-color: rgba(137, 180, 250, 0.2);
+            color: #89b4fa;
+            box-shadow: 0 0 15px rgba(137, 180, 250, 0.5);
+            transform: translateY(-5px);
+        }
+
+        .element.success {
+            border-color: #a6e3a1;
+            background-color: rgba(166, 227, 161, 0.4);
+            color: #a6e3a1;
+            box-shadow: 0 0 20px rgba(166, 227, 161, 0.8);
+            transform: scale(1.1);
+            z-index: 20;
+        }
+
+        .pointers {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            position: absolute;
+            bottom: -30px;
+            left: 0;
+        }
+
+        .pointer {
+            font-size: 1rem;
+            font-weight: bold;
+            transition: all 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+            position: absolute;
+            bottom: -30px;
+        }
+
+        .pointer.left {
+            color: #f38ba8;
+        }
+
+        .pointer.right {
+            color: #89b4fa;
+        }
+
+        .stats {
+            display: flex;
+            gap: 2rem;
+            margin-top: 2rem;
+            font-size: 1.2rem;
+        }
+
+        .stat-box {
+            background-color: #1e1e2e;
+            padding: 10px 20px;
+            border-radius: 8px;
+            border: 1px solid #45475a;
+            min-width: 120px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #eba0ac;
+            margin-top: 5px;
+            display: block;
+        }
+
+        .stat-value.highlight {
+            color: #a6e3a1;
+            text-shadow: 0 0 10px rgba(166, 227, 161, 0.8);
+            transform: scale(1.1);
+            transition: all 0.2s ease;
+        }
+
+        .controls {
+            margin-top: 3rem;
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 1rem;
+            background-color: #89b4fa;
+            color: #11111b;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.2s;
+        }
+
+        button:hover {
+            background-color: #b4befe;
+            transform: translateY(-2px);
+        }
+
+        button:disabled {
+            background-color: #585b70;
+            color: #a6adc8;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .description {
+            margin-top: 1rem;
+            font-size: 1.1rem;
+            color: #bac2de;
+            min-height: 2rem;
+            font-style: italic;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Two Pointers (Target Sum = 11)</h1>
+
+        <div class="array-container" id="array-container">
+            <!-- Elements -->
+            <div class="pointers">
+                <div class="pointer left" id="ptr-left">↑ L</div>
+                <div class="pointer right" id="ptr-right">↑ R</div>
+            </div>
+        </div>
+
+        <div class="stats">
+            <div class="stat-box">
+                Target
+                <span class="stat-value highlight" id="target-value">11</span>
+            </div>
+            <div class="stat-box">
+                Current Sum
+                <span class="stat-value" id="current-sum">0</span>
+            </div>
+        </div>
+
+        <div class="description" id="step-description">Click "Start Animation" to begin.</div>
+
+        <div class="controls">
+            <button id="start-btn" onclick="startAnimation()">Start Animation</button>
+            <button id="reset-btn" onclick="resetAnimation()" disabled>Reset</button>
+        </div>
+    </div>
+
+    <script>
+        // Array must be sorted for Two Pointers to work this way
+        const array = [1, 2, 4, 7, 10, 15];
+        const target = 11;
+        const container = document.getElementById('array-container');
+        const ptrLeft = document.getElementById('ptr-left');
+        const ptrRight = document.getElementById('ptr-right');
+        const currentSumEl = document.getElementById('current-sum');
+        const descEl = document.getElementById('step-description');
+        const startBtn = document.getElementById('start-btn');
+        const resetBtn = document.getElementById('reset-btn');
+
+        const elementWidth = 60;
+        const gap = 10;
+        const padding = 20;
+
+        let left = 0;
+        let right = array.length - 1;
+        let animationTimeouts = [];
+
+        function init() {
+            const elements = container.querySelectorAll('.element');
+            elements.forEach(el => el.remove());
+
+            array.forEach((val, i) => {
+                const el = document.createElement('div');
+                el.className = `element`;
+                el.id = `el-${i}`;
+                el.textContent = val;
+                // Insert before pointers
+                container.insertBefore(el, document.querySelector('.pointers'));
+            });
+
+            resetState();
+        }
+
+        function resetState() {
+            animationTimeouts.forEach(clearTimeout);
+            animationTimeouts = [];
+
+            left = 0;
+            right = array.length - 1;
+
+            updateUI(true);
+            currentSumEl.textContent = '0';
+            currentSumEl.classList.remove('highlight');
+            descEl.textContent = 'Array must be sorted. L starts at 0, R starts at end.';
+
+            document.querySelectorAll('.element').forEach(el => {
+                el.classList.remove('active-left', 'active-right', 'success');
+            });
+
+            startBtn.disabled = false;
+            resetBtn.disabled = true;
+        }
+
+        function getXPosCenter(index) {
+            return padding + index * (elementWidth + gap) + (elementWidth / 2);
+        }
+
+        function updateUI(instant = false) {
+            const leftCenterX = getXPosCenter(left);
+            const rightCenterX = getXPosCenter(right);
+
+            const transition = instant ? 'none' : 'all 0.5s cubic-bezier(0.25, 1, 0.5, 1)';
+
+            ptrLeft.style.transition = transition;
+            ptrRight.style.transition = transition;
+
+            ptrLeft.style.left = `${leftCenterX - 15}px`;
+            ptrRight.style.left = `${rightCenterX - 15}px`;
+
+            document.querySelectorAll('.element').forEach((el, i) => {
+                el.classList.remove('active-left', 'active-right');
+                if (!el.classList.contains('success')) {
+                    if (i === left) el.classList.add('active-left');
+                    if (i === right) el.classList.add('active-right');
+                }
+            });
+        }
+
+        function scheduleTask(task, delay) {
+            animationTimeouts.push(setTimeout(task, delay));
+        }
+
+        function startAnimation() {
+            startBtn.disabled = true;
+            resetBtn.disabled = false;
+
+            let time = 0;
+            const stepDelay = 2000;
+
+            updateUI(); // Show initial pointers
+
+            let currentL = 0;
+            let currentR = array.length - 1;
+
+            while (currentL < currentR) {
+                const stepL = currentL;
+                const stepR = currentR;
+                const sum = array[stepL] + array[stepR];
+
+                // 1. Evaluate Current
+                scheduleTask(() => {
+                    left = stepL;
+                    right = stepR;
+                    updateUI();
+                    currentSumEl.textContent = sum;
+                    descEl.textContent = `Sum = ${array[stepL]} + ${array[stepR]} = ${sum}. Target is ${target}.`;
+                }, time);
+                time += stepDelay;
+
+                // 2. Decide Move
+                if (sum === target) {
+                    scheduleTask(() => {
+                        descEl.innerHTML = `<span style="color:#a6e3a1;font-weight:bold;">Found Target ${target}!</span> Solution: Indices [${stepL}, ${stepR}]`;
+                        currentSumEl.classList.add('highlight');
+                        document.getElementById(`el-${stepL}`).classList.add('success');
+                        document.getElementById(`el-${stepR}`).classList.add('success');
+                    }, time);
+                    time += stepDelay;
+                    break; // End animation generation
+                } else if (sum < target) {
+                    scheduleTask(() => {
+                        descEl.innerHTML = `${sum} < ${target}. <span style="color:#f38ba8;">Move Left pointer right</span> to increase sum.`;
+                    }, time);
+                    currentL++;
+                } else {
+                    scheduleTask(() => {
+                        descEl.innerHTML = `${sum} > ${target}. <span style="color:#89b4fa;">Move Right pointer left</span> to decrease sum.`;
+                    }, time);
+                    currentR--;
+                }
+                time += stepDelay;
+            }
+
+            if (currentL >= currentR && array[currentL] + array[currentR] !== target) {
+                scheduleTask(() => {
+                    descEl.textContent = `Pointers met. No pair adds up to ${target}.`;
+                }, time);
+            }
+        }
+
+        window.onload = init;
+    </script>
+</body>
+
+</html>

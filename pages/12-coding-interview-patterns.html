@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="System Design Reference — Interview Framework">
-  <title>🎯 Interview Framework — System Design Fundamentals</title>
+  <meta name="description" content="System Design Reference — Coding Interview Patterns">
+  <title>🧩 Coding Interview Patterns — System Design Fundamentals</title>
   <link rel="stylesheet" href="../assets/css/styles.css">
   <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
   <style>
@@ -500,7 +500,7 @@
   <link rel="stylesheet" href="../assets/css/system-design-common.css">
   <script defer src="../assets/js/system-design-common.js"></script>
 
-  
+  <script defer src="../assets/js/pattern-animations.js"></script>
 </head>
 <body>
   <div class="layout">
@@ -679,32 +679,32 @@
               <a class="acc-sub-item" href="10-search-operations.html#security">Encryption, IAM, Zero Trust</a>
           </div>
         </details>
-        <details class="acc-chapter" open>
+        <details class="acc-chapter">
           <summary class="acc-summary">
             <span class="chap-icon">🎯</span>
             <span class="chap-text">
               <span class="chap-num">Chapter 11</span>
               <span class="chap-label">Interview Framework</span>
             </span>
-            <span class="chap-curr">●</span>
+            
             <span class="acc-arrow">›</span>
           </summary>
           <div class="acc-sub">
-              <div class="acc-sub-item active" data-sec="framework">The 4-Step SDI Framework</div>
+              <a class="acc-sub-item" href="11-interview-framework.html#framework">The 4-Step SDI Framework</a>
           </div>
         </details>
-        <details class="acc-chapter">
+        <details class="acc-chapter" open>
           <summary class="acc-summary">
             <span class="chap-icon">🧩</span>
             <span class="chap-text">
               <span class="chap-num">Chapter 12</span>
               <span class="chap-label">Coding Patterns</span>
             </span>
-            
+            <span class="chap-curr">●</span>
             <span class="acc-arrow">›</span>
           </summary>
           <div class="acc-sub">
-              <a class="acc-sub-item" href="12-coding-interview-patterns.html#patterns">20 Essential Patterns</a>
+              <div class="acc-sub-item active" data-sec="patterns">20 Essential Patterns</div>
           </div>
         </details>
         <details class="acc-chapter">
@@ -727,124 +727,7 @@
     <div class="main">
       <div class="progress-bar-wrap"><div class="progress-bar" id="pb"></div></div>
 
-<div class="section active" id="framework">
-    <h1 class="section-title">System Design Interview Framework</h1>
-    <p class="section-subtitle">Module 15 &nbsp;|&nbsp; 4-Step Framework · Clarification · High-Level Design · Deep
-      Dive · Wrap-up</p>
-
-    <h2>The 4-Step System Design Framework</h2>
-    <p>A structured approach is critical in a 45-60 minute interview to ensure you cover all necessary ground without
-      getting stuck in the weeds early on.</p>
-
-    <div class="compare four">
-      <div class="compare-card neutral">
-        <h4>1. Clarify & Scope</h4>
-        <p><strong>(5-10 mins)</strong></p>
-        <ul>
-          <li>Identify users and use cases</li>
-          <li>Functional vs. Non-functional requirements</li>
-          <li>Constraints (DAU, storage, latency)</li>
-          <li>"How many users?" / "What's the peak RPS?"</li>
-        </ul>
-      </div>
-      <div class="compare-card neutral">
-        <h4>2. High-Level Design</h4>
-        <p><strong>(10-15 mins)</strong></p>
-        <ul>
-          <li>Sketch core components (LB, API, DB)</li>
-          <li>Define data flow between components</li>
-          <li>Choose the database type (SQL vs. NoSQL)</li>
-          <li>Verify the design meets functional reqs</li>
-        </ul>
-      </div>
-      <div class="compare-card neutral">
-        <h4>3. Deep Dive</h4>
-        <p><strong>(15-25 mins)</strong></p>
-        <ul>
-          <li>Apply scaling patterns (Sharding, Caching)</li>
-          <li>Address failures (Replication, Multi-region)</li>
-          <li>Detail specific APIs or Data Schemas</li>
-          <li>Solve for performance bottlenecks</li>
-        </ul>
-      </div>
-      <div class="compare-card neutral">
-        <h4>4. Wrap Up</h4>
-        <p><strong>(5 mins)</strong></p>
-        <ul>
-          <li>Summarize the final architecture</li>
-          <li>Mention alternative approaches discussed</li>
-          <li>Identify remaining weak points/limitations</li>
-          <li>Suggest monitoring/observability metrics</li>
-        </ul>
-      </div>
-    </div>
-
-    <h2>Step 1: Clarification & Scoping</h2>
-    <p>Never start designing immediately. Spend the first 5-10 minutes asking questions to eliminate ambiguity.
-      Interviewer expectations vary, so you must define the world you are building.</p>
-
-    <div class="example">
-      <div class="example-label">Example Questions for "Design Twitter"</div>
-      <ul>
-        <li>"Can users follow each other?" (Focus: Social Graph)</li>
-        <li>"Do we need to support images and videos?" (Focus: Asset Storage, CDN)</li>
-        <li>"How many users are active daily?" (Focus: Scale, Throughput)</li>
-        <li>"Is the feed sorted by time or relevance?" (Focus: Ranking service)</li>
-      </ul>
-    </div>
-
-    <h2>Step 2: High-Level Design (Proposing a Skeleton)</h2>
-    <p>Your goal is to get a working end-to-end design on the board. Don't worry about optimization yet.</p>
-    <div class="diagram">
-      <pre class="mermaid">
-graph LR
-    User[Web/Mobile Client] --> LB[Load Balancer]
-    LB --> API[API Gateway]
-    API --> Auth[Auth Service]
-    API --> Core[Core Business Logic]
-    Core --> DB[(Primary Store)]
-    Core --> Cache([Read Cache])
-</pre>
-      <p class="diagram-caption">Generic high-level architecture skeleton</p>
-    </div>
-
-    <h2>Step 3: Design Deep Dive (The "Meat" of the Interview)</h2>
-    <p>This is where you show your expertise. The interviewer will usually guide you toward specific bottlenecks.</p>
-    <div class="table-wrap">
-      <table>
-        <tr>
-          <th>Problem</th>
-          <th>Deep Dive Pattern</th>
-        </tr>
-        <tr>
-          <td>Huge write volume</td>
-          <td>LSM-Trees, Sharding, Message Queues (Buffer)</td>
-        </tr>
-        <tr>
-          <td>Huge read volume</td>
-          <td>Caching (Redis), Read Replicas, CDN</td>
-        </tr>
-        <tr>
-          <td>Slow queries</td>
-          <td>Indexing, Denormalization, Materialized Views</td>
-        </tr>
-        <tr>
-          <td>Single point of failure</td>
-          <td>Multi-leader replication, Heartbeats, Failover</td>
-        </tr>
-      </table>
-    </div>
-
-    <h2>Step 4: Wrap-up & Trade-offs</h2>
-    <p>End on a strong note by identifying what your design *doesn't* do well. This shows maturity. No system is
-      perfect; every design choice is a trade-off.</p>
-    <div class="callout tip">
-      <div class="callout-title">Pro-Tip: "The Two-Option Approach"</div>
-      <p>When making a big decision (e.g., choosing a DB), present two options, explain the trade-offs of each, and
-        then make a recommendation based on the constraints you established in Step 1.</p>
-    </div>
-
-    <div class="section" id="patterns">
+<div class="section active" id="patterns">
                 <h1 class="section-title">20 Essential Coding Interview Patterns (FAANG)</h1>
                 <p class="section-subtitle">Deep dive into recurring algorithmic strategies for technical interviews.
                 </p>
@@ -3788,13 +3671,11 @@ Since furthest >= last index, return True.</pre>
 
             </div>
 
-  </div>
-
 
       <div class="page-nav">
-        <a class="page-nav-btn" href="10-search-operations.html">&#8592; Search, Ops & Security</a>
+        <a class="page-nav-btn" href="11-interview-framework.html">&#8592; Interview Framework</a>
         <a class="page-nav-btn home" href="01-introduction.html">&#9776; All Topics</a>
-        <a class="page-nav-btn" href="12-coding-interview-patterns.html">Coding Patterns &#8594;</a>
+        <a class="page-nav-btn" href="../case_studies/open-table.html">Case Studies &#8594;</a>
       </div>
     </div>
   </div>

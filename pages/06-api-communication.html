@@ -5,186 +5,502 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="System Design Reference — API & Communication">
   <title>🔌 API & Communication — System Design Fundamentals</title>
-  <link rel="stylesheet" href="../styles.css">
+  <link rel="stylesheet" href="../assets/css/styles.css">
   <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
-  <link rel="stylesheet" href="../system-design.css">
-
-  <style id="sidebar-improvements">
-    .sidebar { width: 280px; }
-    .main    { margin-left: 280px; }
-
-    /* Header */
-    .sidebar-header {
-      background: linear-gradient(160deg,#1e1e3f 0%,#12122a 100%);
-      border-bottom: 1px solid rgba(137,180,250,0.12);
+  <style>
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
     }
-    .sidebar-header h1 { font-size:.9rem; color:#e2e8f9; letter-spacing:.3px; }
-    .sidebar-header p  { font-size:.72rem; color:#6272a4; }
 
-    .back-link {
-      display:inline-flex; align-items:center; gap:6px;
-      font-size:.75rem; color:#89b4fa; text-decoration:none;
-      padding:4px 12px; border:1px solid rgba(137,180,250,.25);
-      border-radius:20px; transition:all .2s;
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      font-size: 15px;
+      line-height: 1.7;
+      color: #1a1a2e;
+      background: #f4f6f9;
     }
-    .back-link:hover { background:rgba(137,180,250,.1); border-color:#89b4fa; }
 
-    /* Accordion wrapper */
-    .sidebar-accordion {
+    /* ---- Layout ---- */
+    .layout {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    .sidebar {
+      width: 300px;
+      min-width: 300px;
+      background: #1a1a2e;
+      color: #cdd6f4;
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 100vh;
       overflow-y: auto;
-      flex: 1;
-      padding: 8px 0 24px;
+      z-index: 100;
+      padding-bottom: 40px;
     }
 
-    /* Accordion chapter */
-    .acc-chapter {
-      border-bottom: 1px solid rgba(137,180,250,0.07);
+    .sidebar-header {
+      padding: 24px 20px 16px;
+      border-bottom: 1px solid #2d2d4e;
+      position: sticky;
+      top: 0;
+      background: #1a1a2e;
+      z-index: 1;
     }
-    .acc-chapter[open] { background: rgba(137,180,250,0.04); }
 
-    /* Summary row = clickable chapter header */
-    .acc-summary {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 10px 14px;
-      cursor: pointer;
-      list-style: none;
-      user-select: none;
-      transition: background 0.15s;
-    }
-    .acc-summary::-webkit-details-marker { display: none; }
-    .acc-summary:hover { background: rgba(137,180,250,0.08); }
-    .acc-chapter[open] > .acc-summary { background: rgba(137,180,250,0.1); }
-
-    .chap-icon {
+    .sidebar-header h1 {
       font-size: 1rem;
-      flex-shrink: 0;
-      width: 24px;
-      text-align: center;
+      font-weight: 700;
+      color: #89b4fa;
+      letter-spacing: 0.3px;
+      margin-bottom: 4px;
     }
-    .chap-text {
-      display: flex;
-      flex-direction: column;
-      gap: 1px;
-      flex: 1;
-      min-width: 0;
+
+    .sidebar-header p {
+      font-size: 0.75rem;
+      color: #6c7086;
     }
-    .chap-num {
-      font-size: .58rem;
+
+    .nav-module {
+      margin: 6px 0;
+    }
+
+    .nav-module-title {
+      padding: 10px 20px 6px;
+      font-size: 0.68rem;
       font-weight: 700;
       text-transform: uppercase;
-      letter-spacing: .8px;
+      letter-spacing: 1px;
       color: #585b70;
     }
-    .chap-label {
-      font-size: .8rem;
-      color: #a6adc8;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    .acc-chapter[open] .chap-num   { color: #89b4fa; }
-    .acc-chapter[open] .chap-label { color: #cdd6f4; font-weight: 600; }
 
-    .chap-curr {
-      font-size: .45rem;
-      color: #89b4fa;
-      flex-shrink: 0;
-      animation: blink 2s infinite;
-    }
-    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.2} }
-
-    .acc-arrow {
-      font-size: .85rem;
-      color: #585b70;
-      flex-shrink: 0;
-      transition: transform 0.2s;
-    }
-    .acc-chapter[open] .acc-arrow { transform: rotate(90deg); color:#89b4fa; }
-
-    /* Sub-items panel */
-    .acc-sub {
-      padding: 2px 0 6px 0;
-      animation: slideDown .18s ease;
-    }
-    @keyframes slideDown {
-      from { opacity:0; transform:translateY(-6px); }
-      to   { opacity:1; transform:translateY(0); }
-    }
-
-    .acc-sub-item {
+    .nav-item {
       display: block;
-      padding: 7px 14px 7px 48px;
-      font-size: .78rem;
-      color: #7f849c;
+      padding: 7px 20px 7px 28px;
+      font-size: 0.82rem;
+      color: #a6adc8;
       cursor: pointer;
-      border-left: 2px solid transparent;
-      text-decoration: none;
-      transition: all 0.14s;
-      line-height: 1.35;
+      border-left: 3px solid transparent;
+      transition: all 0.15s;
     }
-    .acc-sub-item:hover {
+
+    .nav-item:hover {
+      background: #252540;
       color: #cdd6f4;
-      background: rgba(137,180,250,0.07);
-      border-left-color: rgba(137,180,250,.4);
     }
-    .acc-sub-item.active {
-      color: #cdd6f4;
-      background: rgba(137,180,250,0.12);
+
+    .nav-item.active {
+      background: #1e2050;
       border-left-color: #89b4fa;
+      color: #89b4fa;
       font-weight: 600;
     }
 
-    /* Page nav */
-    .page-nav {
-      display:flex; justify-content:space-between; align-items:center;
-      padding:28px 40px 48px; border-top:1px solid #e0e4f0;
-      margin-top:24px; gap:12px;
+    /* ---- Main content ---- */
+    .main {
+      margin-left: 300px;
+      flex: 1;
+      padding: 0;
     }
-    .page-nav-btn {
-      display:inline-flex; align-items:center; gap:8px;
-      padding:10px 22px; background:#1a1a2e; color:#cdd6f4;
-      border-radius:8px; text-decoration:none; font-size:.84rem;
-      font-weight:600; transition:all .18s;
-      border:1px solid rgba(137,180,250,.15);
-    }
-    .page-nav-btn:hover {
-      background:#313244; border-color:rgba(137,180,250,.35);
-      transform:translateY(-1px); box-shadow:0 4px 12px rgba(0,0,0,.2);
-    }
-    .page-nav-btn.home { background:linear-gradient(135deg,#1e3a5f,#162d48); }
-    .page-nav-btn.home:hover { background:linear-gradient(135deg,#264a78,#1e3a5f); }
 
-    @media (max-width:768px) { .sidebar{width:100%} .main{margin-left:0} }
+    .progress-bar-wrap {
+      position: fixed;
+      top: 0;
+      left: 300px;
+      right: 0;
+      height: 3px;
+      background: #2d2d4e;
+      z-index: 200;
+    }
 
-    /* ── Mermaid diagram consistency ── */
-    .mermaid {
-      background: transparent !important;
-      padding: 0 !important;
+    .progress-bar {
+      height: 100%;
+      background: linear-gradient(90deg, #89b4fa, #b4befe);
+      transition: width 0.3s;
+      width: 0%;
     }
-    .mermaid svg {
-      background: transparent !important;
-      max-width: 100%;
+
+    .section {
+      display: none;
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 48px 48px 80px;
     }
-    /* Override Mermaid's internal background rect (dark in state/sequence diagrams) */
-    .mermaid svg > rect:first-child,
-    .mermaid svg > g:first-child > rect:first-child {
-      fill: transparent !important;
-      stroke: none !important;
+
+    .section.active {
+      display: block;
+      animation: fadein 0.25s ease;
     }
-    /* State diagram node styling */
-    .mermaid .state-note rect,
-    .mermaid .note rect { fill: #fffbdd !important; stroke: #e6d87a !important; }
-    /* Ensure subgraph labels are readable */
-    .mermaid .cluster rect { fill: #f1f5f9 !important; stroke: #cbd5e1 !important; }
-    .mermaid .cluster text { fill: #475569 !important; }
-    /* Entity / node labels */
-    .mermaid .label { color: #1e293b !important; }
-    .mermaid .nodeLabel { color: #1e293b !important; }
-    .mermaid .edgeLabel { background: #fff !important; color: #475569 !important; }
+
+    @keyframes fadein {
+      from {
+        opacity: 0;
+        transform: translateY(8px);
+      }
+
+      to {
+        opacity: 1;
+        transform: none;
+      }
+    }
+
+    /* ---- Typography ---- */
+    .section-title {
+      font-size: 1.9rem;
+      font-weight: 800;
+      color: #1a1a2e;
+      margin-bottom: 6px;
+      padding-bottom: 14px;
+      border-bottom: 3px solid #89b4fa;
+    }
+
+    .section-subtitle {
+      font-size: 0.85rem;
+      color: #6c7086;
+      margin-bottom: 36px;
+    }
+
+    h2 {
+      font-size: 1.45rem;
+      font-weight: 700;
+      color: #1a1a2e;
+      margin: 44px 0 14px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid #e0e4f0;
+    }
+
+    h3 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #2d2d4e;
+      margin: 30px 0 10px;
+    }
+
+    h4 {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #3d3d6e;
+      margin: 22px 0 8px;
+    }
+
+    p {
+      margin-bottom: 12px;
+      color: #333355;
+    }
+
+    ul,
+    ol {
+      margin: 8px 0 14px 22px;
+    }
+
+    li {
+      margin-bottom: 5px;
+      color: #333355;
+    }
+
+    li strong {
+      color: #1a1a2e;
+    }
+
+    /* ---- Callout boxes ---- */
+    .callout {
+      border-radius: 6px;
+      padding: 18px 22px;
+      margin: 20px 0;
+      font-size: 0.9rem;
+    }
+
+    .callout-title {
+      font-weight: 700;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 6px;
+    }
+
+    .callout.info {
+      background: #eff6ff;
+      border-left: 4px solid #3b82f6;
+    }
+
+    .callout.info .callout-title {
+      color: #1d4ed8;
+    }
+
+    .callout.warn {
+      background: #fffbeb;
+      border-left: 4px solid #f59e0b;
+    }
+
+    .callout.warn .callout-title {
+      color: #b45309;
+    }
+
+    .callout.tip {
+      background: #f0fdf4;
+      border-left: 4px solid #22c55e;
+    }
+
+    .callout.tip .callout-title {
+      color: #15803d;
+    }
+
+    .callout.danger {
+      background: #fff1f2;
+      border-left: 4px solid #f43f5e;
+    }
+
+    .callout.danger .callout-title {
+      color: #be123c;
+    }
+
+    /* ---- Example / Real World ---- */
+    .example {
+      background: #f8faff;
+      border: 1px solid #dde3f5;
+      border-radius: 8px;
+      padding: 20px 24px;
+      margin: 20px 0;
+    }
+
+    .example-label {
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: #6c7086;
+      margin-bottom: 8px;
+    }
+
+    .example h4 {
+      margin-top: 0;
+    }
+
+    /* ---- Code blocks ---- */
+    pre,
+    code {
+      font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
+    }
+
+    pre {
+      background: #1e1e2e;
+      color: #cdd6f4;
+      padding: 20px 24px;
+      border-radius: 8px;
+      overflow-x: auto;
+      margin: 16px 0;
+      font-size: 0.84rem;
+      line-height: 1.6;
+    }
+
+    code {
+      background: #eef0f8;
+      color: #1a1a2e;
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-size: 0.85em;
+    }
+
+    pre code {
+      background: transparent;
+      color: inherit;
+      padding: 0;
+      border-radius: 0;
+      font-size: inherit;
+    }
+
+    /* ---- Tables ---- */
+    .table-wrap {
+      overflow-x: auto;
+      margin: 20px 0;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.88rem;
+    }
+
+    th {
+      background: #1a1a2e;
+      color: #cdd6f4;
+      padding: 10px 14px;
+      text-align: left;
+      font-weight: 600;
+      font-size: 0.82rem;
+      letter-spacing: 0.3px;
+    }
+
+    td {
+      padding: 9px 14px;
+      border-bottom: 1px solid #e8ebf5;
+      vertical-align: top;
+    }
+
+    tr:nth-child(even) td {
+      background: #f8f9fe;
+    }
+
+    /* ---- Comparison grid ---- */
+    .compare {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin: 20px 0;
+    }
+
+    .compare.three {
+      grid-template-columns: 1fr 1fr 1fr;
+    }
+
+    .compare.four {
+      grid-template-columns: 1fr 1fr 1fr 1fr;
+    }
+
+    .compare-card {
+      background: white;
+      border: 1px solid #e0e4f0;
+      border-radius: 8px;
+      padding: 18px 20px;
+    }
+
+    .compare-card h4 {
+      margin-top: 0;
+    }
+
+    .compare-card.pro {
+      border-top: 3px solid #22c55e;
+    }
+
+    .compare-card.con {
+      border-top: 3px solid #f43f5e;
+    }
+
+    .compare-card.neutral {
+      border-top: 3px solid #3b82f6;
+    }
+
+    /* ---- Diagram wrapper ---- */
+    .diagram {
+      background: white;
+      border: 1px solid #e0e4f0;
+      border-radius: 8px;
+      padding: 20px;
+      margin: 20px 0;
+      overflow-x: auto;
+      text-align: center;
+    }
+
+    .diagram-caption {
+      font-size: 0.78rem;
+      color: #6c7086;
+      text-align: center;
+      margin-top: 8px;
+    }
+
+    /* ---- Tags ---- */
+    .tag {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.4px;
+      margin: 0 4px 4px 0;
+    }
+
+    .tag-interview {
+      background: #fef3c7;
+      color: #92400e;
+    }
+
+    .tag-critical {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    .tag-concept {
+      background: #ede9fe;
+      color: #5b21b6;
+    }
+
+    .tag-realworld {
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    /* ---- Definition list ---- */
+    .def {
+      margin: 12px 0 16px 0;
+    }
+
+    .def dt {
+      font-weight: 700;
+      color: #1a1a2e;
+      margin-bottom: 3px;
+    }
+
+    .def dd {
+      margin-left: 20px;
+      color: #333355;
+      margin-bottom: 10px;
+    }
+
+    /* ---- Subsection separator ---- */
+    .subsection {
+      margin-top: 48px;
+    }
+
+    /* Chapter 12: Coding Patterns Styles */
+    .pattern-viz {
+      background: #03050d;
+      border: 1px solid #131d35;
+      border-radius: 12px;
+      padding: 15px;
+      margin: 25px 0;
+      min-height: 100px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.5);
+    }
+
+    .pattern-img {
+      display: none;
+    }
+
+    @media (max-width: 768px) {
+      .sidebar {
+        width: 100%;
+        height: auto;
+        position: relative;
+      }
+
+      .main {
+        margin-left: 0;
+      }
+
+      .section {
+        padding: 24px 20px;
+      }
+
+      .compare,
+      .compare.three,
+      .compare.four {
+        grid-template-columns: 1fr;
+      }
+    }
   </style>
+  
+  <link rel="stylesheet" href="../assets/css/system-design-common.css">
+  <script defer src="../assets/js/system-design-common.js"></script>
 
+  
 </head>
 <body>
   <div class="layout">
@@ -379,9 +695,23 @@
         </details>
         <details class="acc-chapter">
           <summary class="acc-summary">
-            <span class="chap-icon">📚</span>
+            <span class="chap-icon">🧩</span>
             <span class="chap-text">
               <span class="chap-num">Chapter 12</span>
+              <span class="chap-label">Coding Patterns</span>
+            </span>
+            
+            <span class="acc-arrow">›</span>
+          </summary>
+          <div class="acc-sub">
+              <a class="acc-sub-item" href="12-coding-interview-patterns.html#patterns">20 Essential Patterns</a>
+          </div>
+        </details>
+        <details class="acc-chapter">
+          <summary class="acc-summary">
+            <span class="chap-icon">📚</span>
+            <span class="chap-text">
+              <span class="chap-num">Chapter 13</span>
               <span class="chap-label">Case Studies</span>
             </span>
             
@@ -398,93 +728,93 @@
       <div class="progress-bar-wrap"><div class="progress-bar" id="pb"></div></div>
 
 <div class="section active" id="api-design">
-        <h1 class="section-title">API Design</h1>
-        <p class="section-subtitle">Module 6 &nbsp;|&nbsp; What is an API · Idempotency · Data Formats · REST · GraphQL
-          · gRPC</p>
+    <h1 class="section-title">API Design</h1>
+    <p class="section-subtitle">Module 6 &nbsp;|&nbsp; What is an API · Idempotency · Data Formats · REST · GraphQL
+      · gRPC</p>
 
-        <h2>What is an API?</h2>
-        <p>An API (Application Programming Interface) is a defined contract that specifies how software components
-          should communicate. In the context of system design, APIs define how clients (web browsers, mobile apps, other
-          services) interact with servers. A well-designed API is consistent, predictable, secure, and versioned.</p>
+    <h2>What is an API?</h2>
+    <p>An API (Application Programming Interface) is a defined contract that specifies how software components
+      should communicate. In the context of system design, APIs define how clients (web browsers, mobile apps, other
+      services) interact with servers. A well-designed API is consistent, predictable, secure, and versioned.</p>
 
-        <h3>API Design Principles</h3>
-        <ul>
-          <li><strong>Consistency:</strong> Naming conventions, error formats, and response structures should be uniform
-            across all endpoints.</li>
-          <li><strong>Backward compatibility:</strong> Existing clients must not break when the API evolves. Add fields,
-            do not remove them. Version breaking changes.</li>
-          <li><strong>Least surprise:</strong> Behavior should match what the name and documentation imply.</li>
-          <li><strong>Proper error responses:</strong> Return informative error codes and messages, not generic 500
-            errors.</li>
-          <li><strong>Security by default:</strong> Authenticate and authorize all sensitive endpoints. Validate all
-            input.</li>
-        </ul>
+    <h3>API Design Principles</h3>
+    <ul>
+      <li><strong>Consistency:</strong> Naming conventions, error formats, and response structures should be uniform
+        across all endpoints.</li>
+      <li><strong>Backward compatibility:</strong> Existing clients must not break when the API evolves. Add fields,
+        do not remove them. Version breaking changes.</li>
+      <li><strong>Least surprise:</strong> Behavior should match what the name and documentation imply.</li>
+      <li><strong>Proper error responses:</strong> Return informative error codes and messages, not generic 500
+        errors.</li>
+      <li><strong>Security by default:</strong> Authenticate and authorize all sensitive endpoints. Validate all
+        input.</li>
+    </ul>
 
-        <h2>Idempotency</h2>
-        <p>An operation is idempotent if performing it multiple times produces the same result as performing it once.
-          This is critical for reliability: in distributed systems, network failures can cause clients to retry requests
-          without knowing if the original succeeded.</p>
+    <h2>Idempotency</h2>
+    <p>An operation is idempotent if performing it multiple times produces the same result as performing it once.
+      This is critical for reliability: in distributed systems, network failures can cause clients to retry requests
+      without knowing if the original succeeded.</p>
 
-        <h3>HTTP Method Idempotency</h3>
-        <div class="table-wrap">
-          <table>
-            <tr>
-              <th>Method</th>
-              <th>Idempotent</th>
-              <th>Safe (read-only)</th>
-              <th>Notes</th>
-            </tr>
-            <tr>
-              <td>GET</td>
-              <td>Yes</td>
-              <td>Yes</td>
-              <td>Read only, no side effects</td>
-            </tr>
-            <tr>
-              <td>HEAD</td>
-              <td>Yes</td>
-              <td>Yes</td>
-              <td>Like GET, returns only headers</td>
-            </tr>
-            <tr>
-              <td>OPTIONS</td>
-              <td>Yes</td>
-              <td>Yes</td>
-              <td>Describes allowed methods</td>
-            </tr>
-            <tr>
-              <td>PUT</td>
-              <td>Yes</td>
-              <td>No</td>
-              <td>Replace resource; same payload → same result</td>
-            </tr>
-            <tr>
-              <td>DELETE</td>
-              <td>Yes</td>
-              <td>No</td>
-              <td>Delete twice → still deleted (may return 404 on second)</td>
-            </tr>
-            <tr>
-              <td>POST</td>
-              <td>No</td>
-              <td>No</td>
-              <td>Creates new resource each time</td>
-            </tr>
-            <tr>
-              <td>PATCH</td>
-              <td>Not always</td>
-              <td>No</td>
-              <td>Depends on implementation</td>
-            </tr>
-          </table>
-        </div>
+    <h3>HTTP Method Idempotency</h3>
+    <div class="table-wrap">
+      <table>
+        <tr>
+          <th>Method</th>
+          <th>Idempotent</th>
+          <th>Safe (read-only)</th>
+          <th>Notes</th>
+        </tr>
+        <tr>
+          <td>GET</td>
+          <td>Yes</td>
+          <td>Yes</td>
+          <td>Read only, no side effects</td>
+        </tr>
+        <tr>
+          <td>HEAD</td>
+          <td>Yes</td>
+          <td>Yes</td>
+          <td>Like GET, returns only headers</td>
+        </tr>
+        <tr>
+          <td>OPTIONS</td>
+          <td>Yes</td>
+          <td>Yes</td>
+          <td>Describes allowed methods</td>
+        </tr>
+        <tr>
+          <td>PUT</td>
+          <td>Yes</td>
+          <td>No</td>
+          <td>Replace resource; same payload → same result</td>
+        </tr>
+        <tr>
+          <td>DELETE</td>
+          <td>Yes</td>
+          <td>No</td>
+          <td>Delete twice → still deleted (may return 404 on second)</td>
+        </tr>
+        <tr>
+          <td>POST</td>
+          <td>No</td>
+          <td>No</td>
+          <td>Creates new resource each time</td>
+        </tr>
+        <tr>
+          <td>PATCH</td>
+          <td>Not always</td>
+          <td>No</td>
+          <td>Depends on implementation</td>
+        </tr>
+      </table>
+    </div>
 
-        <h3>Idempotency Keys</h3>
-        <p>For non-idempotent operations (like POST to create a payment), clients can include an idempotency key — a
-          unique identifier for the request. The server stores the key and the result of the first execution. If the
-          same key is received again, the server returns the stored result without re-executing.</p>
+    <h3>Idempotency Keys</h3>
+    <p>For non-idempotent operations (like POST to create a payment), clients can include an idempotency key — a
+      unique identifier for the request. The server stores the key and the result of the first execution. If the
+      same key is received again, the server returns the stored result without re-executing.</p>
 
-        <pre>
+    <pre>
 POST /api/payments HTTP/1.1
 Idempotency-Key: a8098c1a-f86e-11da-bd1a-00112444be1e
 Content-Type: application/json
@@ -492,8 +822,8 @@ Content-Type: application/json
 { "amount": 99.99, "currency": "USD", "card": "tok_visa" }
 </pre>
 
-        <p><strong>Server implementation:</strong></p>
-        <pre>
+    <p><strong>Server implementation:</strong></p>
+    <pre>
 def create_payment(idempotency_key, payload):
     # Check if this request was already processed
     cached = redis.get(f"idem:{idempotency_key}")
@@ -508,92 +838,92 @@ def create_payment(idempotency_key, payload):
     return result
 </pre>
 
-        <h2>Data Formats</h2>
-        <p>The choice of data serialization format affects API performance, client complexity, human-readability, and
-          schema enforcement.</p>
+    <h2>Data Formats</h2>
+    <p>The choice of data serialization format affects API performance, client complexity, human-readability, and
+      schema enforcement.</p>
 
-        <div class="table-wrap">
-          <table>
-            <tr>
-              <th>Format</th>
-              <th>Encoding</th>
-              <th>Schema</th>
-              <th>Human-readable</th>
-              <th>Relative size</th>
-              <th>Common use</th>
-            </tr>
-            <tr>
-              <td>JSON</td>
-              <td>Text</td>
-              <td>Optional (JSON Schema)</td>
-              <td>Yes</td>
-              <td>1x</td>
-              <td>REST APIs, web, mobile</td>
-            </tr>
-            <tr>
-              <td>XML</td>
-              <td>Text</td>
-              <td>XSD</td>
-              <td>Yes (verbose)</td>
-              <td>~1.5x</td>
-              <td>SOAP, enterprise, configuration</td>
-            </tr>
-            <tr>
-              <td>Protocol Buffers</td>
-              <td>Binary</td>
-              <td>Required (.proto file)</td>
-              <td>No</td>
-              <td>~0.3x</td>
-              <td>gRPC, internal microservices</td>
-            </tr>
-            <tr>
-              <td>MessagePack</td>
-              <td>Binary</td>
-              <td>No</td>
-              <td>No</td>
-              <td>~0.6x</td>
-              <td>Cache payloads, real-time APIs</td>
-            </tr>
-            <tr>
-              <td>Avro</td>
-              <td>Binary</td>
-              <td>Required (JSON schema)</td>
-              <td>No</td>
-              <td>~0.3x</td>
-              <td>Kafka, Hadoop, data pipelines</td>
-            </tr>
-            <tr>
-              <td>Parquet</td>
-              <td>Columnar binary</td>
-              <td>Required</td>
-              <td>No</td>
-              <td>~0.1x (analytics)</td>
-              <td>Data lakes, analytics</td>
-            </tr>
-          </table>
-        </div>
+    <div class="table-wrap">
+      <table>
+        <tr>
+          <th>Format</th>
+          <th>Encoding</th>
+          <th>Schema</th>
+          <th>Human-readable</th>
+          <th>Relative size</th>
+          <th>Common use</th>
+        </tr>
+        <tr>
+          <td>JSON</td>
+          <td>Text</td>
+          <td>Optional (JSON Schema)</td>
+          <td>Yes</td>
+          <td>1x</td>
+          <td>REST APIs, web, mobile</td>
+        </tr>
+        <tr>
+          <td>XML</td>
+          <td>Text</td>
+          <td>XSD</td>
+          <td>Yes (verbose)</td>
+          <td>~1.5x</td>
+          <td>SOAP, enterprise, configuration</td>
+        </tr>
+        <tr>
+          <td>Protocol Buffers</td>
+          <td>Binary</td>
+          <td>Required (.proto file)</td>
+          <td>No</td>
+          <td>~0.3x</td>
+          <td>gRPC, internal microservices</td>
+        </tr>
+        <tr>
+          <td>MessagePack</td>
+          <td>Binary</td>
+          <td>No</td>
+          <td>No</td>
+          <td>~0.6x</td>
+          <td>Cache payloads, real-time APIs</td>
+        </tr>
+        <tr>
+          <td>Avro</td>
+          <td>Binary</td>
+          <td>Required (JSON schema)</td>
+          <td>No</td>
+          <td>~0.3x</td>
+          <td>Kafka, Hadoop, data pipelines</td>
+        </tr>
+        <tr>
+          <td>Parquet</td>
+          <td>Columnar binary</td>
+          <td>Required</td>
+          <td>No</td>
+          <td>~0.1x (analytics)</td>
+          <td>Data lakes, analytics</td>
+        </tr>
+      </table>
+    </div>
 
-        <h2>API Architectural Styles</h2>
-        <p>Different API paradigms make different tradeoffs between flexibility, performance, simplicity, and tooling.
-        </p>
+    <h2>API Architectural Styles</h2>
+    <p>Different API paradigms make different tradeoffs between flexibility, performance, simplicity, and tooling.
+    </p>
 
-        <h2>REST API Design</h2>
-        <p>REST (Representational State Transfer) is an architectural style that uses HTTP methods and URLs to create a
-          uniform interface for accessing and manipulating resources. REST is stateless — each request contains all
-          information needed to process it.</p>
+    <h2>REST API Design</h2>
+    <p>REST (Representational State Transfer) is an architectural style that uses HTTP methods and URLs to create a
+      uniform interface for accessing and manipulating resources. REST is stateless — each request contains all
+      information needed to process it.</p>
 
-        <h3>REST Constraints</h3>
-        <ul>
-          <li><strong>Stateless:</strong> Server holds no session state. All state is in the request.</li>
-          <li><strong>Uniform interface:</strong> Resources identified by URIs; resources manipulated through
-            representations; self-descriptive messages; HATEOAS.</li>
-          <li><strong>Layered system:</strong> Client cannot tell whether it's communicating with an origin server or a
-            middleman (cache, load balancer).</li>
-          <li><strong>Cacheable:</strong> Responses must indicate if they are cacheable.</li>
-        </ul>
+    <h3>REST Constraints</h3>
+    <ul>
+      <li><strong>Stateless:</strong> Server holds no session state. All state is in the request.</li>
+      <li><strong>Uniform interface:</strong> Resources identified by URIs; resources manipulated through
+        representations; self-descriptive messages; HATEOAS.</li>
+      <li><strong>Layered system:</strong> Client cannot tell whether it's communicating with an origin server or a
+        middleman (cache, load balancer).</li>
+      <li><strong>Cacheable:</strong> Responses must indicate if they are cacheable.</li>
+    </ul>
 
-        <h3>Resource-Based URL Design</h3>
-        <pre>
+    <h3>Resource-Based URL Design</h3>
+    <pre>
 # Resources are nouns, not verbs
 GET    /users              — List users
 GET    /users/123          — Get user 123
@@ -612,33 +942,33 @@ POST /users/123/activate   — Acceptable for actions with no resource represent
 GET  /search?q=term        — Query parameters for filtering/searching
 </pre>
 
-        <h3>REST API Best Practices</h3>
-        <ul>
-          <li>Use plural nouns for collections (<code>/users</code>, not <code>/user</code>)</li>
-          <li>Return appropriate HTTP status codes (201 for created, 204 for no content)</li>
-          <li>Provide pagination for list endpoints (<code>?page=2&limit=20</code> or cursor-based)</li>
-          <li>Version your API (<code>/api/v1/</code> or <code>Accept: application/vnd.api+json;version=1</code>)</li>
-          <li>Return consistent error format with machine-readable error codes</li>
-          <li>Use HTTPS always</li>
-        </ul>
+    <h3>REST API Best Practices</h3>
+    <ul>
+      <li>Use plural nouns for collections (<code>/users</code>, not <code>/user</code>)</li>
+      <li>Return appropriate HTTP status codes (201 for created, 204 for no content)</li>
+      <li>Provide pagination for list endpoints (<code>?page=2&limit=20</code> or cursor-based)</li>
+      <li>Version your API (<code>/api/v1/</code> or <code>Accept: application/vnd.api+json;version=1</code>)</li>
+      <li>Return consistent error format with machine-readable error codes</li>
+      <li>Use HTTPS always</li>
+    </ul>
 
-        <h2>GraphQL Deep Dive</h2>
-        <p>GraphQL is a query language for APIs and a runtime for executing those queries. Rather than exposing a
-          collection of fixed endpoints that return predetermined data shapes, GraphQL exposes a single endpoint where
-          clients specify exactly what data they need using a typed query language.</p>
+    <h2>GraphQL Deep Dive</h2>
+    <p>GraphQL is a query language for APIs and a runtime for executing those queries. Rather than exposing a
+      collection of fixed endpoints that return predetermined data shapes, GraphQL exposes a single endpoint where
+      clients specify exactly what data they need using a typed query language.</p>
 
-        <h3>Core Problems GraphQL Solves</h3>
-        <ul>
-          <li><strong>Over-fetching:</strong> REST endpoints return a fixed data shape. Fetching
-            <code>GET /users/123</code> returns all user fields even if you only need name and email.
-          </li>
-          <li><strong>Under-fetching (N+1 requests):</strong> Getting a list of posts with each author's name requires
-            one request for posts, then one per post for author details.</li>
-          <li><strong>Client-specific data requirements:</strong> Mobile and web clients may need different subsets of
-            data but REST uses the same endpoint for both.</li>
-        </ul>
+    <h3>Core Problems GraphQL Solves</h3>
+    <ul>
+      <li><strong>Over-fetching:</strong> REST endpoints return a fixed data shape. Fetching
+        <code>GET /users/123</code> returns all user fields even if you only need name and email.
+      </li>
+      <li><strong>Under-fetching (N+1 requests):</strong> Getting a list of posts with each author's name requires
+        one request for posts, then one per post for author details.</li>
+      <li><strong>Client-specific data requirements:</strong> Mobile and web clients may need different subsets of
+        data but REST uses the same endpoint for both.</li>
+    </ul>
 
-        <pre>
+    <pre>
 # Single GraphQL query — client specifies exactly what it needs
 query {
   user(id: "123") {
@@ -659,12 +989,12 @@ query {
 # Server returns exactly this structure — no more, no less
 </pre>
 
-        <h3>GraphQL Schema</h3>
-        <p>GraphQL APIs are strongly typed. The schema defines all types, queries, mutations, and subscriptions, and
-          serves as a contract between client and server. Introspection allows clients to query the schema itself,
-          enabling powerful tooling (auto-generated documentation, type-safe client code).</p>
+    <h3>GraphQL Schema</h3>
+    <p>GraphQL APIs are strongly typed. The schema defines all types, queries, mutations, and subscriptions, and
+      serves as a contract between client and server. Introspection allows clients to query the schema itself,
+      enabling powerful tooling (auto-generated documentation, type-safe client code).</p>
 
-        <pre>
+    <pre>
 type User {
   id: ID!
   name: String!
@@ -696,41 +1026,41 @@ type Subscription {
 }
 </pre>
 
-        <h3>Tradeoffs</h3>
-        <div class="compare">
-          <div class="compare-card pro">
-            <h4>Advantages</h4>
-            <ul>
-              <li>Client fetches exactly what it needs — no over/under-fetching</li>
-              <li>Single endpoint simplifies API versioning</li>
-              <li>Strong typing catches client/server mismatches at build time</li>
-              <li>Introspection enables self-documenting APIs</li>
-              <li>Subscriptions provide real-time capability</li>
-            </ul>
-          </div>
-          <div class="compare-card con">
-            <h4>Challenges</h4>
-            <ul>
-              <li>HTTP-level caching is harder (single endpoint, complex queries)</li>
-              <li>N+1 query problem if not handled with DataLoader batching</li>
-              <li>Complex queries can be expensive — need query cost analysis and rate limits</li>
-              <li>Steeper learning curve than REST</li>
-              <li>Not ideal for simple CRUD APIs where REST is simpler</li>
-            </ul>
-          </div>
-        </div>
+    <h3>Tradeoffs</h3>
+    <div class="compare">
+      <div class="compare-card pro">
+        <h4>Advantages</h4>
+        <ul>
+          <li>Client fetches exactly what it needs — no over/under-fetching</li>
+          <li>Single endpoint simplifies API versioning</li>
+          <li>Strong typing catches client/server mismatches at build time</li>
+          <li>Introspection enables self-documenting APIs</li>
+          <li>Subscriptions provide real-time capability</li>
+        </ul>
+      </div>
+      <div class="compare-card con">
+        <h4>Challenges</h4>
+        <ul>
+          <li>HTTP-level caching is harder (single endpoint, complex queries)</li>
+          <li>N+1 query problem if not handled with DataLoader batching</li>
+          <li>Complex queries can be expensive — need query cost analysis and rate limits</li>
+          <li>Steeper learning curve than REST</li>
+          <li>Not ideal for simple CRUD APIs where REST is simpler</li>
+        </ul>
+      </div>
+    </div>
 
-        <h2>gRPC Deep Dive</h2>
-        <p>gRPC is a high-performance, open-source remote procedure call framework developed by Google. It uses Protocol
-          Buffers as its interface definition language and data serialization format, and HTTP/2 as its transport
-          protocol.</p>
+    <h2>gRPC Deep Dive</h2>
+    <p>gRPC is a high-performance, open-source remote procedure call framework developed by Google. It uses Protocol
+      Buffers as its interface definition language and data serialization format, and HTTP/2 as its transport
+      protocol.</p>
 
-        <h3>Protocol Buffers</h3>
-        <p>Protocol Buffers (protobuf) define the service contract and message types in a <code>.proto</code> file. Code
-          generators produce client and server stubs in many languages. The binary encoding is typically 3–10x smaller
-          than equivalent JSON and serialization/deserialization is significantly faster.</p>
+    <h3>Protocol Buffers</h3>
+    <p>Protocol Buffers (protobuf) define the service contract and message types in a <code>.proto</code> file. Code
+      generators produce client and server stubs in many languages. The binary encoding is typically 3–10x smaller
+      than equivalent JSON and serialization/deserialization is significantly faster.</p>
 
-        <pre>
+    <pre>
 syntax = "proto3";
 
 service UserService {
@@ -752,343 +1082,343 @@ message GetUserRequest {
 }
 </pre>
 
-        <h3>gRPC Streaming Types</h3>
-        <div class="table-wrap">
-          <table>
-            <tr>
-              <th>Type</th>
-              <th>Request</th>
-              <th>Response</th>
-              <th>Use case</th>
-            </tr>
-            <tr>
-              <td>Unary</td>
-              <td>Single</td>
-              <td>Single</td>
-              <td>Standard request-response (like REST)</td>
-            </tr>
-            <tr>
-              <td>Server streaming</td>
-              <td>Single</td>
-              <td>Stream</td>
-              <td>Server pushes updates (stock prices, notifications)</td>
-            </tr>
-            <tr>
-              <td>Client streaming</td>
-              <td>Stream</td>
-              <td>Single</td>
-              <td>Upload chunks (file upload, sensor data)</td>
-            </tr>
-            <tr>
-              <td>Bidirectional streaming</td>
-              <td>Stream</td>
-              <td>Stream</td>
-              <td>Chat, real-time collaboration, voice calls</td>
-            </tr>
-          </table>
-        </div>
+    <h3>gRPC Streaming Types</h3>
+    <div class="table-wrap">
+      <table>
+        <tr>
+          <th>Type</th>
+          <th>Request</th>
+          <th>Response</th>
+          <th>Use case</th>
+        </tr>
+        <tr>
+          <td>Unary</td>
+          <td>Single</td>
+          <td>Single</td>
+          <td>Standard request-response (like REST)</td>
+        </tr>
+        <tr>
+          <td>Server streaming</td>
+          <td>Single</td>
+          <td>Stream</td>
+          <td>Server pushes updates (stock prices, notifications)</td>
+        </tr>
+        <tr>
+          <td>Client streaming</td>
+          <td>Stream</td>
+          <td>Single</td>
+          <td>Upload chunks (file upload, sensor data)</td>
+        </tr>
+        <tr>
+          <td>Bidirectional streaming</td>
+          <td>Stream</td>
+          <td>Stream</td>
+          <td>Chat, real-time collaboration, voice calls</td>
+        </tr>
+      </table>
+    </div>
 
-        <div class="table-wrap">
-          <table>
-            <tr>
-              <th>Aspect</th>
-              <th>REST (JSON)</th>
-              <th>GraphQL</th>
-              <th>gRPC (Protobuf)</th>
-            </tr>
-            <tr>
-              <td>Protocol</td>
-              <td>HTTP/1.1 or HTTP/2</td>
-              <td>HTTP/1.1 or HTTP/2</td>
-              <td>HTTP/2</td>
-            </tr>
-            <tr>
-              <td>Payload format</td>
-              <td>JSON (text)</td>
-              <td>JSON (text)</td>
-              <td>Protocol Buffers (binary)</td>
-            </tr>
-            <tr>
-              <td>Payload size</td>
-              <td>1x</td>
-              <td>1x</td>
-              <td>~0.3x</td>
-            </tr>
-            <tr>
-              <td>Schema</td>
-              <td>Optional (OpenAPI)</td>
-              <td>Required (SDL)</td>
-              <td>Required (.proto)</td>
-            </tr>
-            <tr>
-              <td>Streaming</td>
-              <td>Limited (SSE, Websocket)</td>
-              <td>Subscriptions (WebSocket)</td>
-              <td>Native bidirectional</td>
-            </tr>
-            <tr>
-              <td>Browser support</td>
-              <td>Native</td>
-              <td>Native</td>
-              <td>Needs grpc-web proxy</td>
-            </tr>
-            <tr>
-              <td>Code generation</td>
-              <td>Optional</td>
-              <td>Optional</td>
-              <td>Required</td>
-            </tr>
-            <tr>
-              <td>Best for</td>
-              <td>Public APIs, simple CRUD</td>
-              <td>Complex data, flexible clients</td>
-              <td>Microservice-to-microservice, performance-critical</td>
-            </tr>
-          </table>
-        </div>
-      </div>
+    <div class="table-wrap">
+      <table>
+        <tr>
+          <th>Aspect</th>
+          <th>REST (JSON)</th>
+          <th>GraphQL</th>
+          <th>gRPC (Protobuf)</th>
+        </tr>
+        <tr>
+          <td>Protocol</td>
+          <td>HTTP/1.1 or HTTP/2</td>
+          <td>HTTP/1.1 or HTTP/2</td>
+          <td>HTTP/2</td>
+        </tr>
+        <tr>
+          <td>Payload format</td>
+          <td>JSON (text)</td>
+          <td>JSON (text)</td>
+          <td>Protocol Buffers (binary)</td>
+        </tr>
+        <tr>
+          <td>Payload size</td>
+          <td>1x</td>
+          <td>1x</td>
+          <td>~0.3x</td>
+        </tr>
+        <tr>
+          <td>Schema</td>
+          <td>Optional (OpenAPI)</td>
+          <td>Required (SDL)</td>
+          <td>Required (.proto)</td>
+        </tr>
+        <tr>
+          <td>Streaming</td>
+          <td>Limited (SSE, Websocket)</td>
+          <td>Subscriptions (WebSocket)</td>
+          <td>Native bidirectional</td>
+        </tr>
+        <tr>
+          <td>Browser support</td>
+          <td>Native</td>
+          <td>Native</td>
+          <td>Needs grpc-web proxy</td>
+        </tr>
+        <tr>
+          <td>Code generation</td>
+          <td>Optional</td>
+          <td>Optional</td>
+          <td>Required</td>
+        </tr>
+        <tr>
+          <td>Best for</td>
+          <td>Public APIs, simple CRUD</td>
+          <td>Complex data, flexible clients</td>
+          <td>Microservice-to-microservice, performance-critical</td>
+        </tr>
+      </table>
+    </div>
+  </div>
 
 <div class="section" id="api-infra">
-        <h1 class="section-title">API Infrastructure</h1>
-        <p class="section-subtitle">Module 6 &nbsp;|&nbsp; Service Mesh, API Gateways, Circuit Breakers, and Resilience
-          Patterns</p>
+    <h1 class="section-title">API Infrastructure</h1>
+    <p class="section-subtitle">Module 6 &nbsp;|&nbsp; Service Mesh, API Gateways, Circuit Breakers, and Resilience
+      Patterns</p>
 
-        <h2>Resilience Patterns: The Circuit Breaker</h2>
-        <p>Named after the electrical circuit breaker: when a downstream service is failing, stop sending
-          requests to it (open the circuit) to prevent cascading failures and allow it time to recover.</p>
+    <h2>Resilience Patterns: The Circuit Breaker</h2>
+    <p>Named after the electrical circuit breaker: when a downstream service is failing, stop sending
+      requests to it (open the circuit) to prevent cascading failures and allow it time to recover.</p>
 
-        <div class="mermaid">
-          stateDiagram-v2
-          [*] --> Closed
-          Closed --> Open: Failure threshold\nexceeded (e.g. 50% in 10s)
-          Open --> HalfOpen: After reset timeout\n(e.g. 30 seconds)
-          HalfOpen --> Closed: Test request succeeds
-          HalfOpen --> Open: Test request fails
-          note right of Closed: Normal operation\nAll requests pass
-          note right of Open: STOP sending requests\nFail fast, return fallback
-          note right of HalfOpen: Allow one trial request\nto test recovery
-        </div>
+    <div class="mermaid">
+      stateDiagram-v2
+      [*] --> Closed
+      Closed --> Open: Failure threshold\nexceeded (e.g. 50% in 10s)
+      Open --> HalfOpen: After reset timeout\n(e.g. 30 seconds)
+      HalfOpen --> Closed: Test request succeeds
+      HalfOpen --> Open: Test request fails
+      note right of Closed: Normal operation\nAll requests pass
+      note right of Open: STOP sending requests\nFail fast, return fallback
+      note right of HalfOpen: Allow one trial request\nto test recovery
+    </div>
 
-        <div class="def">
-          <dt>Why Circuit Breakers Matter: Amazon's 2012 Outage</dt>
-          <dd>In 2012, an Amazon service experienced cascading failures because one upstream dependency slowed,
-            causing callers to queue requests, exhausting thread pools, causing more timeouts, causing more
-            requests to queue — a cascade. Circuit breakers prevent this: when the upstream is slow, fail fast
-            immediately rather than queuing indefinitely. Fail fast = bounded latency.</dd>
-          <dt>Netflix Hystrix → Resilience4j</dt>
-          <dd>Netflix invented Hystrix for circuit breaking in their Java services. It became the industry
-            standard. Hystrix is now in maintenance mode; <strong>Resilience4j</strong> is the successor.
-            Polly is the .NET equivalent. At Netflix, wrapping each external call in a circuit breaker
-            reduced cascading failures from seconds of outage to milliseconds of fallback responses.
-            Netflix's degraded experience (low-res video, no personalization, cached recommendations)
-            is graceful degradation via circuit breakers.</dd>
-          <dt>Parameters to tune</dt>
-          <dd><strong>Failure rate threshold:</strong> 50% of last N calls failed → open.
-            <strong>Slow call threshold:</strong> 50% of calls &gt;2s → also open.
-            <strong>Reset timeout:</strong> Try again after 30s in OPEN state.
-            These must be tuned per service — too sensitive and you'll open on transient blips; too loose and
-            the cascade happens before the breaker opens.
-          </dd>
-        </div>
+    <div class="def">
+      <dt>Why Circuit Breakers Matter: Amazon's 2012 Outage</dt>
+      <dd>In 2012, an Amazon service experienced cascading failures because one upstream dependency slowed,
+        causing callers to queue requests, exhausting thread pools, causing more timeouts, causing more
+        requests to queue — a cascade. Circuit breakers prevent this: when the upstream is slow, fail fast
+        immediately rather than queuing indefinitely. Fail fast = bounded latency.</dd>
+      <dt>Netflix Hystrix → Resilience4j</dt>
+      <dd>Netflix invented Hystrix for circuit breaking in their Java services. It became the industry
+        standard. Hystrix is now in maintenance mode; <strong>Resilience4j</strong> is the successor.
+        Polly is the .NET equivalent. At Netflix, wrapping each external call in a circuit breaker
+        reduced cascading failures from seconds of outage to milliseconds of fallback responses.
+        Netflix's degraded experience (low-res video, no personalization, cached recommendations)
+        is graceful degradation via circuit breakers.</dd>
+      <dt>Parameters to tune</dt>
+      <dd><strong>Failure rate threshold:</strong> 50% of last N calls failed → open.
+        <strong>Slow call threshold:</strong> 50% of calls &gt;2s → also open.
+        <strong>Reset timeout:</strong> Try again after 30s in OPEN state.
+        These must be tuned per service — too sensitive and you'll open on transient blips; too loose and
+        the cascade happens before the breaker opens.
+      </dd>
+    </div>
 
-        <h2>Retry Strategies: When and How to Retry</h2>
-        <div class="compare">
-          <div class="compare-card con">
-            <h4>Naive Retry (DO NOT do this)</h4>
-            <ul>
-              <li>Retry immediately on failure, N times</li>
-              <li>If 100 clients all retry simultaneously → <strong>thundering herd</strong></li>
-              <li>Can amplify load on an already-failing service by 100×</li>
-              <li>Makes cascading failures worse, not better</li>
-            </ul>
-          </div>
-          <div class="compare-card pro">
-            <h4>Exponential Backoff + Jitter (correct approach)</h4>
-            <ul>
-              <li>Retry delay doubles each attempt: 100ms, 200ms, 400ms, 800ms…</li>
-              <li><strong>Add jitter:</strong> random ±25% to each delay to desynchronize clients</li>
-              <li>Cap at max delay (e.g., 30 seconds)</li>
-              <li>Use <strong>idempotent requests only</strong> — never retry non-idempotent (POST payments)</li>
-            </ul>
-          </div>
-        </div>
-
-        <div class="callout tip">
-          <div class="callout-title">AWS SDKs Use Exponential Backoff + Jitter by Default</div>
-          <p>AWS's "Retry Architecture" paper (2015) showed that adding jitter reduced retry-storm magnitude
-            by 50× compared to fixed backoff. All AWS SDKs implement this. When writing your own retry logic,
-            use: <code>sleep(pow(2, attempt) * 100ms + random(0, 100ms))</code>.</p>
-        </div>
-
-        <h2>Bulkhead Pattern: Isolating Failures</h2>
-        <p>Named after compartments in a ship's hull — if one compartment floods, the others stay dry.
-          In software: isolate resources (thread pools, connection pools) per downstream dependency.</p>
-
-        <div class="def">
-          <dt>Thread Pool Bulkhead</dt>
-          <dd>Give each downstream service its own thread pool. Service A: 20 threads. Service B: 20 threads.
-            If Service B starts hanging, only Service B's 20 threads fill up — not all 200 shared threads.
-            Service A continues operating normally. Without bulkheads, slow Service B fills all shared threads,
-            making the entire application unresponsive to all requests.</dd>
-          <dt>Semaphore Bulkhead</dt>
-          <dd>Limit concurrent requests to a service with a counting semaphore (N permits). Faster than thread
-            pool isolation, but doesn't protect against slow calls blocking the calling thread. Used for
-            non-blocking async calls where thread pool isolation is overkill.</dd>
-        </div>
-
-        <h2>Timeout Hierarchy</h2>
-        <div class="table-wrap">
-          <table>
-            <tr>
-              <th>Tier</th>
-              <th>Connect Timeout</th>
-              <th>Read Timeout</th>
-              <th>Total Timeout</th>
-              <th>Notes</th>
-            </tr>
-            <tr>
-              <td>Client → CDN</td>
-              <td>1–2s</td>
-              <td>10–30s</td>
-              <td>—</td>
-              <td>CDN has generous timeouts for slow mobile</td>
-            </tr>
-            <tr>
-              <td>CDN → API Gateway</td>
-              <td>100–500ms</td>
-              <td>5–15s</td>
-              <td>—</td>
-              <td>Behind CDN, latency is lower</td>
-            </tr>
-            <tr>
-              <td>API Gateway → Service</td>
-              <td>50–200ms</td>
-              <td>1–5s</td>
-              <td>600ms–5s</td>
-              <td>Service must complete before this</td>
-            </tr>
-            <tr>
-              <td>Service → DB</td>
-              <td>50–200ms</td>
-              <td>200ms–2s</td>
-              <td>500ms–3s</td>
-              <td>Short! DB calls should be &lt;100ms</td>
-            </tr>
-            <tr>
-              <td>Service → Cache</td>
-              <td>10–50ms</td>
-              <td>50–200ms</td>
-              <td>100ms</td>
-              <td>Very short — fall through to DB on timeout</td>
-            </tr>
-          </table>
-        </div>
-
-        <div class="callout warn">
-          <div class="callout-title">Always Set Timeouts</div>
-          <p>A service with no timeout is a thread leak waiting to happen. Without timeouts, every slow
-            downstream call leaves a thread hanging indefinitely. With 50 API threads and a downstream
-            taking 60s (no timeout), you'll be fully "stuck" in 50 requests. Always: connect timeout
-            (quick failure) + read timeout (bounded wait). Also set <strong>overall request deadlines</strong>
-            (context cancellation in Go, CompletableFuture timeout in Java) that propagate through the entire
-            call chain.</p>
-        </div>
-
-        <h2>API Gateway Deep Dive: Kong vs. AWS API Gateway vs. Envoy</h2>
-        <div class="table-wrap">
-          <table>
-            <tr>
-              <th></th>
-              <th>Kong</th>
-              <th>AWS API Gateway</th>
-              <th>Envoy</th>
-            </tr>
-            <tr>
-              <td>Type</td>
-              <td>Self-hosted or SaaS</td>
-              <td>Managed SaaS</td>
-              <td>Self-hosted proxy</td>
-            </tr>
-            <tr>
-              <td>Performance</td>
-              <td>Very fast (Nginx+LuaJIT)</td>
-              <td>Variable (managed)</td>
-              <td>Fastest (~0.2ms overhead)</td>
-            </tr>
-            <tr>
-              <td>Auth</td>
-              <td>Plugin-based (JWT, OAuth, Basic)</td>
-              <td>IAM, Cognito, Lambda auth</td>
-              <td>via ext_authz filter</td>
-            </tr>
-            <tr>
-              <td>Rate limiting</td>
-              <td>Redis-backed plugin</td>
-              <td>Built-in, per-method</td>
-              <td>Local or global (Redis)</td>
-            </tr>
-            <tr>
-              <td>Protocol support</td>
-              <td>HTTP, gRPC, WebSocket</td>
-              <td>HTTP, WebSocket (gRPC via proxying)</td>
-              <td>HTTP, gRPC, TCP, WebSocket</td>
-            </tr>
-            <tr>
-              <td>Best for</td>
-              <td>Flexible self-hosted API management</td>
-              <td>Serverless / AWS-native architectures</td>
-              <td>Internal service mesh edge proxy</td>
-            </tr>
-          </table>
-        </div>
+    <h2>Retry Strategies: When and How to Retry</h2>
+    <div class="compare">
+      <div class="compare-card con">
+        <h4>Naive Retry (DO NOT do this)</h4>
+        <ul>
+          <li>Retry immediately on failure, N times</li>
+          <li>If 100 clients all retry simultaneously → <strong>thundering herd</strong></li>
+          <li>Can amplify load on an already-failing service by 100×</li>
+          <li>Makes cascading failures worse, not better</li>
+        </ul>
       </div>
+      <div class="compare-card pro">
+        <h4>Exponential Backoff + Jitter (correct approach)</h4>
+        <ul>
+          <li>Retry delay doubles each attempt: 100ms, 200ms, 400ms, 800ms…</li>
+          <li><strong>Add jitter:</strong> random ±25% to each delay to desynchronize clients</li>
+          <li>Cap at max delay (e.g., 30 seconds)</li>
+          <li>Use <strong>idempotent requests only</strong> — never retry non-idempotent (POST payments)</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="callout tip">
+      <div class="callout-title">AWS SDKs Use Exponential Backoff + Jitter by Default</div>
+      <p>AWS's "Retry Architecture" paper (2015) showed that adding jitter reduced retry-storm magnitude
+        by 50× compared to fixed backoff. All AWS SDKs implement this. When writing your own retry logic,
+        use: <code>sleep(pow(2, attempt) * 100ms + random(0, 100ms))</code>.</p>
+    </div>
+
+    <h2>Bulkhead Pattern: Isolating Failures</h2>
+    <p>Named after compartments in a ship's hull — if one compartment floods, the others stay dry.
+      In software: isolate resources (thread pools, connection pools) per downstream dependency.</p>
+
+    <div class="def">
+      <dt>Thread Pool Bulkhead</dt>
+      <dd>Give each downstream service its own thread pool. Service A: 20 threads. Service B: 20 threads.
+        If Service B starts hanging, only Service B's 20 threads fill up — not all 200 shared threads.
+        Service A continues operating normally. Without bulkheads, slow Service B fills all shared threads,
+        making the entire application unresponsive to all requests.</dd>
+      <dt>Semaphore Bulkhead</dt>
+      <dd>Limit concurrent requests to a service with a counting semaphore (N permits). Faster than thread
+        pool isolation, but doesn't protect against slow calls blocking the calling thread. Used for
+        non-blocking async calls where thread pool isolation is overkill.</dd>
+    </div>
+
+    <h2>Timeout Hierarchy</h2>
+    <div class="table-wrap">
+      <table>
+        <tr>
+          <th>Tier</th>
+          <th>Connect Timeout</th>
+          <th>Read Timeout</th>
+          <th>Total Timeout</th>
+          <th>Notes</th>
+        </tr>
+        <tr>
+          <td>Client → CDN</td>
+          <td>1–2s</td>
+          <td>10–30s</td>
+          <td>—</td>
+          <td>CDN has generous timeouts for slow mobile</td>
+        </tr>
+        <tr>
+          <td>CDN → API Gateway</td>
+          <td>100–500ms</td>
+          <td>5–15s</td>
+          <td>—</td>
+          <td>Behind CDN, latency is lower</td>
+        </tr>
+        <tr>
+          <td>API Gateway → Service</td>
+          <td>50–200ms</td>
+          <td>1–5s</td>
+          <td>600ms–5s</td>
+          <td>Service must complete before this</td>
+        </tr>
+        <tr>
+          <td>Service → DB</td>
+          <td>50–200ms</td>
+          <td>200ms–2s</td>
+          <td>500ms–3s</td>
+          <td>Short! DB calls should be &lt;100ms</td>
+        </tr>
+        <tr>
+          <td>Service → Cache</td>
+          <td>10–50ms</td>
+          <td>50–200ms</td>
+          <td>100ms</td>
+          <td>Very short — fall through to DB on timeout</td>
+        </tr>
+      </table>
+    </div>
+
+    <div class="callout warn">
+      <div class="callout-title">Always Set Timeouts</div>
+      <p>A service with no timeout is a thread leak waiting to happen. Without timeouts, every slow
+        downstream call leaves a thread hanging indefinitely. With 50 API threads and a downstream
+        taking 60s (no timeout), you'll be fully "stuck" in 50 requests. Always: connect timeout
+        (quick failure) + read timeout (bounded wait). Also set <strong>overall request deadlines</strong>
+        (context cancellation in Go, CompletableFuture timeout in Java) that propagate through the entire
+        call chain.</p>
+    </div>
+
+    <h2>API Gateway Deep Dive: Kong vs. AWS API Gateway vs. Envoy</h2>
+    <div class="table-wrap">
+      <table>
+        <tr>
+          <th></th>
+          <th>Kong</th>
+          <th>AWS API Gateway</th>
+          <th>Envoy</th>
+        </tr>
+        <tr>
+          <td>Type</td>
+          <td>Self-hosted or SaaS</td>
+          <td>Managed SaaS</td>
+          <td>Self-hosted proxy</td>
+        </tr>
+        <tr>
+          <td>Performance</td>
+          <td>Very fast (Nginx+LuaJIT)</td>
+          <td>Variable (managed)</td>
+          <td>Fastest (~0.2ms overhead)</td>
+        </tr>
+        <tr>
+          <td>Auth</td>
+          <td>Plugin-based (JWT, OAuth, Basic)</td>
+          <td>IAM, Cognito, Lambda auth</td>
+          <td>via ext_authz filter</td>
+        </tr>
+        <tr>
+          <td>Rate limiting</td>
+          <td>Redis-backed plugin</td>
+          <td>Built-in, per-method</td>
+          <td>Local or global (Redis)</td>
+        </tr>
+        <tr>
+          <td>Protocol support</td>
+          <td>HTTP, gRPC, WebSocket</td>
+          <td>HTTP, WebSocket (gRPC via proxying)</td>
+          <td>HTTP, gRPC, TCP, WebSocket</td>
+        </tr>
+        <tr>
+          <td>Best for</td>
+          <td>Flexible self-hosted API management</td>
+          <td>Serverless / AWS-native architectures</td>
+          <td>Internal service mesh edge proxy</td>
+        </tr>
+      </table>
+    </div>
+  </div>
 
 <div class="section" id="api-auth">
-        <h1 class="section-title">Authentication and Authorization</h1>
-        <p class="section-subtitle">Module 6 &nbsp;|&nbsp; Authentication vs Authorization · Session vs Token · JWT ·
-          OAuth2 · SSO</p>
+    <h1 class="section-title">Authentication and Authorization</h1>
+    <p class="section-subtitle">Module 6 &nbsp;|&nbsp; Authentication vs Authorization · Session vs Token · JWT ·
+      OAuth2 · SSO</p>
 
-        <h2>Authentication vs Authorization</h2>
-        <dl class="def">
-          <dt>Authentication (AuthN)</dt>
-          <dd>Verifying <em>who</em> the entity is. Answering: "Are you really Alice?" Methods: password + username,
-            cryptographic certificates, biometrics, hardware tokens.</dd>
-          <dt>Authorization (AuthZ)</dt>
-          <dd>Determining <em>what</em> the authenticated entity is allowed to do. Answering: "Alice, can you delete
-            this resource?" Methods: RBAC, ABAC, ACLs.</dd>
-        </dl>
+    <h2>Authentication vs Authorization</h2>
+    <dl class="def">
+      <dt>Authentication (AuthN)</dt>
+      <dd>Verifying <em>who</em> the entity is. Answering: "Are you really Alice?" Methods: password + username,
+        cryptographic certificates, biometrics, hardware tokens.</dd>
+      <dt>Authorization (AuthZ)</dt>
+      <dd>Determining <em>what</em> the authenticated entity is allowed to do. Answering: "Alice, can you delete
+        this resource?" Methods: RBAC, ABAC, ACLs.</dd>
+    </dl>
 
-        <div class="callout info">
-          <div class="callout-title">Sequence</div>
-          <p>Authentication always happens before authorization. You cannot determine what someone is allowed to do
-            until you know who they are.</p>
-        </div>
+    <div class="callout info">
+      <div class="callout-title">Sequence</div>
+      <p>Authentication always happens before authorization. You cannot determine what someone is allowed to do
+        until you know who they are.</p>
+    </div>
 
-        <h2>Session-Based Authentication (Stateful)</h2>
-        <p>The server creates and stores a session object after successful login. A session ID is sent to the client
-          (usually as an HTTP-only cookie). On subsequent requests, the client sends the session ID; the server looks it
-          up in the session store to retrieve user context.</p>
+    <h2>Session-Based Authentication (Stateful)</h2>
+    <p>The server creates and stores a session object after successful login. A session ID is sent to the client
+      (usually as an HTTP-only cookie). On subsequent requests, the client sends the session ID; the server looks it
+      up in the session store to retrieve user context.</p>
 
-        <h3>Flow</h3>
-        <ol>
-          <li>Client sends credentials (username + password).</li>
-          <li>Server authenticates credentials against database (compare bcrypt hash).</li>
-          <li>Server creates session: stores session data in Redis keyed by session ID.</li>
-          <li>Server sends session ID in <code>Set-Cookie: session_id=abc123; HttpOnly; Secure; SameSite=Lax</code></li>
-          <li>Client sends <code>Cookie: session_id=abc123</code> on every request.</li>
-          <li>Server looks up session in Redis to retrieve user identity and permissions.</li>
-        </ol>
+    <h3>Flow</h3>
+    <ol>
+      <li>Client sends credentials (username + password).</li>
+      <li>Server authenticates credentials against database (compare bcrypt hash).</li>
+      <li>Server creates session: stores session data in Redis keyed by session ID.</li>
+      <li>Server sends session ID in <code>Set-Cookie: session_id=abc123; HttpOnly; Secure; SameSite=Lax</code></li>
+      <li>Client sends <code>Cookie: session_id=abc123</code> on every request.</li>
+      <li>Server looks up session in Redis to retrieve user identity and permissions.</li>
+    </ol>
 
-        <h2>Token-Based Authentication (Stateless)</h2>
-        <p>After successful authentication, the server issues a signed token (typically a JWT) containing claims about
-          the user. The client stores the token and includes it in subsequent requests. The server verifies the token's
-          signature — no server-side storage needed.</p>
+    <h2>Token-Based Authentication (Stateless)</h2>
+    <p>After successful authentication, the server issues a signed token (typically a JWT) containing claims about
+      the user. The client stores the token and includes it in subsequent requests. The server verifies the token's
+      signature — no server-side storage needed.</p>
 
-        <h2>JWT — JSON Web Tokens</h2>
-        <p>A JWT is a compact, URL-safe token format consisting of three Base64URL-encoded parts separated by dots:
-          header, payload, signature.</p>
+    <h2>JWT — JSON Web Tokens</h2>
+    <p>A JWT is a compact, URL-safe token format consisting of three Base64URL-encoded parts separated by dots:
+      header, payload, signature.</p>
 
-        <pre>
+    <pre>
 # Structure
 header.payload.signature
 
@@ -1110,180 +1440,180 @@ header.payload.signature
 # )
 </pre>
 
-        <h3>JWT Verification</h3>
-        <p>The server verifies the token by recomputing the signature using the secret key and comparing it to the
-          signature in the token. If they match, the token is authentic and unmodified. The server can then extract the
-          claims from the payload without any database lookup.</p>
+    <h3>JWT Verification</h3>
+    <p>The server verifies the token by recomputing the signature using the secret key and comparing it to the
+      signature in the token. If they match, the token is authentic and unmodified. The server can then extract the
+      claims from the payload without any database lookup.</p>
 
-        <h3>Access Token + Refresh Token Pattern</h3>
+    <h3>Access Token + Refresh Token Pattern</h3>
+    <ul>
+      <li><strong>Access token:</strong> Short-lived (15 minutes). Used for API requests. If compromised, exposure
+        window is small.</li>
+      <li><strong>Refresh token:</strong> Long-lived (7–30 days). Stored securely (HttpOnly cookie or secure
+        storage). Used only to obtain new access tokens. Can be revoked by deleting from database.</li>
+    </ul>
+
+    <h2>OAuth 2.0 / OAuth2</h2>
+    <p>OAuth 2.0 is an authorization framework that enables a third-party application (client) to obtain limited
+      access to a user's account on a service (resource server), without the user sharing their credentials with the
+      third party.</p>
+
+    <h3>Authorization Code Flow (Most Secure — for Web Apps with Backend)</h3>
+    <ol>
+      <li>User clicks "Login with Google" on your app.</li>
+      <li>Your app redirects user to Google's authorization endpoint with <code>client_id</code>,
+        <code>redirect_uri</code>, <code>scope</code>, and a <code>state</code> parameter (CSRF protection).
+      </li>
+      <li>User logs into Google and grants permission to your app.</li>
+      <li>Google redirects back to your <code>redirect_uri</code> with a short-lived authorization code.</li>
+      <li>Your backend exchanges the authorization code for an access token and optionally a refresh token, using
+        the client secret (server-side only — never exposed to browser).</li>
+      <li>Your app uses the access token to call Google APIs on the user's behalf.</li>
+    </ol>
+
+    <h3>OAuth 2.0 Grant Types</h3>
+    <div class="table-wrap">
+      <table>
+        <tr>
+          <th>Grant Type</th>
+          <th>Used By</th>
+          <th>Flow</th>
+        </tr>
+        <tr>
+          <td>Authorization Code</td>
+          <td>Web apps with backend server</td>
+          <td>Redirect flow with code exchange</td>
+        </tr>
+        <tr>
+          <td>Authorization Code + PKCE</td>
+          <td>Mobile apps, SPAs</td>
+          <td>Same as above with Proof Key for Code Exchange, no client secret</td>
+        </tr>
+        <tr>
+          <td>Client Credentials</td>
+          <td>Machine-to-machine (no user)</td>
+          <td>Service exchanges client_id + secret for token directly</td>
+        </tr>
+        <tr>
+          <td>Implicit (deprecated)</td>
+          <td>Legacy SPAs</td>
+          <td>Token returned in URL fragment — insecure, avoid</td>
+        </tr>
+        <tr>
+          <td>Device Code</td>
+          <td>TV apps, CLI tools</td>
+          <td>Device shows code; user authenticates on another device</td>
+        </tr>
+      </table>
+    </div>
+
+    <h2>Single Sign-On (SSO)</h2>
+    <p>SSO allows a user to authenticate once with an Identity Provider (IdP) and then access multiple applications
+      (Service Providers) without re-authenticating. The IdP asserts the user's identity to each application via a
+      protocol-specific token or assertion.</p>
+
+    <h3>SAML 2.0</h3>
+    <p>Security Assertion Markup Language — XML-based enterprise SSO standard. Widely used in corporate environments
+      (Okta, Azure AD, Ping Identity). The IdP generates a digitally signed XML assertion. The service provider
+      validates the assertion's signature and extracts user attributes.</p>
+
+    <h3>OpenID Connect (OIDC)</h3>
+    <p>An identity layer built on top of OAuth 2.0. OAuth 2.0 was designed for authorization (access to resources);
+      OIDC adds authentication (verifying identity) by introducing the ID Token — a JWT containing identity claims
+      about the authenticated user.</p>
+
+    <div class="compare">
+      <div class="compare-card neutral">
+        <h4>SAML</h4>
         <ul>
-          <li><strong>Access token:</strong> Short-lived (15 minutes). Used for API requests. If compromised, exposure
-            window is small.</li>
-          <li><strong>Refresh token:</strong> Long-lived (7–30 days). Stored securely (HttpOnly cookie or secure
-            storage). Used only to obtain new access tokens. Can be revoked by deleting from database.</li>
+          <li>XML-based assertions</li>
+          <li>Designed for enterprise/corporate SSO</li>
+          <li>Complex specification</li>
+          <li>Excellent legacy system support</li>
+          <li>Typical use: employee accessing Salesforce, Workday, Jira via corporate IdP</li>
         </ul>
-
-        <h2>OAuth 2.0 / OAuth2</h2>
-        <p>OAuth 2.0 is an authorization framework that enables a third-party application (client) to obtain limited
-          access to a user's account on a service (resource server), without the user sharing their credentials with the
-          third party.</p>
-
-        <h3>Authorization Code Flow (Most Secure — for Web Apps with Backend)</h3>
-        <ol>
-          <li>User clicks "Login with Google" on your app.</li>
-          <li>Your app redirects user to Google's authorization endpoint with <code>client_id</code>,
-            <code>redirect_uri</code>, <code>scope</code>, and a <code>state</code> parameter (CSRF protection).
-          </li>
-          <li>User logs into Google and grants permission to your app.</li>
-          <li>Google redirects back to your <code>redirect_uri</code> with a short-lived authorization code.</li>
-          <li>Your backend exchanges the authorization code for an access token and optionally a refresh token, using
-            the client secret (server-side only — never exposed to browser).</li>
-          <li>Your app uses the access token to call Google APIs on the user's behalf.</li>
-        </ol>
-
-        <h3>OAuth 2.0 Grant Types</h3>
-        <div class="table-wrap">
-          <table>
-            <tr>
-              <th>Grant Type</th>
-              <th>Used By</th>
-              <th>Flow</th>
-            </tr>
-            <tr>
-              <td>Authorization Code</td>
-              <td>Web apps with backend server</td>
-              <td>Redirect flow with code exchange</td>
-            </tr>
-            <tr>
-              <td>Authorization Code + PKCE</td>
-              <td>Mobile apps, SPAs</td>
-              <td>Same as above with Proof Key for Code Exchange, no client secret</td>
-            </tr>
-            <tr>
-              <td>Client Credentials</td>
-              <td>Machine-to-machine (no user)</td>
-              <td>Service exchanges client_id + secret for token directly</td>
-            </tr>
-            <tr>
-              <td>Implicit (deprecated)</td>
-              <td>Legacy SPAs</td>
-              <td>Token returned in URL fragment — insecure, avoid</td>
-            </tr>
-            <tr>
-              <td>Device Code</td>
-              <td>TV apps, CLI tools</td>
-              <td>Device shows code; user authenticates on another device</td>
-            </tr>
-          </table>
-        </div>
-
-        <h2>Single Sign-On (SSO)</h2>
-        <p>SSO allows a user to authenticate once with an Identity Provider (IdP) and then access multiple applications
-          (Service Providers) without re-authenticating. The IdP asserts the user's identity to each application via a
-          protocol-specific token or assertion.</p>
-
-        <h3>SAML 2.0</h3>
-        <p>Security Assertion Markup Language — XML-based enterprise SSO standard. Widely used in corporate environments
-          (Okta, Azure AD, Ping Identity). The IdP generates a digitally signed XML assertion. The service provider
-          validates the assertion's signature and extracts user attributes.</p>
-
-        <h3>OpenID Connect (OIDC)</h3>
-        <p>An identity layer built on top of OAuth 2.0. OAuth 2.0 was designed for authorization (access to resources);
-          OIDC adds authentication (verifying identity) by introducing the ID Token — a JWT containing identity claims
-          about the authenticated user.</p>
-
-        <div class="compare">
-          <div class="compare-card neutral">
-            <h4>SAML</h4>
-            <ul>
-              <li>XML-based assertions</li>
-              <li>Designed for enterprise/corporate SSO</li>
-              <li>Complex specification</li>
-              <li>Excellent legacy system support</li>
-              <li>Typical use: employee accessing Salesforce, Workday, Jira via corporate IdP</li>
-            </ul>
-          </div>
-          <div class="compare-card neutral">
-            <h4>OIDC</h4>
-            <ul>
-              <li>JSON/JWT-based</li>
-              <li>Simpler than SAML</li>
-              <li>Built for web and mobile apps</li>
-              <li>Provider examples: Google, Apple, Auth0, Okta</li>
-              <li>Typical use: "Login with Google" on consumer apps</li>
-            </ul>
-          </div>
-        </div>
       </div>
+      <div class="compare-card neutral">
+        <h4>OIDC</h4>
+        <ul>
+          <li>JSON/JWT-based</li>
+          <li>Simpler than SAML</li>
+          <li>Built for web and mobile apps</li>
+          <li>Provider examples: Google, Apple, Auth0, Okta</li>
+          <li>Typical use: "Login with Google" on consumer apps</li>
+        </ul>
+      </div>
+    </div>
+  </div>
 
 <div class="section" id="realtime">
-        <h1 class="section-title">Real-Time Communication</h1>
-        <p class="section-subtitle">Module 6 &nbsp;|&nbsp; WebSockets · SSE · Long Polling · WebRTC</p>
+    <h1 class="section-title">Real-Time Communication</h1>
+    <p class="section-subtitle">Module 6 &nbsp;|&nbsp; WebSockets · SSE · Long Polling · WebRTC</p>
 
-        <h2>Comparison of Protocols</h2>
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>Feature</th>
-                <th>Long Polling</th>
-                <th>SSE</th>
-                <th>WebSockets</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td><strong>Direction</strong></td>
-                <td>Simulated Bidirectional</td>
-                <td>Server $\rightarrow$ Client</td>
-                <td>Full Bidirectional</td>
-              </tr>
-              <tr>
-                <td><strong>Protocol</strong></td>
-                <td>HTTP/1.1</td>
-                <td>HTTP / text-stream</td>
-                <td>ws:// (TCP)</td>
-              </tr>
-              <tr>
-                <td><strong>Latency</strong></td>
-                <td>High (req overhead)</td>
-                <td>Low</td>
-                <td>Lowest</td>
-              </tr>
-              <tr>
-                <td><strong>Scaling</strong></td>
-                <td>Stateless</td>
-                <td>Stateless-ish</td>
-                <td>Stateful (Sticky)</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+    <h2>Comparison of Protocols</h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Feature</th>
+            <th>Long Polling</th>
+            <th>SSE</th>
+            <th>WebSockets</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Direction</strong></td>
+            <td>Simulated Bidirectional</td>
+            <td>Server $\rightarrow$ Client</td>
+            <td>Full Bidirectional</td>
+          </tr>
+          <tr>
+            <td><strong>Protocol</strong></td>
+            <td>HTTP/1.1</td>
+            <td>HTTP / text-stream</td>
+            <td>ws:// (TCP)</td>
+          </tr>
+          <tr>
+            <td><strong>Latency</strong></td>
+            <td>High (req overhead)</td>
+            <td>Low</td>
+            <td>Lowest</td>
+          </tr>
+          <tr>
+            <td><strong>Scaling</strong></td>
+            <td>Stateless</td>
+            <td>Stateless-ish</td>
+            <td>Stateful (Sticky)</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
 
-        <h3>When to use what?</h3>
-        <ul>
-          <li><strong>WebSockets:</strong> Chat apps, Multiplayer gaming, Collaborative editing (Google Docs).</li>
-          <li><strong>SSE:</strong> Stock tickers, Social media feeds, News updates, Notifications.</li>
-          <li><strong>Long Polling:</strong> Legacy support where WebSockets/SSE are blocked by proxies.</li>
-        </ul>
+    <h3>When to use what?</h3>
+    <ul>
+      <li><strong>WebSockets:</strong> Chat apps, Multiplayer gaming, Collaborative editing (Google Docs).</li>
+      <li><strong>SSE:</strong> Stock tickers, Social media feeds, News updates, Notifications.</li>
+      <li><strong>Long Polling:</strong> Legacy support where WebSockets/SSE are blocked by proxies.</li>
+    </ul>
 
-        <h2>WebSockets Deep Dive</h2>
-        <p>A full-duplex connection over a single TCP socket. Starts with an HTTP <code>101 Switching Protocols</code>
-          handshake.</p>
-        <div class="callout warning">
-          <div class="callout-title">Scaling WebSockets</div>
-          <p>Since WS is <strong>Stateful</strong>, a client is tied to a specific server. To scale, you need a
-            <strong>Pub/Sub backplane</strong> (like Redis). When Server A wants to send a message to Client B (on
-            Server B), it publishes to Redis, and Server B picks it up.
-          </p>
-        </div>
+    <h2>WebSockets Deep Dive</h2>
+    <p>A full-duplex connection over a single TCP socket. Starts with an HTTP <code>101 Switching Protocols</code>
+      handshake.</p>
+    <div class="callout warning">
+      <div class="callout-title">Scaling WebSockets</div>
+      <p>Since WS is <strong>Stateful</strong>, a client is tied to a specific server. To scale, you need a
+        <strong>Pub/Sub backplane</strong> (like Redis). When Server A wants to send a message to Client B (on
+        Server B), it publishes to Redis, and Server B picks it up.
+      </p>
+    </div>
 
-        <h2>Server-Sent Events (SSE)</h2>
-        <p>SSE is a standard HTTP mechanism for servers to push a stream of events to a client over a single long-lived
-          HTTP connection. It is one-directional: server to client only. SSE uses the standard HTTP protocol and is
-          therefore compatible with HTTP/2 multiplexing and most proxies.</p>
+    <h2>Server-Sent Events (SSE)</h2>
+    <p>SSE is a standard HTTP mechanism for servers to push a stream of events to a client over a single long-lived
+      HTTP connection. It is one-directional: server to client only. SSE uses the standard HTTP protocol and is
+      therefore compatible with HTTP/2 multiplexing and most proxies.</p>
 
-        <pre>
+    <pre>
 // Server (Node.js)
 app.get('/events', (req, res) => {
     res.setHeader('Content-Type', 'text/event-stream');
@@ -1310,51 +1640,51 @@ source.addEventListener('price', (e) => {
 // Auto-reconnects on disconnect with last event ID tracking
 </pre>
 
-        <h3>SSE vs WebSockets</h3>
-        <div class="compare">
-          <div class="compare-card neutral">
-            <h4>SSE</h4>
-            <ul>
-              <li>One-way: server to client only</li>
-              <li>Uses standard HTTP — compatible everywhere</li>
-              <li>Built-in reconnection and event ID tracking</li>
-              <li>Text-based (UTF-8 strings)</li>
-              <li>Works well with HTTP/2 multiplexing</li>
-              <li>Best for: live feeds, notifications, dashboards</li>
-            </ul>
-          </div>
-          <div class="compare-card neutral">
-            <h4>WebSockets</h4>
-            <ul>
-              <li>Bidirectional: both sides send</li>
-              <li>Custom protocol after HTTP upgrade</li>
-              <li>Manual reconnection logic needed</li>
-              <li>Binary and text support</li>
-              <li>Lower per-message overhead</li>
-              <li>Best for: chat, gaming, collaborative editing</li>
-            </ul>
-          </div>
-        </div>
-
-        <h2>Webhooks</h2>
-        <p>Webhooks are HTTP callbacks: your server registers a URL with a third-party service; when an event occurs in
-          that service, it sends an HTTP POST request to your URL with event data. Webhooks are server-to-server
-          communication, not browser-based.</p>
-
-        <h3>Key Design Considerations</h3>
+    <h3>SSE vs WebSockets</h3>
+    <div class="compare">
+      <div class="compare-card neutral">
+        <h4>SSE</h4>
         <ul>
-          <li><strong>Idempotency:</strong> The same webhook may be delivered more than once (the sender retries on
-            network failure or timeout). Your handler must be idempotent — track processed event IDs.</li>
-          <li><strong>Signature verification:</strong> The sender signs the payload with a shared secret. Always verify
-            the signature before processing to prevent forged requests.</li>
-          <li><strong>Fast response:</strong> Respond with 200 OK as quickly as possible (within 5–30 seconds, depending
-            on provider). If processing is slow, queue the event and process asynchronously — otherwise the sender may
-            time out and retry.</li>
-          <li><strong>Failure handling:</strong> Senders typically retry with exponential backoff if they receive a
-            non-2xx response. Return 5xx to trigger retry, not 4xx.</li>
+          <li>One-way: server to client only</li>
+          <li>Uses standard HTTP — compatible everywhere</li>
+          <li>Built-in reconnection and event ID tracking</li>
+          <li>Text-based (UTF-8 strings)</li>
+          <li>Works well with HTTP/2 multiplexing</li>
+          <li>Best for: live feeds, notifications, dashboards</li>
         </ul>
+      </div>
+      <div class="compare-card neutral">
+        <h4>WebSockets</h4>
+        <ul>
+          <li>Bidirectional: both sides send</li>
+          <li>Custom protocol after HTTP upgrade</li>
+          <li>Manual reconnection logic needed</li>
+          <li>Binary and text support</li>
+          <li>Lower per-message overhead</li>
+          <li>Best for: chat, gaming, collaborative editing</li>
+        </ul>
+      </div>
+    </div>
 
-        <pre>
+    <h2>Webhooks</h2>
+    <p>Webhooks are HTTP callbacks: your server registers a URL with a third-party service; when an event occurs in
+      that service, it sends an HTTP POST request to your URL with event data. Webhooks are server-to-server
+      communication, not browser-based.</p>
+
+    <h3>Key Design Considerations</h3>
+    <ul>
+      <li><strong>Idempotency:</strong> The same webhook may be delivered more than once (the sender retries on
+        network failure or timeout). Your handler must be idempotent — track processed event IDs.</li>
+      <li><strong>Signature verification:</strong> The sender signs the payload with a shared secret. Always verify
+        the signature before processing to prevent forged requests.</li>
+      <li><strong>Fast response:</strong> Respond with 200 OK as quickly as possible (within 5–30 seconds, depending
+        on provider). If processing is slow, queue the event and process asynchronously — otherwise the sender may
+        time out and retry.</li>
+      <li><strong>Failure handling:</strong> Senders typically retry with exponential backoff if they receive a
+        non-2xx response. Return 5xx to trigger retry, not 4xx.</li>
+    </ul>
+
+    <pre>
 # Stripe webhook handler (Python/Flask)
 import stripe
 
@@ -1383,20 +1713,20 @@ def stripe_webhook():
     return '', 200    # Respond quickly
 </pre>
 
-        <h2>WebRTC (Peer-to-Peer)</h2>
-        <p>Used for high-bandwidth media (Video/Audio) and direct data transfer. Zero-latency because traffic doesn't
-          route through your server (usually).</p>
-        <div class="def">
-          <dt>STUN</dt>
-          <dd>Tell the client its public IP. Used to established P2P connection.</dd>
-          <dt>TURN</dt>
-          <dd>Relay server used when P2P fails (Symmetric NAT). High cost.</dd>
-          <dt>Signaling</dt>
-          <dd>Outgoing "handshake" to exchange IPs/Capabilities via WebSockets or HTTP.</dd>
-        </div>
+    <h2>WebRTC (Peer-to-Peer)</h2>
+    <p>Used for high-bandwidth media (Video/Audio) and direct data transfer. Zero-latency because traffic doesn't
+      route through your server (usually).</p>
+    <div class="def">
+      <dt>STUN</dt>
+      <dd>Tell the client its public IP. Used to established P2P connection.</dd>
+      <dt>TURN</dt>
+      <dd>Relay server used when P2P fails (Symmetric NAT). High cost.</dd>
+      <dt>Signaling</dt>
+      <dd>Outgoing "handshake" to exchange IPs/Capabilities via WebSockets or HTTP.</dd>
+    </div>
 
-        <div class="diagram">
-          <pre class="mermaid">
+    <div class="diagram">
+      <pre class="mermaid">
 sequenceDiagram
     participant A as Peer A
     participant S as Signaling Server
@@ -1406,98 +1736,98 @@ sequenceDiagram
     B->>A: Answer (SDP)
     Note over A,B: Direct P2P Media Flow
 </pre>
-          <p class="diagram-caption">WebRTC Signaling and Peer-to-Peer flow</p>
-        </div>
-      </div>
+      <p class="diagram-caption">WebRTC Signaling and Peer-to-Peer flow</p>
+    </div>
+  </div>
 
 <div class="section" id="async">
-        <h1 class="section-title">Asynchronous Communication</h1>
-        <p class="section-subtitle">Module 6 &nbsp;|&nbsp; Sync vs Async · Message Queues · Pub/Sub · Dead Letter Queues
-          · CDC · Delivery Semantics</p>
+    <h1 class="section-title">Asynchronous Communication</h1>
+    <p class="section-subtitle">Module 6 &nbsp;|&nbsp; Sync vs Async · Message Queues · Pub/Sub · Dead Letter Queues
+      · CDC · Delivery Semantics</p>
 
-        <h2>Synchronous vs Asynchronous Communication</h2>
-        <div class="compare">
-          <div class="compare-card neutral">
-            <h4>Synchronous</h4>
-            <p>The caller blocks and waits for the callee to respond before continuing. Tight coupling — if the callee
-              is slow or down, the caller suffers.</p>
-            <ul>
-              <li>Simpler to reason about (request-response pairs)</li>
-              <li>Immediate feedback on success or failure</li>
-              <li>Creates dependency chains — if payment service is slow, the order service is slow</li>
-              <li>Used for: user-facing operations requiring immediate response</li>
-            </ul>
-          </div>
-          <div class="compare-card neutral">
-            <h4>Asynchronous</h4>
-            <p>The sender dispatches a message and continues immediately. A separate process consumes and handles the
-              message later.</p>
-            <ul>
-              <li>Decouples producers and consumers</li>
-              <li>Resilient: messages are buffered if consumer is slow or down</li>
-              <li>Enables load leveling — absorb traffic spikes in the queue</li>
-              <li>More complex: error handling, retries, ordering, at-least-once delivery</li>
-              <li>Used for: background jobs, notifications, event processing</li>
-            </ul>
-          </div>
-        </div>
-
-        <h2>Message Queues</h2>
-        <p>A message queue is a buffer that stores messages from producers until consumers are ready to process them.
-          Producers and consumers are decoupled — they do not need to be available simultaneously.</p>
-
-        <h3>Core Properties</h3>
+    <h2>Synchronous vs Asynchronous Communication</h2>
+    <div class="compare">
+      <div class="compare-card neutral">
+        <h4>Synchronous</h4>
+        <p>The caller blocks and waits for the callee to respond before continuing. Tight coupling — if the callee
+          is slow or down, the caller suffers.</p>
         <ul>
-          <li><strong>Durability:</strong> Messages are persisted to disk. Even if the broker restarts, messages are not
-            lost.</li>
-          <li><strong>Acknowledgment:</strong> A message is not removed from the queue until the consumer explicitly
-            acknowledges successful processing. This prevents message loss on consumer crash.</li>
-          <li><strong>Ordering:</strong> Most queues deliver messages in FIFO order within a partition, though ordering
-            guarantees vary by system.</li>
-          <li><strong>Visibility timeout:</strong> When a consumer reads a message, it becomes invisible to other
-            consumers for a period. If not acknowledged within that period, it becomes visible again (enabling retry on
-            consumer crash).</li>
+          <li>Simpler to reason about (request-response pairs)</li>
+          <li>Immediate feedback on success or failure</li>
+          <li>Creates dependency chains — if payment service is slow, the order service is slow</li>
+          <li>Used for: user-facing operations requiring immediate response</li>
         </ul>
+      </div>
+      <div class="compare-card neutral">
+        <h4>Asynchronous</h4>
+        <p>The sender dispatches a message and continues immediately. A separate process consumes and handles the
+          message later.</p>
+        <ul>
+          <li>Decouples producers and consumers</li>
+          <li>Resilient: messages are buffered if consumer is slow or down</li>
+          <li>Enables load leveling — absorb traffic spikes in the queue</li>
+          <li>More complex: error handling, retries, ordering, at-least-once delivery</li>
+          <li>Used for: background jobs, notifications, event processing</li>
+        </ul>
+      </div>
+    </div>
 
-        <h3>Queue vs Stream</h3>
-        <div class="table-wrap">
-          <table>
-            <tr>
-              <th>Aspect</th>
-              <th>Traditional Queue (RabbitMQ, SQS)</th>
-              <th>Log-Based Stream (Kafka)</th>
-            </tr>
-            <tr>
-              <td>Message retention</td>
-              <td>Deleted on ACK</td>
-              <td>Retained for configured period (days/weeks)</td>
-            </tr>
-            <tr>
-              <td>Multiple consumers</td>
-              <td>Competing consumers (one message → one consumer)</td>
-              <td>Consumer groups read independently; all groups can read same message</td>
-            </tr>
-            <tr>
-              <td>Replay</td>
-              <td>Not possible after ACK</td>
-              <td>Any consumer can replay from any offset</td>
-            </tr>
-            <tr>
-              <td>Throughput</td>
-              <td>High (100K msg/s typical)</td>
-              <td>Very high (millions msg/s)</td>
-            </tr>
-            <tr>
-              <td>Use case</td>
-              <td>Task queues, job scheduling</td>
-              <td>Event sourcing, audit logs, stream processing, CDC</td>
-            </tr>
-          </table>
-        </div>
+    <h2>Message Queues</h2>
+    <p>A message queue is a buffer that stores messages from producers until consumers are ready to process them.
+      Producers and consumers are decoupled — they do not need to be available simultaneously.</p>
 
-        <div class="example">
-          <div class="example-label">Example: Order Processing Pipeline</div>
-          <pre>
+    <h3>Core Properties</h3>
+    <ul>
+      <li><strong>Durability:</strong> Messages are persisted to disk. Even if the broker restarts, messages are not
+        lost.</li>
+      <li><strong>Acknowledgment:</strong> A message is not removed from the queue until the consumer explicitly
+        acknowledges successful processing. This prevents message loss on consumer crash.</li>
+      <li><strong>Ordering:</strong> Most queues deliver messages in FIFO order within a partition, though ordering
+        guarantees vary by system.</li>
+      <li><strong>Visibility timeout:</strong> When a consumer reads a message, it becomes invisible to other
+        consumers for a period. If not acknowledged within that period, it becomes visible again (enabling retry on
+        consumer crash).</li>
+    </ul>
+
+    <h3>Queue vs Stream</h3>
+    <div class="table-wrap">
+      <table>
+        <tr>
+          <th>Aspect</th>
+          <th>Traditional Queue (RabbitMQ, SQS)</th>
+          <th>Log-Based Stream (Kafka)</th>
+        </tr>
+        <tr>
+          <td>Message retention</td>
+          <td>Deleted on ACK</td>
+          <td>Retained for configured period (days/weeks)</td>
+        </tr>
+        <tr>
+          <td>Multiple consumers</td>
+          <td>Competing consumers (one message → one consumer)</td>
+          <td>Consumer groups read independently; all groups can read same message</td>
+        </tr>
+        <tr>
+          <td>Replay</td>
+          <td>Not possible after ACK</td>
+          <td>Any consumer can replay from any offset</td>
+        </tr>
+        <tr>
+          <td>Throughput</td>
+          <td>High (100K msg/s typical)</td>
+          <td>Very high (millions msg/s)</td>
+        </tr>
+        <tr>
+          <td>Use case</td>
+          <td>Task queues, job scheduling</td>
+          <td>Event sourcing, audit logs, stream processing, CDC</td>
+        </tr>
+      </table>
+    </div>
+
+    <div class="example">
+      <div class="example-label">Example: Order Processing Pipeline</div>
+      <pre>
 # Producer: Order Service
 queue.send('order_processing', {
     'order_id': 'ord_123',
@@ -1520,37 +1850,37 @@ def process_payment(message):
     charge_result = payment.charge(message['user_id'], ...)
     queue.ack(message)
   </pre>
-        </div>
+    </div>
 
-        <h2>Pub/Sub Pattern</h2>
-        <p>In Pub/Sub (Publish/Subscribe), publishers send messages to a topic without knowing who will receive them.
-          Multiple subscribers can independently receive copies of every message published to the topic. This enables
-          fan-out — one event triggers multiple independent actions.</p>
+    <h2>Pub/Sub Pattern</h2>
+    <p>In Pub/Sub (Publish/Subscribe), publishers send messages to a topic without knowing who will receive them.
+      Multiple subscribers can independently receive copies of every message published to the topic. This enables
+      fan-out — one event triggers multiple independent actions.</p>
 
-        <div class="compare">
-          <div class="compare-card neutral">
-            <h4>Message Queue (Point-to-Point)</h4>
-            <ul>
-              <li>One message → consumed by one consumer</li>
-              <li>Multiple competing consumers share the work</li>
-              <li>Load balancing between consumers</li>
-              <li>Use for: task distribution</li>
-            </ul>
-          </div>
-          <div class="compare-card neutral">
-            <h4>Pub/Sub (Broadcast)</h4>
-            <ul>
-              <li>One message → delivered to all subscribers</li>
-              <li>Each subscriber receives its own copy</li>
-              <li>Independent processing per subscriber</li>
-              <li>Use for: event notifications, fan-out</li>
-            </ul>
-          </div>
-        </div>
+    <div class="compare">
+      <div class="compare-card neutral">
+        <h4>Message Queue (Point-to-Point)</h4>
+        <ul>
+          <li>One message → consumed by one consumer</li>
+          <li>Multiple competing consumers share the work</li>
+          <li>Load balancing between consumers</li>
+          <li>Use for: task distribution</li>
+        </ul>
+      </div>
+      <div class="compare-card neutral">
+        <h4>Pub/Sub (Broadcast)</h4>
+        <ul>
+          <li>One message → delivered to all subscribers</li>
+          <li>Each subscriber receives its own copy</li>
+          <li>Independent processing per subscriber</li>
+          <li>Use for: event notifications, fan-out</li>
+        </ul>
+      </div>
+    </div>
 
-        <div class="example">
-          <div class="example-label">Example: User Registration Event</div>
-          <pre>
+    <div class="example">
+      <div class="example-label">Example: User Registration Event</div>
+      <pre>
 # Publisher
 eventBus.publish('user.registered', {
     'user_id': 'usr_789',
@@ -1575,38 +1905,38 @@ def track_signup(event):
 def initialize_recommendations(event):
     recommendations.seed_profile(event['user_id'])
   </pre>
-        </div>
+    </div>
 
-        <h2>Dead Letter Queues (DLQ)</h2>
-        <p>A Dead Letter Queue is a separate queue where messages are routed after failing to be processed successfully
-          after a configured number of retries. Instead of blocking the main queue or silently discarding failed
-          messages, they are held in the DLQ for inspection and manual or automated remediation.</p>
+    <h2>Dead Letter Queues (DLQ)</h2>
+    <p>A Dead Letter Queue is a separate queue where messages are routed after failing to be processed successfully
+      after a configured number of retries. Instead of blocking the main queue or silently discarding failed
+      messages, they are held in the DLQ for inspection and manual or automated remediation.</p>
 
-        <h3>When a Message Goes to the DLQ</h3>
-        <ul>
-          <li>Processing has been retried more than the maximum configured times</li>
-          <li>The message has exceeded its maximum retention time in the queue</li>
-          <li>The message is unroutable (no matching consumer)</li>
-          <li>The consumer explicitly sends the message to the DLQ (e.g., malformed payload)</li>
-        </ul>
+    <h3>When a Message Goes to the DLQ</h3>
+    <ul>
+      <li>Processing has been retried more than the maximum configured times</li>
+      <li>The message has exceeded its maximum retention time in the queue</li>
+      <li>The message is unroutable (no matching consumer)</li>
+      <li>The consumer explicitly sends the message to the DLQ (e.g., malformed payload)</li>
+    </ul>
 
-        <h3>DLQ Operations</h3>
-        <ul>
-          <li><strong>Alerting:</strong> Monitor DLQ size. Any message in the DLQ indicates a processing failure that
-            needs investigation.</li>
-          <li><strong>Inspection:</strong> Examine failed messages to diagnose bugs or data issues.</li>
-          <li><strong>Replay:</strong> After fixing the bug, replay DLQ messages back to the main queue.</li>
-        </ul>
+    <h3>DLQ Operations</h3>
+    <ul>
+      <li><strong>Alerting:</strong> Monitor DLQ size. Any message in the DLQ indicates a processing failure that
+        needs investigation.</li>
+      <li><strong>Inspection:</strong> Examine failed messages to diagnose bugs or data issues.</li>
+      <li><strong>Replay:</strong> After fixing the bug, replay DLQ messages back to the main queue.</li>
+    </ul>
 
-        <h2>Change Data Capture (CDC)</h2>
-        <p>CDC is a pattern that captures changes (inserts, updates, deletes) in a database and publishes them as a
-          stream of events. Rather than polling the database periodically or modifying application code to publish
-          events, CDC reads the database's internal transaction log (e.g., PostgreSQL WAL, MySQL binlog) and converts
-          log entries into events.</p>
+    <h2>Change Data Capture (CDC)</h2>
+    <p>CDC is a pattern that captures changes (inserts, updates, deletes) in a database and publishes them as a
+      stream of events. Rather than polling the database periodically or modifying application code to publish
+      events, CDC reads the database's internal transaction log (e.g., PostgreSQL WAL, MySQL binlog) and converts
+      log entries into events.</p>
 
-        <h3>Architecture</h3>
-        <div class="diagram">
-          <pre class="mermaid">
+    <h3>Architecture</h3>
+    <div class="diagram">
+      <pre class="mermaid">
 graph LR
   DB[(PostgreSQL\nWrite-Ahead Log)] -->|CDC tool reads WAL| D[Debezium Connector]
   D -->|Change events| K[Kafka Topic:\ndb.users.changes]
@@ -1619,69 +1949,69 @@ graph LR
   style D fill:#dbeafe,stroke:#3b82f6
   style K fill:#fef9c3,stroke:#ca8a04
 </pre>
-          <p class="diagram-caption">Debezium reads PostgreSQL WAL and publishes change events to Kafka for multiple
-            consumers</p>
-        </div>
+      <p class="diagram-caption">Debezium reads PostgreSQL WAL and publishes change events to Kafka for multiple
+        consumers</p>
+    </div>
 
-        <h3>Benefits</h3>
-        <ul>
-          <li><strong>Guaranteed capture:</strong> Every committed database change is captured — no event can be missed
-            by application-level logic.</li>
-          <li><strong>Zero application code changes:</strong> The database itself is the source of truth; no extra
-            publish calls in business logic.</li>
-          <li><strong>Historical replay:</strong> Reprocess all changes from the beginning of the log for new consumers.
-          </li>
-          <li><strong>Multiple downstream systems:</strong> One CDC stream feeds many consumers independently.</li>
-        </ul>
+    <h3>Benefits</h3>
+    <ul>
+      <li><strong>Guaranteed capture:</strong> Every committed database change is captured — no event can be missed
+        by application-level logic.</li>
+      <li><strong>Zero application code changes:</strong> The database itself is the source of truth; no extra
+        publish calls in business logic.</li>
+      <li><strong>Historical replay:</strong> Reprocess all changes from the beginning of the log for new consumers.
+      </li>
+      <li><strong>Multiple downstream systems:</strong> One CDC stream feeds many consumers independently.</li>
+    </ul>
 
-        <p><strong>Tools:</strong> Debezium (most widely used, open source), AWS DMS, Striim, Airbyte (with CDC mode)
-        </p>
+    <p><strong>Tools:</strong> Debezium (most widely used, open source), AWS DMS, Striim, Airbyte (with CDC mode)
+    </p>
 
-        <h2>Delivery Semantics</h2>
-        <p>Delivery semantics define the guarantee a messaging system provides about whether and how many times a
-          message is delivered to a consumer.</p>
+    <h2>Delivery Semantics</h2>
+    <p>Delivery semantics define the guarantee a messaging system provides about whether and how many times a
+      message is delivered to a consumer.</p>
 
-        <div class="table-wrap">
-          <table>
-            <tr>
-              <th>Semantic</th>
-              <th>Guarantee</th>
-              <th>Implementation</th>
-              <th>Risk</th>
-              <th>Use case</th>
-            </tr>
-            <tr>
-              <td>At-most-once</td>
-              <td>Delivered 0 or 1 times; may be lost</td>
-              <td>Fire-and-forget, no ACK, no retry</td>
-              <td>Message loss</td>
-              <td>Logs, metrics where occasional loss is acceptable</td>
-            </tr>
-            <tr>
-              <td>At-least-once</td>
-              <td>Delivered 1 or more times; never lost</td>
-              <td>Retry on failure, ACK only on success</td>
-              <td>Duplicate delivery</td>
-              <td>Most use cases — combined with idempotent processing</td>
-            </tr>
-            <tr>
-              <td>Exactly-once</td>
-              <td>Delivered exactly once; never lost, never duplicated</td>
-              <td>Distributed transactions or idempotency keys + dedup</td>
-              <td>High complexity, performance cost</td>
-              <td>Financial transactions, exactly-once semantics in Kafka</td>
-            </tr>
-          </table>
-        </div>
+    <div class="table-wrap">
+      <table>
+        <tr>
+          <th>Semantic</th>
+          <th>Guarantee</th>
+          <th>Implementation</th>
+          <th>Risk</th>
+          <th>Use case</th>
+        </tr>
+        <tr>
+          <td>At-most-once</td>
+          <td>Delivered 0 or 1 times; may be lost</td>
+          <td>Fire-and-forget, no ACK, no retry</td>
+          <td>Message loss</td>
+          <td>Logs, metrics where occasional loss is acceptable</td>
+        </tr>
+        <tr>
+          <td>At-least-once</td>
+          <td>Delivered 1 or more times; never lost</td>
+          <td>Retry on failure, ACK only on success</td>
+          <td>Duplicate delivery</td>
+          <td>Most use cases — combined with idempotent processing</td>
+        </tr>
+        <tr>
+          <td>Exactly-once</td>
+          <td>Delivered exactly once; never lost, never duplicated</td>
+          <td>Distributed transactions or idempotency keys + dedup</td>
+          <td>High complexity, performance cost</td>
+          <td>Financial transactions, exactly-once semantics in Kafka</td>
+        </tr>
+      </table>
+    </div>
 
-        <div class="callout warn">
-          <div class="callout-title">Exactly-Once is Rare and Expensive</div>
-          <p>True exactly-once delivery across distributed systems is extremely difficult and imposes significant
-            overhead. In practice, most systems implement at-least-once delivery and make consumer processing idempotent
-            — i.e., processing the same message twice produces the same result as processing it once. This combination
-            is simpler, more performant, and functionally equivalent to exactly-once for most use cases.</p>
-        </div>
-      </div>
+    <div class="callout warn">
+      <div class="callout-title">Exactly-Once is Rare and Expensive</div>
+      <p>True exactly-once delivery across distributed systems is extremely difficult and imposes significant
+        overhead. In practice, most systems implement at-least-once delivery and make consumer processing idempotent
+        — i.e., processing the same message twice produces the same result as processing it once. This combination
+        is simpler, more performant, and functionally equivalent to exactly-once for most use cases.</p>
+    </div>
+  </div>
 
 
       <div class="page-nav">
@@ -1695,95 +2025,13 @@ graph LR
   <button id="back-to-top" title="Back to top" aria-label="Back to top">&#8593;</button>
 
   <script>
-    mermaid.initialize({
-      startOnLoad: false,
-      theme: 'default',
-      themeVariables: {
-        primaryColor: '#e8f4fd',
-        primaryTextColor: '#1e293b',
-        primaryBorderColor: '#93c5fd',
-        lineColor: '#64748b',
-        secondaryColor: '#f0fdf4',
-        tertiaryColor: '#faf5ff',
-        background: '#ffffff',
-        mainBkg: '#f8fafc',
-        nodeBorder: '#cbd5e1',
-        clusterBkg: '#f1f5f9',
-        titleColor: '#1e293b',
-        edgeLabelBackground: '#ffffff',
-        attributeBackgroundColorEven: '#f8fafc',
-        attributeBackgroundColorOdd: '#f1f5f9'
-      },
-      flowchart: { useMaxWidth: true, htmlLabels: true, curve: 'basis' },
-      sequence: { useMaxWidth: true },
-      stateDiagram: { useMaxWidth: true },
-      securityLevel: 'loose'
-    });
-
-    // ── Section switching (same-page nav items only) ──
-    const pageSections = document.querySelectorAll('.section');
-    const subItems     = document.querySelectorAll('.acc-sub-item[data-sec]');
-    const pb           = document.getElementById('pb');
-
-    function showSection(id) {
-      pageSections.forEach(s => s.classList.remove('active'));
-      subItems.forEach(n => n.classList.remove('active'));
-      const target = document.getElementById(id);
-      if (target) {
-        target.classList.add('active');
-        const diags = target.querySelectorAll('.mermaid:not([data-processed])');
-        if (diags.length) mermaid.run({ nodes: diags });
-        // Scroll content area to top, NOT the whole window
-        const main = document.querySelector('.main');
-        if (main) main.scrollTo(0, 0);
-      }
-      const item = document.querySelector(`.acc-sub-item[data-sec="${id}"]`);
-      if (item) item.classList.add('active');
-      updateProgress(id);
+    if (typeof mermaid !== 'undefined') {
+        mermaid.initialize({
+          startOnLoad: false,
+          theme: 'default',
+          securityLevel: 'loose'
+        });
     }
-
-    function updateProgress(activeId) {
-      const ids = Array.from(subItems).map(n => n.dataset.sec);
-      const idx = ids.indexOf(activeId);
-      const pct = idx >= 0 ? Math.round(((idx + 1) / ids.length) * 100) : 0;
-      pb.style.width = pct + '%';
-    }
-
-    subItems.forEach(item => {
-      item.addEventListener('click', () => {
-        if (item.dataset.sec) showSection(item.dataset.sec);
-      });
-    });
-
-    // On load: check URL hash for deep link from another page
-    const hash = window.location.hash.slice(1);
-    if (hash && document.getElementById(hash)) {
-      showSection(hash);
-    } else if (subItems.length) {
-      showSection(subItems[0].dataset.sec);
-    }
-
-    // Scroll progress
-    const mainEl = document.querySelector('.main');
-    if (mainEl) {
-      mainEl.style.overflowY = 'auto';
-      mainEl.style.height = '100vh';
-      mainEl.addEventListener('scroll', () => {
-        const scrolled = mainEl.scrollTop + mainEl.clientHeight;
-        const total = mainEl.scrollHeight;
-        if (total > 0) pb.style.width = Math.min(100, Math.round((scrolled / total) * 100)) + '%';
-      });
-    }
-
-    const bttBtn = document.getElementById('back-to-top');
-    (mainEl || window).addEventListener('scroll', () => {
-      const top = mainEl ? mainEl.scrollTop : window.scrollY;
-      bttBtn.classList.toggle('visible', top > 500);
-    });
-    bttBtn.addEventListener('click', () => {
-      if (mainEl) mainEl.scrollTo({top:0,behavior:'smooth'});
-      else window.scrollTo({top:0,behavior:'smooth'});
-    });
   </script>
 </body>
 </html>

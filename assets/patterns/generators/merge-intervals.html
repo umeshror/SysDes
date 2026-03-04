@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Merge Intervals Animation</title>
+    <style>
+        body {
+            background-color: #1a1a2e;
+            color: #cdd6f4;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        .container {
+            text-align: center;
+            width: 100%;
+            max-width: 800px;
+        }
+
+        h1 {
+            color: #89b4fa;
+            margin-bottom: 2rem;
+            text-shadow: 0 0 10px rgba(137, 180, 250, 0.5);
+        }
+
+        .timeline-container {
+            position: relative;
+            height: 400px;
+            margin-bottom: 2rem;
+            border: 1px solid #313244;
+            border-radius: 12px;
+            background-color: #11111b;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .axis {
+            position: absolute;
+            bottom: 40px;
+            left: 50px;
+            right: 50px;
+            height: 4px;
+            background-color: #585b70;
+            border-radius: 2px;
+        }
+
+        .tick {
+            position: absolute;
+            top: -5px;
+            width: 2px;
+            height: 14px;
+            background-color: #bac2de;
+        }
+
+        .tick-label {
+            position: absolute;
+            top: 15px;
+            transform: translateX(-50%);
+            font-size: 0.8rem;
+            color: #a6adc8;
+        }
+
+        .intervals-area {
+            position: absolute;
+            top: 20px;
+            left: 50px;
+            right: 50px;
+            bottom: 80px;
+        }
+
+        .interval {
+            position: absolute;
+            height: 30px;
+            background-color: rgba(137, 180, 250, 0.2);
+            border: 2px solid #89b4fa;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            font-weight: bold;
+            color: #cdd6f4;
+            transition: all 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+            box-shadow: 0 0 10px rgba(137, 180, 250, 0.3);
+        }
+
+        .interval.active {
+            border-color: #f9e2af;
+            background-color: rgba(249, 226, 175, 0.3);
+            box-shadow: 0 0 15px rgba(249, 226, 175, 0.6);
+            transform: scaleY(1.1);
+            z-index: 10;
+        }
+
+        .interval.merged {
+            border-color: #a6e3a1;
+            background-color: rgba(166, 227, 161, 0.3);
+            box-shadow: 0 0 15px rgba(166, 227, 161, 0.6);
+            z-index: 5;
+        }
+
+        .interval.faded {
+            opacity: 0.3;
+            border-color: #585b70;
+            background-color: transparent;
+            box-shadow: none;
+        }
+
+        .description {
+            margin-top: 1rem;
+            font-size: 1.2rem;
+            color: #bac2de;
+            min-height: 3rem;
+            font-style: italic;
+            padding: 10px;
+            background-color: rgba(49, 50, 68, 0.5);
+            border-radius: 8px;
+        }
+
+        .controls {
+            margin-top: 2rem;
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 1rem;
+            background-color: #89b4fa;
+            color: #11111b;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.2s;
+        }
+
+        button:hover {
+            background-color: #b4befe;
+            transform: translateY(-2px);
+        }
+
+        button:disabled {
+            background-color: #585b70;
+            color: #a6adc8;
+            cursor: not-allowed;
+            transform: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Merge Intervals</h1>
+
+        <div class="timeline-container">
+            <div class="intervals-area" id="intervals-area">
+                <!-- Intervals inserted down here -->
+            </div>
+            <div class="axis" id="axis">
+                <!-- Ticks inserted here -->
+            </div>
+        </div>
+
+        <div class="description" id="step-description">Click "Start Animation" to begin.</div>
+
+        <div class="controls">
+            <button id="start-btn" onclick="startAnimation()">Start Animation</button>
+            <button id="reset-btn" onclick="resetAnimation()" disabled>Reset</button>
+        </div>
+    </div>
+
+    <script>
+        // Input: [[1,3],[2,6],[8,10],[15,18]]
+        // Unsorted initially for realism, then we sort it.
+        const initialIntervals = [
+            [8, 10], [1, 3], [15, 18], [2, 6]
+        ];
+
+        const scale = 35; // px per unit
+
+        const area = document.getElementById('intervals-area');
+        const axis = document.getElementById('axis');
+        const descEl = document.getElementById('step-description');
+        const startBtn = document.getElementById('start-btn');
+        const resetBtn = document.getElementById('reset-btn');
+
+        let animationTimeouts = [];
+        let domIntervals = [];
+
+        function init() {
+            // Draw axis ticks
+            axis.innerHTML = '';
+            for (let i = 0; i <= 20; i += 2) {
+                const tick = document.createElement('div');
+                tick.className = 'tick';
+                tick.style.left = `${i * scale}px`;
+                axis.appendChild(tick);
+
+                const label = document.createElement('div');
+                label.className = 'tick-label';
+                label.style.left = `${i * scale}px`;
+                label.textContent = i;
+                axis.appendChild(label);
+            }
+
+            resetState();
+        }
+
+        function createIntervalDOM(id, start, end, topIndex) {
+            const el = document.createElement('div');
+            el.className = 'interval';
+            el.id = `int-${id}`;
+            el.style.left = `${start * scale}px`;
+            el.style.width = `${(end - start) * scale}px`;
+            el.style.top = `${topIndex * 45}px`;
+            el.innerHTML = `[${start}, ${end}]`;
+            area.appendChild(el);
+            return el;
+        }
+
+        function resetState() {
+            animationTimeouts.forEach(clearTimeout);
+            animationTimeouts = [];
+            area.innerHTML = '';
+            domIntervals = [];
+
+            // Create initial unsorted intervals
+            initialIntervals.forEach((inv, i) => {
+                const el = createIntervalDOM(i, inv[0], inv[1], i);
+                domIntervals.push({ id: i, el: el, start: inv[0], end: inv[1] });
+            });
+
+            descEl.innerHTML = 'Given a list of intervals: <code>[[8,10], [1,3], [15,18], [2,6]]</code>';
+            startBtn.disabled = false;
+            resetBtn.disabled = true;
+        }
+
+        function startAnimation() {
+            startBtn.disabled = true;
+            resetBtn.disabled = false;
+
+            let time = 0;
+            const stepDelay = 2000;
+
+            // Step 1: Sort
+            scheduleTask(() => {
+                descEl.innerHTML = `<strong>Step 1:</strong> Sort intervals based on start time.`;
+
+                // Sort logical array
+                domIntervals.sort((a, b) => a.start - b.start);
+
+                // Animate to new vertical positions
+                domIntervals.forEach((inv, newIndex) => {
+                    inv.el.style.top = `${newIndex * 45}px`;
+                });
+            }, time);
+
+            time += stepDelay;
+
+            // Step 2: Merge logic
+            let mergedList = [];
+            let currentMergeEl = null;
+            let currentMergeTop = 0;
+
+            scheduleTask(() => {
+                descEl.innerHTML = `<strong>Step 2:</strong> Iterate and merge overlapping intervals.`;
+
+                // Initialize first merge
+                const first = domIntervals[0];
+                mergedList.push({ start: first.start, end: first.end });
+                first.el.classList.add('merged');
+                currentMergeEl = first.el;
+                currentMergeTop = 0;
+            }, time);
+
+            time += stepDelay;
+
+            // Loop schedule
+            let loopTimeMultiplier = 0;
+
+            for (let i = 1; i < domIntervals.length; i++) {
+                const currentInv = domIntervals[i];
+
+                scheduleTask(() => {
+                    currentInv.el.classList.add('active');
+                    const lastMerged = mergedList[mergedList.length - 1];
+
+                    descEl.innerHTML = `Comparing current <code>[${currentInv.start}, ${currentInv.end}]</code> with last merged <code>[${lastMerged.start}, ${lastMerged.end}]</code>.`;
+                }, time + (loopTimeMultiplier * stepDelay * 2));
+
+                scheduleTask(() => {
+                    const lastMerged = mergedList[mergedList.length - 1];
+
+                    if (currentInv.start <= lastMerged.end) {
+                        // Overlap
+                        const newEnd = Math.max(lastMerged.end, currentInv.end);
+                        descEl.innerHTML = `<span style="color:#f9e2af">Overlap!</span> ${currentInv.start} <= ${lastMerged.end}. Merging...`;
+
+                        lastMerged.end = newEnd;
+
+                        // Animate merge visually
+                        currentInv.el.classList.remove('active');
+                        currentInv.el.classList.add('faded');
+
+                        // Expand the merged element
+                        currentMergeEl.style.width = `${(lastMerged.end - lastMerged.start) * scale}px`;
+                        currentMergeEl.innerHTML = `[${lastMerged.start}, ${lastMerged.end}]`;
+
+                    } else {
+                        // No overlap
+                        descEl.innerHTML = `<span style="color:#a6e3a1">No overlap.</span> ${currentInv.start} > ${lastMerged.end}. Adding to merged list.`;
+
+                        mergedList.push({ start: currentInv.start, end: currentInv.end });
+
+                        currentInv.el.classList.remove('active');
+                        currentInv.el.classList.add('merged');
+
+                        // This becomes new merged target
+                        currentMergeTop = i;
+                        currentMergeEl = currentInv.el;
+                    }
+                }, time + (loopTimeMultiplier * stepDelay * 2) + stepDelay);
+
+                loopTimeMultiplier++;
+            }
+
+            // Final Step
+            scheduleTask(() => {
+                const finalResult = mergedList.map(m => `[${m.start},${m.end}]`).join(', ');
+                descEl.innerHTML = `<strong>Finished!</strong> Final merged intervals: <code>[${finalResult}]</code>`;
+            }, time + (loopTimeMultiplier * stepDelay * 2));
+        }
+
+        function scheduleTask(task, delay) {
+            animationTimeouts.push(setTimeout(task, delay));
+        }
+
+        window.onload = init;
+    </script>
+</body>
+
+</html>

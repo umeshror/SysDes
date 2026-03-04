@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fast & Slow Pointers Animation</title>
+    <style>
+        body {
+            background-color: #1a1a2e;
+            color: #cdd6f4;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        .container {
+            text-align: center;
+            width: 100%;
+            max-width: 800px;
+        }
+
+        h1 {
+            color: #89b4fa;
+            margin-bottom: 2rem;
+            text-shadow: 0 0 10px rgba(137, 180, 250, 0.5);
+        }
+
+        .graph-container {
+            position: relative;
+            height: 300px;
+            margin-bottom: 2rem;
+            border: 1px solid #313244;
+            border-radius: 12px;
+            background-color: #11111b;
+        }
+
+        svg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        .node {
+            width: 50px;
+            height: 50px;
+            background-color: #313244;
+            border: 2px solid #585b70;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            font-weight: bold;
+            position: absolute;
+            z-index: 10;
+            transform: translate(-50%, -50%);
+            /* Center on coordinates */
+        }
+
+        .node.cycle-entry {
+            border-color: #f9e2af;
+            box-shadow: 0 0 10px rgba(249, 226, 175, 0.5);
+        }
+
+        .pointer-token {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            position: absolute;
+            z-index: 20;
+            transform: translate(-50%, -50%);
+            transition: all 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: bold;
+            color: #11111b;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+        }
+
+        .pointer-token.slow {
+            background-color: #a6e3a1;
+            /* Green */
+            margin-top: -20px;
+            margin-left: -20px;
+        }
+
+        .pointer-token.fast {
+            background-color: #f38ba8;
+            /* Red */
+            margin-top: 20px;
+            margin-left: 20px;
+        }
+
+        .legend {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.1rem;
+        }
+
+        .legend-color {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+        }
+
+        .description {
+            margin-top: 1rem;
+            font-size: 1.2rem;
+            color: #bac2de;
+            min-height: 3rem;
+            font-style: italic;
+            padding: 10px;
+            background-color: rgba(49, 50, 68, 0.5);
+            border-radius: 8px;
+        }
+
+        .controls {
+            margin-top: 2rem;
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 1rem;
+            background-color: #89b4fa;
+            color: #11111b;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.2s;
+        }
+
+        button:hover {
+            background-color: #b4befe;
+            transform: translateY(-2px);
+        }
+
+        button:disabled {
+            background-color: #585b70;
+            color: #a6adc8;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: translate(-50%, -50%) scale(1);
+                box-shadow: 0 0 0 0 rgba(243, 139, 168, 0.7);
+            }
+
+            70% {
+                transform: translate(-50%, -50%) scale(1.2);
+                box-shadow: 0 0 0 15px rgba(243, 139, 168, 0);
+            }
+
+            100% {
+                transform: translate(-50%, -50%) scale(1);
+                box-shadow: 0 0 0 0 rgba(243, 139, 168, 0);
+            }
+        }
+
+        .collision {
+            animation: pulse 1s infinite;
+            z-index: 30;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Fast & Slow Pointers (Cycle Detection)</h1>
+
+        <div class="legend">
+            <div class="legend-item">
+                <div class="legend-color" style="background-color: #a6e3a1;"></div>
+                <span>Slow Pointer (1 step)</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background-color: #f38ba8;"></div>
+                <span>Fast Pointer (2 steps)</span>
+            </div>
+        </div>
+
+        <div class="graph-container" id="graph-container">
+            <svg id="edges"></svg>
+            <!-- Nodes and tokens inserted via JS -->
+        </div>
+
+        <div class="description" id="step-description">Click "Start Animation" to begin.</div>
+
+        <div class="controls">
+            <button id="start-btn" onclick="startAnimation()">Start Animation</button>
+            <button id="reset-btn" onclick="resetAnimation()" disabled>Reset</button>
+        </div>
+    </div>
+
+    <script>
+        // Define Graph Structure (A linked list with a cycle)
+        // 0 -> 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> (back to 3)
+        const nodesData = [
+            { id: 0, val: 1, x: 50, y: 150 },
+            { id: 1, val: 2, x: 150, y: 150 },
+            { id: 2, val: 3, x: 250, y: 150 },
+            // Cycle nodes (circle layout)
+            { id: 3, val: 4, x: 380, y: 150 }, // Cycle entry
+            { id: 4, val: 5, x: 450, y: 80 },
+            { id: 5, val: 6, x: 550, y: 80 },
+            { id: 6, val: 7, x: 620, y: 150 },
+            { id: 7, val: 8, x: 550, y: 220 },
+            { id: 8, val: 9, x: 450, y: 220 },
+        ];
+
+        // Define the "next" pointers
+        const edgesData = [
+            [0, 1], [1, 2], [2, 3],
+            [3, 4], [4, 5], [5, 6], [6, 7], [7, 8], [8, 3] // The cycle
+        ];
+
+        const container = document.getElementById('graph-container');
+        const svg = document.getElementById('edges');
+        const descEl = document.getElementById('step-description');
+        const startBtn = document.getElementById('start-btn');
+        const resetBtn = document.getElementById('reset-btn');
+
+        let slowToken, fastToken;
+        let animationTimeouts = [];
+
+        function initGraph() {
+            // Draw Edges
+            svg.innerHTML = '';
+            edgesData.forEach(([u, v]) => {
+                const n1 = nodesData[u];
+                const n2 = nodesData[v];
+
+                // Curve the back-edge for aesthetics
+                let d;
+                if (u === 8 && v === 3) {
+                    d = `M ${n1.x} ${n1.y} C ${n1.x - 50} ${n1.y}, ${n2.x - 20} ${n2.y + 50}, ${n2.x} ${n2.y}`;
+                } else {
+                    d = `M ${n1.x} ${n1.y} L ${n2.x} ${n2.y}`;
+                }
+
+                const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                path.setAttribute('d', d);
+                path.setAttribute('stroke', '#585b70');
+                path.setAttribute('stroke-width', '3');
+                path.setAttribute('fill', 'none');
+
+                // Add arrowhead
+                const markerId = `arrowhead-${u}-${v}`;
+                const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+                defs.innerHTML = `
+                    <marker id="${markerId}" markerWidth="10" markerHeight="7" refX="25" refY="3.5" orient="auto">
+                        <polygon points="0 0, 10 3.5, 0 7" fill="#585b70" />
+                    </marker>
+                `;
+                svg.appendChild(defs);
+                path.setAttribute('marker-end', `url(#${markerId})`);
+
+                svg.appendChild(path);
+            });
+
+            // Draw Nodes
+            nodesData.forEach(node => {
+                const el = document.createElement('div');
+                el.className = 'node';
+                if (node.id === 3) el.classList.add('cycle-entry');
+                el.id = `node-${node.id}`;
+                el.textContent = node.val;
+                el.style.left = `${node.x}px`;
+                el.style.top = `${node.y}px`;
+                container.appendChild(el);
+            });
+
+            // Create Tokens
+            slowToken = document.createElement('div');
+            slowToken.className = 'pointer-token slow';
+            slowToken.textContent = 'S';
+            container.appendChild(slowToken);
+
+            fastToken = document.createElement('div');
+            fastToken.className = 'pointer-token fast';
+            fastToken.textContent = 'F';
+            container.appendChild(fastToken);
+
+            resetState();
+        }
+
+        function resetState() {
+            animationTimeouts.forEach(clearTimeout);
+            animationTimeouts = [];
+
+            moveToken(slowToken, 0, true);
+            moveToken(fastToken, 0, true);
+
+            slowToken.classList.remove('collision');
+            fastToken.classList.remove('collision');
+
+            descEl.textContent = 'Both pointers start at the head of the Linked List.';
+
+            startBtn.disabled = false;
+            resetBtn.disabled = true;
+        }
+
+        function moveToken(token, nodeId, instant = false) {
+            const node = nodesData[nodeId];
+            token.style.transition = instant ? 'none' : 'all 0.5s cubic-bezier(0.25, 1, 0.5, 1)';
+            token.style.left = `${node.x}px`;
+            token.style.top = `${node.y}px`;
+        }
+
+        function scheduleTask(task, delay) {
+            animationTimeouts.push(setTimeout(task, delay));
+        }
+
+        function startAnimation() {
+            startBtn.disabled = true;
+            resetBtn.disabled = false;
+
+            const stepDelay = 1500;
+
+            let slowId = 0;
+            let fastId = 0;
+            let step = 1;
+
+            // Helper to get next node id
+            const getNext = (id) => edgesData.find(e => e[0] === id)[1];
+
+            function nextStep() {
+                if (step > 15) return; // safety 
+
+                const nextSlow = getNext(slowId);
+                const fastHop1 = getNext(fastId);
+                const nextFast = getNext(fastHop1);
+
+                descEl.innerHTML = `Step ${step}: <span style="color:#a6e3a1">Slow moves 1 step</span> to Node ${nodesData[nextSlow].val}. <span style="color:#f38ba8">Fast moves 2 steps</span> to Node ${nodesData[nextFast].val}.`;
+
+                slowId = nextSlow;
+                moveToken(slowToken, slowId);
+
+                fastId = nextFast;
+                moveToken(fastToken, fastId);
+
+                if (nextSlow === nextFast) {
+                    // Collision
+                    animationTimeouts.push(setTimeout(() => {
+                        descEl.innerHTML = `Collision detected at Node ${nodesData[nextSlow].val}! <span style="color:#f9e2af; font-weight:bold;">Cycle confirmed.</span>`;
+                        slowToken.classList.add('collision');
+                        fastToken.classList.add('collision');
+                    }, stepDelay));
+                    return; // End animation
+                }
+
+                step++;
+                animationTimeouts.push(setTimeout(nextStep, stepDelay));
+            }
+
+            // Start the chain
+            animationTimeouts.push(setTimeout(nextStep, stepDelay));
+        }
+
+        window.onload = initGraph;
+    </script>
+</body>
+
+</html>
