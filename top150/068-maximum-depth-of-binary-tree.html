@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Top Interview 150</title>
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Fira+Code:wght@400;500&display=swap"
+        rel="stylesheet" />
+    <!-- Highlight.js for syntax highlighting -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css" rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <!-- Use the same CSS as blind75 -->
+    <link rel="stylesheet" href="../blind75/question.css">
+</head>
+
+<body>
+    <!-- SIDEBAR -->
+        <nav class="sidebar">
+        <div class="sidebar-header">
+            <a href="../index.html">← Back to Home</a>
+            <h1>Top Interview 150</h1>
+            <p>Essential LeetCode patterns</p>
+        </div>
+        <div class="sidebar-search">
+            <input type="text" id="q-search" placeholder="Search questions…" oninput="filterQuestions(this.value)">
+        </div>
+        <div class="sidebar-scroll" id="sidebar-list">
+            <div class="nav-module">
+                <div class="nav-module-title">Array / String</div>
+                <a href="001-merge-sorted-array.html" class="q-item" data-q="q88" style="text-decoration:none;">
+                    <span class="q-num">1</span>      <span class="q-check"></span>      <span class="q-name">Merge Sorted Array</span>      <span class="q-diff diff-easy">TODO</span>
+                </a>
+                <a href="002-remove-element.html" class="q-item" data-q="q27" style="text-decoration:none;">
+                    <span class="q-num">2</span>      <span class="q-check"></span>      <span class="q-name">Remove Element</span>      <span class="q-diff diff-easy">TODO</span>
+                </a>
+                <a href="003-remove-duplicates-from-sorted-array.html" class="q-item" data-q="q26" style="text-decoration:none;">
+                    <span class="q-num">3</span>      <span class="q-check"></span>      <span class="q-name">Remove Duplicates from Sorted Array</span>      <span class="q-diff diff-easy">TODO</span>
+                </a>
+                <a href="004-remove-duplicates-from-sorted-array-ii.html" class="q-item" data-q="q80" style="text-decoration:none;">
+                    <span class="q-num">4</span>      <span class="q-check"></span>      <span class="q-name">Remove Duplicates from Sorted Array II</span>      <span class="q-diff diff-easy">TODO</span>
+                </a>
+                <a href="005-majority-element.html" class="q-item" data-q="q169" style="text-decoration:none;">
+                    <span class="q-num">5</span>      <span class="q-check"></span>      <span class="q-name">Majority Element</span>      <span class="q-diff diff-easy">TODO</span>
+                </a>
+                <a href="006-rotate-array.html" class="q-item" data-q="q189" style="text-decoration:none;">
+                    <span class="q-num">6</span>      <span class="q-check"></span>      <span class="q-name">Rotate Array</span>      <span class="q-diff diff-easy">TODO</span>
+                </a>
+                <a href="007-best-time-to-buy-and-sell-stock.html" class="q-item" data-q="q121" style="text-decoration:none;">
+                    <span class="q-num">7</span>      <span class="q-check"></span>      <span class="q-name">Best Time to Buy and Sell Stock</span>      <span class="q-diff diff-easy">TODO</span>
+                </a>
+                <a href="008-best-time-to-buy-and-sell-stock-ii.html" class="q-item" data-q="q122" style="text-decoration:none;">
+                    <span class="q-num">8</span>      <span class="q-check"></span>      <span class="q-name">Best Time to Buy and Sell Stock II</span>      <span class="q-diff diff-easy">TODO</span>
+                </a>
+                <a href="009-jump-game.html" class="q-item" data-q="q55" style="text-decoration:none;">
+                    <span class="q-num">9</span>      <span class="q-check"></span>      <span class="q-name">Jump Game</span>      <span class="q-diff diff-easy">TODO</span>
+                </a>
+                <a href="010-jump-game-ii.html" class="q-item" data-q="q45" style="text-decoration:none;">
+                    <span class="q-num">10</span>      <span class="q-check"></span>      <span class="q-name">Jump Game II</span>      <span class="q-diff diff-easy">TODO</span>
+                </a>
+                <a href="011-h-index.html" class="q-item" data-q="q274" style="text-decoration:none;">
+                    <span class="q-num">11</span>      <span class="q-check"></span>      <span class="q-name">H-Index</span>      <span class="q-diff diff-easy">TODO</span>
+                </a>
+                <a href="012-insert-delete-getrandom-o1.html" class="q-item" data-q="q380" style="text-decoration:none;">
+                    <span class="q-num">12</span>      <span class="q-check"></span>      <span class="q-name">Insert Delete GetRandom O(1)</span>      <span class="q-diff diff-easy">TODO</span>
+                </a>
+                <a href="013-product-of-array-except-self.html" class="q-item" data-q="q238" style="text-decoration:none;">
+                    <span class="q-num">13</span>      <span class="q-check"></span>      <span class="q-name">Product of Array Except Self</span>      <span class="q-diff diff-easy">TODO</span>
+                </a>
+                <a href="014-gas-station.html" class="q-item" data-q="q134" style="text-decoration:none;">
+                    <span class="q-num">14</span>      <span class="q-check"></span>      <span class="q-name">Gas Station</span>      <span class="q-diff diff-easy">TODO</span>
+                </a>
+                <a href="015-candy.html" class="q-item" data-q="q135" style="text-decoration:none;">
+                    <span class="q-num">15</span>      <span class="q-check"></span>      <span class="q-name">Candy</span>      <span class="q-diff diff-easy">TODO</span>
+                </a>
+                <a href="016-trapping-rain-water.html" class="q-item" data-q="q42" style="text-decoration:none;">
+                    <span class="q-num">16</span>      <span class="q-check"></span>      <span class="q-name">Trapping Rain Water</span>      <span class="q-diff diff-easy">TODO</span>
+                </a>
+                <a href="017-roman-to-integer.html" class="q-item" data-q="q13" style="text-decoration:none;">
+                    <span class="q-num">17</span>      <span class="q-check"></span>      <span class="q-name">Roman to Integer</span>      <span class="q-diff diff-easy">TODO</span>
+                </a>
+                <a href="018-integer-to-roman.html" class="q-item" data-q="q12" style="text-decoration:none;">
+                    <span class="q-num">18</span>      <span class="q-check"></span>      <span class="q-name">Integer to Roman</span>      <span class="q-diff diff-easy">TODO</span>
+                </a>
+                <a href="019-length-of-last-word.html" class="q-item" data-q="q58" style="text-decoration:none;">
+                    <span class="q-num">19</span>      <span class="q-check"></span>      <span class="q-name">Length of Last Word</span>      <span class="q-diff diff-easy">TODO</span>
+                </a>
+                <a href="020-longest-common-prefix.html" class="q-item" data-q="q14" style="text-decoration:none;">
+                    <span class="q-num">20</span>      <span class="q-check"></span>      <span class="q-name">Longest Common Prefix</span>      <span class="q-diff diff-easy">TODO</span>
+                </a>
+                <a href="021-reverse-words-in-a-string.html" class="q-item" data-q="q151" style="text-decoration:none;">
+                    <span class="q-num">21</span>      <span class="q-check"></span>      <span class="q-name">Reverse Words in a String</span>      <span class="q-diff diff-easy">TODO</span>
+                </a>
+                <a href="022-zigzag-conversion.html" class="q-item" data-q="q6" style="text-decoration:none;">
+                    <span class="q-num">22</span>      <span class="q-check"></span>      <span class="q-name">Zigzag Conversion</span>      <span class="q-diff diff-easy">TODO</span>
+                </a>
+                <a href="023-find-the-index-of-the-first-occurrence-in-a-string.html" class="q-item" data-q="q28" style="text-decoration:none;">
+                    <span class="q-num">23</span>      <span class="q-check"></span>      <span class="q-name">Find the Index of the First Occurrence in a String</span>      <span class="q-diff diff-easy">TODO</span>
+                </a>
+                <a href="024-text-justification.html" class="q-item" data-q="q68" style="text-decoration:none;">
+                    <span class="q-num">24</span>      <span class="q-check"></span>      <span class="q-name">Text Justification</span>      <span class="q-diff diff-easy">TODO</span>
+                </a>
+            </div>
+            <div class="nav-module">
+                <div class="nav-module-title">Two Pointers</div>
+                <a href="025-valid-palindrome.html" class="q-item" data-q="q125" style="text-decoration:none;">
+                    <span class="q-num">25</span>      <span class="q-check"></span>      <span class="q-name">Valid Palindrome</span>      <span class="q-diff diff-easy">TODO</span>
+                </a>
+                <a href="026-is-subsequence.html" class="q-item" data-q="q392" style="text-decoration:none;">
+                    <span class="q-num">26</span>      <span class="q-check"></span>      <span class="q-name">Is Subsequence</span>      <span class="q-diff diff-easy">TODO</span>
+                </a>
+                <a href="027-two-sum-ii-input-array-is-sorted.html" class="q-item" data-q="q167" style="text-decoration:none;">
+                    <span class="q-num">27</span>      <span class="q-check"></span>      <span class="q-name">Two Sum II - Input Array Is Sorted</span>      <span class="q-diff diff-easy">TODO</span>
+                </a>
+                <a href="028-container-with-most-water.html" class="q-item" data-q="q11" style="text-decoration:none;">
+                    <span class="q-num">28</span>      <span class="q-check"></span>      <span class="q-name">Container With Most Water</span>      <span class="q-diff diff-easy">TODO</span>
+                </a>
+                <a href="029-3sum.html" class="q-item" data-q="q15" style="text-decoration:none;">
+                    <span class="q-num">29</span>      <span class="q-check"></span>      <span class="q-name">3Sum</span>      <span class="q-diff diff-easy">TODO</span>
+                </a>
+            </div>
+            <div class="nav-module">
+                <div class="nav-module-title">Sliding Window</div>
+                <a href="030-minimum-size-subarray-sum.html" class="q-item" data-q="q209" style="text-decoration:none;">
+                    <span class="q-num">30</span>      <span class="q-check"></span>      <span class="q-name">Minimum Size Subarray Sum</span>      <span class="q-diff diff-easy">TODO</span>
+                </a>
+                <a href="031-longest-substring-without-repeating-characters.html" class="q-item" data-q="q3" style="text-decoration:none;">
+                    <span class="q-num">31</span>      <span class="q-check"></span>      <span class="q-name">Longest Substring Without Repeating Characters</span>      <span class="q-diff diff-easy">TODO</span>
+                </a>
+                <a href="032-substring-with-concatenation-of-all-words.html" class="q-item" data-q="q30" style="text-decoration:none;">
+                    <span class="q-num">32</span>      <span class="q-check"></span>      <span class="q-name">Substring with Concatenation of All Words</span>      <span class="q-diff diff-easy">TODO</span>
+                </a>
+                <a href="033-minimum-window-substring.html" class="q-item" data-q="q76" style="text-decoration:none;">
+                    <span class="q-num">33</span>      <span class="q-check"></span>      <span class="q-name">Minimum Window Substring</span>      <span class="q-diff diff-easy">TODO</span>
+                </a>
+            </div>
+            <div class="nav-module">
+                <div class="nav-module-title">Matrix</div>
+                <a href="034-valid-sudoku.html" class="q-item" data-q="q36" style="text-decoration:none;">
+                    <span class="q-num">34</span>      <span class="q-check"></span>      <span class="q-name">Valid Sudoku</span>      <span class="q-diff diff-easy">TODO</span>
+                </a>
+                <a href="035-spiral-matrix.html" class="q-item" data-q="q54" style="text-decoration:none;">
+                    <span class="q-num">35</span>      <span class="q-check"></span>      <span class="q-name">Spiral Matrix</span>      <span class="q-diff diff-easy">TODO</span>
+                </a>
+                <a href="036-rotate-image.html" class="q-item" data-q="q48" style="text-decoration:none;">
+                    <span class="q-num">36</span>      <span class="q-check"></span>      <span class="q-name">Rotate Image</span>      <span class="q-diff diff-easy">TODO</span>
+                </a>
+                <a href="037-set-matrix-zeroes.html" class="q-item" data-q="q73" style="text-decoration:none;">
+                    <span class="q-num">37</span>      <span class="q-check"></span>      <span class="q-name">Set Matrix Zeroes</span>      <span class="q-diff diff-easy">TODO</span>
+                </a>
+                <a href="038-game-of-life.html" class="q-item" data-q="q289" style="text-decoration:none;">
+                    <span class="q-num">38</span>      <span class="q-check"></span>      <span class="q-name">Game of Life</span>      <span class="q-diff diff-easy">TODO</span>
+                </a>
+            </div>
+            <div class="nav-module">
+                <div class="nav-module-title">Hashmap</div>
+                <a href="039-ransom-note.html" class="q-item" data-q="q383" style="text-decoration:none;">
+                    <span class="q-num">39</span>      <span class="q-check"></span>      <span class="q-name">Ransom Note</span>      <span class="q-diff diff-easy">TODO</span>
+                </a>
+                <a href="040-isomorphic-strings.html" class="q-item" data-q="q205" style="text-decoration:none;">
+                    <span class="q-num">40</span>      <span class="q-check"></span>      <span class="q-name">Isomorphic Strings</span>      <span class="q-diff diff-easy">TODO</span>
+                </a>
+                <a href="041-word-pattern.html" class="q-item" data-q="q290" style="text-decoration:none;">
+                    <span class="q-num">41</span>      <span class="q-check"></span>      <span class="q-name">Word Pattern</span>      <span class="q-diff diff-easy">TODO</span>
+                </a>
+                <a href="042-valid-anagram.html" class="q-item" data-q="q242" style="text-decoration:none;">
+                    <span class="q-num">42</span>      <span class="q-check"></span>      <span class="q-name">Valid Anagram</span>      <span class="q-diff diff-easy">TODO</span>
+                </a>
+                <a href="043-group-anagrams.html" class="q-item" data-q="q49" style="text-decoration:none;">
+                    <span class="q-num">43</span>      <span class="q-check"></span>      <span class="q-name">Group Anagrams</span>      <span class="q-diff diff-easy">TODO</span>
+                </a>
+                <a href="044-two-sum.html" class="q-item" data-q="q1" style="text-decoration:none;">
+                    <span class="q-num">44</span>      <span class="q-check"></span>      <span class="q-name">Two Sum</span>      <span class="q-diff diff-easy">TODO</span>
+                </a>
+                <a href="045-happy-number.html" class="q-item" data-q="q202" style="text-decoration:none;">
+                    <span class="q-num">45</span>      <span class="q-check"></span>      <span class="q-name">Happy Number</span>      <span class="q-diff diff-easy">TODO</span>
+                </a>
+                <a href="046-contains-duplicate-ii.html" class="q-item" data-q="q219" style="text-decoration:none;">
+                    <span class="q-num">46</span>      <span class="q-check"></span>      <span class="q-name">Contains Duplicate II</span>      <span class="q-diff diff-easy">TODO</span>
+                </a>
+                <a href="047-longest-consecutive-sequence.html" class="q-item" data-q="q128" style="text-decoration:none;">
+                    <span class="q-num">47</span>      <span class="q-check"></span>      <span class="q-name">Longest Consecutive Sequence</span>      <span class="q-diff diff-easy">TODO</span>
+                </a>
+            </div>
+            <div class="nav-module">
+                <div class="nav-module-title">Intervals</div>
+                <a href="048-summary-ranges.html" class="q-item" data-q="q228" style="text-decoration:none;">
+                    <span class="q-num">48</span>      <span class="q-check"></span>      <span class="q-name">Summary Ranges</span>      <span class="q-diff diff-easy">TODO</span>
+                </a>
+                <a href="049-merge-intervals.html" class="q-item" data-q="q56" style="text-decoration:none;">
+                    <span class="q-num">49</span>      <span class="q-check"></span>      <span class="q-name">Merge Intervals</span>      <span class="q-diff diff-easy">TODO</span>
+                </a>
+                <a href="050-insert-interval.html" class="q-item" data-q="q57" style="text-decoration:none;">
+                    <span class="q-num">50</span>      <span class="q-check"></span>      <span class="q-name">Insert Interval</span>      <span class="q-diff diff-easy">TODO</span>
+                </a>
+                <a href="051-minimum-number-of-arrows-to-burst-balloons.html" class="q-item" data-q="q452" style="text-decoration:none;">
+                    <span class="q-num">51</span>      <span class="q-check"></span>      <span class="q-name">Minimum Number of Arrows to Burst Balloons</span>      <span class="q-diff diff-easy">TODO</span>
+                </a>
+            </div>
+            <div class="nav-module">
+                <div class="nav-module-title">Stack</div>
+                <a href="052-valid-parentheses.html" class="q-item" data-q="q20" style="text-decoration:none;">
+                    <span class="q-num">52</span>      <span class="q-check"></span>      <span class="q-name">Valid Parentheses</span>      <span class="q-diff diff-easy">TODO</span>
+                </a>
+                <a href="053-simplify-path.html" class="q-item" data-q="q71" style="text-decoration:none;">
+                    <span class="q-num">53</span>      <span class="q-check"></span>      <span class="q-name">Simplify Path</span>      <span class="q-diff diff-easy">TODO</span>
+                </a>
+                <a href="054-min-stack.html" class="q-item" data-q="q155" style="text-decoration:none;">
+                    <span class="q-num">54</span>      <span class="q-check"></span>      <span class="q-name">Min Stack</span>      <span class="q-diff diff-easy">TODO</span>
+                </a>
+                <a href="055-evaluate-reverse-polish-notation.html" class="q-item" data-q="q150" style="text-decoration:none;">
+                    <span class="q-num">55</span>      <span class="q-check"></span>      <span class="q-name">Evaluate Reverse Polish Notation</span>      <span class="q-diff diff-easy">TODO</span>
+                </a>
+                <a href="056-basic-calculator.html" class="q-item" data-q="q224" style="text-decoration:none;">
+                    <span class="q-num">56</span>      <span class="q-check"></span>      <span class="q-name">Basic Calculator</span>      <span class="q-diff diff-easy">TODO</span>
+                </a>
+            </div>
+            <div class="nav-module">
+                <div class="nav-module-title">Linked List</div>
+                <a href="057-linked-list-cycle.html" class="q-item" data-q="q141" style="text-decoration:none;">
+                    <span class="q-num">57</span>      <span class="q-check"></span>      <span class="q-name">Linked List Cycle</span>      <span class="q-diff diff-easy">TODO</span>
+                </a>
+                <a href="058-add-two-numbers.html" class="q-item" data-q="q2" style="text-decoration:none;">
+                    <span class="q-num">58</span>      <span class="q-check"></span>      <span class="q-name">Add Two Numbers</span>      <span class="q-diff diff-easy">TODO</span>
+                </a>
+                <a href="059-merge-two-sorted-lists.html" class="q-item" data-q="q21" style="text-decoration:none;">
+                    <span class="q-num">59</span>      <span class="q-check"></span>      <span class="q-name">Merge Two Sorted Lists</span>      <span class="q-diff diff-easy">TODO</span>
+                </a>
+                <a href="060-copy-list-with-random-pointer.html" class="q-item" data-q="q138" style="text-decoration:none;">
+                    <span class="q-num">60</span>      <span class="q-check"></span>      <span class="q-name">Copy List with Random Pointer</span>      <span class="q-diff diff-easy">TODO</span>
+                </a>
+                <a href="061-reverse-linked-list-ii.html" class="q-item" data-q="q92" style="text-decoration:none;">
+                    <span class="q-num">61</span>      <span class="q-check"></span>      <span class="q-name">Reverse Linked List II</span>      <span class="q-diff diff-easy">TODO</span>
+                </a>
+                <a href="062-reverse-nodes-in-k-group.html" class="q-item" data-q="q25" style="text-decoration:none;">
+                    <span class="q-num">62</span>      <span class="q-check"></span>      <span class="q-name">Reverse Nodes in k-Group</span>      <span class="q-diff diff-easy">TODO</span>
+                </a>
+                <a href="063-remove-nth-node-from-end-of-list.html" class="q-item" data-q="q19" style="text-decoration:none;">
+                    <span class="q-num">63</span>      <span class="q-check"></span>      <span class="q-name">Remove Nth Node From End of List</span>      <span class="q-diff diff-easy">TODO</span>
+                </a>
+                <a href="064-remove-duplicates-from-sorted-list-ii.html" class="q-item" data-q="q82" style="text-decoration:none;">
+                    <span class="q-num">64</span>      <span class="q-check"></span>      <span class="q-name">Remove Duplicates from Sorted List II</span>      <span class="q-diff diff-easy">TODO</span>
+                </a>
+                <a href="065-rotate-list.html" class="q-item" data-q="q61" style="text-decoration:none;">
+                    <span class="q-num">65</span>      <span class="q-check"></span>      <span class="q-name">Rotate List</span>      <span class="q-diff diff-easy">TODO</span>
+                </a>
+                <a href="066-partition-list.html" class="q-item" data-q="q86" style="text-decoration:none;">
+                    <span class="q-num">66</span>      <span class="q-check"></span>      <span class="q-name">Partition List</span>      <span class="q-diff diff-easy">TODO</span>
+                </a>
+                <a href="067-lru-cache.html" class="q-item" data-q="q146" style="text-decoration:none;">
+                    <span class="q-num">67</span>      <span class="q-check"></span>      <span class="q-name">LRU Cache</span>      <span class="q-diff diff-easy">TODO</span>
+                </a>
+            </div>
+            <div class="nav-module expanded">
+                <div class="nav-module-title">Binary Tree General</div>
+                <a href="068-maximum-depth-of-binary-tree.html" class="q-item active" data-q="q104" style="text-decoration:none;">
+                    <span class="q-num">68</span>      <span class="q-check"></span>      <span class="q-name">Maximum Depth of Binary Tree</span>      <span class="q-diff diff-easy">TODO</span>
+                </a>
+                <a href="069-same-tree.html" class="q-item" data-q="q100" style="text-decoration:none;">
+                    <span class="q-num">69</span>      <span class="q-check"></span>      <span class="q-name">Same Tree</span>      <span class="q-diff diff-easy">TODO</span>
+                </a>
+                <a href="070-invert-binary-tree.html" class="q-item" data-q="q226" style="text-decoration:none;">
+                    <span class="q-num">70</span>      <span class="q-check"></span>      <span class="q-name">Invert Binary Tree</span>      <span class="q-diff diff-easy">TODO</span>
+                </a>
+                <a href="071-symmetric-tree.html" class="q-item" data-q="q101" style="text-decoration:none;">
+                    <span class="q-num">71</span>      <span class="q-check"></span>      <span class="q-name">Symmetric Tree</span>      <span class="q-diff diff-easy">TODO</span>
+                </a>
+                <a href="072-construct-binary-tree-from-preorder-and-inorder-traversal.html" class="q-item" data-q="q105" style="text-decoration:none;">
+                    <span class="q-num">72</span>      <span class="q-check"></span>      <span class="q-name">Construct Binary Tree from Preorder and Inorder Traversal</span>      <span class="q-diff diff-easy">TODO</span>
+                </a>
+                <a href="073-construct-binary-tree-from-inorder-and-postorder-traversal.html" class="q-item" data-q="q106" style="text-decoration:none;">
+                    <span class="q-num">73</span>      <span class="q-check"></span>      <span class="q-name">Construct Binary Tree from Inorder and Postorder Traversal</span>      <span class="q-diff diff-easy">TODO</span>
+                </a>
+                <a href="074-populating-next-right-pointers-in-each-node-ii.html" class="q-item" data-q="q117" style="text-decoration:none;">
+                    <span class="q-num">74</span>      <span class="q-check"></span>      <span class="q-name">Populating Next Right Pointers in Each Node II</span>      <span class="q-diff diff-easy">TODO</span>
+                </a>
+                <a href="075-flatten-binary-tree-to-linked-list.html" class="q-item" data-q="q114" style="text-decoration:none;">
+                    <span class="q-num">75</span>      <span class="q-check"></span>      <span class="q-name">Flatten Binary Tree to Linked List</span>      <span class="q-diff diff-easy">TODO</span>
+                </a>
+                <a href="076-path-sum.html" class="q-item" data-q="q112" style="text-decoration:none;">
+                    <span class="q-num">76</span>      <span class="q-check"></span>      <span class="q-name">Path Sum</span>      <span class="q-diff diff-easy">TODO</span>
+                </a>
+                <a href="077-sum-root-to-leaf-numbers.html" class="q-item" data-q="q129" style="text-decoration:none;">
+                    <span class="q-num">77</span>      <span class="q-check"></span>      <span class="q-name">Sum Root to Leaf Numbers</span>      <span class="q-diff diff-easy">TODO</span>
+                </a>
+                <a href="078-binary-tree-maximum-path-sum.html" class="q-item" data-q="q124" style="text-decoration:none;">
+                    <span class="q-num">78</span>      <span class="q-check"></span>      <span class="q-name">Binary Tree Maximum Path Sum</span>      <span class="q-diff diff-easy">TODO</span>
+                </a>
+                <a href="079-binary-search-tree-iterator.html" class="q-item" data-q="q173" style="text-decoration:none;">
+                    <span class="q-num">79</span>      <span class="q-check"></span>      <span class="q-name">Binary Search Tree Iterator</span>      <span class="q-diff diff-easy">TODO</span>
+                </a>
+                <a href="080-count-complete-tree-nodes.html" class="q-item" data-q="q222" style="text-decoration:none;">
+                    <span class="q-num">80</span>      <span class="q-check"></span>      <span class="q-name">Count Complete Tree Nodes</span>      <span class="q-diff diff-easy">TODO</span>
+                </a>
+                <a href="081-lowest-common-ancestor-of-a-binary-tree.html" class="q-item" data-q="q236" style="text-decoration:none;">
+                    <span class="q-num">81</span>      <span class="q-check"></span>      <span class="q-name">Lowest Common Ancestor of a Binary Tree</span>      <span class="q-diff diff-easy">TODO</span>
+                </a>
+            </div>
+            <div class="nav-module">
+                <div class="nav-module-title">Binary Tree BFS</div>
+                <a href="082-binary-tree-right-side-view.html" class="q-item" data-q="q199" style="text-decoration:none;">
+                    <span class="q-num">82</span>      <span class="q-check"></span>      <span class="q-name">Binary Tree Right Side View</span>      <span class="q-diff diff-easy">TODO</span>
+                </a>
+                <a href="083-average-of-levels-in-binary-tree.html" class="q-item" data-q="q637" style="text-decoration:none;">
+                    <span class="q-num">83</span>      <span class="q-check"></span>      <span class="q-name">Average of Levels in Binary Tree</span>      <span class="q-diff diff-easy">TODO</span>
+                </a>
+                <a href="084-binary-tree-level-order-traversal.html" class="q-item" data-q="q102" style="text-decoration:none;">
+                    <span class="q-num">84</span>      <span class="q-check"></span>      <span class="q-name">Binary Tree Level Order Traversal</span>      <span class="q-diff diff-easy">TODO</span>
+                </a>
+                <a href="085-binary-tree-zigzag-level-order-traversal.html" class="q-item" data-q="q103" style="text-decoration:none;">
+                    <span class="q-num">85</span>      <span class="q-check"></span>      <span class="q-name">Binary Tree Zigzag Level Order Traversal</span>      <span class="q-diff diff-easy">TODO</span>
+                </a>
+            </div>
+            <div class="nav-module">
+                <div class="nav-module-title">Binary Search Tree</div>
+                <a href="086-minimum-absolute-difference-in-bst.html" class="q-item" data-q="q530" style="text-decoration:none;">
+                    <span class="q-num">86</span>      <span class="q-check"></span>      <span class="q-name">Minimum Absolute Difference in BST</span>      <span class="q-diff diff-easy">TODO</span>
+                </a>
+                <a href="087-kth-smallest-element-in-a-bst.html" class="q-item" data-q="q230" style="text-decoration:none;">
+                    <span class="q-num">87</span>      <span class="q-check"></span>      <span class="q-name">Kth Smallest Element in a BST</span>      <span class="q-diff diff-easy">TODO</span>
+                </a>
+                <a href="088-validate-binary-search-tree.html" class="q-item" data-q="q98" style="text-decoration:none;">
+                    <span class="q-num">88</span>      <span class="q-check"></span>      <span class="q-name">Validate Binary Search Tree</span>      <span class="q-diff diff-easy">TODO</span>
+                </a>
+            </div>
+            <div class="nav-module">
+                <div class="nav-module-title">Graph General</div>
+                <a href="089-number-of-islands.html" class="q-item" data-q="q200" style="text-decoration:none;">
+                    <span class="q-num">89</span>      <span class="q-check"></span>      <span class="q-name">Number of Islands</span>      <span class="q-diff diff-easy">TODO</span>
+                </a>
+                <a href="090-surrounded-regions.html" class="q-item" data-q="q130" style="text-decoration:none;">
+                    <span class="q-num">90</span>      <span class="q-check"></span>      <span class="q-name">Surrounded Regions</span>      <span class="q-diff diff-easy">TODO</span>
+                </a>
+                <a href="091-clone-graph.html" class="q-item" data-q="q133" style="text-decoration:none;">
+                    <span class="q-num">91</span>      <span class="q-check"></span>      <span class="q-name">Clone Graph</span>      <span class="q-diff diff-easy">TODO</span>
+                </a>
+                <a href="092-evaluate-division.html" class="q-item" data-q="q399" style="text-decoration:none;">
+                    <span class="q-num">92</span>      <span class="q-check"></span>      <span class="q-name">Evaluate Division</span>      <span class="q-diff diff-easy">TODO</span>
+                </a>
+                <a href="093-course-schedule.html" class="q-item" data-q="q207" style="text-decoration:none;">
+                    <span class="q-num">93</span>      <span class="q-check"></span>      <span class="q-name">Course Schedule</span>      <span class="q-diff diff-easy">TODO</span>
+                </a>
+                <a href="094-course-schedule-ii.html" class="q-item" data-q="q210" style="text-decoration:none;">
+                    <span class="q-num">94</span>      <span class="q-check"></span>      <span class="q-name">Course Schedule II</span>      <span class="q-diff diff-easy">TODO</span>
+                </a>
+            </div>
+            <div class="nav-module">
+                <div class="nav-module-title">Graph BFS</div>
+                <a href="095-snakes-and-ladders.html" class="q-item" data-q="q909" style="text-decoration:none;">
+                    <span class="q-num">95</span>      <span class="q-check"></span>      <span class="q-name">Snakes and Ladders</span>      <span class="q-diff diff-easy">TODO</span>
+                </a>
+                <a href="096-minimum-genetic-mutation.html" class="q-item" data-q="q433" style="text-decoration:none;">
+                    <span class="q-num">96</span>      <span class="q-check"></span>      <span class="q-name">Minimum Genetic Mutation</span>      <span class="q-diff diff-easy">TODO</span>
+                </a>
+                <a href="097-word-ladder.html" class="q-item" data-q="q127" style="text-decoration:none;">
+                    <span class="q-num">97</span>      <span class="q-check"></span>      <span class="q-name">Word Ladder</span>      <span class="q-diff diff-easy">TODO</span>
+                </a>
+            </div>
+            <div class="nav-module">
+                <div class="nav-module-title">Trie</div>
+                <a href="098-implement-trie-prefix-tree.html" class="q-item" data-q="q208" style="text-decoration:none;">
+                    <span class="q-num">98</span>      <span class="q-check"></span>      <span class="q-name">Implement Trie (Prefix Tree)</span>      <span class="q-diff diff-easy">TODO</span>
+                </a>
+                <a href="099-design-add-and-search-words-data-structure.html" class="q-item" data-q="q211" style="text-decoration:none;">
+                    <span class="q-num">99</span>      <span class="q-check"></span>      <span class="q-name">Design Add and Search Words Data Structure</span>      <span class="q-diff diff-easy">TODO</span>
+                </a>
+                <a href="100-word-search-ii.html" class="q-item" data-q="q212" style="text-decoration:none;">
+                    <span class="q-num">100</span>      <span class="q-check"></span>      <span class="q-name">Word Search II</span>      <span class="q-diff diff-easy">TODO</span>
+                </a>
+            </div>
+            <div class="nav-module">
+                <div class="nav-module-title">Backtracking</div>
+                <a href="101-letter-combinations-of-a-phone-number.html" class="q-item" data-q="q17" style="text-decoration:none;">
+                    <span class="q-num">101</span>      <span class="q-check"></span>      <span class="q-name">Letter Combinations of a Phone Number</span>      <span class="q-diff diff-easy">TODO</span>
+                </a>
+                <a href="102-combinations.html" class="q-item" data-q="q77" style="text-decoration:none;">
+                    <span class="q-num">102</span>      <span class="q-check"></span>      <span class="q-name">Combinations</span>      <span class="q-diff diff-easy">TODO</span>
+                </a>
+                <a href="103-permutations.html" class="q-item" data-q="q46" style="text-decoration:none;">
+                    <span class="q-num">103</span>      <span class="q-check"></span>      <span class="q-name">Permutations</span>      <span class="q-diff diff-easy">TODO</span>
+                </a>
+                <a href="104-combination-sum.html" class="q-item" data-q="q39" style="text-decoration:none;">
+                    <span class="q-num">104</span>      <span class="q-check"></span>      <span class="q-name">Combination Sum</span>      <span class="q-diff diff-easy">TODO</span>
+                </a>
+                <a href="105-n-queens-ii.html" class="q-item" data-q="q52" style="text-decoration:none;">
+                    <span class="q-num">105</span>      <span class="q-check"></span>      <span class="q-name">N-Queens II</span>      <span class="q-diff diff-easy">TODO</span>
+                </a>
+                <a href="106-generate-parentheses.html" class="q-item" data-q="q22" style="text-decoration:none;">
+                    <span class="q-num">106</span>      <span class="q-check"></span>      <span class="q-name">Generate Parentheses</span>      <span class="q-diff diff-easy">TODO</span>
+                </a>
+                <a href="107-word-search.html" class="q-item" data-q="q79" style="text-decoration:none;">
+                    <span class="q-num">107</span>      <span class="q-check"></span>      <span class="q-name">Word Search</span>      <span class="q-diff diff-easy">TODO</span>
+                </a>
+            </div>
+            <div class="nav-module">
+                <div class="nav-module-title">Divide & Conquer</div>
+                <a href="108-convert-sorted-array-to-binary-search-tree.html" class="q-item" data-q="q108" style="text-decoration:none;">
+                    <span class="q-num">108</span>      <span class="q-check"></span>      <span class="q-name">Convert Sorted Array to Binary Search Tree</span>      <span class="q-diff diff-easy">TODO</span>
+                </a>
+                <a href="109-sort-list.html" class="q-item" data-q="q148" style="text-decoration:none;">
+                    <span class="q-num">109</span>      <span class="q-check"></span>      <span class="q-name">Sort List</span>      <span class="q-diff diff-easy">TODO</span>
+                </a>
+                <a href="110-construct-quad-tree.html" class="q-item" data-q="q427" style="text-decoration:none;">
+                    <span class="q-num">110</span>      <span class="q-check"></span>      <span class="q-name">Construct Quad Tree</span>      <span class="q-diff diff-easy">TODO</span>
+                </a>
+                <a href="111-merge-k-sorted-lists.html" class="q-item" data-q="q23" style="text-decoration:none;">
+                    <span class="q-num">111</span>      <span class="q-check"></span>      <span class="q-name">Merge k Sorted Lists</span>      <span class="q-diff diff-easy">TODO</span>
+                </a>
+            </div>
+            <div class="nav-module">
+                <div class="nav-module-title">Kadane's Algorithm</div>
+                <a href="112-maximum-subarray.html" class="q-item" data-q="q53" style="text-decoration:none;">
+                    <span class="q-num">112</span>      <span class="q-check"></span>      <span class="q-name">Maximum Subarray</span>      <span class="q-diff diff-easy">TODO</span>
+                </a>
+                <a href="113-maximum-sum-circular-subarray.html" class="q-item" data-q="q918" style="text-decoration:none;">
+                    <span class="q-num">113</span>      <span class="q-check"></span>      <span class="q-name">Maximum Sum Circular Subarray</span>      <span class="q-diff diff-easy">TODO</span>
+                </a>
+            </div>
+            <div class="nav-module">
+                <div class="nav-module-title">Binary Search</div>
+                <a href="114-search-insert-position.html" class="q-item" data-q="q35" style="text-decoration:none;">
+                    <span class="q-num">114</span>      <span class="q-check"></span>      <span class="q-name">Search Insert Position</span>      <span class="q-diff diff-easy">TODO</span>
+                </a>
+                <a href="115-search-a-2d-matrix.html" class="q-item" data-q="q74" style="text-decoration:none;">
+                    <span class="q-num">115</span>      <span class="q-check"></span>      <span class="q-name">Search a 2D Matrix</span>      <span class="q-diff diff-easy">TODO</span>
+                </a>
+                <a href="116-find-peak-element.html" class="q-item" data-q="q162" style="text-decoration:none;">
+                    <span class="q-num">116</span>      <span class="q-check"></span>      <span class="q-name">Find Peak Element</span>      <span class="q-diff diff-easy">TODO</span>
+                </a>
+                <a href="117-search-in-rotated-sorted-array.html" class="q-item" data-q="q33" style="text-decoration:none;">
+                    <span class="q-num">117</span>      <span class="q-check"></span>      <span class="q-name">Search in Rotated Sorted Array</span>      <span class="q-diff diff-easy">TODO</span>
+                </a>
+                <a href="118-find-first-and-last-position-of-element-in-sorted-array.html" class="q-item" data-q="q34" style="text-decoration:none;">
+                    <span class="q-num">118</span>      <span class="q-check"></span>      <span class="q-name">Find First and Last Position of Element in Sorted Array</span>      <span class="q-diff diff-easy">TODO</span>
+                </a>
+                <a href="119-find-minimum-in-rotated-sorted-array.html" class="q-item" data-q="q153" style="text-decoration:none;">
+                    <span class="q-num">119</span>      <span class="q-check"></span>      <span class="q-name">Find Minimum in Rotated Sorted Array</span>      <span class="q-diff diff-easy">TODO</span>
+                </a>
+                <a href="120-median-of-two-sorted-arrays.html" class="q-item" data-q="q4" style="text-decoration:none;">
+                    <span class="q-num">120</span>      <span class="q-check"></span>      <span class="q-name">Median of Two Sorted Arrays</span>      <span class="q-diff diff-easy">TODO</span>
+                </a>
+            </div>
+            <div class="nav-module">
+                <div class="nav-module-title">Heap</div>
+                <a href="121-kth-largest-element-in-an-array.html" class="q-item" data-q="q215" style="text-decoration:none;">
+                    <span class="q-num">121</span>      <span class="q-check"></span>      <span class="q-name">Kth Largest Element in an Array</span>      <span class="q-diff diff-easy">TODO</span>
+                </a>
+                <a href="122-ipo.html" class="q-item" data-q="q502" style="text-decoration:none;">
+                    <span class="q-num">122</span>      <span class="q-check"></span>      <span class="q-name">IPO</span>      <span class="q-diff diff-easy">TODO</span>
+                </a>
+                <a href="123-find-k-pairs-with-smallest-sums.html" class="q-item" data-q="q373" style="text-decoration:none;">
+                    <span class="q-num">123</span>      <span class="q-check"></span>      <span class="q-name">Find K Pairs with Smallest Sums</span>      <span class="q-diff diff-easy">TODO</span>
+                </a>
+                <a href="124-find-median-from-data-stream.html" class="q-item" data-q="q295" style="text-decoration:none;">
+                    <span class="q-num">124</span>      <span class="q-check"></span>      <span class="q-name">Find Median from Data Stream</span>      <span class="q-diff diff-easy">TODO</span>
+                </a>
+            </div>
+            <div class="nav-module">
+                <div class="nav-module-title">Bit Manipulation</div>
+                <a href="125-add-binary.html" class="q-item" data-q="q67" style="text-decoration:none;">
+                    <span class="q-num">125</span>      <span class="q-check"></span>      <span class="q-name">Add Binary</span>      <span class="q-diff diff-easy">TODO</span>
+                </a>
+                <a href="126-reverse-bits.html" class="q-item" data-q="q190" style="text-decoration:none;">
+                    <span class="q-num">126</span>      <span class="q-check"></span>      <span class="q-name">Reverse Bits</span>      <span class="q-diff diff-easy">TODO</span>
+                </a>
+                <a href="127-number-of-1-bits.html" class="q-item" data-q="q191" style="text-decoration:none;">
+                    <span class="q-num">127</span>      <span class="q-check"></span>      <span class="q-name">Number of 1 Bits</span>      <span class="q-diff diff-easy">TODO</span>
+                </a>
+                <a href="128-single-number.html" class="q-item" data-q="q136" style="text-decoration:none;">
+                    <span class="q-num">128</span>      <span class="q-check"></span>      <span class="q-name">Single Number</span>      <span class="q-diff diff-easy">TODO</span>
+                </a>
+                <a href="129-single-number-ii.html" class="q-item" data-q="q137" style="text-decoration:none;">
+                    <span class="q-num">129</span>      <span class="q-check"></span>      <span class="q-name">Single Number II</span>      <span class="q-diff diff-easy">TODO</span>
+                </a>
+                <a href="130-bitwise-and-of-numbers-range.html" class="q-item" data-q="q201" style="text-decoration:none;">
+                    <span class="q-num">130</span>      <span class="q-check"></span>      <span class="q-name">Bitwise AND of Numbers Range</span>      <span class="q-diff diff-easy">TODO</span>
+                </a>
+            </div>
+            <div class="nav-module">
+                <div class="nav-module-title">Math</div>
+                <a href="131-palindrome-number.html" class="q-item" data-q="q9" style="text-decoration:none;">
+                    <span class="q-num">131</span>      <span class="q-check"></span>      <span class="q-name">Palindrome Number</span>      <span class="q-diff diff-easy">TODO</span>
+                </a>
+                <a href="132-plus-one.html" class="q-item" data-q="q66" style="text-decoration:none;">
+                    <span class="q-num">132</span>      <span class="q-check"></span>      <span class="q-name">Plus One</span>      <span class="q-diff diff-easy">TODO</span>
+                </a>
+                <a href="133-factorial-trailing-zeroes.html" class="q-item" data-q="q172" style="text-decoration:none;">
+                    <span class="q-num">133</span>      <span class="q-check"></span>      <span class="q-name">Factorial Trailing Zeroes</span>      <span class="q-diff diff-easy">TODO</span>
+                </a>
+                <a href="134-sqrtx.html" class="q-item" data-q="q69" style="text-decoration:none;">
+                    <span class="q-num">134</span>      <span class="q-check"></span>      <span class="q-name">Sqrt(x)</span>      <span class="q-diff diff-easy">TODO</span>
+                </a>
+                <a href="135-powx-n.html" class="q-item" data-q="q50" style="text-decoration:none;">
+                    <span class="q-num">135</span>      <span class="q-check"></span>      <span class="q-name">Pow(x, n)</span>      <span class="q-diff diff-easy">TODO</span>
+                </a>
+                <a href="136-max-points-on-a-line.html" class="q-item" data-q="q149" style="text-decoration:none;">
+                    <span class="q-num">136</span>      <span class="q-check"></span>      <span class="q-name">Max Points on a Line</span>      <span class="q-diff diff-easy">TODO</span>
+                </a>
+            </div>
+            <div class="nav-module">
+                <div class="nav-module-title">1D DP</div>
+                <a href="137-climbing-stairs.html" class="q-item" data-q="q70" style="text-decoration:none;">
+                    <span class="q-num">137</span>      <span class="q-check"></span>      <span class="q-name">Climbing Stairs</span>      <span class="q-diff diff-easy">TODO</span>
+                </a>
+                <a href="138-house-robber.html" class="q-item" data-q="q198" style="text-decoration:none;">
+                    <span class="q-num">138</span>      <span class="q-check"></span>      <span class="q-name">House Robber</span>      <span class="q-diff diff-easy">TODO</span>
+                </a>
+                <a href="139-word-break.html" class="q-item" data-q="q139" style="text-decoration:none;">
+                    <span class="q-num">139</span>      <span class="q-check"></span>      <span class="q-name">Word Break</span>      <span class="q-diff diff-easy">TODO</span>
+                </a>
+                <a href="140-coin-change.html" class="q-item" data-q="q322" style="text-decoration:none;">
+                    <span class="q-num">140</span>      <span class="q-check"></span>      <span class="q-name">Coin Change</span>      <span class="q-diff diff-easy">TODO</span>
+                </a>
+                <a href="141-longest-increasing-subsequence.html" class="q-item" data-q="q300" style="text-decoration:none;">
+                    <span class="q-num">141</span>      <span class="q-check"></span>      <span class="q-name">Longest Increasing Subsequence</span>      <span class="q-diff diff-easy">TODO</span>
+                </a>
+            </div>
+            <div class="nav-module">
+                <div class="nav-module-title">Multidimensional DP</div>
+                <a href="142-triangle.html" class="q-item" data-q="q120" style="text-decoration:none;">
+                    <span class="q-num">142</span>      <span class="q-check"></span>      <span class="q-name">Triangle</span>      <span class="q-diff diff-easy">TODO</span>
+                </a>
+                <a href="143-minimum-path-sum.html" class="q-item" data-q="q64" style="text-decoration:none;">
+                    <span class="q-num">143</span>      <span class="q-check"></span>      <span class="q-name">Minimum Path Sum</span>      <span class="q-diff diff-easy">TODO</span>
+                </a>
+                <a href="144-unique-paths-ii.html" class="q-item" data-q="q63" style="text-decoration:none;">
+                    <span class="q-num">144</span>      <span class="q-check"></span>      <span class="q-name">Unique Paths II</span>      <span class="q-diff diff-easy">TODO</span>
+                </a>
+                <a href="145-longest-palindromic-substring.html" class="q-item" data-q="q5" style="text-decoration:none;">
+                    <span class="q-num">145</span>      <span class="q-check"></span>      <span class="q-name">Longest Palindromic Substring</span>      <span class="q-diff diff-easy">TODO</span>
+                </a>
+                <a href="146-interleaving-string.html" class="q-item" data-q="q97" style="text-decoration:none;">
+                    <span class="q-num">146</span>      <span class="q-check"></span>      <span class="q-name">Interleaving String</span>      <span class="q-diff diff-easy">TODO</span>
+                </a>
+                <a href="147-edit-distance.html" class="q-item" data-q="q72" style="text-decoration:none;">
+                    <span class="q-num">147</span>      <span class="q-check"></span>      <span class="q-name">Edit Distance</span>      <span class="q-diff diff-easy">TODO</span>
+                </a>
+                <a href="148-best-time-to-buy-and-sell-stock-iii.html" class="q-item" data-q="q123" style="text-decoration:none;">
+                    <span class="q-num">148</span>      <span class="q-check"></span>      <span class="q-name">Best Time to Buy and Sell Stock III</span>      <span class="q-diff diff-easy">TODO</span>
+                </a>
+                <a href="149-best-time-to-buy-and-sell-stock-iv.html" class="q-item" data-q="q188" style="text-decoration:none;">
+                    <span class="q-num">149</span>      <span class="q-check"></span>      <span class="q-name">Best Time to Buy and Sell Stock IV</span>      <span class="q-diff diff-easy">TODO</span>
+                </a>
+                <a href="150-maximal-square.html" class="q-item" data-q="q221" style="text-decoration:none;">
+                    <span class="q-num">150</span>      <span class="q-check"></span>      <span class="q-name">Maximal Square</span>      <span class="q-diff diff-easy">TODO</span>
+                </a>
+            </div>
+        </div>
+        <div class="progress-footer">
+            <div class="progress-label"><span id="solved-count">0</span> / 150 solved</div>
+            <div class="progress-bar-wrap">
+                <div class="progress-bar-fill" id="progress-fill"></div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- MAIN PANEL -->
+    <div class="main" id="main-panel">
+        
+        <div class="question-panel active" id="q104">
+            <div class="q-header">
+                <div class="q-header-meta">
+                    <span class="q-number-badge"># 68 &middot; LeetCode</span>
+                    <span class="diff-badge diff-easy">EASY</span>
+                    <span class="topic-tag">Binary Tree General</span>
+                </div>
+                <h1 class="q-title">Maximum Depth of Binary Tree</h1>
+                <p class="q-source"><a href="https://leetcode.com/problems/maximum-depth-of-binary-tree/" target="_blank">leetcode.com/problems/maximum-depth-of-binary-tree</a> &middot; Top Interview 150</p>
+            </div>
+            <hr class="section-rule">
+            
+            <div class="warn-box" style="margin-top: 40px; text-align: center; padding: 60px 20px;">
+                <h2 style="margin-bottom: 20px; color: #a6adc8;">Content Pending</h2>
+                <p style="color: #6c7086;">The FAANG-level breakdown for this problem is currently being generated.</p>
+                <p style="color: #6c7086; margin-top: 10px;">Check back later for detailed optimal solutions, complexity analysis, and interview tips.</p>
+            </div>
+            
+            <button class="mark-solved-btn" id="solve-q104" onclick="markSolved('q104',this)" style="margin-top: 60px;">Mark as Solved</button>
+        </div>
+    
+
+        
+        <div class="page-nav" style="max-width: 960px; margin: 40px auto 0; padding: 20px 48px;">
+            <a class="page-nav-btn" href="067-lru-cache.html">&#8592; LRU Cache</a>
+            <a class="page-nav-btn home" href="../index.html">&#9776; Back to Portfolio</a>
+            <a class="page-nav-btn" href="069-same-tree.html">Same Tree &#8594;</a>
+        </div>
+    </div>
+
+    <script>
+        // Initialize highlight.js
+        hljs.highlightAll();
+        // Initialize mermaid.js
+        mermaid.initialize({ startOnLoad: true, theme: 'dark' });
+
+        // Tab switching
+        function switchTab(btn, contentId) {
+            const wrap = btn.closest('.code-tabs');
+            wrap.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            wrap.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            btn.classList.add('active');
+            const target = document.getElementById(contentId);
+            if (target) {
+                target.classList.add('active');
+                target.querySelectorAll('code:not(.hljs)').forEach(el => hljs.highlightElement(el));
+            }
+        }
+
+        // Solved tracking
+        let solved = JSON.parse(localStorage.getItem('top150-solved') || '[]');
+
+        function markSolved(qId, btn) {
+            if (!solved.includes(qId)) {
+                solved.push(qId);
+                localStorage.setItem('top150-solved', JSON.stringify(solved));
+            }
+            btn.textContent = ' Solved!';
+            btn.classList.add('solved');
+            const item = document.querySelector(`.q-item[data-q="${qId}"]`);
+            if (item) item.classList.add('solved');
+            updateProgress();
+        }
+
+        function updateProgress() {
+            const total = 150;
+            const countNode = document.getElementById('solved-count');
+            const fillNode = document.getElementById('progress-fill');
+            if (countNode) countNode.textContent = solved.length;
+            if (fillNode) fillNode.style.width = (solved.length / total * 100) + '%';
+        }
+
+        // Restore solved state
+        solved.forEach(qId => {
+            const item = document.querySelector(`.q-item[data-q="${qId}"]`);
+            if (item) item.classList.add('solved');
+            const btn = document.getElementById(`solve-${qId}`);
+            if (btn) { btn.textContent = ' Solved!'; btn.classList.add('solved'); }
+        });
+
+        // Make sure progress is updated on load
+        document.addEventListener('DOMContentLoaded', updateProgress);
+
+        // Sidebar module toggle
+        document.querySelectorAll('.nav-module-title').forEach(title => {
+            title.addEventListener('click', () => {
+                const module = title.parentElement;
+                module.classList.toggle('expanded');
+            });
+        });
+
+        // Search filtering
+        function filterQuestions(query) {
+            query = query.toLowerCase();
+            document.querySelectorAll('.q-item').forEach(item => {
+                const text = item.textContent.toLowerCase();
+                if (text.includes(query)) {
+                    item.style.display = 'block';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Top Interview 150</title>
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Fira+Code:wght@400;500&display=swap"
+        rel="stylesheet" />
+    <!-- Highlight.js for syntax highlighting -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css" rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <!-- Use the same CSS as blind75 -->
+    <link rel="stylesheet" href="../blind75/question.css">
+</head>
+
+<body>
+    <!-- SIDEBAR -->
+    <!-- {{SIDEBAR_HTML}} -->
+
+    <!-- MAIN PANEL -->
+    <div class="main" id="main-panel">
+        <!-- {{MAIN_CONTENT}} -->
+
+        <!-- {{PAGE_NAV}} -->
+    </div>
+
+    <script>
+        // Initialize highlight.js
+        hljs.highlightAll();
+        // Initialize mermaid.js
+        mermaid.initialize({ startOnLoad: true, theme: 'dark' });
+
+        // Tab switching
+        function switchTab(btn, contentId) {
+            const wrap = btn.closest('.code-tabs');
+            wrap.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            wrap.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            btn.classList.add('active');
+            const target = document.getElementById(contentId);
+            if (target) {
+                target.classList.add('active');
+                target.querySelectorAll('code:not(.hljs)').forEach(el => hljs.highlightElement(el));
+            }
+        }
+
+        // Solved tracking
+        let solved = JSON.parse(localStorage.getItem('top150-solved') || '[]');
+
+        function markSolved(qId, btn) {
+            if (!solved.includes(qId)) {
+                solved.push(qId);
+                localStorage.setItem('top150-solved', JSON.stringify(solved));
+            }
+            btn.textContent = ' Solved!';
+            btn.classList.add('solved');
+            const item = document.querySelector(`.q-item[data-q="${qId}"]`);
+            if (item) item.classList.add('solved');
+            updateProgress();
+        }
+
+        function updateProgress() {
+            const total = 150;
+            const countNode = document.getElementById('solved-count');
+            const fillNode = document.getElementById('progress-fill');
+            if (countNode) countNode.textContent = solved.length;
+            if (fillNode) fillNode.style.width = (solved.length / total * 100) + '%';
+        }
+
+        // Restore solved state
+        solved.forEach(qId => {
+            const item = document.querySelector(`.q-item[data-q="${qId}"]`);
+            if (item) item.classList.add('solved');
+            const btn = document.getElementById(`solve-${qId}`);
+            if (btn) { btn.textContent = ' Solved!'; btn.classList.add('solved'); }
+        });
+
+        // Make sure progress is updated on load
+        document.addEventListener('DOMContentLoaded', updateProgress);
+
+        // Sidebar module toggle
+        document.querySelectorAll('.nav-module-title').forEach(title => {
+            title.addEventListener('click', () => {
+                const module = title.parentElement;
+                module.classList.toggle('expanded');
+            });
+        });
+
+        // Search filtering
+        function filterQuestions(query) {
+            query = query.toLowerCase();
+            document.querySelectorAll('.q-item').forEach(item => {
+                const text = item.textContent.toLowerCase();
+                if (text.includes(query)) {
+                    item.style.display = 'block';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        }
+    </script>
+</body>
+
+</html>
