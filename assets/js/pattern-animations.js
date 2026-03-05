@@ -27,89 +27,63 @@ const T = {
 };
 
 class PatternAnimator {
-  constructor(containerId, renderFn, interval = 600, statusFn = null) {
-    this.wrapper = document.getElementById(containerId);
-    if (!this.wrapper) return;
-    this.renderFn = renderFn;
-    this.statusFn = statusFn;
-    this.interval = interval;
-    this.tick = 0;
-    this.paused = false;
-    this.color = this.wrapper.dataset.color || T.colors.cyan;
-    this._buildUI();
-    this._loop();
-  }
+  constructor(containerId, renderFn, interval) {
+    const el = document.getElementById(containerId);
+    if (!el) return;
+    const color = el.dataset.color || T.colors.cyan;
+    let tick = 0;
+    let paused = false;
+    let speed = interval || 600;
 
-  _buildUI() {
-    this.svgEl = document.createElement('div');
-    this.svgEl.style.cssText = `background:${T.bg};border-radius:10px;padding:16px 12px 8px;
-      border:1px solid ${T.border};min-height:90px;`;
+    // Build UI
+    const svgWrap = document.createElement('div');
+    svgWrap.style.cssText = 'min-height:80px;';
 
-    this.statusEl = document.createElement('div');
-    this.statusEl.style.cssText = `font-family:monospace;font-size:11px;color:${T.muted};
-      text-align:center;margin-top:8px;min-height:18px;letter-spacing:.3px;transition:color .3s;`;
+    const statusEl = document.createElement('div');
+    statusEl.style.cssText = 'font-family:monospace;font-size:11px;color:' + T.muted + ';text-align:center;margin:6px 0;min-height:18px;';
 
-    const ctrl = document.createElement('div');
-    ctrl.style.cssText = `display:flex;align-items:center;justify-content:space-between;
-      margin-top:10px;gap:8px;flex-wrap:wrap;`;
+    const controls = document.createElement('div');
+    controls.style.cssText = 'display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:8px;';
 
-    const btnStyle = (col) => `background:${T.card};border:1px solid ${col}55;color:${col};
-      border-radius:6px;padding:5px 12px;font-size:11px;font-weight:700;
-      font-family:monospace;cursor:pointer;letter-spacing:.4px;transition:all .2s;`;
-
-    this.playBtn = document.createElement('button');
-    this.playBtn.innerHTML = '⏸ Pause';
-    this.playBtn.style.cssText = btnStyle(this.color);
-    this.playBtn.onclick = () => { this.paused = !this.paused; this.playBtn.innerHTML = this.paused ? '▶ Play' : '⏸ Pause'; };
-
-    const stepBtn = document.createElement('button');
-    stepBtn.innerHTML = '⏭ Step';
-    stepBtn.style.cssText = btnStyle(T.muted);
-    stepBtn.onclick = () => { this.paused = true; this.playBtn.innerHTML = '▶ Play'; this._render(); };
-
-    const resetBtn = document.createElement('button');
-    resetBtn.innerHTML = '↺ Reset';
-    resetBtn.style.cssText = btnStyle(T.muted);
-    resetBtn.onclick = () => { this.tick = 0; this._render(); };
-
-    const speedWrap = document.createElement('div');
-    speedWrap.style.cssText = 'display:flex;align-items:center;gap:5px;margin-left:auto;';
-    const sLabel = document.createElement('span');
-    sLabel.textContent = 'Speed:';
-    sLabel.style.cssText = `font-family:monospace;font-size:10px;color:${T.muted};`;
-    const sel = document.createElement('select');
-    sel.style.cssText = `background:${T.card};border:1px solid ${T.border};color:${this.color};
-      border-radius:4px;padding:3px 6px;font-size:10px;font-family:monospace;cursor:pointer;`;
-    [['0.5×', 1200], ['1×', 600], ['2×', 300], ['3×', 150]].forEach(([lbl, ms]) => {
-      const o = document.createElement('option'); o.value = ms; o.textContent = lbl;
-      if (ms === 600) o.selected = true; sel.appendChild(o);
-    });
-    sel.onchange = () => { this.interval = parseInt(sel.value); };
-    speedWrap.append(sLabel, sel);
-
-    this.tickEl = document.createElement('span');
-    this.tickEl.style.cssText = `font-family:monospace;font-size:10px;color:${T.muted};`;
-
-    ctrl.append(this.playBtn, stepBtn, resetBtn, speedWrap, this.tickEl);
-    this.wrapper.append(this.svgEl, this.statusEl, ctrl);
-  }
-
-  _render() {
-    if (!this.paused) this.tick++;
-    this.svgEl.innerHTML = this.renderFn(this.tick, this.color);
-    if (this.statusFn) {
-      const r = this.statusFn(this.tick, this.color);
-      if (r) { this.statusEl.textContent = r.text || ''; this.statusEl.style.color = r.color || T.muted; }
-    }
-    this.tickEl.textContent = `step ${this.tick}`;
-  }
-
-  _loop() {
-    const frame = () => {
-      if (!this.paused) this._render();
-      setTimeout(() => requestAnimationFrame(frame), this.interval);
+    const makeBtn = (label, col) => {
+      const b = document.createElement('button');
+      b.innerHTML = label;
+      b.style.cssText = 'background:' + T.card + ';border:1px solid ' + col + '55;color:' + col + ';border-radius:6px;padding:4px 12px;font-size:11px;font-weight:700;font-family:monospace;cursor:pointer;';
+      return b;
     };
-    requestAnimationFrame(frame);
+
+    const playBtn = makeBtn('⏸ Pause', color);
+    playBtn.onclick = () => { paused = !paused; playBtn.innerHTML = paused ? '▶ Play' : '⏸ Pause'; };
+
+    const stepBtn = makeBtn('⏭ Step', T.muted);
+    stepBtn.onclick = () => { paused = true; playBtn.innerHTML = '▶ Play'; tick++; render(); };
+
+    const resetBtn = makeBtn('↺ Reset', T.muted);
+    resetBtn.onclick = () => { tick = 0; render(); };
+
+    const sel = document.createElement('select');
+    sel.style.cssText = 'background:' + T.card + ';border:1px solid ' + T.border + ';color:' + color + ';border-radius:4px;padding:3px 6px;font-size:10px;cursor:pointer;font-family:monospace;margin-left:auto;';
+    [['0.5×', 1200], ['1×', 600], ['2×', 300], ['3×', 150]].forEach(([lbl, ms]) => {
+      const o = document.createElement('option');
+      o.value = ms; o.textContent = lbl;
+      if (ms === (interval || 600)) o.selected = true;
+      sel.appendChild(o);
+    });
+    sel.onchange = () => { speed = +sel.value; };
+
+    const tickEl = document.createElement('span');
+    tickEl.style.cssText = 'font-family:monospace;font-size:10px;color:' + T.muted + ';';
+
+    controls.append(playBtn, stepBtn, resetBtn, sel, tickEl);
+    el.append(svgWrap, statusEl, controls);
+
+    function render() {
+      svgWrap.innerHTML = renderFn(tick, color);
+      tickEl.textContent = 'step ' + tick;
+    }
+
+    render();
+    setInterval(() => { if (!paused) { tick++; render(); } }, speed);
   }
 }
 
@@ -860,7 +834,7 @@ function renderMonotonicStack(tick, color) {
     const col = resolved ? T.colors.green : inStack ? color : i < n ? T.muted : T.border;
     return `
       <g style="transition:all 0.35s ease">
-        <rect x="${6 + i * 34}" y="8}" width="30" height="26" rx="4"
+        <rect x="${6 + i * 34}" y="8" width="30" height="26" rx="4"
           fill="${col}18" stroke="${col}" stroke-width="${isCurr ? 2.5 : 1.5}"
           style="${isCurr ? `filter:drop-shadow(0 0 8px ${col})` : ""}"/>
         <text x="${21 + i * 34}" y="26" text-anchor="middle" fill="${col}"
@@ -950,15 +924,15 @@ function renderDP(tick, color) {
     const col = isCurr ? T.colors.amber : active ? colForVal(v) : T.border;
     return `
       <g style="transition:all 0.4s ease">
-        <rect x="${3 + i * 26}" y="15}" width="24" height="26" rx="4"
+        <rect x="${3 + i * 26}" y="15" width="24" height="26" rx="4"
           fill="${active ? `${col}20` : T.surface}" stroke="${active ? col : T.border}"
           stroke-width="${isCurr ? 2.5 : active ? 1.5 : 0.8}"
           style="${isCurr ? `filter:drop-shadow(0 0 9px ${col})` : active ? `drop-shadow(0 0 3px ${col}60)` : "none"}"/>
-        <text x="${15 + i * 26}" y="30}" text-anchor="middle"
+        <text x="${15 + i * 26}" y="30" text-anchor="middle"
           fill="${active ? col : T.muted}" font-size="10" font-weight="${active ? "700" : "400"}" font-family="monospace">
           ${active ? (v === Infinity ? "∞" : v) : "·"}
         </text>
-        <text x="${15 + i * 26}" y="50}" text-anchor="middle" fill="${T.muted}" font-size="7" font-family="monospace">${i}</text>
+        <text x="${15 + i * 26}" y="50" text-anchor="middle" fill="${T.muted}" font-size="7" font-family="monospace">${i}</text>
       </g>`;
   }).join('');
 
@@ -988,10 +962,10 @@ function renderGreedy(tick, color) {
     const col = isGoal ? T.colors.green : isStep ? T.colors.amber : reachable[i] ? color : T.muted;
     return `
       <g style="transition:all 0.35s ease">
-        <rect x="${14 + i * 46}" y="16}" width="38" height="32" rx="5"
+        <rect x="${14 + i * 46}" y="16" width="38" height="32" rx="5"
           fill="${col}18" stroke="${col}" stroke-width="${isStep ? 2.5 : 1.5}"
           style="${isStep ? `filter:drop-shadow(0 0 10px ${col})` : ""}"/>
-        <text x="${33 + i * 46}" y="36}" text-anchor="middle" fill="${col}"
+        <text x="${33 + i * 46}" y="36" text-anchor="middle" fill="${col}"
           font-size="16" font-weight="700" font-family="monospace">${v}</text>
         ${isStep && v > 0 && i < arr.length - 1 ? `
           <path d="M${33 + i * 46} 14 C${33 + i * 46} 4,${33 + reach * 46} 4,${33 + reach * 46} 14"
@@ -1026,12 +1000,12 @@ function renderBits(tick, color) {
     const col = isCurr ? T.colors.amber : proc ? T.colors.violet : T.border;
     return `
       <g>
-        <rect x="${6 + i * 46}" y="10}" width="42" height="30" rx="4"
+        <rect x="${6 + i * 46}" y="10" width="42" height="30" rx="4"
           fill="${col}18" stroke="${col}" stroke-width="${isCurr ? 2.5 : 1}"
           style="${isCurr ? `filter:drop-shadow(0 0 8px ${col})` : ""}"/>
-        <text x="${27 + i * 46}" y="24}" text-anchor="middle" fill="${col}"
+        <text x="${27 + i * 46}" y="24" text-anchor="middle" fill="${col}"
           font-size="8" font-family="monospace" letter-spacing="2">${bin(v)}</text>
-        <text x="${27 + i * 46}" y="34}" text-anchor="middle" fill="${col}99"
+        <text x="${27 + i * 46}" y="34" text-anchor="middle" fill="${col}99"
           font-size="8" font-family="monospace">${v}</text>
       </g>`;
   }).join('');
@@ -1046,7 +1020,7 @@ function renderBits(tick, color) {
       <rect x="130" y="46" width="120" height="20" rx="4"
         fill="${step >= nums.length ? `${T.colors.green}18` : T.surface}"
         stroke="${step >= nums.length ? T.colors.green : T.border}" stroke-width="1.5"/>
-      <text x="190" y="59}" text-anchor="middle"
+      <text x="190" y="59" text-anchor="middle"
         fill="${step >= nums.length ? T.colors.green : T.muted}" font-size="9"
         font-family="monospace" font-weight="${step >= nums.length ? "700" : "400"}">
         ${step >= nums.length ? `unique = ${current}` : `running XOR = ${current}`}
@@ -1054,28 +1028,6 @@ function renderBits(tick, color) {
     </svg>`;
 }
 
-// Initialization function
-function initAnimations() {
-  new PatternAnimator('viz-p1', renderSlidingWindow, 650);
-  new PatternAnimator('viz-p2', renderTwoPointers, 800);
-  new PatternAnimator('viz-p3', renderFastSlow, 450);
-  new PatternAnimator('viz-p4', renderMergeIntervals, 1000);
-  new PatternAnimator('viz-p5', renderCyclicSort, 720);
-  new PatternAnimator('viz-p6', renderInPlaceReversal, 600);
-  new PatternAnimator('viz-p7', renderTreeBFS, 480);
-  new PatternAnimator('viz-p8', renderTreeDFS, 520);
-  new PatternAnimator('viz-p9', renderTwoHeaps, 700);
-  new PatternAnimator('viz-p10', renderSubsets, 700);
-  new PatternAnimator('viz-p11', renderBinarySearch, 800);
-  new PatternAnimator('viz-p12', renderTopKElements, 680);
-  new PatternAnimator('viz-p13', renderKWayMerge, 620);
-  new PatternAnimator('viz-p14', renderTopoSort, 750);
-  new PatternAnimator('viz-p15', renderPrefixSum, 680);
-  new PatternAnimator('viz-p16', renderMonotonicStack, 730);
-  new PatternAnimator('viz-p17', renderUnionFind, 820);
-  new PatternAnimator('viz-p18', renderDP, 660);
-  new PatternAnimator('viz-p19', renderGreedy, 580);
-  new PatternAnimator('viz-p20', renderBits, 680);
-}
-
-document.addEventListener('DOMContentLoaded', initAnimations);
+// Function aliases so generator names work
+const renderTopK = renderTopKElements;
+const renderBitManip = renderBits;
