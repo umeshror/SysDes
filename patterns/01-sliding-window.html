@@ -4,12 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pattern 1: Sliding Window — Coding Interview Patterns</title>
-    <meta name="description" content="Deep dive into the Sliding Window pattern — when to use it, complexity analysis, LeetCode problems, and animated visualizations.">
-
-    <!-- Highlight.js -->
+    <meta name="description" content="Deep dive into the Sliding Window pattern — visualized live with animation, Python code, and full editorial.">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
-
     <style>
         :root {
             --accent: #00e5ff;
@@ -24,201 +21,124 @@
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); display: flex; min-height: 100vh; }
 
-        /* ── Sidebar ─────────────────────────────────── */
+        /* ── Sidebar */
         .patterns-sidebar {
-            width: var(--sidebar-w);
-            min-width: var(--sidebar-w);
-            background: var(--surface);
-            border-right: 1px solid var(--border);
-            position: fixed;
-            top: 0; left: 0;
-            height: 100vh;
-            display: flex; flex-direction: column;
-            overflow: hidden;
+            width: var(--sidebar-w); min-width: var(--sidebar-w);
+            background: var(--surface); border-right: 1px solid var(--border);
+            position: fixed; top: 0; left: 0; height: 100vh;
+            display: flex; flex-direction: column; overflow: hidden;
         }
-        .ps-header {
-            padding: 20px 16px 14px;
-            border-bottom: 1px solid var(--border);
-            background: var(--surface);
-            flex-shrink: 0;
-        }
-        .ps-back-row { font-size: 0.75rem; margin-bottom: 10px; }
+        .ps-header { padding: 20px 16px 14px; border-bottom: 1px solid var(--border); flex-shrink: 0; }
+        .ps-back-row { font-size: .75rem; margin-bottom: 10px; }
         .ps-back-row .back-link { color: var(--muted); text-decoration: none; transition: color .2s; }
         .ps-back-row .back-link:hover { color: var(--accent); }
         .ps-title { font-size: 1rem; font-weight: 700; color: var(--accent); margin-bottom: 2px; }
-        .ps-sub { font-size: 0.72rem; color: var(--muted); }
-
-        .ps-list {
-            flex: 1;
-            overflow-y: auto;
-            padding: 8px 0;
-        }
-        .ps-list::-webkit-scrollbar { width: 4px; }
+        .ps-sub { font-size: .72rem; color: var(--muted); }
+        .ps-list { flex: 1; overflow-y: auto; padding: 8px 0; }
+        .ps-list::-webkit-scrollbar { width: 3px; }
         .ps-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
-
-        .p-nav-item {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 8px 16px;
-            font-size: 0.82rem;
-            color: var(--muted);
-            text-decoration: none;
-            border-left: 3px solid transparent;
-            transition: all .15s;
-        }
+        .p-nav-item { display: flex; align-items: center; gap: 10px; padding: 8px 16px; font-size: .82rem; color: var(--muted); text-decoration: none; border-left: 3px solid transparent; transition: all .15s; }
         .p-nav-item:hover { background: var(--card); color: var(--text); }
-        .p-nav-item.active { background: #0b1120; border-left-color: var(--accent); color: var(--accent); }
-        .p-num { width: 20px; font-size: 0.7rem; font-weight: 700; color: var(--muted); flex-shrink: 0; }
+        .p-nav-item.active { background: var(--card); border-left-color: var(--accent); color: var(--accent); }
+        .p-num { width: 20px; font-size: .7rem; font-weight: 700; color: var(--muted); flex-shrink: 0; }
         .p-nav-item.active .p-num { color: var(--accent); }
-
-        .ps-footer {
-            padding: 14px 16px;
-            border-top: 1px solid var(--border);
-            flex-shrink: 0;
-        }
-        .ps-progress-label { font-size: 0.75rem; color: var(--muted); margin-bottom: 6px; }
+        .p-name { flex: 1; }
+        .m-dot { width: 6px; height: 6px; border-radius: 50%; background: transparent; flex-shrink: 0; transition: background .3s; }
+        .m-dot.done { background: #00ff9f; box-shadow: 0 0 4px #00ff9f; }
+        .ps-footer { padding: 14px 16px; border-top: 1px solid var(--border); flex-shrink: 0; }
+        .ps-progress-label { font-size: .75rem; color: var(--muted); margin-bottom: 6px; }
         .ps-bar-wrap { background: var(--border); border-radius: 4px; height: 4px; }
         .ps-bar-fill { background: var(--accent); height: 100%; border-radius: 4px; width: 0%; transition: width .4s; }
 
-        /* ── Main ─────────────────────────────────────── */
-        .main-content {
-            margin-left: var(--sidebar-w);
-            flex: 1;
-            max-width: 900px;
-            padding: 48px 48px 80px;
-        }
+        /* ── Main */
+        .main-content { margin-left: var(--sidebar-w); flex: 1; max-width: 900px; padding: 48px 48px 80px; }
 
-        /* ── Pattern header ───────────────────────────── */
-        .pattern-header {
-            margin-bottom: 36px;
-        }
-        .pattern-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            background: var(--card);
-            border: 1px solid var(--border);
-            border-radius: 999px;
-            padding: 4px 14px;
-            font-size: 0.75rem;
-            color: var(--muted);
-            margin-bottom: 16px;
-        }
+        /* ── Pattern header */
+        .pattern-header { margin-bottom: 32px; }
+        .pattern-badge { display: inline-flex; align-items: center; gap: 8px; background: var(--card); border: 1px solid var(--border); border-radius: 999px; padding: 4px 14px; font-size: .75rem; color: var(--muted); margin-bottom: 14px; }
         .pattern-badge .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 6px var(--accent); }
-        .pattern-title {
-            font-size: 2.4rem;
-            font-weight: 800;
-            color: var(--text);
-            line-height: 1.1;
-            margin-bottom: 12px;
-        }
+        .pattern-title { font-size: 2.4rem; font-weight: 800; color: var(--text); line-height: 1.1; margin-bottom: 10px; }
         .pattern-title span { color: var(--accent); }
-        .pattern-meta { font-size: 0.85rem; color: var(--muted); }
 
-        /* ── Animation card ───────────────────────────── */
-        .anim-card {
+        /* ── Complexity / tag chips */
+        .meta-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 28px; }
+        .chip { font-family: monospace; font-size: .72rem; padding: 4px 10px; border-radius: 4px; border: 1px solid; letter-spacing: .4px; }
+        .chip-tag  { color: var(--accent); border-color: var(--accent); background: rgba(255,255,255,.03); }
+        .chip-time { color: #ffb700; border-color: #ffb70044; background: #ffb70008; }
+        .chip-space { color: #b47fff; border-color: #b47fff44; background: #b47fff08; }
+
+        /* ── Visualization card */
+        .viz-card {
             background: var(--card);
             border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 24px;
+            border-radius: 14px;
+            overflow: hidden;
             margin-bottom: 36px;
         }
-        .anim-label {
-            font-size: 0.7rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: var(--muted);
-            margin-bottom: 12px;
-        }
-        #anim-container { }
-
-        /* ── Infographic ─────────────────────────────── */
-        .infographic-img {
-            width: 100%;
-            border-radius: 12px;
-            border: 1px solid var(--border);
-            margin-bottom: 36px;
-        }
-
-        /* ── Section content ─────────────────────────── */
-        .pattern-content h2 {
-            font-size: 1.3rem;
-            font-weight: 700;
-            color: var(--text);
-            margin: 36px 0 14px;
-            padding-bottom: 8px;
+        /* tab bar */
+        .viz-tabs {
+            display: flex;
             border-bottom: 1px solid var(--border);
+            background: var(--surface);
         }
-        .pattern-content h3 {
-            font-size: 1.05rem;
+        .viz-tab {
+            padding: 10px 20px;
+            font-size: .72rem;
             font-weight: 700;
-            color: var(--accent);
-            margin: 24px 0 8px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            font-family: monospace;
+            color: var(--muted);
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all .2s;
+            background: none;
+            border-top: none;
+            border-left: none;
+            border-right: none;
         }
+        .viz-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+        /* tab panels */
+        .viz-panel { display: none; padding: 24px; }
+        .viz-panel.active { display: block; }
+
+        /* anim panel inner */
+        .anim-inner { }
+
+        /* code panel */
+        .code-panel pre { margin: 0; font-size: .83rem; line-height: 1.75; border-radius: 8px; }
+
+        /* ── Infographic */
+        .infographic-img { width: 100%; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 36px; }
+
+        /* ── Content */
+        .pattern-content h2 { font-size: 1.3rem; font-weight: 700; color: var(--text); margin: 36px 0 14px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
+        .pattern-content h3 { font-size: 1.05rem; font-weight: 700; color: var(--accent); margin: 24px 0 8px; }
         .pattern-content p { color: #8a9abf; margin-bottom: 12px; line-height: 1.8; }
         .pattern-content ul, .pattern-content ol { margin: 8px 0 14px 22px; }
         .pattern-content li { color: #8a9abf; margin-bottom: 6px; line-height: 1.7; }
         .pattern-content li strong { color: var(--text); }
         .pattern-content pre { background: #0d1117; border: 1px solid var(--border); border-radius: 8px; padding: 18px; overflow-x: auto; margin: 14px 0; }
-        .pattern-content code { font-family: 'Fira Code', monospace; font-size: 0.85rem; }
-        .pattern-content p code { background: var(--card); border: 1px solid var(--border); padding: 1px 5px; border-radius: 4px; font-size: 0.82rem; color: var(--accent); }
-
-        .callout {
-            border-radius: 8px;
-            padding: 16px 20px;
-            margin: 16px 0;
-            font-size: 0.88rem;
-            border-left: 4px solid;
-        }
+        .pattern-content code { font-family: 'Fira Code', monospace; font-size: .85rem; }
+        .pattern-content p code { background: var(--card); border: 1px solid var(--border); padding: 1px 5px; border-radius: 4px; font-size: .82rem; color: var(--accent); }
+        .callout { border-radius: 8px; padding: 16px 20px; margin: 16px 0; font-size: .88rem; border-left: 4px solid; }
         .callout.info { background: #0e1a2e; border-color: #4da8ff; }
         .callout.warn { background: #1a1200; border-color: #ffb700; }
         .callout.tip  { background: #091a0e; border-color: #00ff9f; }
-        .callout-title { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; margin-bottom: 6px; }
+        .callout-title { font-size: .75rem; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; margin-bottom: 6px; }
         .callout.info .callout-title { color: #4da8ff; }
         .callout.warn .callout-title { color: #ffb700; }
         .callout.tip  .callout-title  { color: #00ff9f; }
         .callout p { color: #8a9abf !important; margin: 0 !important; }
 
-        /* ── Mark mastered ────────────────────────────── */
-        .mark-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            background: var(--card);
-            border: 1px solid var(--accent);
-            color: var(--accent);
-            padding: 12px 28px;
-            border-radius: 8px;
-            font-size: 0.9rem;
-            font-weight: 600;
-            cursor: pointer;
-            margin-top: 40px;
-            transition: all .2s;
-        }
+        /* ── Mark mastered */
+        .mark-btn { display: inline-flex; align-items: center; gap: 8px; background: var(--card); border: 1px solid var(--accent); color: var(--accent); padding: 12px 28px; border-radius: 8px; font-size: .9rem; font-weight: 600; cursor: pointer; margin-top: 40px; transition: all .2s; }
         .mark-btn:hover { background: var(--accent); color: var(--bg); }
         .mark-btn.mastered { background: var(--accent); color: var(--bg); }
 
-        /* ── Page nav ────────────────────────────────── */
-        .page-nav {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 60px;
-            padding-top: 24px;
-            border-top: 1px solid var(--border);
-        }
-        .pnav-btn {
-            color: var(--muted);
-            text-decoration: none;
-            font-size: 0.85rem;
-            padding: 8px 16px;
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            background: var(--card);
-            transition: all .2s;
-        }
+        /* ── Page nav */
+        .page-nav { display: flex; justify-content: space-between; align-items: center; margin-top: 60px; padding-top: 24px; border-top: 1px solid var(--border); }
+        .pnav-btn { color: var(--muted); text-decoration: none; font-size: .85rem; padding: 8px 16px; border: 1px solid var(--border); border-radius: 6px; background: var(--card); transition: all .2s; }
         .pnav-btn:hover { border-color: var(--accent); color: var(--accent); }
     </style>
 </head>
@@ -237,26 +157,26 @@
             <p class="ps-sub">20 Mastery Blueprints</p>
         </div>
         <div class="ps-list">
-        <a href="01-sliding-window.html" class="p-nav-item active" data-num="1"><span class="p-num">1</span><span class="p-name">Sliding Window</span></a>
-        <a href="02-two-pointers.html" class="p-nav-item" data-num="2"><span class="p-num">2</span><span class="p-name">Two Pointers</span></a>
-        <a href="03-fast-slow-pointers.html" class="p-nav-item" data-num="3"><span class="p-num">3</span><span class="p-name">Fast & Slow Pointers</span></a>
-        <a href="04-merge-intervals.html" class="p-nav-item" data-num="4"><span class="p-num">4</span><span class="p-name">Merge Intervals</span></a>
-        <a href="05-cyclic-sort.html" class="p-nav-item" data-num="5"><span class="p-num">5</span><span class="p-name">Cyclic Sort</span></a>
-        <a href="06-in-place-reversal.html" class="p-nav-item" data-num="6"><span class="p-num">6</span><span class="p-name">In-place Reversal</span></a>
-        <a href="07-tree-bfs.html" class="p-nav-item" data-num="7"><span class="p-num">7</span><span class="p-name">Tree BFS</span></a>
-        <a href="08-tree-dfs.html" class="p-nav-item" data-num="8"><span class="p-num">8</span><span class="p-name">Tree DFS</span></a>
-        <a href="09-two-heaps.html" class="p-nav-item" data-num="9"><span class="p-num">9</span><span class="p-name">Two Heaps</span></a>
-        <a href="10-subsets.html" class="p-nav-item" data-num="10"><span class="p-num">10</span><span class="p-name">Subsets</span></a>
-        <a href="11-modified-binary-search.html" class="p-nav-item" data-num="11"><span class="p-num">11</span><span class="p-name">Modified Binary Search</span></a>
-        <a href="12-top-k-elements.html" class="p-nav-item" data-num="12"><span class="p-num">12</span><span class="p-name">Top K Elements</span></a>
-        <a href="13-k-way-merge.html" class="p-nav-item" data-num="13"><span class="p-num">13</span><span class="p-name">K-way Merge</span></a>
-        <a href="14-topological-sort.html" class="p-nav-item" data-num="14"><span class="p-num">14</span><span class="p-name">Topological Sort</span></a>
-        <a href="15-prefix-sum.html" class="p-nav-item" data-num="15"><span class="p-num">15</span><span class="p-name">Prefix Sum</span></a>
-        <a href="16-monotonic-stack.html" class="p-nav-item" data-num="16"><span class="p-num">16</span><span class="p-name">Monotonic Stack</span></a>
-        <a href="17-union-find.html" class="p-nav-item" data-num="17"><span class="p-num">17</span><span class="p-name">Union Find</span></a>
-        <a href="18-dynamic-programming.html" class="p-nav-item" data-num="18"><span class="p-num">18</span><span class="p-name">Dynamic Programming</span></a>
-        <a href="19-greedy.html" class="p-nav-item" data-num="19"><span class="p-num">19</span><span class="p-name">Greedy</span></a>
-        <a href="20-bit-manipulation.html" class="p-nav-item" data-num="20"><span class="p-num">20</span><span class="p-name">Bit Manipulation</span></a>
+        <a href="01-sliding-window.html" class="p-nav-item active" data-num="1"><span class="p-num">1</span><span class="p-name">Sliding Window</span><span class="m-dot" id="m-dot-1"></span></a>
+        <a href="02-two-pointers.html" class="p-nav-item" data-num="2"><span class="p-num">2</span><span class="p-name">Two Pointers</span><span class="m-dot" id="m-dot-2"></span></a>
+        <a href="03-fast-slow-pointers.html" class="p-nav-item" data-num="3"><span class="p-num">3</span><span class="p-name">Fast & Slow Pointers</span><span class="m-dot" id="m-dot-3"></span></a>
+        <a href="04-merge-intervals.html" class="p-nav-item" data-num="4"><span class="p-num">4</span><span class="p-name">Merge Intervals</span><span class="m-dot" id="m-dot-4"></span></a>
+        <a href="05-cyclic-sort.html" class="p-nav-item" data-num="5"><span class="p-num">5</span><span class="p-name">Cyclic Sort</span><span class="m-dot" id="m-dot-5"></span></a>
+        <a href="06-in-place-reversal.html" class="p-nav-item" data-num="6"><span class="p-num">6</span><span class="p-name">In-place Reversal</span><span class="m-dot" id="m-dot-6"></span></a>
+        <a href="07-tree-bfs.html" class="p-nav-item" data-num="7"><span class="p-num">7</span><span class="p-name">Tree BFS</span><span class="m-dot" id="m-dot-7"></span></a>
+        <a href="08-tree-dfs.html" class="p-nav-item" data-num="8"><span class="p-num">8</span><span class="p-name">Tree DFS</span><span class="m-dot" id="m-dot-8"></span></a>
+        <a href="09-two-heaps.html" class="p-nav-item" data-num="9"><span class="p-num">9</span><span class="p-name">Two Heaps</span><span class="m-dot" id="m-dot-9"></span></a>
+        <a href="10-subsets.html" class="p-nav-item" data-num="10"><span class="p-num">10</span><span class="p-name">Subsets</span><span class="m-dot" id="m-dot-10"></span></a>
+        <a href="11-modified-binary-search.html" class="p-nav-item" data-num="11"><span class="p-num">11</span><span class="p-name">Modified Binary Search</span><span class="m-dot" id="m-dot-11"></span></a>
+        <a href="12-top-k-elements.html" class="p-nav-item" data-num="12"><span class="p-num">12</span><span class="p-name">Top K Elements</span><span class="m-dot" id="m-dot-12"></span></a>
+        <a href="13-k-way-merge.html" class="p-nav-item" data-num="13"><span class="p-num">13</span><span class="p-name">K-way Merge</span><span class="m-dot" id="m-dot-13"></span></a>
+        <a href="14-topological-sort.html" class="p-nav-item" data-num="14"><span class="p-num">14</span><span class="p-name">Topological Sort</span><span class="m-dot" id="m-dot-14"></span></a>
+        <a href="15-prefix-sum.html" class="p-nav-item" data-num="15"><span class="p-num">15</span><span class="p-name">Prefix Sum</span><span class="m-dot" id="m-dot-15"></span></a>
+        <a href="16-monotonic-stack.html" class="p-nav-item" data-num="16"><span class="p-num">16</span><span class="p-name">Monotonic Stack</span><span class="m-dot" id="m-dot-16"></span></a>
+        <a href="17-union-find.html" class="p-nav-item" data-num="17"><span class="p-num">17</span><span class="p-name">Union Find</span><span class="m-dot" id="m-dot-17"></span></a>
+        <a href="18-dynamic-programming.html" class="p-nav-item" data-num="18"><span class="p-num">18</span><span class="p-name">Dynamic Programming</span><span class="m-dot" id="m-dot-18"></span></a>
+        <a href="19-greedy.html" class="p-nav-item" data-num="19"><span class="p-num">19</span><span class="p-name">Greedy</span><span class="m-dot" id="m-dot-19"></span></a>
+        <a href="20-bit-manipulation.html" class="p-nav-item" data-num="20"><span class="p-num">20</span><span class="p-name">Bit Manipulation</span><span class="m-dot" id="m-dot-20"></span></a>
         </div>
         <div class="ps-footer">
             <div class="ps-progress-label"><span id="solved-count">0</span> / 20 mastered</div>
@@ -271,16 +191,36 @@
             <div class="dot"></div>
             Pattern 01 of 20
         </div>
-        <h1 class="pattern-title">
-            <span>Sliding Window</span>
-        </h1>
-        <p class="pattern-meta">A fundamental algorithmic blueprint used across FAANG interviews.</p>
+        <h1 class="pattern-title"><span>Sliding Window</span></h1>
     </div>
 
-    <!-- Live Animation -->
-    <div class="anim-card">
-        <div class="anim-label">Live Visualization</div>
-        <div id="anim-container" data-color="#00e5ff"></div>
+    <!-- Complexity chips -->
+    <div class="meta-chips">
+        <span class="chip chip-tag">Array</span>
+        <span class="chip chip-time">⏱ Time: O(N)</span>
+        <span class="chip chip-space">📦 Space: O(K)</span>
+    </div>
+
+    <!-- Visualization + Code card -->
+    <div class="viz-card">
+        <div class="viz-tabs">
+            <button class="viz-tab active" onclick="switchTab(this,'anim-panel-1')">▶ Animation</button>
+            <button class="viz-tab" onclick="switchTab(this,'code-panel-1')">⌨ Python</button>
+        </div>
+        <div id="anim-panel-1" class="viz-panel active">
+            <div class="anim-inner" id="anim-container" data-color="#00e5ff"></div>
+        </div>
+        <div id="code-panel-1" class="viz-panel code-panel">
+            <pre><code class="language-python">def sliding_window(nums, k):
+  left, best, window = 0, 0, 0
+  for right in range(len(nums)):
+    window += nums[right]          # expand
+    while window &gt; k:              # shrink
+      window -= nums[left]
+      left += 1
+    best = max(best, right-left+1) # record
+  return best</code></pre>
+        </div>
     </div>
 
     <!-- Infographic -->
@@ -446,11 +386,29 @@ Step 4: hit 'a', window becomes 'bca', max=3</pre>
 <script>
     hljs.highlightAll();
 
-    // Fire the animation for this pattern
+    // Tab switcher
+    function switchTab(btn, panelId) {
+        btn.closest('.viz-card').querySelectorAll('.viz-tab').forEach(t => t.classList.remove('active'));
+        btn.closest('.viz-card').querySelectorAll('.viz-panel').forEach(p => p.classList.remove('active'));
+        btn.classList.add('active');
+        document.getElementById(panelId).classList.add('active');
+    }
+
+    // Fire the animation
     new PatternAnimator('anim-container', renderSlidingWindow, 600);
 
-    // Progress / Mastered tracking
+    // Progress / mastered
     let mastered = JSON.parse(localStorage.getItem('patterns-mastered') || '[]');
+
+    function updateProgress() {
+        const n = mastered.length;
+        document.getElementById('solved-count').textContent = n;
+        document.getElementById('progress-fill').style.width = (n / 20 * 100) + '%';
+        mastered.forEach(s => {
+            const num = [1: "sliding-window",2: "two-pointers",3: "fast-slow-pointers",4: "merge-intervals",5: "cyclic-sort",6: "in-place-reversal",7: "tree-bfs",8: "tree-dfs",9: "two-heaps",10: "subsets",11: "modified-binary-search",12: "top-k-elements",13: "k-way-merge",14: "topological-sort",15: "prefix-sum",16: "monotonic-stack",17: "union-find",18: "dynamic-programming",19: "greedy",20: "bit-manipulation"][s] || null;
+            // light up sidebar dots
+        });
+    }
 
     function markMastered(slug, btn) {
         if (!mastered.includes(slug)) {
@@ -460,24 +418,32 @@ Step 4: hit 'a', window becomes 'bca', max=3</pre>
         btn.textContent = '★ Mastered!';
         btn.classList.add('mastered');
         const item = document.querySelector('.p-nav-item.active');
-        if (item) item.style.borderLeftColor = '#00ff9f';
+        if (item) {
+            item.style.borderLeftColor = '#00ff9f';
+            const dot = item.querySelector('.m-dot');
+            if (dot) dot.classList.add('done');
+        }
         updateProgress();
     }
 
-    function updateProgress() {
-        const n = mastered.length;
-        document.getElementById('solved-count').textContent = n;
-        document.getElementById('progress-fill').style.width = (n / 20 * 100) + '%';
-    }
-
-    // Restore mastered state on load
-    mastered.forEach(slug => {
-        if (slug === 'sliding-window') {
-            const btn = document.getElementById('mark-btn');
-            if (btn) { btn.textContent = '★ Mastered!'; btn.classList.add('mastered'); }
-        }
-    });
-    updateProgress();
+    // Restore on load
+    (function() {
+        const slugMap = {"sliding-window": 1,"two-pointers": 2,"fast-slow-pointers": 3,"merge-intervals": 4,"cyclic-sort": 5,"in-place-reversal": 6,"tree-bfs": 7,"tree-dfs": 8,"two-heaps": 9,"subsets": 10,"modified-binary-search": 11,"top-k-elements": 12,"k-way-merge": 13,"topological-sort": 14,"prefix-sum": 15,"monotonic-stack": 16,"union-find": 17,"dynamic-programming": 18,"greedy": 19,"bit-manipulation": 20};
+        mastered.forEach(s => {
+            const n = slugMap[s];
+            if (n) {
+                const dot = document.getElementById('m-dot-' + n);
+                if (dot) dot.classList.add('done');
+                const item = document.querySelector('.p-nav-item[data-num="' + n + '"]');
+                if (item) item.style.borderLeftColor = '#00ff9f';
+            }
+            if (s === 'sliding-window') {
+                const btn = document.getElementById('mark-btn');
+                if (btn) { btn.textContent = '★ Mastered!'; btn.classList.add('mastered'); }
+            }
+        });
+        updateProgress();
+    })();
 </script>
 </body>
 </html>

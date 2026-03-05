@@ -27,25 +27,92 @@ const T = {
 };
 
 class PatternAnimator {
-  constructor(containerId, renderFn, interval = 600) {
-    this.container = document.getElementById(containerId);
-    if (!this.container) return;
+  constructor(containerId, renderFn, interval = 600, statusFn = null) {
+    this.wrapper = document.getElementById(containerId);
+    if (!this.wrapper) return;
     this.renderFn = renderFn;
+    this.statusFn = statusFn;
     this.interval = interval;
     this.tick = 0;
-    this.color = this.container.dataset.color || T.colors.cyan;
-    this.start();
+    this.paused = false;
+    this.color = this.wrapper.dataset.color || T.colors.cyan;
+    this._buildUI();
+    this._loop();
   }
 
-  start() {
-    const update = () => {
-      this.container.innerHTML = this.renderFn(this.tick, this.color);
-      this.tick++;
-      setTimeout(() => requestAnimationFrame(update), this.interval);
+  _buildUI() {
+    this.svgEl = document.createElement('div');
+    this.svgEl.style.cssText = `background:${T.bg};border-radius:10px;padding:16px 12px 8px;
+      border:1px solid ${T.border};min-height:90px;`;
+
+    this.statusEl = document.createElement('div');
+    this.statusEl.style.cssText = `font-family:monospace;font-size:11px;color:${T.muted};
+      text-align:center;margin-top:8px;min-height:18px;letter-spacing:.3px;transition:color .3s;`;
+
+    const ctrl = document.createElement('div');
+    ctrl.style.cssText = `display:flex;align-items:center;justify-content:space-between;
+      margin-top:10px;gap:8px;flex-wrap:wrap;`;
+
+    const btnStyle = (col) => `background:${T.card};border:1px solid ${col}55;color:${col};
+      border-radius:6px;padding:5px 12px;font-size:11px;font-weight:700;
+      font-family:monospace;cursor:pointer;letter-spacing:.4px;transition:all .2s;`;
+
+    this.playBtn = document.createElement('button');
+    this.playBtn.innerHTML = '⏸ Pause';
+    this.playBtn.style.cssText = btnStyle(this.color);
+    this.playBtn.onclick = () => { this.paused = !this.paused; this.playBtn.innerHTML = this.paused ? '▶ Play' : '⏸ Pause'; };
+
+    const stepBtn = document.createElement('button');
+    stepBtn.innerHTML = '⏭ Step';
+    stepBtn.style.cssText = btnStyle(T.muted);
+    stepBtn.onclick = () => { this.paused = true; this.playBtn.innerHTML = '▶ Play'; this._render(); };
+
+    const resetBtn = document.createElement('button');
+    resetBtn.innerHTML = '↺ Reset';
+    resetBtn.style.cssText = btnStyle(T.muted);
+    resetBtn.onclick = () => { this.tick = 0; this._render(); };
+
+    const speedWrap = document.createElement('div');
+    speedWrap.style.cssText = 'display:flex;align-items:center;gap:5px;margin-left:auto;';
+    const sLabel = document.createElement('span');
+    sLabel.textContent = 'Speed:';
+    sLabel.style.cssText = `font-family:monospace;font-size:10px;color:${T.muted};`;
+    const sel = document.createElement('select');
+    sel.style.cssText = `background:${T.card};border:1px solid ${T.border};color:${this.color};
+      border-radius:4px;padding:3px 6px;font-size:10px;font-family:monospace;cursor:pointer;`;
+    [['0.5×', 1200], ['1×', 600], ['2×', 300], ['3×', 150]].forEach(([lbl, ms]) => {
+      const o = document.createElement('option'); o.value = ms; o.textContent = lbl;
+      if (ms === 600) o.selected = true; sel.appendChild(o);
+    });
+    sel.onchange = () => { this.interval = parseInt(sel.value); };
+    speedWrap.append(sLabel, sel);
+
+    this.tickEl = document.createElement('span');
+    this.tickEl.style.cssText = `font-family:monospace;font-size:10px;color:${T.muted};`;
+
+    ctrl.append(this.playBtn, stepBtn, resetBtn, speedWrap, this.tickEl);
+    this.wrapper.append(this.svgEl, this.statusEl, ctrl);
+  }
+
+  _render() {
+    if (!this.paused) this.tick++;
+    this.svgEl.innerHTML = this.renderFn(this.tick, this.color);
+    if (this.statusFn) {
+      const r = this.statusFn(this.tick, this.color);
+      if (r) { this.statusEl.textContent = r.text || ''; this.statusEl.style.color = r.color || T.muted; }
+    }
+    this.tickEl.textContent = `step ${this.tick}`;
+  }
+
+  _loop() {
+    const frame = () => {
+      if (!this.paused) this._render();
+      setTimeout(() => requestAnimationFrame(frame), this.interval);
     };
-    requestAnimationFrame(update);
+    requestAnimationFrame(frame);
   }
 }
+
 
 /* 1 · Sliding Window */
 function renderSlidingWindow(tick, color) {
