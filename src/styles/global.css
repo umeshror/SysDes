@@ -1,42 +1,90 @@
 /* ─────────────────────────────────────────────────────
-   Global design tokens — imported in Base.astro
-   All sections share these values.
+   Global design system — imported once in Base.astro
+   Supports dark (default) + light theme via data-theme="light"
 ───────────────────────────────────────────────────── */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Fira+Code:wght@400;500&display=swap');
 
+/* ── Dark theme (default) ───────────────────────────── */
 :root {
-    /* ── Brand colours */
-    --accent: #00ffd5;
-    --accent2: #b47fff;
-    --success: #00ff9f;
-    --warn: #ffb700;
-    --danger: #ff5470;
+    /* Brand */
+    --accent: #00d4aa;
+    --accent2: #9b6fff;
+    --success: #00c87a;
+    --warn: #e6a600;
+    --danger: #e8445f;
 
-    /* ── Surface palette */
+    /* Surfaces */
     --bg: #03050d;
     --surface: #070c1a;
     --card: #0b1120;
-    --border: #131d35;
+    --border: #1a2540;
 
-    /* ── Text */
+    /* Text */
     --text: #c8d4f0;
     --dim: #8a9abf;
     --muted: #3a4a70;
 
-    /* ── Layout */
+    /* Sidebar */
+    --sidebar-bg: #070c1a;
+    --sidebar-item: #3a4a70;
+    --sidebar-active-bg: #0b1120;
+    --sidebar-active-text: #00d4aa;
+
+    /* Code */
+    --code-bg: #0b1120;
+
+    /* Layout */
     --sidebar-w: 280px;
     --navbar-h: 54px;
     --max-w: 900px;
 
-    /* ── Type scale */
+    /* Type */
     --font-body: 'Inter', system-ui, sans-serif;
     --font-code: 'Fira Code', monospace;
 
-    /* ── Motion */
+    /* Motion */
     --ease: cubic-bezier(.4, 0, .2, 1);
     --dur-fast: 150ms;
     --dur-base: 200ms;
     --dur-slow: 300ms;
+
+    /* Shadows */
+    --shadow-sm: 0 1px 4px rgba(0, 0, 0, .4);
+    --shadow-md: 0 4px 20px rgba(0, 0, 0, .5);
+}
+
+/* ── Light theme ────────────────────────────────────── */
+html[data-theme="light"] {
+    /* Brand — slightly shifted for contrast on white */
+    --accent: #007a62;
+    --accent2: #6b3fd4;
+    --success: #1a9c5e;
+    --warn: #b87800;
+    --danger: #c0304a;
+
+    /* Surfaces */
+    --bg: #f5f6fa;
+    --surface: #ffffff;
+    --card: #ffffff;
+    --border: #dde1ec;
+
+    /* Text */
+    --text: #1a1f36;
+    --dim: #4a5068;
+    --muted: #8c92aa;
+
+    /* Sidebar */
+    --sidebar-bg: #ffffff;
+    --sidebar-item: #8c92aa;
+    --sidebar-active-bg: #f0fdf9;
+    --sidebar-active-text: #007a62;
+
+    /* Code */
+    --code-bg: #f0f2f8;
+
+    /* Shadows */
+    --shadow-sm: 0 1px 4px rgba(0, 0, 0, .08);
+    --shadow-md: 0 4px 20px rgba(0, 0, 0, .10);
 }
 
 *,
@@ -53,6 +101,7 @@ body {
     color: var(--text);
     -webkit-font-smoothing: antialiased;
     min-height: 100vh;
+    transition: background var(--dur-base) var(--ease), color var(--dur-base) var(--ease);
 }
 
 /* ── Scrollbar */
@@ -148,26 +197,26 @@ body {
 
 .chip-accent {
     color: var(--accent);
-    border-color: rgba(0, 255, 213, .25);
-    background: rgba(0, 255, 213, .05);
+    border-color: color-mix(in srgb, var(--accent) 30%, transparent);
+    background: color-mix(in srgb, var(--accent) 8%, transparent);
 }
 
 .chip-warn {
     color: var(--warn);
-    border-color: rgba(255, 183, 0, .25);
-    background: rgba(255, 183, 0, .05);
+    border-color: color-mix(in srgb, var(--warn) 30%, transparent);
+    background: color-mix(in srgb, var(--warn) 8%, transparent);
 }
 
 .chip-purple {
     color: var(--accent2);
-    border-color: rgba(180, 127, 255, .25);
-    background: rgba(180, 127, 255, .05);
+    border-color: color-mix(in srgb, var(--accent2) 30%, transparent);
+    background: color-mix(in srgb, var(--accent2) 8%, transparent);
 }
 
 .chip-success {
     color: var(--success);
-    border-color: rgba(0, 255, 159, .25);
-    background: rgba(0, 255, 159, .05);
+    border-color: color-mix(in srgb, var(--success) 30%, transparent);
+    background: color-mix(in srgb, var(--success) 8%, transparent);
 }
 
 /* ── Section dividers */

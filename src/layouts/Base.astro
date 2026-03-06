@@ -31,6 +31,14 @@ const {
 
   <title>{title}</title>
 
+  <!-- Flash prevention: apply saved theme BEFORE first paint -->
+  <script is:inline>
+    (function() {
+      var t = localStorage.getItem('theme');
+      if (t === 'light') document.documentElement.setAttribute('data-theme', 'light');
+    })();
+  </script>
+
   <!-- Highlight.js for code blocks -->
   <link rel="stylesheet"
         href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css" />
