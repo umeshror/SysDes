@@ -1,0 +1,21 @@
+<nav class="sidebar" style="display:flex;flex-direction:column">
+    <div class="sidebar-header">
+        <div style="margin-bottom:14px; font-size: 0.9em; display:flex; gap:8px; flex-wrap:wrap;">
+            <a href="{{ROOT_PATH}}index.html" class="back-link">Home</a>|
+            <a href="{{ROOT_PATH}}pages/01-introduction.html" class="back-link">SysDes</a>|
+            <a href="{{ROOT_PATH}}blind75/index.html" class="back-link">Blind 75</a>|
+            <a href="{{ROOT_PATH}}top150/index.html" class="back-link">Top 150</a>|
+            <a href="{{ROOT_PATH}}patterns/01-sliding-window.html" class="back-link">Patterns</a>
+        </div>
+        <h1>{{SECTION_TITLE}}</h1>
+        <p>{{SECTION_SUBTITLE}}</p>
+    </div>
+
+    {{SEARCH_BAR_HTML}}
+
+    <div class="sidebar-scroll" id="sidebar-list">
+        {{SIDEBAR_CONTENT}}
+    </div>
+
+    {{PROGRESS_FOOTER_HTML}}
+</nav>
