@@ -1,0 +1,246 @@
+[
+    {
+        "num": 1,
+        "slug": "sliding-window",
+        "name": "Sliding Window",
+        "type": "Array / String",
+        "desc": "Maintain a moving subarray to find optimal subarrays without recomputing from scratch.",
+        "time": "O(N)",
+        "space": "O(1)",
+        "tags": [
+            "Array",
+            "String"
+        ]
+    },
+    {
+        "num": 2,
+        "slug": "two-pointers",
+        "name": "Two Pointers",
+        "type": "Array / String",
+        "desc": "Use two indices moving toward or away from each other to solve pair/subarray problems in linear time.",
+        "time": "O(N)",
+        "space": "O(1)",
+        "tags": [
+            "Array",
+            "String"
+        ]
+    },
+    {
+        "num": 3,
+        "slug": "fast-slow-pointers",
+        "name": "Fast & Slow Pointers",
+        "type": "Linked List",
+        "desc": "Floyd's cycle detection — detect loops, find midpoints, and identify entry nodes in O(1) space.",
+        "time": "O(N)",
+        "space": "O(1)",
+        "tags": [
+            "LinkedList"
+        ]
+    },
+    {
+        "num": 4,
+        "slug": "merge-intervals",
+        "name": "Merge Intervals",
+        "type": "Array / Sorting",
+        "desc": "Sort intervals then merge overlapping ones — the backbone of scheduling and calendar problems.",
+        "time": "O(N log N)",
+        "space": "O(N)",
+        "tags": [
+            "Array"
+        ]
+    },
+    {
+        "num": 5,
+        "slug": "cyclic-sort",
+        "name": "Cyclic Sort",
+        "type": "Array / In-place",
+        "desc": "Place each number at its correct index in one pass — ideal for missing/duplicate number problems.",
+        "time": "O(N)",
+        "space": "O(1)",
+        "tags": [
+            "Array"
+        ]
+    },
+    {
+        "num": 6,
+        "slug": "in-place-reversal",
+        "name": "In-place Reversal",
+        "type": "Linked List",
+        "desc": "Reverse a linked list (or sublist) in place using pointer manipulation — no extra memory needed.",
+        "time": "O(N)",
+        "space": "O(1)",
+        "tags": [
+            "LinkedList"
+        ]
+    },
+    {
+        "num": 7,
+        "slug": "tree-bfs",
+        "name": "Tree BFS",
+        "type": "Tree / Queue",
+        "desc": "Level-order traversal using a queue — the key to zigzag, right-view, and level-average problems.",
+        "time": "O(N)",
+        "space": "O(W)",
+        "tags": [
+            "Tree"
+        ]
+    },
+    {
+        "num": 8,
+        "slug": "tree-dfs",
+        "name": "Tree DFS",
+        "type": "Tree / Recursion",
+        "desc": "Pre/In/Post-order recursive traversal — covers path sums, diameter, and subtree queries.",
+        "time": "O(N)",
+        "space": "O(H)",
+        "tags": [
+            "Tree"
+        ]
+    },
+    {
+        "num": 9,
+        "slug": "two-heaps",
+        "name": "Two Heaps",
+        "type": "Heap / Priority Queue",
+        "desc": "Maintain a max-heap and min-heap to track the median of a sliding dataset in O(log N) per insert.",
+        "time": "O(log N)",
+        "space": "O(N)",
+        "tags": [
+            "Heap"
+        ]
+    },
+    {
+        "num": 10,
+        "slug": "subsets",
+        "name": "Subsets",
+        "type": "Backtracking / BFS",
+        "desc": "Generate all subsets, permutations, and combinations using BFS expansion or DFS backtracking.",
+        "time": "O(2^N)",
+        "space": "O(2^N)",
+        "tags": [
+            "Backtracking"
+        ]
+    },
+    {
+        "num": 11,
+        "slug": "modified-binary-search",
+        "name": "Modified Binary Search",
+        "type": "Array / Search",
+        "desc": "Extend binary search for rotated arrays, infinite lists, and minimum/maximum constraint problems.",
+        "time": "O(log N)",
+        "space": "O(1)",
+        "tags": [
+            "Array"
+        ]
+    },
+    {
+        "num": 12,
+        "slug": "top-k-elements",
+        "name": "Top K Elements",
+        "type": "Heap / QuickSelect",
+        "desc": "Maintain a size-K heap to find top-K frequent, largest, or closest elements without full sort.",
+        "time": "O(N log K)",
+        "space": "O(K)",
+        "tags": [
+            "Heap"
+        ]
+    },
+    {
+        "num": 13,
+        "slug": "k-way-merge",
+        "name": "K-way Merge",
+        "type": "Heap / Merge",
+        "desc": "Merge K sorted lists using a min-heap to always extract the global minimum in O(N log K).",
+        "time": "O(N log K)",
+        "space": "O(K)",
+        "tags": [
+            "Heap"
+        ]
+    },
+    {
+        "num": 14,
+        "slug": "topological-sort",
+        "name": "Topological Sort",
+        "type": "Graph / DAG",
+        "desc": "Order nodes in a DAG respecting dependency constraints — core to build order and scheduling problems.",
+        "time": "O(V+E)",
+        "space": "O(V)",
+        "tags": [
+            "Graph"
+        ]
+    },
+    {
+        "num": 15,
+        "slug": "prefix-sum",
+        "name": "Prefix Sum",
+        "type": "Array / DP",
+        "desc": "Precompute cumulative sums to answer range queries in O(1) after O(N) preprocessing.",
+        "time": "O(1) query",
+        "space": "O(N)",
+        "tags": [
+            "Array"
+        ]
+    },
+    {
+        "num": 16,
+        "slug": "monotonic-stack",
+        "name": "Monotonic Stack",
+        "type": "Stack / Array",
+        "desc": "Maintain a monotonically increasing/decreasing stack to find next/previous greater elements in O(N).",
+        "time": "O(N)",
+        "space": "O(N)",
+        "tags": [
+            "Stack",
+            "Array"
+        ]
+    },
+    {
+        "num": 17,
+        "slug": "union-find",
+        "name": "Union Find",
+        "type": "Graph / Disjoint Set",
+        "desc": "Track connected components with near-constant union/find operations using path compression.",
+        "time": "O(α·N)",
+        "space": "O(N)",
+        "tags": [
+            "Graph"
+        ]
+    },
+    {
+        "num": 18,
+        "slug": "dynamic-programming",
+        "name": "Dynamic Programming",
+        "type": "DP / Memoization",
+        "desc": "Break problems into overlapping subproblems and store results — covers 0/1 knapsack, LCS, and coin change.",
+        "time": "O(N·M)",
+        "space": "O(N·M)",
+        "tags": [
+            "DP"
+        ]
+    },
+    {
+        "num": 19,
+        "slug": "greedy",
+        "name": "Greedy",
+        "type": "Array / Interval",
+        "desc": "Make the locally optimal choice at each step — works when a greedy choice leads to global optimum.",
+        "time": "O(N log N)",
+        "space": "O(1)",
+        "tags": [
+            "Array",
+            "DP"
+        ]
+    },
+    {
+        "num": 20,
+        "slug": "bit-manipulation",
+        "name": "Bit Manipulation",
+        "type": "Bit Operations",
+        "desc": "XOR, AND, OR, and bit shifts to solve low-level problems — single number, power of two, and more.",
+        "time": "O(N)",
+        "space": "O(1)",
+        "tags": [
+            "Bit"
+        ]
+    }
+]

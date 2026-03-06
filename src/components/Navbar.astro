@@ -1,0 +1,107 @@
+---
+/**
+ * Navbar.astro — Sticky top navigation bar, shared across all sections.
+ *
+ * Props:
+ *   active: which nav item to highlight ('home'|'blind75'|'top150'|'patterns'|'sysdes')
+ *   homeHref: base href for the Home logo link (default '/')
+ */
+export interface Props {
+  active?: string;
+  homeHref?: string;
+}
+
+const { active = '', homeHref = '/' } = Astro.props;
+
+const navItems = [
+  { id: 'blind75',  label: 'Blind 75',      href: '/blind75/'  },
+  { id: 'top150',   label: 'Top 150',        href: '/top150/'   },
+  { id: 'patterns', label: 'Patterns',       href: '/patterns/' },
+  { id: 'sysdes',   label: 'System Design',  href: '/sysdes/'   },
+];
+---
+
+<nav class="topnav">
+  <div class="nav-inner">
+    <a href={homeHref} class="nav-logo">Umesh Saruk</a>
+
+    <!-- Mobile toggle -->
+    <button class="nav-toggle" aria-label="Toggle Navigation" aria-expanded="false" id="nav-toggle">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none"
+           stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="3" y1="12" x2="21" y2="12"/>
+        <line x1="3" y1="6"  x2="21" y2="6" />
+        <line x1="3" y1="18" x2="21" y2="18"/>
+      </svg>
+    </button>
+
+    <ul class="nav-list" id="nav-list">
+      {navItems.map(item => (
+        <li>
+          <a
+            href={item.href}
+            class:list={['nav-link', { 'nav-active': active === item.id }]}
+          >
+            {item.label}
+          </a>
+        </li>
+      ))}
+    </ul>
+  </div>
+</nav>
+
+<style>
+  .topnav {
+    position: sticky; top: 0; z-index: 200;
+    background: rgba(3,5,13,.9);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border-bottom: 1px solid var(--border);
+    height: var(--navbar-h);
+  }
+  .nav-inner {
+    max-width: 1200px; margin: 0 auto; padding: 0 1.5rem;
+    height: 100%; display: flex; align-items: center; gap: 1rem;
+  }
+  .nav-logo {
+    font-weight: 700; font-size: .95rem;
+    color: var(--text); text-decoration: none;
+    letter-spacing: -.01em; flex-shrink: 0;
+    transition: color var(--dur-fast) var(--ease);
+  }
+  .nav-logo:hover { color: var(--accent); }
+
+  .nav-list {
+    display: flex; gap: .15rem; list-style: none; margin-left: auto;
+  }
+  .nav-link {
+    font-size: .83rem; font-weight: 500;
+    color: var(--muted); text-decoration: none;
+    padding: .35rem .8rem; border-radius: 5px;
+    transition: all var(--dur-fast) var(--ease);
+  }
+  .nav-link:hover  { color: var(--text); background: rgba(200,212,240,.06); }
+  .nav-active      { color: var(--accent) !important; }
+
+  .nav-toggle { display: none; background: none; border: none; cursor: pointer; color: var(--text); }
+
+  @media (max-width: 640px) {
+    .nav-toggle { display: flex; margin-left: auto; }
+    .nav-list {
+      display: none; position: absolute; top: var(--navbar-h); left: 0; right: 0;
+      background: var(--surface); border-bottom: 1px solid var(--border);
+      flex-direction: column; padding: 12px 0;
+    }
+    .nav-list.open { display: flex; }
+    .nav-link { padding: .6rem 1.5rem; border-radius: 0; }
+  }
+</style>
+
+<script>
+  const toggle = document.getElementById('nav-toggle');
+  const list   = document.getElementById('nav-list');
+  toggle?.addEventListener('click', () => {
+    const open = list?.classList.toggle('open');
+    toggle.setAttribute('aria-expanded', String(open));
+  });
+</script>

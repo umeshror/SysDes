@@ -1,0 +1,117 @@
+---
+/**
+ * patterns/[slug].astro — Dynamic route for each of the 20 patterns.
+ * getStaticPaths() tells Astro which slugs to pre-render.
+ * The page body is loaded from the existing pattern HTML files (in /patterns/)
+ * via content injection — we preserve the animation canvas and code tabs.
+ */
+import PatternLayout from '../../layouts/PatternLayout.astro';
+import patterns from '../../data/patterns.json';
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
+
+export function getStaticPaths() {
+  return patterns.map(p => ({
+    params: { slug: p.slug },
+    props:  { pattern: p },
+  }));
+}
+
+const { pattern } = Astro.props;
+
+// Read the existing static HTML file for this pattern and pull out
+// the <main> body content so we can embed it in the new layout.
+// During migration: if the file doesn't exist yet, show a placeholder.
+let bodyContent = '';
+try {
+  const filePath = resolve(process.cwd(), `patterns/${String(pattern.num).padStart(2,'0')}-${pattern.slug}.html`);
+  const raw = readFileSync(filePath, 'utf8');
+  // Extract everything inside <main class="main-content">...</main>
+  const match = raw.match(/<main[^>]*class="main-content"[^>]*>([\s\S]*?)<\/main>/i);
+  // Strip the trailing page-nav since PatternLayout adds its own
+  let inner = match ? match[1] : '';
+  inner = inner.replace(/<nav[^>]*class="page-nav"[^>]*>[\s\S]*?<\/nav>/i, '');
+  bodyContent = inner.trim();
+} catch {
+  bodyContent = `
+    <div class="pattern-header">
+      <div class="pattern-badge"><div class="dot"></div>Pattern ${String(pattern.num).padStart(2,'0')} of 20</div>
+      <h1 class="pattern-title"><span>${pattern.name}</span></h1>
+    </div>
+    <div class="meta-chips">
+      <span class="chip chip-accent">${pattern.type}</span>
+      <span class="chip chip-warn">⏱ Time: ${pattern.time}</span>
+      <span class="chip chip-purple">Space: ${pattern.space}</span>
+    </div>
+    <div class="pattern-content">
+      <h2>Overview</h2>
+      <p>${pattern.desc}</p>
+      <p style="color:var(--muted);font-size:.85rem;margin-top:24px;">
+        Full editorial with animation and code tabs coming soon.
+      </p>
+    </div>
+  `;
+}
+---
+
+<PatternLayout
+  currentNum={pattern.num}
+  title={`Pattern ${pattern.num}: ${pattern.name} — Coding Interview Patterns`}
+  description={pattern.desc}
+>
+  <!-- Render the extracted / generated body content -->
+  <Fragment set:html={bodyContent} />
+
+  <!-- Inject animation JS (existing file) -->
+  <script src="/js/pattern-animations.js" is:inline></script>
+</PatternLayout>
+
+<style is:global>
+  /* ── Pattern page shared styles (supplement PatternLayout) */
+  .pattern-header   { margin-bottom: 28px; }
+  .pattern-badge    {
+    display: inline-flex; align-items: center; gap: 7px;
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 999px; padding: 4px 14px;
+    font-size: .72rem; color: var(--muted); margin-bottom: 12px;
+  }
+  .pattern-badge .dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--accent); box-shadow: 0 0 6px var(--accent);
+  }
+  .pattern-title    { font-size: clamp(1.8rem,3.5vw,2.4rem); font-weight: 800; color: var(--text); }
+  .pattern-title span { color: var(--accent); }
+  .meta-chips       { display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 26px; }
+
+  /* ── Visualization card */
+  .viz-card         {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 12px; overflow: hidden; margin-bottom: 32px;
+  }
+  .viz-tabs         { display: flex; border-bottom: 1px solid var(--border); background: var(--surface); }
+  .viz-tab          {
+    padding: 9px 18px; font-size: .7rem; font-weight: 700; letter-spacing: 1px;
+    text-transform: uppercase; font-family: var(--font-code);
+    color: var(--muted); cursor: pointer;
+    border-bottom: 2px solid transparent;
+    background: none; border-top: none; border-left: none; border-right: none;
+    transition: all var(--dur-base);
+  }
+  .viz-tab.active   { color: var(--accent); border-bottom-color: var(--accent); }
+  .viz-panel        { display: none; padding: 22px; }
+  .viz-panel.active { display: block; }
+  .code-panel pre   { margin: 0; font-size: .82rem; line-height: 1.75; border-radius: 8px; }
+
+  /* ── Content prose */
+  .pattern-content h2 {
+    font-size: 1.25rem; font-weight: 700; color: var(--text);
+    margin: 32px 0 12px; padding-bottom: 8px; border-bottom: 1px solid var(--border);
+  }
+  .pattern-content h3 { font-size: 1rem; font-weight: 700; color: var(--accent); margin: 20px 0 7px; }
+  .pattern-content p  { color: var(--dim); margin-bottom: 11px; line-height: 1.8; }
+  .pattern-content ul,
+  .pattern-content ol { margin: 8px 0 13px 22px; }
+  .pattern-content li { color: var(--dim); margin-bottom: 5px; line-height: 1.7; }
+  .pattern-content li strong { color: var(--text); }
+  .pattern-content code       { font-family: var(--font-code); font-size: .85em; color: var(--accent); background: rgba(0,255,213,.06); padding: 1px 5px; border-radius: 3px; }
+</style>
