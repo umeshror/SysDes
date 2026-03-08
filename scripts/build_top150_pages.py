@@ -66,7 +66,7 @@ def build_main_content(item):
             
             <div class="warn-box" style="margin-top: 40px; text-align: center; padding: 60px 20px;">
                 <h2 style="margin-bottom: 20px; color: #a6adc8;">Content Pending</h2>
-                <p style="color: #6c7086;">The FAANG-level breakdown for this problem is currently being generated.</p>
+                <p style="color: #6c7086;">The level breakdown for this problem is currently being generated.</p>
                 <p style="color: #6c7086; margin-top: 10px;">Check back later for detailed optimal solutions, complexity analysis, and interview tips.</p>
             </div>
             

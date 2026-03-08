@@ -1,0 +1,1029 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Complete Code Review Guide</title>
+<style>
+  :root {
+    --blue: #1a56db;
+    --darkblue: #1e3a5f;
+    --lightblue: #e8f0fe;
+    --green: #0f7b55;
+    --lightgreen: #e6f4ef;
+    --red: #c0392b;
+    --lightred: #fdecea;
+    --yellow: #b7770d;
+    --lightyellow: #fef9e7;
+    --purple: #6a3a9c;
+    --lightpurple: #f3eeff;
+    --gray: #4a5568;
+    --lightgray: #f7f8fa;
+    --border: #e2e8f0;
+    --text: #1a202c;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    font-size: 15px;
+    color: var(--text);
+    background: #fff;
+    line-height: 1.75;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 40px 24px;
+  }
+  h1 { font-size: 2.2em; color: var(--darkblue); margin-bottom: 8px; }
+  h2 { font-size: 1.5em; color: var(--darkblue); margin: 44px 0 16px; border-bottom: 2px solid var(--blue); padding-bottom: 8px; }
+  h3 { font-size: 1.15em; color: var(--darkblue); margin: 28px 0 10px; }
+  h4 { font-size: 1em; color: var(--gray); margin: 18px 0 8px; text-transform: uppercase; letter-spacing: 0.05em; }
+  p { margin-bottom: 14px; }
+  ul, ol { margin: 10px 0 14px 24px; }
+  li { margin-bottom: 7px; }
+  strong { color: var(--darkblue); }
+  a { color: var(--blue); }
+
+  .subtitle { font-size: 1.1em; color: var(--gray); margin-bottom: 30px; }
+  .toc { background: var(--lightblue); border-radius: 10px; padding: 20px 28px; margin: 30px 0; }
+  .toc h3 { margin-top: 0; color: var(--blue); }
+  .toc ol { margin-left: 18px; }
+  .toc li { margin-bottom: 4px; }
+  .toc a { color: var(--blue); text-decoration: none; font-weight: 500; }
+  .toc a:hover { text-decoration: underline; }
+
+  .callout {
+    border-left: 4px solid var(--blue);
+    background: var(--lightblue);
+    border-radius: 0 8px 8px 0;
+    padding: 14px 18px;
+    margin: 18px 0;
+  }
+  .callout.green { border-color: var(--green); background: var(--lightgreen); }
+  .callout.red { border-color: var(--red); background: var(--lightred); }
+  .callout.yellow { border-color: var(--yellow); background: var(--lightyellow); }
+  .callout.purple { border-color: var(--purple); background: var(--lightpurple); }
+  .callout p:last-child { margin-bottom: 0; }
+  .callout-title { font-weight: 700; margin-bottom: 6px; font-size: 0.85em; text-transform: uppercase; letter-spacing: 0.07em; }
+  .callout.green .callout-title { color: var(--green); }
+  .callout.red .callout-title { color: var(--red); }
+  .callout.yellow .callout-title { color: var(--yellow); }
+  .callout.purple .callout-title { color: var(--purple); }
+  .callout .callout-title { color: var(--blue); }
+
+  .code-block {
+    background: #1e2230;
+    color: #e8eaf0;
+    border-radius: 8px;
+    padding: 16px 20px;
+    font-family: 'Cascadia Code', 'Fira Code', monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    margin: 14px 0;
+    overflow-x: auto;
+    white-space: pre;
+  }
+  .code-block .comment { color: #6b8a9e; }
+  .code-block .bad { color: #ff7b7b; }
+  .code-block .good { color: #7be57b; }
+  .code-block .label { color: #f4c96e; font-weight: bold; }
+  .code-block .kw { color: #82aaff; }
+
+  .compare {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin: 16px 0;
+  }
+  @media (max-width: 620px) { .compare { grid-template-columns: 1fr; } }
+  .compare-box {
+    border-radius: 8px;
+    padding: 14px 16px;
+    font-size: 0.93em;
+  }
+  .compare-box.bad { background: var(--lightred); border: 1px solid #f5c6c2; }
+  .compare-box.good { background: var(--lightgreen); border: 1px solid #a8d5c3; }
+  .compare-box .label-tag {
+    font-size: 0.75em;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    margin-bottom: 8px;
+    display: block;
+  }
+  .bad .label-tag { color: var(--red); }
+  .good .label-tag { color: var(--green); }
+
+  .tag-row { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0; }
+  .tag {
+    display: inline-block;
+    border-radius: 20px;
+    padding: 4px 14px;
+    font-size: 0.82em;
+    font-weight: 600;
+    cursor: default;
+  }
+  .tag.blocker { background: #fdecea; color: #c0392b; border: 1px solid #f5b7b1; }
+  .tag.issue { background: #fff3e0; color: #d35400; border: 1px solid #f0c27f; }
+  .tag.suggestion { background: #e8f5e9; color: #1b5e20; border: 1px solid #a8d5b0; }
+  .tag.question { background: var(--lightblue); color: var(--blue); border: 1px solid #93baf7; }
+  .tag.nitpick { background: #f3e5f5; color: var(--purple); border: 1px solid #ce93d8; }
+  .tag.praise { background: #fffde7; color: #f57f17; border: 1px solid #ffe082; }
+  .tag.thought { background: #e0f7fa; color: #006064; border: 1px solid #80deea; }
+  .tag.todo { background: #e8eaf6; color: #283593; border: 1px solid #9fa8da; }
+
+  .principle-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 16px;
+    margin: 16px 0;
+  }
+  .principle-card {
+    background: var(--lightgray);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+  }
+  .principle-card .num { font-size: 1.6em; font-weight: 800; color: var(--blue); opacity: 0.4; line-height: 1; }
+  .principle-card .title { font-weight: 700; color: var(--darkblue); font-size: 0.97em; margin: 4px 0; }
+  .principle-card .desc { font-size: 0.88em; color: var(--gray); }
+
+  .section-divider { border: none; border-top: 2px dashed var(--border); margin: 40px 0; }
+  blockquote { border-left: 3px solid var(--border); color: var(--gray); padding-left: 16px; font-style: italic; margin: 14px 0; }
+  table { border-collapse: collapse; width: 100%; margin: 14px 0; }
+  th { background: var(--darkblue); color: white; padding: 10px 14px; text-align: left; font-size: 0.88em; }
+  td { padding: 9px 14px; border-bottom: 1px solid var(--border); font-size: 0.92em; vertical-align: top; }
+  tr:nth-child(even) td { background: var(--lightgray); }
+
+  .step-list { counter-reset: steps; list-style: none; margin-left: 0; }
+  .step-list li {
+    counter-increment: steps;
+    padding: 12px 16px 12px 52px;
+    position: relative;
+    background: var(--lightgray);
+    border-radius: 8px;
+    margin-bottom: 10px;
+  }
+  .step-list li::before {
+    content: counter(steps);
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: var(--blue);
+    color: white;
+    width: 26px; height: 26px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 0.85em;
+  }
+  .big-quote {
+    font-size: 1.25em;
+    font-style: italic;
+    color: var(--darkblue);
+    border-left: 5px solid var(--blue);
+    padding: 16px 22px;
+    margin: 24px 0;
+    background: var(--lightblue);
+    border-radius: 0 10px 10px 0;
+  }
+  footer { margin-top: 60px; padding-top: 24px; border-top: 1px solid var(--border); font-size: 0.85em; color: var(--gray); }
+</style>
+</head>
+<body>
+
+<h1>🔍 The Complete Code Review Guide</h1>
+<p class="subtitle">Everything from <strong>Awesome Code Review</strong> — explained in depth, with real examples</p>
+
+<div class="toc">
+  <h3>📚 Table of Contents</h3>
+  <ol>
+    <li><a href="#philosophy">Philosophy: Why Code Review Exists</a></li>
+    <li><a href="#what-to-look-for">What to Actually Look For</a></li>
+    <li><a href="#navigating">How to Navigate a PR/CL</a></li>
+    <li><a href="#speed">Speed: The Underrated Factor</a></li>
+    <li><a href="#writing-comments">Writing Great Review Comments</a></li>
+    <li><a href="#conventional">Conventional Comments System</a></li>
+    <li><a href="#feedback-ladder">Netlify's Feedback Ladder</a></li>
+    <li><a href="#toxic">Toxic Behaviors to Unlearn</a></li>
+    <li><a href="#human">Code Reviews Like a Human (mtlynch)</a></li>
+    <li><a href="#author">Being a Great PR Author</a></li>
+    <li><a href="#small-prs">Ship Small Diffs</a></li>
+    <li><a href="#stacked">Stacked Pull Requests</a></li>
+    <li><a href="#pushback">Handling Pushback &amp; Disagreements</a></li>
+    <li><a href="#inclusive">Building an Inclusive Review Culture</a></li>
+    <li><a href="#research">What Research Says (Microsoft, Academia)</a></li>
+    <li><a href="#automation">Automation: Let Computers Do Their Job</a></li>
+    <li><a href="#principles">10 Principles to Live By</a></li>
+  </ol>
+</div>
+
+<!-- ===== SECTION 1 ===== -->
+<h2 id="philosophy">1. Philosophy: Why Code Review Exists</h2>
+
+<p>Before tactics, you need to understand the <em>purpose</em>. Most developers think code review is about catching bugs. That's too narrow. The resources on the Awesome Code Review list converge on a richer picture:</p>
+
+<h3>The Four Real Purposes</h3>
+
+<ol>
+  <li><strong>Codebase health over time</strong> — The primary goal isn't perfection in any single PR. It's that the codebase improves on a trajectory. A CL that makes things 10% better should be approved, even if it isn't perfect.</li>
+  <li><strong>Knowledge sharing</strong> — Reviews spread understanding of the codebase across the whole team. Microsoft's research shows that developers cite knowledge transfer as the #1 value of code review — ahead of bug detection.</li>
+  <li><strong>Mentorship</strong> — Reviews are an opportunity to pass along best practices, architectural instincts, and domain knowledge to newer developers.</li>
+  <li><strong>Social bonding</strong> — A well-run code review builds trust between teammates. It signals "I care about your success and the quality of what we ship together."</li>
+</ol>
+
+<div class="big-quote">
+  "Code reviews are as much a social exercise as a technical one. They're an opportunity for teammates to share knowledge and bond through collaboration."
+</div>
+
+<div class="callout yellow">
+  <div class="callout-title">⚠️ The Anti-Pattern: Gatekeeping</div>
+  <p>If your reviews feel like a toll booth — where developers grudgingly pay their way through — you've lost. Reviews should feel like <em>collaboration</em>, not inspection. The difference shows up in language, speed, and tone. All of that is in your control as a reviewer.</p>
+</div>
+
+<hr class="section-divider">
+
+<!-- ===== SECTION 2 ===== -->
+<h2 id="what-to-look-for">2. What to Actually Look For</h2>
+
+<p>Google's engineering practices document gives the most complete checklist. Here it is, with examples added for each item:</p>
+
+<h3>🧭 Design</h3>
+<p>Does the change fit the architecture? Are pieces interacting well?</p>
+<div class="callout red">
+  <div class="callout-title">❌ Bad Design Signal</div>
+  <p>A developer adds a feature by storing user preferences in the HTTP session object. Works now — but now preferences are lost on logout, can't be shared across devices, and can't be queried from admin tools. The design is wrong even if the code is clean.</p>
+</div>
+<div class="callout green">
+  <div class="callout-title">✅ Right Comment</div>
+  <p><em>"Storing prefs in the session means they can't survive a logout or be accessed server-side. Would you be open to persisting this to the UserProfile table instead? Happy to discuss the migration path."</em></p>
+</div>
+
+<h3>⚙️ Functionality</h3>
+<p>Does the code do what the author intended? Does it do what <em>users</em> need?</p>
+<ul>
+  <li>Think about edge cases: empty lists, null values, concurrent modification, very large inputs</li>
+  <li>Think about the user's mental model: will they see the right error message when this fails?</li>
+  <li>Think about race conditions in async/parallel code</li>
+</ul>
+
+<div class="code-block"><span class="comment">// What would a reviewer catch here?</span>
+function calculateAverage(numbers) {
+  <span class="bad">return numbers.reduce((sum, n) => sum + n, 0) / numbers.length;</span>
+  <span class="comment">// BUG: if numbers = [], returns NaN (0 / 0)</span>
+}
+
+<span class="comment">// After the review:</span>
+function calculateAverage(numbers) {
+  <span class="good">if (numbers.length === 0) return 0;</span>
+  return numbers.reduce((sum, n) => sum + n, 0) / numbers.length;
+}</div>
+
+<h3>🧠 Complexity</h3>
+<p>Could this be simpler? Will a future developer be able to understand and modify this safely?</p>
+
+<blockquote>"Reviewers should be especially vigilant about over-engineering. Encourage developers to solve the problem they know needs to be solved now, not the problem that the developer speculates might need to be solved in the future."</blockquote>
+
+<div class="callout yellow">
+  <div class="callout-title">🚫 YAGNI — You Aren't Gonna Need It</div>
+  <p>This is one of the most linked principles in the list. A developer building a <code>NotificationService</code> might add plugin hooks, strategy patterns, and event buses "for future extensibility." But if the current feature just needs to send one email — all of that is waste. Future requirements will change the interface anyway. Build what you know you need, today.</p>
+</div>
+
+<h3>🧪 Tests</h3>
+<p>Tests are code too. They need to be reviewed with the same rigor as production code. Ask:</p>
+<ul>
+  <li>Will this test actually fail if the code breaks?</li>
+  <li>Does it test behavior, or is it just a ceremony that always passes?</li>
+  <li>Are edge cases covered?</li>
+  <li>Is the test brittle — will minor refactoring break it even if the behavior is still correct?</li>
+</ul>
+<div class="code-block"><span class="comment">// Weak test — tests nothing meaningful:</span>
+<span class="bad">it('should return a user', () => {
+  const result = getUser(1);
+  expect(result).toBeDefined(); // Always true if no exception thrown
+});</span>
+
+<span class="comment">// Strong test — tests actual behavior:</span>
+<span class="good">it('should return the correct user name and email', () => {
+  const result = getUser(1);
+  expect(result.name).toBe('Alice');
+  expect(result.email).toBe('alice@example.com');
+});
+
+it('should throw NotFoundError for a non-existent ID', () => {
+  expect(() => getUser(999)).toThrow(NotFoundError);
+});</span></div>
+
+<h3>📛 Naming</h3>
+<p>Names are the primary documentation of code. Bad names force every future reader to reverse-engineer intent.</p>
+<div class="compare">
+  <div class="compare-box bad"><span class="label-tag">❌ Confusing</span>
+    <code>const d = new Date();</code><br>
+    <code>let x = users.filter(u => u.a);</code><br>
+    <code>function proc(inp) { ... }</code>
+  </div>
+  <div class="compare-box good"><span class="label-tag">✅ Clear</span>
+    <code>const createdAt = new Date();</code><br>
+    <code>let activeUsers = users.filter(u => u.isActive);</code><br>
+    <code>function processPayment(order) { ... }</code>
+  </div>
+</div>
+
+<h3>💬 Comments in Code</h3>
+<p>Code comments should explain <strong>why</strong>, not <strong>what</strong>. If the "what" isn't obvious from the code, fix the code — don't add a comment to explain confusing code.</p>
+<div class="compare">
+  <div class="compare-box bad"><span class="label-tag">❌ Useless</span>
+    <code>// Increment i by 1</code><br>
+    <code>i++;</code>
+  </div>
+  <div class="compare-box good"><span class="label-tag">✅ Valuable</span>
+    <code>// Skip the first element — it's always a header row</code><br>
+    <code>// that the CSV library doesn't strip automatically</code><br>
+    <code>for (let i = 1; i &lt; rows.length; i++) {</code>
+  </div>
+</div>
+
+<h3>📐 Style</h3>
+<p>Style debates with no canonical reference are a waste of time. The style guide is law. If there is no style guide, accept the author's style — and then create a style guide after.</p>
+
+<hr class="section-divider">
+
+<!-- ===== SECTION 3 ===== -->
+<h2 id="navigating">3. How to Navigate a PR / CL</h2>
+
+<p>A PR with 30 changed files is overwhelming if you start at the top and work down. Google's engineering practices give a structured way to navigate:</p>
+
+<ol class="step-list">
+  <li><strong>Read the description first.</strong> Does this change make sense? Is it solving the right problem? If the description is missing or vague, ask for one before reviewing. A good description explains <em>what</em> the change does and <em>why</em>.</li>
+  <li><strong>Find the "main" file.</strong> Usually one file has the largest number of logical changes. Start there. This gives you context that makes the rest of the PR fall into place.</li>
+  <li><strong>Read the tests.</strong> Tests tell you what the author <em>intended</em> to do. They're the executable specification. Read them before the implementation.</li>
+  <li><strong>Check for major design problems immediately.</strong> If there are architectural issues, flag them right away — even if you haven't finished reviewing. If you find a fatal design flaw on file 2 of 30, there's no point reviewing files 3–30. The developer needs to know now, before they build more code on top of this base.</li>
+  <li><strong>Review the rest in logical order.</strong> After major files, go through remaining files systematically. Most review tools have a sensible default order.</li>
+</ol>
+
+<div class="callout yellow">
+  <div class="callout-title">💡 When to Reject Before Starting</div>
+  <p>Sometimes a PR shouldn't exist at all — the team is deprecating the system being modified, or the approach fundamentally conflicts with the roadmap. Reject early and politely. Example: <em>"Looks like you put some good work into this! However, we're moving away from the FooWidget system you're modifying. Would you be open to discussing an alternative approach before we proceed?"</em></p>
+</div>
+
+<hr class="section-divider">
+
+<!-- ===== SECTION 4 ===== -->
+<h2 id="speed">4. Speed: The Most Underrated Factor</h2>
+
+<p>Most complaints developers have about code review are actually complaints about <em>speed</em>. Slow reviews cause cascading damage:</p>
+
+<ul>
+  <li><strong>Team velocity drops</strong> — other developers are blocked waiting for their dependencies to land</li>
+  <li><strong>Context is lost</strong> — the author has moved on mentally; revisiting old code is now expensive</li>
+  <li><strong>Quality pressure builds</strong> — developers start accepting subpar code just to get things moving</li>
+  <li><strong>Cleanups stop happening</strong> — nobody refactors if they know it'll sit in review for a week</li>
+</ul>
+
+<div class="big-quote">
+  "One business day is the maximum time it should take to respond to a code review request. Following this guideline means a typical CL should get multiple rounds of review within a single day."
+  <br><small>— Google Engineering Practices</small>
+</div>
+
+<h3>The Right Tradeoff: Personal vs. Team Velocity</h3>
+<p>There's one exception: <strong>don't interrupt deep work.</strong> Research shows that interrupting focused coding is more expensive for the team than making a developer wait an hour or two. The key word is "respond" — you don't need to drop everything immediately. Wait for a natural break (after lunch, end of a task, returning from a meeting), then review promptly.</p>
+
+<h3>When to Give LGTM With Outstanding Comments</h3>
+<p>You can approve a PR while still leaving comments if:</p>
+<ul>
+  <li>You're confident the developer will address the remaining notes appropriately</li>
+  <li>The remaining comments are minor and don't affect correctness</li>
+</ul>
+<p>This avoids an unnecessary round-trip for low-stakes nits. It's a sign of trust and respect for the author's judgment.</p>
+
+<h3>Timezone Handling</h3>
+<p>When working across timezones, try to return reviews while the author still has time to respond the same day. A review dropped at 5pm in their timezone effectively adds a full day to the cycle. If you can't complete a full review, send a partial response with a note on when you'll finish. The developer can unblock on the initial comments.</p>
+
+<hr class="section-divider">
+
+<!-- ===== SECTION 5 ===== -->
+<h2 id="writing-comments">5. Writing Great Review Comments</h2>
+
+<h3>The Core Rule: Code, Not Person</h3>
+<p>Every comment should be about a line of code, a function, a design decision — never about the developer as a person. This single rule, if followed religiously, eliminates most toxic review behavior.</p>
+
+<div class="compare">
+  <div class="compare-box bad"><span class="label-tag">❌ Personal</span>
+    "You wrote this in the worst possible way."<br><br>
+    "Did you even test this?"<br><br>
+    "I can't believe you didn't handle the null case."
+  </div>
+  <div class="compare-box good"><span class="label-tag">✅ About the Code</span>
+    "This function will throw if the array is empty. What would you think about adding a guard clause?"<br><br>
+    "There doesn't appear to be a test for the null input case — would a test here help document this behavior?"
+  </div>
+</div>
+
+<h3>The "Never Say You" Technique (mtlynch)</h3>
+<p>Michael Lynch suggests never using the word "you" in a review comment. It sounds extreme but works: it forces you to phrase feedback about the code, not the person who wrote it.</p>
+
+<div class="compare">
+  <div class="compare-box bad"><span class="label-tag">❌ With "you"</span>
+    "You need to handle the error here."<br><br>
+    "Why did you use a loop instead of a map?"<br><br>
+    "You should add a test for this."
+  </div>
+  <div class="compare-box good"><span class="label-tag">✅ Without "you"</span>
+    "This error case isn't handled — would it make sense to return an empty array here?"<br><br>
+    "Curious about the loop vs. map choice here — is there a performance reason?"<br><br>
+    "A test covering this edge case would help document the expected behavior."
+  </div>
+</div>
+
+<h3>Back Opinions with Evidence</h3>
+<p>Never present a personal preference as a fact. If you want something changed, cite:</p>
+<ul>
+  <li>The style guide: <em>"The style guide (section 3.4) prefers early returns over nested if blocks."</em></li>
+  <li>A performance measurement: <em>"I benchmarked this — the Map lookup is 10x faster than iterating for large inputs."</em></li>
+  <li>A documented best practice: <em>"MDN recommends against this approach because X."</em></li>
+  <li>A concrete concern: <em>"This regex can catastrophically backtrack on inputs like 'aaaaaab' — here's a safer alternative."</em></li>
+</ul>
+
+<h3>Ask Questions, Don't Issue Commands</h3>
+<div class="compare">
+  <div class="compare-box bad"><span class="label-tag">❌ Commands</span>
+    "Rename this variable."<br><br>
+    "Move this to a separate function."<br><br>
+    "Don't use a for loop here."
+  </div>
+  <div class="compare-box good"><span class="label-tag">✅ Questions &amp; Suggestions</span>
+    "What would you think about a name like <code>activeUsers</code> to make the intent clearer?"<br><br>
+    "This is getting complex — would extracting the validation logic into its own function help readability?"<br><br>
+    "<code>.map()</code> might communicate the intent more clearly here — curious if you considered it?"
+  </div>
+</div>
+
+<h3>Show Code Examples (Sparingly)</h3>
+<p>When a suggestion is clear and uncontroversial, a concrete code example communicates faster than words. But limit yourself to 2–3 per review round. If you're writing the entire PR for someone, you're signaling you don't trust them.</p>
+
+<div class="code-block"><span class="comment">// Your comment:</span>
+<span class="comment">// "This 8-line loop can be a one-liner — would this work?"</span>
+
+<span class="comment">// Current code:</span>
+<span class="bad">const result = [];
+for (let i = 0; i &lt; users.length; i++) {
+  if (users[i].isActive) {
+    result.push(users[i].name);
+  }
+}
+return result;</span>
+
+<span class="comment">// Suggested replacement:</span>
+<span class="good">return users.filter(u => u.isActive).map(u => u.name);</span></div>
+
+<h3>Praise Good Work</h3>
+<p>This is not optional politeness. Positive reinforcement motivates developers, creates psychological safety, and builds the kind of trust where they <em>want</em> their code reviewed rather than dread it.</p>
+<div class="callout green">
+  <div class="callout-title">✅ Examples of Good Praise</div>
+  <p>"This error handling is really clean — I'll remember this pattern."</p>
+  <p>"Great test coverage on the edge cases. Exactly what this function needed."</p>
+  <p>"I didn't know about this API — this is a much better approach than what we've been doing."</p>
+</div>
+
+<h3>Signal Why Something Matters</h3>
+<p>Don't just flag a problem. Explain why fixing it matters. This is how you teach, not just enforce.</p>
+<div class="callout">
+  <div class="callout-title">💡 Example with Context</div>
+  <p><em>"This query runs inside the loop, so for 1,000 users we're making 1,000 DB calls. Moving it outside and batching the results will make this page load 50× faster under real traffic. Happy to show an example."</em></p>
+</div>
+
+<hr class="section-divider">
+
+<!-- ===== SECTION 6 ===== -->
+<h2 id="conventional">6. Conventional Comments</h2>
+
+<p>Conventional Comments is a standard format for writing review comments that immediately communicates the reviewer's intent. It works by prefixing every comment with a typed label.</p>
+
+<h3>The Format</h3>
+<div class="code-block"><span class="label">&lt;label&gt;</span> [(<span class="label">decorations</span>)]: <span class="kw">subject</span>
+
+<span class="comment">Optional discussion — explain the "why", provide context,
+suggest a path to resolution, or cite relevant documentation.</span></div>
+
+<h3>The Labels</h3>
+<div class="tag-row">
+  <span class="tag blocker">blocker</span>
+  <span class="tag issue">issue</span>
+  <span class="tag suggestion">suggestion</span>
+  <span class="tag question">question</span>
+  <span class="tag nitpick">nitpick</span>
+  <span class="tag praise">praise</span>
+  <span class="tag thought">thought</span>
+  <span class="tag todo">todo</span>
+</div>
+
+<table>
+  <thead>
+    <tr><th>Label</th><th>Meaning</th><th>Action Required?</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><span class="tag blocker">blocker</span></td>
+      <td>This must be fixed before merge. A real defect, security issue, or correctness failure.</td>
+      <td><strong>Yes — cannot merge</strong></td>
+    </tr>
+    <tr>
+      <td><span class="tag issue">issue</span></td>
+      <td>A problem that needs to be addressed. Often paired with a suggestion for how to fix it.</td>
+      <td><strong>Yes — should fix</strong></td>
+    </tr>
+    <tr>
+      <td><span class="tag suggestion">suggestion</span></td>
+      <td>A proposed improvement. May or may not be blocking depending on severity. Pair with a (blocking) or (non-blocking) decoration.</td>
+      <td>Depends on decoration</td>
+    </tr>
+    <tr>
+      <td><span class="tag question">question</span></td>
+      <td>A genuine question. Seeking understanding, not implying a problem. May resolve to no action if the author explains the rationale.</td>
+      <td>Answer, not necessarily change</td>
+    </tr>
+    <tr>
+      <td><span class="tag nitpick">nitpick</span></td>
+      <td>A trivial preference — variable name, whitespace, a minor stylistic thing. Almost always non-blocking.</td>
+      <td>Usually no</td>
+    </tr>
+    <tr>
+      <td><span class="tag praise">praise</span></td>
+      <td>Genuine positive recognition. No action needed, but powerful for culture and motivation.</td>
+      <td>No</td>
+    </tr>
+    <tr>
+      <td><span class="tag thought">thought</span></td>
+      <td>An idea that might spark a discussion or future improvement. Not an actionable request right now.</td>
+      <td>No — food for thought</td>
+    </tr>
+    <tr>
+      <td><span class="tag todo">todo</span></td>
+      <td>A small, clear action item. Usually blocking.</td>
+      <td><strong>Yes — before merge</strong></td>
+    </tr>
+  </tbody>
+</table>
+
+<h3>Decorations</h3>
+<p>Decorations add precision to a label. The most important ones:</p>
+<ul>
+  <li><strong>(blocking)</strong> — must be resolved before merge</li>
+  <li><strong>(non-blocking)</strong> — author may address at their discretion</li>
+  <li><strong>(if-minor)</strong> — blocking only if the fix is easy</li>
+  <li><strong>(security)</strong> — security-sensitive suggestion</li>
+</ul>
+
+<h3>Real Examples</h3>
+<div class="code-block"><span class="label">blocker</span>: This endpoint has no authentication check.
+Any unauthenticated user can access all customer data.
+Please add the @RequireAuth decorator before merging.
+
+<span class="label">issue</span>: This function doesn't handle empty arrays.
+If passed [], it returns NaN. Consider returning 0 or throwing
+a more descriptive error.
+
+<span class="label">suggestion (non-blocking)</span>: The .filter().map() chain
+could be a single .reduce() call, which avoids a full second pass.
+Only worth changing if performance is a concern here.
+
+<span class="label">question</span>: Why is the timeout set to 30 seconds here
+rather than the standard 5? Is this an intentional exception?
+
+<span class="label">nitpick (non-blocking)</span>: "isUserAuthenticated" could
+just be "isAuthenticated" since the context already implies a user.
+Up to you!
+
+<span class="label">praise</span>: This retry logic with exponential backoff is
+elegant. I'll borrow this pattern for the jobs queue.
+
+<span class="label">thought</span>: Long-term it might be nice to extract the
+validation logic into a shared utility — not for this PR, but worth
+noting for future refactoring discussions.</div>
+
+<div class="callout green">
+  <div class="callout-title">🏆 Why This System is Powerful</div>
+  <p>In async code review (the default for most teams), tone is invisible. A comment that reads as casual curiosity to the author might feel like an accusation to the reader. Labels remove the guesswork. The author knows exactly what they're dealing with: is this a crisis or a nitpick? Can they merge after answering a question, or do they need to redesign something?</p>
+</div>
+
+<hr class="section-divider">
+
+<!-- ===== SECTION 7 ===== -->
+<h2 id="feedback-ladder">7. Netlify's Feedback Ladder</h2>
+
+<p>Netlify published one of the most practical ideas in the list: the <strong>feedback ladder</strong>. The core insight is that review comments exist on a spectrum, and teams that communicate this spectrum explicitly have far smoother reviews.</p>
+
+<p>The ladder (from most to least critical):</p>
+
+<table>
+  <thead>
+    <tr><th>Rung</th><th>Label</th><th>Meaning</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>🔴 6</td><td><strong>Blocker</strong></td><td>Cannot merge. Correctness, security, or a fundamental design failure.</td></tr>
+    <tr><td>🟠 5</td><td><strong>Should Fix</strong></td><td>Strong recommendation. Would significantly improve code health.</td></tr>
+    <tr><td>🟡 4</td><td><strong>Consider</strong></td><td>A suggestion worth thinking about. Won't block the PR.</td></tr>
+    <tr><td>🟢 3</td><td><strong>Nit</strong></td><td>A trivial stylistic preference. Take it or leave it.</td></tr>
+    <tr><td>🔵 2</td><td><strong>Praise</strong></td><td>Calling out something good. No action needed.</td></tr>
+    <tr><td>⚪ 1</td><td><strong>FYI</strong></td><td>Sharing information. No action requested.</td></tr>
+  </tbody>
+</table>
+
+<h3>The Roundtrip Problem</h3>
+
+<div class="big-quote">
+  "Roundtrips — from teammate to reviewer back to teammate — are expensive, costing up to two working days of a sprint each time."
+</div>
+
+<p>Every unnecessary back-and-forth round is a tax on both the author and the reviewer. The feedback ladder reduces roundtrips in two ways:</p>
+<ol>
+  <li>Authors can immediately see which comments block them and which don't — no more waiting to clarify whether a comment means "fix this now" or "think about this someday."</li>
+  <li>Reviewers are forced to decide whether something truly blocks a merge before writing the comment. This naturally filters out low-signal noise.</li>
+</ol>
+
+<h3>Self-Review as a Pre-emptive Tool</h3>
+<p>Netlify also recommends that authors <strong>review their own code before submitting</strong> and annotate it with comments meant for the reviewer. For example:</p>
+<div class="code-block"><span class="comment">// Author's note for reviewer:
+// I chose the retry-3-times approach here instead of circuit breakers
+// because this endpoint is called infrequently and the infra team
+// doesn't have circuit breaker support yet. Open to other approaches
+// if there's a strong preference.</span></div>
+<p>This proactively answers questions the reviewer was about to ask, saving an entire roundtrip.</p>
+
+<hr class="section-divider">
+
+<!-- ===== SECTION 8 ===== -->
+<h2 id="toxic">8. Toxic Behaviors to Unlearn</h2>
+
+<p>Sandya Sankarram's talk "Unlearning Toxic Behaviors in a Code Review Culture" is one of the most human-centered pieces on the list. The behaviors she identifies:</p>
+
+<h3>🧨 Toxic Behavior #1: Opinion Passed Off as Fact</h3>
+<div class="compare">
+  <div class="compare-box bad"><span class="label-tag">❌ Toxic</span>
+    "This is wrong. Use a hashmap."
+  </div>
+  <div class="compare-box good"><span class="label-tag">✅ Backed by Evidence</span>
+    "For this size of input (&gt;1000 items), a Map lookup is O(1) vs O(n) for the array search. If performance matters here, the Map would be worth the added complexity."
+  </div>
+</div>
+<p>Personal preference is not a sufficient reason to request a change. Developers need to know <em>why</em>. If you can't explain the why, reconsider whether you're asking for a real improvement.</p>
+
+<h3>🧨 Toxic Behavior #2: The Comment Avalanche</h3>
+<p>Dumping 50 comments in a first review pass is overwhelming and demoralizing, especially for junior developers. Even if every individual comment is valid, the cumulative effect reads as "this entire PR is garbage and so are you."</p>
+<div class="callout yellow">
+  <div class="callout-title">💡 The Letter Grade Approach (mtlynch)</div>
+  <p>Privately rate the PR from A to F. If it's a D, help the author get to a C or B−, not an A+. A D → A+ journey takes 8 rounds of review. By the end, the author never wants to send you code again. The goal is <em>incremental improvement over time</em>, not perfection in one pass.</p>
+</div>
+
+<h3>🧨 Toxic Behavior #3: Scope Creep Used as Power</h3>
+<p>Blocking a PR because of pre-existing problems the author didn't cause is a form of hostage-taking. The rule: if it was broken before this PR, it should be tracked in a separate ticket — not used to block an unrelated change.</p>
+
+<h3>🧨 Toxic Behavior #4: Sarcasm and Condescension</h3>
+<div class="compare">
+  <div class="compare-box bad"><span class="label-tag">❌ Corrosive</span>
+    "Another O(n²) loop. Classic."<br><br>
+    "I can't believe this passed linting."<br><br>
+    "This is... interesting design."
+  </div>
+  <div class="compare-box good"><span class="label-tag">✅ Constructive</span>
+    "This nested loop is O(n²) — for large data sets that's a concern. A Map-based approach would bring it to O(n)."<br><br>
+    "Looks like the linting rule for X isn't catching this. Shall I flag it in our config?"
+  </div>
+</div>
+
+<h3>🧨 Toxic Behavior #5: Judgmental "Why" Questions</h3>
+<div class="compare">
+  <div class="compare-box bad"><span class="label-tag">❌ Accusatory</span>
+    "Why didn't you just use the existing utility function?"<br><br>
+    "Why is this so complicated?"
+  </div>
+  <div class="compare-box good"><span class="label-tag">✅ Curious</span>
+    "There's an existing utility function <code>formatDate()</code> that does something similar — would that work here, or is there a reason this needs a custom implementation?"<br><br>
+    "I'm having trouble following this logic — could we break it into smaller functions or add some comments to help future readers?"
+  </div>
+</div>
+
+<div class="callout red">
+  <div class="callout-title">🚨 Why This Matters Beyond Feelings</div>
+  <p>Toxic behaviors in code reviews can be more harmful than <em>no code review at all</em>, because they actively stifle the qualities developers need most: creativity, confidence to try new approaches, and the willingness to ask questions. A review culture that engineers dread produces worse code than one with no reviews at all.</p>
+</div>
+
+<hr class="section-divider">
+
+<!-- ===== SECTION 9 ===== -->
+<h2 id="human">9. Code Reviews Like a Human (mtlynch.io)</h2>
+
+<p>Michael Lynch's two-part series is the most cited article in the list. Its central argument: most review guides treat code review as a purely technical process. In reality, the social dynamics determine whether a review is useful or destructive.</p>
+
+<h3>High-Level Before Low-Level</h3>
+<p>Don't review style nits in round one if there are architectural problems to discuss. Your low-level notes may become completely moot once the author addresses the high-level design feedback. Sequence your rounds:</p>
+<ol>
+  <li><strong>Round 1:</strong> Architecture, design, approach. Is this the right solution?</li>
+  <li><strong>Round 2:</strong> Logic, correctness, edge cases. Does it work correctly?</li>
+  <li><strong>Round 3:</strong> Style, naming, readability. Is it easy to maintain?</li>
+</ol>
+
+<h3>The Worst Code Review of My Life</h3>
+<p>Lynch describes receiving a first PR from a new teammate and leaving 59 comments. She never sent him code again. The lesson: even technically correct feedback, delivered all at once without empathy for context, is toxic. She was new to Python, working on a legacy codebase, and 59 notes was not a teaching moment — it was a wall.</p>
+
+<h3>Frame Feedback as Collaboration</h3>
+<p>The best reviewers don't position themselves as gatekeepers approving or rejecting work. They position themselves as a collaborator helping polish shared code. Language choices matter enormously here:</p>
+
+<div class="compare">
+  <div class="compare-box bad"><span class="label-tag">❌ Gatekeeper Frame</span>
+    "I'm not approving this until X is fixed."<br><br>
+    "This needs to be completely rewritten."<br><br>
+    "Missing test coverage."
+  </div>
+  <div class="compare-box good"><span class="label-tag">✅ Collaborator Frame</span>
+    "This is close — just need to sort out X before we land it."<br><br>
+    "The approach here is making this complex. What if we tried Y instead? Here's a quick sketch."<br><br>
+    "Test coverage for the error path would make this much safer to iterate on. Want me to add an example test?"
+  </div>
+</div>
+
+<h3>When to Meet Synchronously</h3>
+<p>If a thread has gone 4+ messages and no consensus is emerging, stop the async discussion and schedule a 10-minute call. Text communication strips out tone, context, and body language. A short conversation resolves in minutes what text threads drag on for days. After the meeting, post a comment summarizing the decision made, so the PR record is complete.</p>
+
+<hr class="section-divider">
+
+<!-- ===== SECTION 10 ===== -->
+<h2 id="author">10. Being a Great PR Author</h2>
+
+<p>Lynch's companion piece, "How to Make Your Code Reviewer Fall in Love with You," covers the author's side of the equation. Reviews are dramatically better when the author makes them easy.</p>
+
+<h3>Write a Great Description</h3>
+<p>A good PR description has three parts:</p>
+<ul>
+  <li><strong>What</strong> — what does this change do at a high level?</li>
+  <li><strong>Why</strong> — what problem does it solve? Why is this the right solution?</li>
+  <li><strong>How to test</strong> — how can the reviewer verify this works? Any special setup?</li>
+</ul>
+
+<div class="callout red">
+  <div class="callout-title">❌ Bad PR Description</div>
+  <p><em>Title:</em> "fix stuff"<br><em>Body:</em> (empty)</p>
+</div>
+
+<div class="callout green">
+  <div class="callout-title">✅ Good PR Description</div>
+  <p><strong>Title:</strong> "Fix order total calculation when discount codes are stacked"</p>
+  <p><strong>Body:</strong><br>
+  Fixes a bug where stacking two discount codes resulted in a negative total if both were percentage-based and the combined discount exceeded 100%.<br><br>
+  <strong>Root cause:</strong> The discounts were applied sequentially to the original price rather than cumulatively on the remaining balance.<br><br>
+  <strong>Fix:</strong> Caps the combined discount percentage at 100% before applying.<br><br>
+  <strong>Testing:</strong> Added unit tests for single discount, stacked discounts, and the edge case of >100% combined. Can manually test by adding codes SAVE20 + SAVE90 to any order.</p>
+</div>
+
+<h3>Review Your Own Code First</h3>
+<p>Before requesting review, open the diff as if you were the reviewer. You'll catch embarrassing issues that would otherwise waste your reviewer's time — and the act of explaining your own code often reveals design problems you didn't notice while writing it.</p>
+
+<h3>Respond to Feedback Gracefully</h3>
+<p>When a reviewer catches a bug, your first instinct may be to make excuses. Don't. Thank them. When someone spots a subtle logic error in well-written code, it means your PR is in good shape — the reviewer had enough clarity to find deep issues rather than surface noise.</p>
+<p>When a reviewer is wrong, push back politely with evidence. You're both trying to write the best code possible — it's a dialogue, not a judgment.</p>
+
+<h3>Acknowledge Every Comment</h3>
+<p>For every comment, either make the change and mark it resolved, or reply with your reasoning. Never silently ignore a comment — the reviewer doesn't know whether you missed it, disagree, or are planning to address it later.</p>
+
+<hr class="section-divider">
+
+<!-- ===== SECTION 11 ===== -->
+<h2 id="small-prs">11. Ship Small Diffs</h2>
+
+<p>This is one of the most universally agreed-upon practices in all of software engineering, yet it's routinely ignored. The evidence is overwhelming:</p>
+
+<div class="callout">
+  <div class="callout-title">📊 The Data</div>
+  <p>Teams that keep PRs under 200 lines ship approximately <strong>40% more code</strong> than teams doing 200+ line PRs. The cognitive overhead of a large PR isn't just inconvenient — it measurably reduces throughput.</p>
+</div>
+
+<h3>What Happens With Large PRs</h3>
+<p>Two failure modes, both bad:</p>
+<ul>
+  <li><strong>Review delay</strong> — the PR is so large the reviewer keeps postponing it until they "have time." That time never comes. The PR sits for days or weeks.</li>
+  <li><strong>Rubber stamp</strong> — the reviewer gets through it superficially, approves to stop the bleeding, and misses genuine bugs. The review is theater, not safety.</li>
+</ul>
+
+<blockquote>"Ask a programmer to review 10 lines of code, he'll find 10 issues. Ask him to review 500 lines, he'll say it looks good."</blockquote>
+
+<h3>How to Split Large Work</h3>
+<ul>
+  <li><strong>Separate refactoring from feature work.</strong> Rename a function in one PR; add the new behavior in the next.</li>
+  <li><strong>Use feature flags.</strong> Merge incomplete code to main behind a flag that's off in production. This unlocks continuous integration without waiting for a full feature.</li>
+  <li><strong>Plan your PRs before you code.</strong> List the steps the feature requires. Most of those steps can be separate PRs.</li>
+  <li><strong>Database migrations first.</strong> Add columns in one PR; write the code that uses them in the next.</li>
+</ul>
+
+<h3>What "Small" Actually Means</h3>
+<p>Small doesn't just mean few lines — it means <strong>one logical change</strong>. A PR that touches 50 files across three different concerns is hard to review even if it's only 200 lines. A PR that touches 100 lines but does one coherent thing is easy to review.</p>
+
+<hr class="section-divider">
+
+<!-- ===== SECTION 12 ===== -->
+<h2 id="stacked">12. Stacked Pull Requests</h2>
+
+<p>Stacked PRs are the advanced technique for keeping diffs small when you're building a large feature that has natural sequential dependencies.</p>
+
+<h3>The Problem They Solve</h3>
+<p>Suppose you're building a new payments feature. It requires: a DB schema change → a data model layer → a service layer → an API endpoint → a UI component. These steps can't be parallelized, but building them all in one PR creates a massive, tangled diff that's nearly impossible to review well.</p>
+
+<h3>The Stacked PR Workflow</h3>
+<ol class="step-list">
+  <li>Create branch <code>fb-schema</code> from <code>main</code>. Add the DB migration. Open PR #1 targeting <code>main</code>.</li>
+  <li>While PR #1 is in review, create branch <code>fb-model</code> from <code>fb-schema</code>. Add the model layer. Open PR #2 targeting <code>fb-schema</code>. The diff for PR #2 only shows the model changes, not the schema.</li>
+  <li>Continue stacking: <code>fb-service</code> from <code>fb-model</code>, <code>fb-api</code> from <code>fb-service</code>, etc.</li>
+  <li>Merge in order: PR #1 first, retarget PR #2 to <code>main</code>, merge, and so on.</li>
+</ol>
+
+<div class="callout yellow">
+  <div class="callout-title">⚠️ The Trade-Off</div>
+  <p>Stacked PRs create rebasing complexity. If PR #1 is changed based on review feedback, all downstream branches need to be rebased. Tools like <code>ghstack</code> automate this. If doing it manually, agree with your team that the author owns rebasing the stack after any change to an early PR.</p>
+</div>
+
+<h3>Benefits</h3>
+<ul>
+  <li>Each PR is focused and reviewable in isolation</li>
+  <li>Reviewers can specialize — a DB expert reviews the schema PR; a backend engineer reviews the service PR</li>
+  <li>You don't block on reviews to start the next piece of work</li>
+  <li>A merge on any PR doesn't block deployment of that piece</li>
+</ul>
+
+<hr class="section-divider">
+
+<!-- ===== SECTION 13 ===== -->
+<h2 id="pushback">13. Handling Pushback &amp; Disagreements</h2>
+
+<p>Even in the best teams, reviewer and author sometimes disagree. How you handle this determines the long-term health of the review culture.</p>
+
+<h3>When the Author Pushes Back</h3>
+<p>First: actually consider that they might be right. They're closer to the code. If their argument makes sense from a code health perspective, drop the issue and acknowledge they were right. Reviewers who can't do this lose credibility fast.</p>
+
+<p>If you still believe the change is the right one after hearing their argument, explain more clearly — not just restate your position, but address their specific concern:</p>
+
+<div class="callout">
+  <div class="callout-title">💡 Good Disagreement Example</div>
+  <p><strong>Reviewer:</strong> "This should use our standard <code>RetryPolicy</code> class rather than manual retry logic."</p>
+  <p><strong>Author:</strong> "The RetryPolicy class doesn't support this timeout behavior I need."</p>
+  <p><strong>Reviewer:</strong> "That's a fair point — I didn't realize RetryPolicy didn't support custom timeouts. Two options: (1) we could extend RetryPolicy with a timeout parameter, which benefits everyone, or (2) if the timeline is tight, we could use the custom logic now and file a ticket to generalize it. Which do you prefer?"</p>
+</div>
+
+<h3>The "Clean It Up Later" Promise</h3>
+<p>Developers often say "I'll fix this in a follow-up PR" to unblock review. Sometimes they genuinely will. Often they won't — the next task takes priority, context is lost, and the cleanup never happens. The rule: if the cleanup is important enough to ask for, it's important enough to require before merging. If it's not important enough to block merge, accept the code as-is.</p>
+
+<h3>Escalation Path</h3>
+<p>If a genuine technical disagreement can't be resolved between two people:</p>
+<ol>
+  <li>Switch to a synchronous conversation (video/voice) — text is terrible for conflict resolution</li>
+  <li>Bring in a third technical opinion: a tech lead, architect, or domain expert</li>
+  <li>Reference the team's documented standards — having a written style guide or architecture decision records (ADRs) is the single best way to remove personality from technical disputes</li>
+</ol>
+
+<hr class="section-divider">
+
+<!-- ===== SECTION 14 ===== -->
+<h2 id="inclusive">14. Building an Inclusive Review Culture</h2>
+
+<p>Code review culture can unintentionally exclude people — junior developers, new hires, developers from underrepresented groups, or people for whom English is not a first language. An inclusive review culture requires deliberate design.</p>
+
+<h3>The Confidence Gap</h3>
+<p>Experienced developers often have confidence to push back on comments they disagree with. Newer developers don't. They'll make changes they don't agree with and don't understand, learning nothing from the interaction except that reviews are unpleasant. Label your feedback clearly (Conventional Comments helps here) and explain your reasoning more, not less, for developers who are still learning.</p>
+
+<h3>Don't Pile On</h3>
+<p>When multiple reviewers are assigned, avoid a pile-on where everyone leaves the same feedback. Coordinate — pick a primary reviewer and have others only add what the primary missed. 15 people commenting "this needs a null check" is demoralizing even if they're all right.</p>
+
+<h3>Psychological Safety</h3>
+<p>If people are afraid to submit code for review — because they fear judgment, mockery, or public humiliation — they'll avoid reviews, batch their changes into massive PRs to minimize touchpoints, or leave the team. The ultimate measure of your review culture is: do people <em>want</em> to send you their code?</p>
+
+<h3>Onboarding New Members</h3>
+<p>For new developers especially, the first few reviews set expectations that last. Make them positive. Be generous with context (they don't know your conventions yet), explicit about what's blocking vs. optional, and sparing with feedback volume. One key point per round is often enough to start.</p>
+
+<hr class="section-divider">
+
+<!-- ===== SECTION 15 ===== -->
+<h2 id="research">15. What Research Says</h2>
+
+<p>The Awesome Code Review list includes several academic papers and industry research studies. Here are the key findings:</p>
+
+<h3>Microsoft's Study (Bosu, Greiler, Bird — 2015)</h3>
+<p>A large-scale study at Microsoft on which code review comments developers actually find useful. Key findings:</p>
+<ul>
+  <li>Comments were most valued when they pointed to relevant expertise the author lacked</li>
+  <li>Vague, subjective comments ("this could be cleaner") were consistently rated as unhelpful</li>
+  <li>Knowledge transfer was cited as the #1 value of code review — ahead of defect detection</li>
+  <li>Early, frequent reviews were significantly more useful than large, infrequent ones</li>
+</ul>
+
+<h3>The Smartbear/Cisco Study</h3>
+<p>An analysis of code review data from Cisco found that:</p>
+<ul>
+  <li>Reviewers catch significantly fewer defects after 60–90 minutes of review time</li>
+  <li>Reviews of more than 200–400 lines of code produce significantly fewer bug findings per line</li>
+  <li>The sweet spot is reviewing less than 400 lines over no more than 60 minutes</li>
+</ul>
+
+<h3>Multi-Stage vs. Single-Pass Review</h3>
+<p>An early paper (Porter, Siy, Toman & Votta, 1997) tested multi-stage reviews (multiple passes with different focuses) vs. single offline pass with two reviewers. The finding: you can get most of the benefit of elaborate multi-stage review in a single pass with two reviewers. More elaborate processes don't yield proportionally more value.</p>
+
+<h3>What Good Comments Look Like (in Data)</h3>
+<p>Comments that were consistently rated useful had these characteristics:</p>
+<ul>
+  <li>Specific — pointed to a concrete problem, not a vague pattern</li>
+  <li>Actionable — suggested a clear path to resolution</li>
+  <li>Educational — explained the "why" not just the "what"</li>
+  <li>Delivered quickly — value drops dramatically with time</li>
+</ul>
+
+<hr class="section-divider">
+
+<!-- ===== SECTION 16 ===== -->
+<h2 id="automation">16. Automation: Let Computers Do Their Job</h2>
+
+<p>One of the most widely agreed-upon ideas across the entire list: automation should handle everything a computer can check, so humans can focus on things only humans can judge.</p>
+
+<h3>What to Automate</h3>
+<ul>
+  <li><strong>Formatting</strong> — Prettier, gofmt, rustfmt. No human should ever leave a comment about indentation.</li>
+  <li><strong>Linting</strong> — ESLint, Pylint, Rubocop. Catch undefined variables, unused imports, deprecated APIs.</li>
+  <li><strong>Type checking</strong> — TypeScript, mypy, Sorbet. Catch type errors before humans read the code.</li>
+  <li><strong>Test execution</strong> — CI runs tests automatically. No PR should be reviewable if tests are failing.</li>
+  <li><strong>Test coverage</strong> — Block merge if coverage drops below a threshold.</li>
+  <li><strong>Security scanning</strong> — Tools like Snyk, Dependabot, and Semgrep catch common vulnerability patterns.</li>
+  <li><strong>Code complexity metrics</strong> — Cyclomatic complexity, function length. Flag functions that are getting too long or complex.</li>
+</ul>
+
+<div class="callout green">
+  <div class="callout-title">✅ The Right Division of Labor</div>
+  <p><strong>Automation handles:</strong> style, formatting, linting, test execution, type checking, coverage, known security patterns<br>
+  <strong>Humans handle:</strong> design, logic correctness, edge cases, readability, mentorship, architectural fitness</p>
+</div>
+
+<h3>The Cultural Shift</h3>
+<p>Setting up these tools requires an upfront investment and some initial friction (people don't like being told their formatting is wrong by a bot). But within a few weeks, style debates disappear entirely from human reviews. This is a feature, not a bug — it returns hundreds of hours per year to the team for work that actually requires human judgment.</p>
+
+<hr class="section-divider">
+
+<!-- ===== SECTION 17 ===== -->
+<h2 id="principles">17. The 10 Principles to Live By</h2>
+
+<div class="principle-grid">
+  <div class="principle-card">
+    <div class="num">01</div>
+    <div class="title">Automate the mechanical stuff</div>
+    <div class="desc">Linters, formatters, CI. Free reviewers to think about design and logic.</div>
+  </div>
+  <div class="principle-card">
+    <div class="num">02</div>
+    <div class="title">Approve when it improves things</div>
+    <div class="desc">Don't hold out for perfection. A CL that makes the codebase better deserves to land.</div>
+  </div>
+  <div class="principle-card">
+    <div class="num">03</div>
+    <div class="title">Keep PRs small — always</div>
+    <div class="desc">One logical change per PR. If it's large, break it up. This is a skill; practice it.</div>
+  </div>
+  <div class="principle-card">
+    <div class="num">04</div>
+    <div class="title">Label your feedback clearly</div>
+    <div class="desc">Use Conventional Comments or a feedback ladder. Eliminate ambiguity about what's blocking.</div>
+  </div>
+  <div class="principle-card">
+    <div class="num">05</div>
+    <div class="title">Back opinions with evidence</div>
+    <div class="desc">Style guide, docs, benchmarks, or concrete reasoning. "I prefer" is never enough.</div>
+  </div>
+  <div class="principle-card">
+    <div class="num">06</div>
+    <div class="title">Comment on code, not the person</div>
+    <div class="desc">"This function" not "you wrote". Every single time. No exceptions.</div>
+  </div>
+  <div class="principle-card">
+    <div class="num">07</div>
+    <div class="title">Ask questions, don't issue commands</div>
+    <div class="desc">"What would you think about..." opens collaboration. "Do this." closes it.</div>
+  </div>
+  <div class="principle-card">
+    <div class="num">08</div>
+    <div class="title">Praise good work genuinely</div>
+    <div class="desc">It motivates, builds psychological safety, and models the behaviors you want to see.</div>
+  </div>
+  <div class="principle-card">
+    <div class="num">09</div>
+    <div class="title">When stuck, talk</div>
+    <div class="desc">Async threads spiral. A 10-minute call resolves what 30 comment replies couldn't.</div>
+  </div>
+  <div class="principle-card">
+    <div class="num">10</div>
+    <div class="title">Respond within one business day</div>
+    <div class="desc">Most complaints about code review are really complaints about speed. Be fast.</div>
+  </div>
+</div>
+
+<div class="big-quote">
+  "The best code reviewers are great not because they find the most bugs, but because they create an environment where people <em>want</em> their code reviewed."
+</div>
+
+<footer>
+  <p>Based on the <strong>joho/awesome-code-review</strong> curated list, covering resources from Google Engineering Practices, mtlynch.io, Netlify, conventionalcomments.org, Sandya Sankarram, Microsoft Research, and more.</p>
+</footer>
+
+</body>
+</html>

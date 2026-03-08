@@ -2,7 +2,7 @@
 
 A static portfolio site and interactive interview prep platform combining:
 - **System Design Playbook** — 12 chapters, 180+ topics, case studies
-- **Blind 75** — 75 FAANG-level coding problems with optimal solutions (Python/Java/Go)
+- **Blind 75** — 75 level coding problems with optimal solutions (Python/Java/Go)
 - **Top Interview 150** — All 150 LeetCode top interview problems
 - **20 Coding Patterns** — Animated visualizations + editorial deep-dives
 

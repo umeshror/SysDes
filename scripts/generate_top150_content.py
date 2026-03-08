@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 generate_top150_content.py
-Uses the Gemini API to generate FAANG-level problem content for all 150
+Uses the Gemini API to generate level problem content for all 150
 Top Interview 150 problems, then rebuilds the HTML pages.
 
 Requirements:

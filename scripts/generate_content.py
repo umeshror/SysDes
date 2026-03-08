@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Generate FAANG-level HTML content for all 75 Blind 75 problems.
+Generate level HTML content for all 75 Blind 75 problems.
 Writes directly into blind75-spa.html, replacing 'Content Pending' placeholders.
 Then re-runs the page builder to regenerate individual pages.
 """
