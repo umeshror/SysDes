@@ -21,11 +21,15 @@
     <!-- SIDEBAR -->
     <nav class="sidebar">
         <div class="sidebar-header">
-            <a href="../index.html">← Back to Home</a>
+            <div style="margin-bottom:14px; font-size: 0.8em; display: flex; flex-wrap: wrap; gap: 8px;">
+                <a href="../index.html" style="color: #89b4fa; text-decoration: none;">&#8592; Home</a> &nbsp;|&nbsp;
+                <a href="../pages/01-introduction.html" style="color: #89b4fa; text-decoration: none;">Curriculum</a> &nbsp;|&nbsp;
+                <a href="../case_studies/url-shortener.html" style="color: #89b4fa; text-decoration: none;">Case Studies</a>
+                <a href="../patterns/index.html" style="color: #89b4fa; text-decoration: none;">Patterns</a>
+            </div>
             <h1>Top Interview 150</h1>
-            <p>Essential LeetCode patterns</p>
-        </div>
-        <div class="sidebar-search">
+            <p>Essential LeetCode Patterns</p>
+        </div><div class="sidebar-search">
             <input type="text" id="q-search" placeholder="Search questions…" oninput="filterQuestions(this.value)">
         </div>
         <div class="sidebar-scroll" id="sidebar-list">
@@ -784,10 +788,12 @@
 
 
 
-        <div class="page-nav" style="max-width: 960px; margin: 40px auto 0; padding: 20px 48px;">
-            <a class="page-nav-btn" href="144-unique-paths-ii.html">&#8592; Unique Paths II</a>
-            <a class="page-nav-btn home" href="../index.html">&#9776; Back to Portfolio</a>
-            <a class="page-nav-btn" href="146-interleaving-string.html">Interleaving String &#8594;</a>
+        
+                <div class="page-nav">
+                    <a class="page-nav-btn" href="144-unique-paths-ii.html">&larr; Previous</a>
+                    <a class="page-nav-btn home" href="../pages/01-introduction.html">&#9776; All Topics</a>
+                    <a class="page-nav-btn" href="146-interleaving-string.html">Next &rarr;</a>
+                </div>
         </div>
     </div>
 

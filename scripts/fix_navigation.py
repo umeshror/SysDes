@@ -65,42 +65,60 @@ PAGES = [
     {"file":"12-coding-interview-patterns.html","title":"Coding Interview Patterns",
      "module":"Coding Patterns","icon":"🧩","num":"12",
      "sections":["patterns"],"nav":[("patterns","14 Essential Patterns")]},
-    {"file":"../case_studies/open-table.html","title":"Case Studies",
+    {"file":"../case_studies/url-shortener.html","title":"Global URL Shortener",
      "module":"Case Studies","icon":"📚","num":"13",
-     "sections":["case-opentable"],"nav":[("case-opentable","Design OpenTable (Deep Dive)")]},
+     "sections":["case-urlshortener"],"nav":[
+         ("case-urlshortener","URL Shortening Platform")]},
+    {"file":"../case_studies/open-table.html","title":"Design OpenTable",
+     "module":"Case Studies","icon":"🍴","num":"14",
+     "sections":["case-opentable"],"nav":[
+         ("case-opentable","Design OpenTable (Deep Dive)")]},
 ]
 
-def generate_sidebar(current_file):
-    html = '<div class="sidebar-accordion">\n'
-    for p in PAGES:
-        # Normalize paths for comparison
-        target_file = p["file"].split("/")[-1]
-        this_file = current_file.split("/")[-1]
+def get_relative_path(target_path, current_filepath):
+    """
+    Resolves the relative path between the current file and the target page.
+    Assumes standard SysDes structure: /pages/ and /case_studies/
+    """
+    if not target_path: return ""
+    
+    current_dir = os.path.dirname(current_filepath)
+    
+    if current_dir == "pages":
+        return target_path # target is already relative to pages/ or is ../case_studies/...
+    
+    if current_dir == "case_studies":
+        if target_path.startswith("../case_studies/"):
+            return target_path.split("/")[-1] # "url-shortener.html"
+        return "../pages/" + target_path # "../pages/01-intro.html"
         
-        is_cur = target_file == this_file
+    return target_path
+
+def generate_sidebar(current_filepath, filter_module=None):
+    """Generates the sidebar accordion HTML."""
+    html_lines = ['<div class="sidebar-accordion">']
+    
+    for p in PAGES:
+        # 1. Filtering
+        if filter_module and p["module"] != filter_module:
+            continue
+
+        # 2. State checks
+        target_filename = p["file"].split("/")[-1]
+        current_filename = current_filepath.split("/")[-1]
+        is_cur = target_filename == current_filename
+        
         open_attr = ' open' if is_cur else ''
         cur_badge = '<span class="chap-curr">●</span>' if is_cur else ''
+        base_href = get_relative_path(p["file"], current_filepath)
         
-        sub_items = ""
+        # 3. Sub-items Link construction
+        sub_items_html = ""
         for sec_id, label in p["nav"]:
-            if is_cur:
-                # We assume the first section is active by default for sidebar highlighting
-                is_first = p["nav"][0][0] == sec_id
-                active_cls = ' class="acc-sub-item active"' if is_first else ' class="acc-sub-item"'
-                sub_items += f'              <div{active_cls} data-sec="{sec_id}">{label}</div>\n'
-            else:
-                # Need to handle path depth
-                href = p["file"] if current_file.startswith("pages") else p["file"].replace("../", "")
-                if current_file.startswith("case_studies") and not p["file"].startswith("../"):
-                    href = "../pages/" + p["file"]
-                
-                # Special case for case studies link from within case studies
-                if current_file.startswith("case_studies") and p["file"].startswith("../case_studies"):
-                    href = p["file"].split("/")[-1]
+            sub_items_html += f'              <a class="acc-sub-item" href="{base_href}#{sec_id}" data-sec="{sec_id}">{label}</a>\n'
 
-                sub_items += f'              <a class="acc-sub-item" href="{href}#{sec_id}">{label}</a>\n'
-
-        html += f"""        <details class="acc-chapter"{open_attr}>
+        # 4. Assemble Details/Summary
+        html_lines.append(f"""        <details class="acc-chapter"{open_attr}>
           <summary class="acc-summary">
             <span class="chap-icon">{p['icon']}</span>
             <span class="chap-text">
@@ -111,66 +129,72 @@ def generate_sidebar(current_file):
             <span class="acc-arrow">›</span>
           </summary>
           <div class="acc-sub">
-{sub_items}          </div>
-        </details>\n"""
-    html += '      </div>'
-    return html
+{sub_items_html}          </div>
+        </details>""")
+        
+    html_lines.append('      </div>')
+    return "\n".join(html_lines)
 
-def fix_file(filepath):
-    print(f"Fixing {filepath}...")
-    with open(filepath, 'r', encoding='utf-8') as f:
-        content = f.read()
-
-    # 1. Update Sidebar
-    sidebar_html = generate_sidebar(filepath)
-    content = re.sub(r'<div class="sidebar-accordion">.*?</div>\s*</nav>', sidebar_html + '\n    </nav>', content, flags=re.DOTALL)
-
-    # 2. Update Page Nav (Prev/Next)
-    filename = filepath.split("/")[-1]
-    current_idx = -1
-    for i, p in enumerate(PAGES):
-        if p["file"].split("/")[-1] == filename:
-            current_idx = i
-            break
+def generate_nav_footer(current_filepath):
+    """Generates the Prev / All Topics / Next navigation footer."""
+    filename = current_filepath.split("/")[-1]
     
-    if current_idx != -1:
-        prev_p = PAGES[current_idx-1] if current_idx > 0 else None
-        next_p = PAGES[current_idx+1] if current_idx < len(PAGES)-1 else None
-        
-        # Helper to fix links based on depth
-        def fix_link(link):
-            if not link: return ""
-            if filepath.startswith("pages"):
-                return link # already relative or starts with ../case_studies
-            if filepath.startswith("case_studies"):
-                if link.startswith("../case_studies"): return link.split("/")[-1]
-                return "../pages/" + link
-            return link
+    # Find current page in sequence
+    current_idx = next((i for i, p in enumerate(PAGES) if p["file"].split("/")[-1] == filename), -1)
+    if current_idx == -1: return ""
 
-        prev_link = fix_link(prev_p["file"]) if prev_p else ""
-        next_link = fix_link(next_p["file"]) if next_p else ""
-        home_link = fix_link("01-introduction.html")
-
-        prev_btn = f'<a class="page-nav-btn" href="{prev_link}">&#8592; {prev_p["module"]}</a>' if prev_p else '<span></span>'
-        next_btn = f'<a class="page-nav-btn" href="{next_link}">{next_p["module"]} &#8594;</a>' if next_p else '<span></span>'
-        
-        new_nav = f"""      <div class="page-nav">
+    prev_p = PAGES[current_idx - 1] if current_idx > 0 else None
+    next_p = PAGES[current_idx + 1] if current_idx < len(PAGES) - 1 else None
+    
+    # Path resolution
+    prev_link = get_relative_path(prev_p["file"], current_filepath) if prev_p else ""
+    next_link = get_relative_path(next_p["file"], current_filepath) if next_p else ""
+    home_link = get_relative_path("01-introduction.html", current_filepath)
+    
+    # Template construction
+    prev_btn = f'<a class="page-nav-btn" href="{prev_link}">&#8592; {prev_p["module"]}</a>' if prev_p else '<span></span>'
+    next_btn = f'<a class="page-nav-btn" href="{next_link}">{next_p["module"]} &#8594;</a>' if next_p else '<span></span>'
+    
+    return f"""      <div class="page-nav">
         {prev_btn}
         <a class="page-nav-btn home" href="{home_link}">&#9776; All Topics</a>
         {next_btn}
       </div>"""
-        
-        content = re.sub(r'<div class="page-nav">.*?</div>', new_nav, content, flags=re.DOTALL)
+
+def fix_file(filepath):
+    """Processes a single HTML file to inject navigation components."""
+    print(f"Fixing {filepath}...")
+    
+    filter_module = "Case Studies" if filepath.startswith("case_studies") else None
+
+    with open(filepath, 'r', encoding='utf-8') as f:
+        content = f.read()
+
+    # 1. Update Sidebar
+    sidebar_html = generate_sidebar(filepath, filter_module=filter_module)
+    content = re.sub(r'<div class="sidebar-accordion">.*?</div>\s*</nav>', 
+                     f'{sidebar_html}\n    </nav>', content, flags=re.DOTALL)
+
+    # 2. Update Nav Footer
+    nav_footer_html = generate_nav_footer(filepath)
+    if nav_footer_html:
+        content = re.sub(r'<div class="page-nav">.*?</div>', nav_footer_html, content, flags=re.DOTALL)
 
     with open(filepath, 'w', encoding='utf-8') as f:
         f.write(content)
 
 if __name__ == "__main__":
-    # Fix all pages in pages/
-    for f in os.listdir("pages"):
-        if f.endswith(".html"):
-            fix_file(os.path.join("pages", f))
+    # 1. Sync Pages
+    if os.path.exists("pages"):
+        for f in os.listdir("pages"):
+            if f.endswith(".html"):
+                fix_file(os.path.join("pages", f))
     
-    # Fix open-table.html in case_studies/
-    fix_file("case_studies/open-table.html")
-    print("Navigation unified!")
+    # 2. Sync Case Studies
+    if os.path.exists("case_studies"):
+        for f in os.listdir("case_studies"):
+            # Skip indices or non-article files if necessary, but here we fix specifically requested ones
+            if f in ["url-shortener.html", "open-table.html"]:
+                fix_file(os.path.join("case_studies", f))
+
+    print("Navigation unified and refactored!")

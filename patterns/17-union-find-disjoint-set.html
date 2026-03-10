@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Union Find / Disjoint Set — Coding Interview Patterns</title>
+    <link rel="stylesheet" href="../assets/css/styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>
+        body { font-family: 'Segoe UI', system-ui, sans-serif; background: #f4f6f9; }
+        .layout { display: flex; min-height: 100vh; }
+        .sidebar { width: 300px; background: #1a1a2e; color: #cdd6f4; position: fixed; height: 100vh; overflow-y: auto; }
+        .main { margin-left: 300px; flex: 1; padding: 48px; max-width: 1000px; margin: 0 auto; }
+        /* Additional pattern-specific styles from original file */
+        .pattern-header { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; }
+        .pattern-num { background: #89b4fa; color: #1a1a2e; padding: 4px 12px; border-radius: 6px; font-weight: 800; }
+        .pattern-title { margin: 0; font-size: 2rem; border: none; }
+        pre { background: #1e1e2e; color: #cdd6f4; padding: 20px; border-radius: 8px; overflow-x: auto; }
+        .problem-link { display: inline-block; background: #eff6ff; color: #1e40af; padding: 8px 16px; border-radius: 6px; text-decoration: none; font-size: 0.9rem; font-weight: 500; border: 1px solid #dbeafe; }
+        .callout { padding: 16px; border-radius: 6px; margin: 24px 0; }
+        .callout.tip { background: #f0fdf4; border-left: 4px solid #22c55e; }
+        .callout.warning { background: #fef2f2; border-left: 4px solid #ef4444; }
+        .complexity-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 24px 0; }
+        .comp-card { background: white; padding: 16px; border-radius: 8px; border: 1px solid #e2e8f0; }
+        .comp-label { font-size: 0.8rem; color: #64748b; text-transform: uppercase; font-weight: 700; }
+        .comp-value { font-size: 1.2rem; font-weight: 700; color: #1e293b; }
+    </style>
+</head>
+<body>
+    <div class="layout">
+        <nav class="sidebar">
+            <div class="sidebar-header" style="padding: 24px 20px;">
+                <a href="../index.html" style="color: #a6adc8; text-decoration: none; font-size: 0.8rem;">← Back to Home</a>
+                <h1 style="font-size: 1.2rem; margin-top: 12px; color: #fff;">Coding Patterns</h1>
+            </div>
+            <div class="sidebar-accordion">
+        <details class="acc-chapter">
+          <summary class="acc-summary">
+            <span class="chap-icon">🧩</span>
+            <span class="chap-text">
+              <span class="chap-num">Chapter 12</span>
+              <span class="chap-label">Coding Patterns</span>
+            </span>
+            
+            <span class="acc-arrow">›</span>
+          </summary>
+          <div class="acc-sub">
+              <a class="acc-sub-item" href="01-sliding-window.html#p1" data-sec="p1">Sliding Window</a>
+          </div>
+        </details>
+        <details class="acc-chapter">
+          <summary class="acc-summary">
+            <span class="chap-icon">🧩</span>
+            <span class="chap-text">
+              <span class="chap-num">Chapter 13</span>
+              <span class="chap-label">Coding Patterns</span>
+            </span>
+            
+            <span class="acc-arrow">›</span>
+          </summary>
+          <div class="acc-sub">
+              <a class="acc-sub-item" href="02-two-pointers.html#p2" data-sec="p2">Two Pointers</a>
+          </div>
+        </details>
+        <details class="acc-chapter">
+          <summary class="acc-summary">
+            <span class="chap-icon">🧩</span>
+            <span class="chap-text">
+              <span class="chap-num">Chapter 14</span>
+              <span class="chap-label">Coding Patterns</span>
+            </span>
+            
+            <span class="acc-arrow">›</span>
+          </summary>
+          <div class="acc-sub">
+              <a class="acc-sub-item" href="03-fast-slow-pointers.html#p3" data-sec="p3">Fast & Slow Pointers</a>
+          </div>
+        </details>
+        <details class="acc-chapter">
+          <summary class="acc-summary">
+            <span class="chap-icon">🧩</span>
+            <span class="chap-text">
+              <span class="chap-num">Chapter 15</span>
+              <span class="chap-label">Coding Patterns</span>
+            </span>
+            
+            <span class="acc-arrow">›</span>
+          </summary>
+          <div class="acc-sub">
+              <a class="acc-sub-item" href="04-merge-intervals.html#p4" data-sec="p4">Merge Intervals</a>
+          </div>
+        </details>
+        <details class="acc-chapter">
+          <summary class="acc-summary">
+            <span class="chap-icon">🧩</span>
+            <span class="chap-text">
+              <span class="chap-num">Chapter 16</span>
+              <span class="chap-label">Coding Patterns</span>
+            </span>
+            
+            <span class="acc-arrow">›</span>
+          </summary>
+          <div class="acc-sub">
+              <a class="acc-sub-item" href="05-cyclic-sort.html#p5" data-sec="p5">Cyclic Sort</a>
+          </div>
+        </details>
+        <details class="acc-chapter">
+          <summary class="acc-summary">
+            <span class="chap-icon">🧩</span>
+            <span class="chap-text">
+              <span class="chap-num">Chapter 17</span>
+              <span class="chap-label">Coding Patterns</span>
+            </span>
+            
+            <span class="acc-arrow">›</span>
+          </summary>
+          <div class="acc-sub">
+              <a class="acc-sub-item" href="06-in-place-reversal-of-a-linked-list.html#p6" data-sec="p6">In-place Reversal</a>
+          </div>
+        </details>
+        <details class="acc-chapter">
+          <summary class="acc-summary">
+            <span class="chap-icon">🧩</span>
+            <span class="chap-text">
+              <span class="chap-num">Chapter 18</span>
+              <span class="chap-label">Coding Patterns</span>
+            </span>
+            
+            <span class="acc-arrow">›</span>
+          </summary>
+          <div class="acc-sub">
+              <a class="acc-sub-item" href="07-tree-bfs.html#p7" data-sec="p7">Tree BFS</a>
+          </div>
+        </details>
+        <details class="acc-chapter">
+          <summary class="acc-summary">
+            <span class="chap-icon">🧩</span>
+            <span class="chap-text">
+              <span class="chap-num">Chapter 19</span>
+              <span class="chap-label">Coding Patterns</span>
+            </span>
+            
+            <span class="acc-arrow">›</span>
+          </summary>
+          <div class="acc-sub">
+              <a class="acc-sub-item" href="08-tree-dfs.html#p8" data-sec="p8">Tree DFS</a>
+          </div>
+        </details>
+        <details class="acc-chapter">
+          <summary class="acc-summary">
+            <span class="chap-icon">🧩</span>
+            <span class="chap-text">
+              <span class="chap-num">Chapter 20</span>
+              <span class="chap-label">Coding Patterns</span>
+            </span>
+            
+            <span class="acc-arrow">›</span>
+          </summary>
+          <div class="acc-sub">
+              <a class="acc-sub-item" href="09-two-heaps.html#p9" data-sec="p9">Two Heaps</a>
+          </div>
+        </details>
+        <details class="acc-chapter">
+          <summary class="acc-summary">
+            <span class="chap-icon">🧩</span>
+            <span class="chap-text">
+              <span class="chap-num">Chapter 21</span>
+              <span class="chap-label">Coding Patterns</span>
+            </span>
+            
+            <span class="acc-arrow">›</span>
+          </summary>
+          <div class="acc-sub">
+              <a class="acc-sub-item" href="10-subsets.html#p10" data-sec="p10">Subsets</a>
+          </div>
+        </details>
+        <details class="acc-chapter">
+          <summary class="acc-summary">
+            <span class="chap-icon">🧩</span>
+            <span class="chap-text">
+              <span class="chap-num">Chapter 22</span>
+              <span class="chap-label">Coding Patterns</span>
+            </span>
+            
+            <span class="acc-arrow">›</span>
+          </summary>
+          <div class="acc-sub">
+              <a class="acc-sub-item" href="11-modified-binary-search.html#p11" data-sec="p11">Modified Binary Search</a>
+          </div>
+        </details>
+        <details class="acc-chapter">
+          <summary class="acc-summary">
+            <span class="chap-icon">🧩</span>
+            <span class="chap-text">
+              <span class="chap-num">Chapter 23</span>
+              <span class="chap-label">Coding Patterns</span>
+            </span>
+            
+            <span class="acc-arrow">›</span>
+          </summary>
+          <div class="acc-sub">
+              <a class="acc-sub-item" href="12-top-k-elements.html#p12" data-sec="p12">Top K Elements</a>
+          </div>
+        </details>
+        <details class="acc-chapter">
+          <summary class="acc-summary">
+            <span class="chap-icon">🧩</span>
+            <span class="chap-text">
+              <span class="chap-num">Chapter 24</span>
+              <span class="chap-label">Coding Patterns</span>
+            </span>
+            
+            <span class="acc-arrow">›</span>
+          </summary>
+          <div class="acc-sub">
+              <a class="acc-sub-item" href="13-k-way-merge.html#p13" data-sec="p13">K-way Merge</a>
+          </div>
+        </details>
+        <details class="acc-chapter">
+          <summary class="acc-summary">
+            <span class="chap-icon">🧩</span>
+            <span class="chap-text">
+              <span class="chap-num">Chapter 25</span>
+              <span class="chap-label">Coding Patterns</span>
+            </span>
+            
+            <span class="acc-arrow">›</span>
+          </summary>
+          <div class="acc-sub">
+              <a class="acc-sub-item" href="14-topological-sort.html#p14" data-sec="p14">Topological Sort</a>
+          </div>
+        </details>
+        <details class="acc-chapter">
+          <summary class="acc-summary">
+            <span class="chap-icon">🧩</span>
+            <span class="chap-text">
+              <span class="chap-num">Chapter 26</span>
+              <span class="chap-label">Coding Patterns</span>
+            </span>
+            
+            <span class="acc-arrow">›</span>
+          </summary>
+          <div class="acc-sub">
+              <a class="acc-sub-item" href="15-prefix-sum.html#p15" data-sec="p15">Prefix Sum</a>
+          </div>
+        </details>
+        <details class="acc-chapter">
+          <summary class="acc-summary">
+            <span class="chap-icon">🧩</span>
+            <span class="chap-text">
+              <span class="chap-num">Chapter 27</span>
+              <span class="chap-label">Coding Patterns</span>
+            </span>
+            
+            <span class="acc-arrow">›</span>
+          </summary>
+          <div class="acc-sub">
+              <a class="acc-sub-item" href="16-monotonic-stack.html#p16" data-sec="p16">Monotonic Stack</a>
+          </div>
+        </details>
+        <details class="acc-chapter" open>
+          <summary class="acc-summary">
+            <span class="chap-icon">🧩</span>
+            <span class="chap-text">
+              <span class="chap-num">Chapter 28</span>
+              <span class="chap-label">Coding Patterns</span>
+            </span>
+            <span class="chap-curr">●</span>
+            <span class="acc-arrow">›</span>
+          </summary>
+          <div class="acc-sub">
+              <a class="acc-sub-item" href="17-union-find-disjoint-set.html#p17" data-sec="p17">Union Find</a>
+          </div>
+        </details>
+        <details class="acc-chapter">
+          <summary class="acc-summary">
+            <span class="chap-icon">🧩</span>
+            <span class="chap-text">
+              <span class="chap-num">Chapter 29</span>
+              <span class="chap-label">Coding Patterns</span>
+            </span>
+            
+            <span class="acc-arrow">›</span>
+          </summary>
+          <div class="acc-sub">
+              <a class="acc-sub-item" href="18-dynamic-programming.html#p18" data-sec="p18">Dynamic Programming</a>
+          </div>
+        </details>
+        <details class="acc-chapter">
+          <summary class="acc-summary">
+            <span class="chap-icon">🧩</span>
+            <span class="chap-text">
+              <span class="chap-num">Chapter 30</span>
+              <span class="chap-label">Coding Patterns</span>
+            </span>
+            
+            <span class="acc-arrow">›</span>
+          </summary>
+          <div class="acc-sub">
+              <a class="acc-sub-item" href="19-greedy.html#p19" data-sec="p19">Greedy</a>
+          </div>
+        </details>
+      </div>
+    </nav>
+        <main class="main">
+            <div class="section active">
+                
+              <div class="pattern-header">
+                <span class="pattern-num">17</span>
+                <h2 class="pattern-title">Union Find (Disjoint Set)</h2>
+              </div>
+              <div class="pattern-viz" id="viz-p17" data-color="#b47fff"></div>
+              <img src="../assets/patterns/p17-union-find.png" alt="Union Find Visual" class="pattern-img">
+              <p><strong>The Core Idea:</strong> Efficiently track a set of elements partitioned into a
+                number of disjoint (non-overlapping) subsets. Near constant time O(α(N)) for finding
+                components and merging them.</p>
+              <p>A data structure that tracks a set of elements partitioned into multiple disjoint
+                (non-overlapping) subsets. Perfect for grouping things or detecting cycles in an
+                undirected graph.</p>
+
+              <div class="signal-box">
+                <div class="signal-title">Identify by keywords</div>
+                <ul>
+                  <li>"Number of Connected Components"</li>
+                  <li>"Are these two nodes in the same group/network?"</li>
+                  <li>"Valid Tree" (detecting cycles in undirected graphs)</li>
+                </ul>
+              </div>
+
+              <div class="complexity-grid">
+                <div class="comp-card">
+                  <div class="comp-label">Time Complexity</div>
+                  <div class="comp-value">O(α(N)) ≈ O(1) ops</div>
+                </div>
+                <div class="comp-card">
+                  <div class="comp-label">Space Complexity</div>
+                  <div class="comp-value">O(N)</div>
+                </div>
+              </div>
+
+              <h4>Reasoning: Brute Force to Optimized</h4>
+              <div class="reasoning-flow">
+                <div class="flow-step">
+                  <div class="step-title">1. Brute Force</div>
+                  <p>Run DFS/BFS every single time you need to check if node A can reach node B.</p>
+                </div>
+                <div class="flow-step">
+                  <div class="step-title">2. Observation</div>
+                  <p>Instead of traversing edges repeatedly, we can assign a single "Leader" or
+                    "Parent" to each component. Two nodes are connected if they share the same
+                    Leader.</p>
+                </div>
+                <div class="flow-step">
+                  <div class="step-title">3. Optimized</div>
+                  <p>Maintain a <code>parent</code> array. Use Path Compression (make nodes point
+                    directly to the ultimate leader) and Union by Rank (attach smaller trees under
+                    larger ones) for near-instant <code>O(1)</code> performance.</p>
+                </div>
+              </div>
+
+              <div class="warning-box">
+                <div class="warning-title">When NOT to use this pattern</div>
+                <p>If you need to <strong>remove</strong> edges from the graph. Standard Union-Find does
+                  not support an "un-union" operation. You would have to rebuild the entire graph. If
+                  edges are being removed, process the edge removals in reverse (adding them back) to
+                  stick with Union Find.</p>
+              </div>
+
+              <h4>The Universal Masterclass Template</h4>
+              <pre><code class="language-python">class UnionFind:
+    def __init__(self, size):
+        # Initially, each node is its own parent (its own leader)
+        self.parent = [i for i in range(size)]
+        # Rank keeps track of tree depth to keep things balanced
+        self.rank = [1] * size
+        self.components = size
+
+    def find(self, x):
+        # 1. Base case: If node is its own parent, we found the leader!
+        if self.parent[x] == x:
+            return x
+        # 2. PATH COMPRESSION: Make the node point directly to the ultimate leader
+        self.parent[x] = self.find(self.parent[x])
+        return self.parent[x]
+
+    def union(self, x, y):
+        root_x = self.find(x)
+        root_y = self.find(y)
+
+        if root_x != root_y:
+            # 3. UNION BY RANK: Attach the shorter tree under the taller tree
+            if self.rank[root_x] > self.rank[root_y]:
+                self.parent[root_y] = root_x
+            elif self.rank[root_x] < self.rank[root_y]:
+                self.parent[root_x] = root_y
+            else:
+                self.parent[root_y] = root_x
+                self.rank[root_x] += 1
+                
+            self.components -= 1
+            return True # Successfully joined two different sets
+        return False # They were already in the same set! (Cycle detected)</code></pre>
+
+              <h4>Relevant Blind 75 Problems</h4>
+              <div style="display:flex; flex-wrap:wrap; gap:8px;">
+                <span class="problem-link">Number of Connected Components</span>
+                <span class="problem-link">Graph Valid Tree</span>
+              </div>
+
+              <div
+                style="background:#f8fafc; padding: 16px; border-radius:8px; margin-top: 30px; margin-bottom: 20px; border:1px solid #e2e8f0;">
+                <h4>Walkthrough: Connected Components</h4>
+                <pre>Edges: A-B, C-D.
+Sets: [A,B], [C,D]
+New Edge B-C introduced.
+Find root of B (is A). Find root of C (is C).
+Union them: Make C point to A. Now [A, B, C, D] is one giant set.</pre>
+              </div>
+              <div class="callout warning"
+                style="background:#fef2f2; border-left:4px solid #ef4444; padding: 16px; margin-bottom: 30px; border-radius: 4px;">
+                <h4 style="margin-top:0; color:#b91c1c; font-size:1.05rem;">⚠️ Common Interview Mistakes
+                </h4>
+                <div style="color:#7f1d1d; margin-bottom:0;">
+                  <ul>
+                    <li>Not implementing Path Compression or Union By Rank, causing the tree to
+                      degenerate to O(N) linear time lookups.</li>
+                    <li>Initializing the parents array to incorrect generic zeros instead of
+                      `parent[i] = i`.</li>
+                  </ul>
+                </div>
+              </div>
+            
+            </div>
+            
+                  <div class="page-nav">
+        <a class="page-nav-btn" href="16-monotonic-stack.html">&#8592; Monotonic Stack</a>
+        <a class="page-nav-btn home" href="../pages/01-introduction.html">&#9776; All Topics</a>
+        <a class="page-nav-btn" href="18-dynamic-programming.html">Dynamic Programming &#8594;</a>
+      </div>
+        </main>
+    </div>
+</body>
+</html>

@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prefix Sum — Coding Interview Patterns</title>
+    <link rel="stylesheet" href="../assets/css/styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>
+        body { font-family: 'Segoe UI', system-ui, sans-serif; background: #f4f6f9; }
+        .layout { display: flex; min-height: 100vh; }
+        .sidebar { width: 300px; background: #1a1a2e; color: #cdd6f4; position: fixed; height: 100vh; overflow-y: auto; }
+        .main { margin-left: 300px; flex: 1; padding: 48px; max-width: 1000px; margin: 0 auto; }
+        /* Additional pattern-specific styles from original file */
+        .pattern-header { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; }
+        .pattern-num { background: #89b4fa; color: #1a1a2e; padding: 4px 12px; border-radius: 6px; font-weight: 800; }
+        .pattern-title { margin: 0; font-size: 2rem; border: none; }
+        pre { background: #1e1e2e; color: #cdd6f4; padding: 20px; border-radius: 8px; overflow-x: auto; }
+        .problem-link { display: inline-block; background: #eff6ff; color: #1e40af; padding: 8px 16px; border-radius: 6px; text-decoration: none; font-size: 0.9rem; font-weight: 500; border: 1px solid #dbeafe; }
+        .callout { padding: 16px; border-radius: 6px; margin: 24px 0; }
+        .callout.tip { background: #f0fdf4; border-left: 4px solid #22c55e; }
+        .callout.warning { background: #fef2f2; border-left: 4px solid #ef4444; }
+        .complexity-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 24px 0; }
+        .comp-card { background: white; padding: 16px; border-radius: 8px; border: 1px solid #e2e8f0; }
+        .comp-label { font-size: 0.8rem; color: #64748b; text-transform: uppercase; font-weight: 700; }
+        .comp-value { font-size: 1.2rem; font-weight: 700; color: #1e293b; }
+    </style>
+</head>
+<body>
+    <div class="layout">
+        <nav class="sidebar">
+            <div class="sidebar-header" style="padding: 24px 20px;">
+                <a href="../index.html" style="color: #a6adc8; text-decoration: none; font-size: 0.8rem;">← Back to Home</a>
+                <h1 style="font-size: 1.2rem; margin-top: 12px; color: #fff;">Coding Patterns</h1>
+            </div>
+            <div class="sidebar-accordion">
+        <details class="acc-chapter">
+          <summary class="acc-summary">
+            <span class="chap-icon">🧩</span>
+            <span class="chap-text">
+              <span class="chap-num">Chapter 12</span>
+              <span class="chap-label">Coding Patterns</span>
+            </span>
+            
+            <span class="acc-arrow">›</span>
+          </summary>
+          <div class="acc-sub">
+              <a class="acc-sub-item" href="01-sliding-window.html#p1" data-sec="p1">Sliding Window</a>
+          </div>
+        </details>
+        <details class="acc-chapter">
+          <summary class="acc-summary">
+            <span class="chap-icon">🧩</span>
+            <span class="chap-text">
+              <span class="chap-num">Chapter 13</span>
+              <span class="chap-label">Coding Patterns</span>
+            </span>
+            
+            <span class="acc-arrow">›</span>
+          </summary>
+          <div class="acc-sub">
+              <a class="acc-sub-item" href="02-two-pointers.html#p2" data-sec="p2">Two Pointers</a>
+          </div>
+        </details>
+        <details class="acc-chapter">
+          <summary class="acc-summary">
+            <span class="chap-icon">🧩</span>
+            <span class="chap-text">
+              <span class="chap-num">Chapter 14</span>
+              <span class="chap-label">Coding Patterns</span>
+            </span>
+            
+            <span class="acc-arrow">›</span>
+          </summary>
+          <div class="acc-sub">
+              <a class="acc-sub-item" href="03-fast-slow-pointers.html#p3" data-sec="p3">Fast & Slow Pointers</a>
+          </div>
+        </details>
+        <details class="acc-chapter">
+          <summary class="acc-summary">
+            <span class="chap-icon">🧩</span>
+            <span class="chap-text">
+              <span class="chap-num">Chapter 15</span>
+              <span class="chap-label">Coding Patterns</span>
+            </span>
+            
+            <span class="acc-arrow">›</span>
+          </summary>
+          <div class="acc-sub">
+              <a class="acc-sub-item" href="04-merge-intervals.html#p4" data-sec="p4">Merge Intervals</a>
+          </div>
+        </details>
+        <details class="acc-chapter">
+          <summary class="acc-summary">
+            <span class="chap-icon">🧩</span>
+            <span class="chap-text">
+              <span class="chap-num">Chapter 16</span>
+              <span class="chap-label">Coding Patterns</span>
+            </span>
+            
+            <span class="acc-arrow">›</span>
+          </summary>
+          <div class="acc-sub">
+              <a class="acc-sub-item" href="05-cyclic-sort.html#p5" data-sec="p5">Cyclic Sort</a>
+          </div>
+        </details>
+        <details class="acc-chapter">
+          <summary class="acc-summary">
+            <span class="chap-icon">🧩</span>
+            <span class="chap-text">
+              <span class="chap-num">Chapter 17</span>
+              <span class="chap-label">Coding Patterns</span>
+            </span>
+            
+            <span class="acc-arrow">›</span>
+          </summary>
+          <div class="acc-sub">
+              <a class="acc-sub-item" href="06-in-place-reversal-of-a-linked-list.html#p6" data-sec="p6">In-place Reversal</a>
+          </div>
+        </details>
+        <details class="acc-chapter">
+          <summary class="acc-summary">
+            <span class="chap-icon">🧩</span>
+            <span class="chap-text">
+              <span class="chap-num">Chapter 18</span>
+              <span class="chap-label">Coding Patterns</span>
+            </span>
+            
+            <span class="acc-arrow">›</span>
+          </summary>
+          <div class="acc-sub">
+              <a class="acc-sub-item" href="07-tree-bfs.html#p7" data-sec="p7">Tree BFS</a>
+          </div>
+        </details>
+        <details class="acc-chapter">
+          <summary class="acc-summary">
+            <span class="chap-icon">🧩</span>
+            <span class="chap-text">
+              <span class="chap-num">Chapter 19</span>
+              <span class="chap-label">Coding Patterns</span>
+            </span>
+            
+            <span class="acc-arrow">›</span>
+          </summary>
+          <div class="acc-sub">
+              <a class="acc-sub-item" href="08-tree-dfs.html#p8" data-sec="p8">Tree DFS</a>
+          </div>
+        </details>
+        <details class="acc-chapter">
+          <summary class="acc-summary">
+            <span class="chap-icon">🧩</span>
+            <span class="chap-text">
+              <span class="chap-num">Chapter 20</span>
+              <span class="chap-label">Coding Patterns</span>
+            </span>
+            
+            <span class="acc-arrow">›</span>
+          </summary>
+          <div class="acc-sub">
+              <a class="acc-sub-item" href="09-two-heaps.html#p9" data-sec="p9">Two Heaps</a>
+          </div>
+        </details>
+        <details class="acc-chapter">
+          <summary class="acc-summary">
+            <span class="chap-icon">🧩</span>
+            <span class="chap-text">
+              <span class="chap-num">Chapter 21</span>
+              <span class="chap-label">Coding Patterns</span>
+            </span>
+            
+            <span class="acc-arrow">›</span>
+          </summary>
+          <div class="acc-sub">
+              <a class="acc-sub-item" href="10-subsets.html#p10" data-sec="p10">Subsets</a>
+          </div>
+        </details>
+        <details class="acc-chapter">
+          <summary class="acc-summary">
+            <span class="chap-icon">🧩</span>
+            <span class="chap-text">
+              <span class="chap-num">Chapter 22</span>
+              <span class="chap-label">Coding Patterns</span>
+            </span>
+            
+            <span class="acc-arrow">›</span>
+          </summary>
+          <div class="acc-sub">
+              <a class="acc-sub-item" href="11-modified-binary-search.html#p11" data-sec="p11">Modified Binary Search</a>
+          </div>
+        </details>
+        <details class="acc-chapter">
+          <summary class="acc-summary">
+            <span class="chap-icon">🧩</span>
+            <span class="chap-text">
+              <span class="chap-num">Chapter 23</span>
+              <span class="chap-label">Coding Patterns</span>
+            </span>
+            
+            <span class="acc-arrow">›</span>
+          </summary>
+          <div class="acc-sub">
+              <a class="acc-sub-item" href="12-top-k-elements.html#p12" data-sec="p12">Top K Elements</a>
+          </div>
+        </details>
+        <details class="acc-chapter">
+          <summary class="acc-summary">
+            <span class="chap-icon">🧩</span>
+            <span class="chap-text">
+              <span class="chap-num">Chapter 24</span>
+              <span class="chap-label">Coding Patterns</span>
+            </span>
+            
+            <span class="acc-arrow">›</span>
+          </summary>
+          <div class="acc-sub">
+              <a class="acc-sub-item" href="13-k-way-merge.html#p13" data-sec="p13">K-way Merge</a>
+          </div>
+        </details>
+        <details class="acc-chapter">
+          <summary class="acc-summary">
+            <span class="chap-icon">🧩</span>
+            <span class="chap-text">
+              <span class="chap-num">Chapter 25</span>
+              <span class="chap-label">Coding Patterns</span>
+            </span>
+            
+            <span class="acc-arrow">›</span>
+          </summary>
+          <div class="acc-sub">
+              <a class="acc-sub-item" href="14-topological-sort.html#p14" data-sec="p14">Topological Sort</a>
+          </div>
+        </details>
+        <details class="acc-chapter" open>
+          <summary class="acc-summary">
+            <span class="chap-icon">🧩</span>
+            <span class="chap-text">
+              <span class="chap-num">Chapter 26</span>
+              <span class="chap-label">Coding Patterns</span>
+            </span>
+            <span class="chap-curr">●</span>
+            <span class="acc-arrow">›</span>
+          </summary>
+          <div class="acc-sub">
+              <a class="acc-sub-item" href="15-prefix-sum.html#p15" data-sec="p15">Prefix Sum</a>
+          </div>
+        </details>
+        <details class="acc-chapter">
+          <summary class="acc-summary">
+            <span class="chap-icon">🧩</span>
+            <span class="chap-text">
+              <span class="chap-num">Chapter 27</span>
+              <span class="chap-label">Coding Patterns</span>
+            </span>
+            
+            <span class="acc-arrow">›</span>
+          </summary>
+          <div class="acc-sub">
+              <a class="acc-sub-item" href="16-monotonic-stack.html#p16" data-sec="p16">Monotonic Stack</a>
+          </div>
+        </details>
+        <details class="acc-chapter">
+          <summary class="acc-summary">
+            <span class="chap-icon">🧩</span>
+            <span class="chap-text">
+              <span class="chap-num">Chapter 28</span>
+              <span class="chap-label">Coding Patterns</span>
+            </span>
+            
+            <span class="acc-arrow">›</span>
+          </summary>
+          <div class="acc-sub">
+              <a class="acc-sub-item" href="17-union-find-disjoint-set.html#p17" data-sec="p17">Union Find</a>
+          </div>
+        </details>
+        <details class="acc-chapter">
+          <summary class="acc-summary">
+            <span class="chap-icon">🧩</span>
+            <span class="chap-text">
+              <span class="chap-num">Chapter 29</span>
+              <span class="chap-label">Coding Patterns</span>
+            </span>
+            
+            <span class="acc-arrow">›</span>
+          </summary>
+          <div class="acc-sub">
+              <a class="acc-sub-item" href="18-dynamic-programming.html#p18" data-sec="p18">Dynamic Programming</a>
+          </div>
+        </details>
+        <details class="acc-chapter">
+          <summary class="acc-summary">
+            <span class="chap-icon">🧩</span>
+            <span class="chap-text">
+              <span class="chap-num">Chapter 30</span>
+              <span class="chap-label">Coding Patterns</span>
+            </span>
+            
+            <span class="acc-arrow">›</span>
+          </summary>
+          <div class="acc-sub">
+              <a class="acc-sub-item" href="19-greedy.html#p19" data-sec="p19">Greedy</a>
+          </div>
+        </details>
+      </div>
+    </nav>
+        <main class="main">
+            <div class="section active">
+                
+              <div class="pattern-header">
+                <span class="pattern-num">15</span>
+                <h2 class="pattern-title">Prefix Sum</h2>
+              </div>
+              <div class="pattern-viz" id="viz-p15" data-color="#00e5ff"></div>
+              <img src="../assets/patterns/p15-prefix-sum.png" alt="Prefix Sum Visual" class="pattern-img">
+              <p><strong>The Core Idea:</strong> Precompute cumulative sums of an array so that the sum of
+                any contiguous subarray can be queried in O(1) time instead of O(N).</p>
+              <p>Used for answering multiple range sum queries efficiently. Instead of re-calculating the
+                sum of a subarray iteratively, we precompute a cumulative sum array.</p>
+
+              <div class="signal-box">
+                <div class="signal-title">Identify by keywords</div>
+                <ul>
+                  <li>"Sum of subarray or range [i, j]"</li>
+                  <li>"Find the number of subarrays that sum to K" (often combined with a Hash Map)
+                  </li>
+                </ul>
+              </div>
+
+              <div class="complexity-grid">
+                <div class="comp-card">
+                  <div class="comp-label">Time Complexity</div>
+                  <div class="comp-value">O(N) pre-compute, O(1) query</div>
+                </div>
+                <div class="comp-card">
+                  <div class="comp-label">Space Complexity</div>
+                  <div class="comp-value">O(N) layout, or O(1) in-place</div>
+                </div>
+              </div>
+
+              <h4>Reasoning: Brute Force to Optimized</h4>
+              <div class="reasoning-flow">
+                <div class="flow-step">
+                  <div class="step-title">1. Brute Force</div>
+                  <p>Whenever asked for the sum between index <code>i</code> and <code>j</code>, use a
+                    loop to add the elements.</p>
+                  <code>Time: O(N) per query</code>
+                </div>
+                <div class="flow-step">
+                  <div class="step-title">2. Observation</div>
+                  <p>The sum from <code>i</code> to <code>j</code> is simply the sum from
+                    <code>0</code> to <code>j</code> MINUS the sum from <code>0</code> to
+                    <code>i-1</code>. If we know the sum from the start to every index, we can find
+                    any sub-range sum immediately.
+                  </p>
+                </div>
+                <div class="flow-step">
+                  <div class="step-title">3. Optimized</div>
+                  <p>Create a <code>prefix</code> array where <code>prefix[x]</code> is the sum of
+                    elements up to <code>x</code>. For continuous queries, use
+                    <code>prefix[j] - prefix[i-1]</code>.
+                  </p>
+                  <code>Time: O(1) per query</code>
+                </div>
+              </div>
+
+              <div class="warning-box">
+                <div class="warning-title">When NOT to use this pattern</div>
+                <p>If the array values are constantly being updated dynamically between queries.
+                  Updating a single element requires updating <code>O(N)</code> prefix sums. Use a
+                  <strong>Segment Tree</strong> or <strong>Binary Indexed Tree (Fenwick Tree)</strong>
+                  instead.
+                </p>
+              </div>
+
+              <h4>The Universal Masterclass Template</h4>
+              <pre><code class="language-python">class PrefixSum:
+    def __init__(self, nums):
+        # We make the prefix array 1 element larger to handle edge cases easily
+        # prefix[i] will store the sum of all elements before index i
+        self.prefix = [0] * (len(nums) + 1)
+        for i in range(len(nums)):
+            self.prefix[i + 1] = self.prefix[i] + nums[i]
+
+    def sumRange(self, left, right):
+        # The sum from index 'left' to 'right' inclusive
+        # is the total sum up to 'right + 1' minus the total sum BEFORE 'left'
+        return self.prefix[right + 1] - self.prefix[left]</code></pre>
+
+              <h4>Relevant Blind 75 Problems</h4>
+              <div style="display:flex; flex-wrap:wrap; gap:8px;">
+                <span class="problem-link">Contiguous Array</span>
+                <span class="problem-link">Subarray Sum Equals K</span>
+              </div>
+
+              <div
+                style="background:#f8fafc; padding: 16px; border-radius:8px; margin-top: 30px; margin-bottom: 20px; border:1px solid #e2e8f0;">
+                <h4>Walkthrough: Range Sum</h4>
+                <pre>Input: [2, 4, 6, 8]
+Prefix arrays: [0, 2, 6, 12, 20]
+Sum from index 1 to 2 (4+6 = 10)
+Prefix calculation: Prefix[3] - Prefix[1] = 12 - 2 = 10.</pre>
+              </div>
+              <div class="callout warning"
+                style="background:#fef2f2; border-left:4px solid #ef4444; padding: 16px; margin-bottom: 30px; border-radius: 4px;">
+                <h4 style="margin-top:0; color:#b91c1c; font-size:1.05rem;">⚠️ Common Interview Mistakes
+                </h4>
+                <div style="color:#7f1d1d; margin-bottom:0;">
+                  <ul>
+                    <li>Forgetting to initialize the Prefix array with a default initial value of 0
+                      to handle sums starting from the 0th index.</li>
+                    <li>Using a nested loop when a Hash Map tracking previous prefix sums is
+                      required.</li>
+                  </ul>
+                </div>
+              </div>
+            
+            </div>
+            
+                  <div class="page-nav">
+        <a class="page-nav-btn" href="14-topological-sort.html">&#8592; Topological Sort</a>
+        <a class="page-nav-btn home" href="../pages/01-introduction.html">&#9776; All Topics</a>
+        <a class="page-nav-btn" href="16-monotonic-stack.html">Monotonic Stack &#8594;</a>
+      </div>
+        </main>
+    </div>
+</body>
+</html>

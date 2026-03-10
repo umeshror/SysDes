@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Two Pointers — Coding Interview Patterns</title>
+    <link rel="stylesheet" href="../assets/css/styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>
+        body { font-family: 'Segoe UI', system-ui, sans-serif; background: #f4f6f9; }
+        .layout { display: flex; min-height: 100vh; }
+        .sidebar { width: 300px; background: #1a1a2e; color: #cdd6f4; position: fixed; height: 100vh; overflow-y: auto; }
+        .main { margin-left: 300px; flex: 1; padding: 48px; max-width: 1000px; margin: 0 auto; }
+        /* Additional pattern-specific styles from original file */
+        .pattern-header { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; }
+        .pattern-num { background: #89b4fa; color: #1a1a2e; padding: 4px 12px; border-radius: 6px; font-weight: 800; }
+        .pattern-title { margin: 0; font-size: 2rem; border: none; }
+        pre { background: #1e1e2e; color: #cdd6f4; padding: 20px; border-radius: 8px; overflow-x: auto; }
+        .problem-link { display: inline-block; background: #eff6ff; color: #1e40af; padding: 8px 16px; border-radius: 6px; text-decoration: none; font-size: 0.9rem; font-weight: 500; border: 1px solid #dbeafe; }
+        .callout { padding: 16px; border-radius: 6px; margin: 24px 0; }
+        .callout.tip { background: #f0fdf4; border-left: 4px solid #22c55e; }
+        .callout.warning { background: #fef2f2; border-left: 4px solid #ef4444; }
+        .complexity-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 24px 0; }
+        .comp-card { background: white; padding: 16px; border-radius: 8px; border: 1px solid #e2e8f0; }
+        .comp-label { font-size: 0.8rem; color: #64748b; text-transform: uppercase; font-weight: 700; }
+        .comp-value { font-size: 1.2rem; font-weight: 700; color: #1e293b; }
+    </style>
+</head>
+<body>
+    <div class="layout">
+        <nav class="sidebar">
+            <div class="sidebar-header" style="padding: 24px 20px;">
+                <a href="../index.html" style="color: #a6adc8; text-decoration: none; font-size: 0.8rem;">← Back to Home</a>
+                <h1 style="font-size: 1.2rem; margin-top: 12px; color: #fff;">Coding Patterns</h1>
+            </div>
+            <div class="sidebar-accordion">
+        <details class="acc-chapter">
+          <summary class="acc-summary">
+            <span class="chap-icon">🧩</span>
+            <span class="chap-text">
+              <span class="chap-num">Chapter 12</span>
+              <span class="chap-label">Coding Patterns</span>
+            </span>
+            
+            <span class="acc-arrow">›</span>
+          </summary>
+          <div class="acc-sub">
+              <a class="acc-sub-item" href="01-sliding-window.html#p1" data-sec="p1">Sliding Window</a>
+          </div>
+        </details>
+        <details class="acc-chapter" open>
+          <summary class="acc-summary">
+            <span class="chap-icon">🧩</span>
+            <span class="chap-text">
+              <span class="chap-num">Chapter 13</span>
+              <span class="chap-label">Coding Patterns</span>
+            </span>
+            <span class="chap-curr">●</span>
+            <span class="acc-arrow">›</span>
+          </summary>
+          <div class="acc-sub">
+              <a class="acc-sub-item" href="02-two-pointers.html#p2" data-sec="p2">Two Pointers</a>
+          </div>
+        </details>
+        <details class="acc-chapter">
+          <summary class="acc-summary">
+            <span class="chap-icon">🧩</span>
+            <span class="chap-text">
+              <span class="chap-num">Chapter 14</span>
+              <span class="chap-label">Coding Patterns</span>
+            </span>
+            
+            <span class="acc-arrow">›</span>
+          </summary>
+          <div class="acc-sub">
+              <a class="acc-sub-item" href="03-fast-slow-pointers.html#p3" data-sec="p3">Fast & Slow Pointers</a>
+          </div>
+        </details>
+        <details class="acc-chapter">
+          <summary class="acc-summary">
+            <span class="chap-icon">🧩</span>
+            <span class="chap-text">
+              <span class="chap-num">Chapter 15</span>
+              <span class="chap-label">Coding Patterns</span>
+            </span>
+            
+            <span class="acc-arrow">›</span>
+          </summary>
+          <div class="acc-sub">
+              <a class="acc-sub-item" href="04-merge-intervals.html#p4" data-sec="p4">Merge Intervals</a>
+          </div>
+        </details>
+        <details class="acc-chapter">
+          <summary class="acc-summary">
+            <span class="chap-icon">🧩</span>
+            <span class="chap-text">
+              <span class="chap-num">Chapter 16</span>
+              <span class="chap-label">Coding Patterns</span>
+            </span>
+            
+            <span class="acc-arrow">›</span>
+          </summary>
+          <div class="acc-sub">
+              <a class="acc-sub-item" href="05-cyclic-sort.html#p5" data-sec="p5">Cyclic Sort</a>
+          </div>
+        </details>
+        <details class="acc-chapter">
+          <summary class="acc-summary">
+            <span class="chap-icon">🧩</span>
+            <span class="chap-text">
+              <span class="chap-num">Chapter 17</span>
+              <span class="chap-label">Coding Patterns</span>
+            </span>
+            
+            <span class="acc-arrow">›</span>
+          </summary>
+          <div class="acc-sub">
+              <a class="acc-sub-item" href="06-in-place-reversal-of-a-linked-list.html#p6" data-sec="p6">In-place Reversal</a>
+          </div>
+        </details>
+        <details class="acc-chapter">
+          <summary class="acc-summary">
+            <span class="chap-icon">🧩</span>
+            <span class="chap-text">
+              <span class="chap-num">Chapter 18</span>
+              <span class="chap-label">Coding Patterns</span>
+            </span>
+            
+            <span class="acc-arrow">›</span>
+          </summary>
+          <div class="acc-sub">
+              <a class="acc-sub-item" href="07-tree-bfs.html#p7" data-sec="p7">Tree BFS</a>
+          </div>
+        </details>
+        <details class="acc-chapter">
+          <summary class="acc-summary">
+            <span class="chap-icon">🧩</span>
+            <span class="chap-text">
+              <span class="chap-num">Chapter 19</span>
+              <span class="chap-label">Coding Patterns</span>
+            </span>
+            
+            <span class="acc-arrow">›</span>
+          </summary>
+          <div class="acc-sub">
+              <a class="acc-sub-item" href="08-tree-dfs.html#p8" data-sec="p8">Tree DFS</a>
+          </div>
+        </details>
+        <details class="acc-chapter">
+          <summary class="acc-summary">
+            <span class="chap-icon">🧩</span>
+            <span class="chap-text">
+              <span class="chap-num">Chapter 20</span>
+              <span class="chap-label">Coding Patterns</span>
+            </span>
+            
+            <span class="acc-arrow">›</span>
+          </summary>
+          <div class="acc-sub">
+              <a class="acc-sub-item" href="09-two-heaps.html#p9" data-sec="p9">Two Heaps</a>
+          </div>
+        </details>
+        <details class="acc-chapter">
+          <summary class="acc-summary">
+            <span class="chap-icon">🧩</span>
+            <span class="chap-text">
+              <span class="chap-num">Chapter 21</span>
+              <span class="chap-label">Coding Patterns</span>
+            </span>
+            
+            <span class="acc-arrow">›</span>
+          </summary>
+          <div class="acc-sub">
+              <a class="acc-sub-item" href="10-subsets.html#p10" data-sec="p10">Subsets</a>
+          </div>
+        </details>
+        <details class="acc-chapter">
+          <summary class="acc-summary">
+            <span class="chap-icon">🧩</span>
+            <span class="chap-text">
+              <span class="chap-num">Chapter 22</span>
+              <span class="chap-label">Coding Patterns</span>
+            </span>
+            
+            <span class="acc-arrow">›</span>
+          </summary>
+          <div class="acc-sub">
+              <a class="acc-sub-item" href="11-modified-binary-search.html#p11" data-sec="p11">Modified Binary Search</a>
+          </div>
+        </details>
+        <details class="acc-chapter">
+          <summary class="acc-summary">
+            <span class="chap-icon">🧩</span>
+            <span class="chap-text">
+              <span class="chap-num">Chapter 23</span>
+              <span class="chap-label">Coding Patterns</span>
+            </span>
+            
+            <span class="acc-arrow">›</span>
+          </summary>
+          <div class="acc-sub">
+              <a class="acc-sub-item" href="12-top-k-elements.html#p12" data-sec="p12">Top K Elements</a>
+          </div>
+        </details>
+        <details class="acc-chapter">
+          <summary class="acc-summary">
+            <span class="chap-icon">🧩</span>
+            <span class="chap-text">
+              <span class="chap-num">Chapter 24</span>
+              <span class="chap-label">Coding Patterns</span>
+            </span>
+            
+            <span class="acc-arrow">›</span>
+          </summary>
+          <div class="acc-sub">
+              <a class="acc-sub-item" href="13-k-way-merge.html#p13" data-sec="p13">K-way Merge</a>
+          </div>
+        </details>
+        <details class="acc-chapter">
+          <summary class="acc-summary">
+            <span class="chap-icon">🧩</span>
+            <span class="chap-text">
+              <span class="chap-num">Chapter 25</span>
+              <span class="chap-label">Coding Patterns</span>
+            </span>
+            
+            <span class="acc-arrow">›</span>
+          </summary>
+          <div class="acc-sub">
+              <a class="acc-sub-item" href="14-topological-sort.html#p14" data-sec="p14">Topological Sort</a>
+          </div>
+        </details>
+        <details class="acc-chapter">
+          <summary class="acc-summary">
+            <span class="chap-icon">🧩</span>
+            <span class="chap-text">
+              <span class="chap-num">Chapter 26</span>
+              <span class="chap-label">Coding Patterns</span>
+            </span>
+            
+            <span class="acc-arrow">›</span>
+          </summary>
+          <div class="acc-sub">
+              <a class="acc-sub-item" href="15-prefix-sum.html#p15" data-sec="p15">Prefix Sum</a>
+          </div>
+        </details>
+        <details class="acc-chapter">
+          <summary class="acc-summary">
+            <span class="chap-icon">🧩</span>
+            <span class="chap-text">
+              <span class="chap-num">Chapter 27</span>
+              <span class="chap-label">Coding Patterns</span>
+            </span>
+            
+            <span class="acc-arrow">›</span>
+          </summary>
+          <div class="acc-sub">
+              <a class="acc-sub-item" href="16-monotonic-stack.html#p16" data-sec="p16">Monotonic Stack</a>
+          </div>
+        </details>
+        <details class="acc-chapter">
+          <summary class="acc-summary">
+            <span class="chap-icon">🧩</span>
+            <span class="chap-text">
+              <span class="chap-num">Chapter 28</span>
+              <span class="chap-label">Coding Patterns</span>
+            </span>
+            
+            <span class="acc-arrow">›</span>
+          </summary>
+          <div class="acc-sub">
+              <a class="acc-sub-item" href="17-union-find-disjoint-set.html#p17" data-sec="p17">Union Find</a>
+          </div>
+        </details>
+        <details class="acc-chapter">
+          <summary class="acc-summary">
+            <span class="chap-icon">🧩</span>
+            <span class="chap-text">
+              <span class="chap-num">Chapter 29</span>
+              <span class="chap-label">Coding Patterns</span>
+            </span>
+            
+            <span class="acc-arrow">›</span>
+          </summary>
+          <div class="acc-sub">
+              <a class="acc-sub-item" href="18-dynamic-programming.html#p18" data-sec="p18">Dynamic Programming</a>
+          </div>
+        </details>
+        <details class="acc-chapter">
+          <summary class="acc-summary">
+            <span class="chap-icon">🧩</span>
+            <span class="chap-text">
+              <span class="chap-num">Chapter 30</span>
+              <span class="chap-label">Coding Patterns</span>
+            </span>
+            
+            <span class="acc-arrow">›</span>
+          </summary>
+          <div class="acc-sub">
+              <a class="acc-sub-item" href="19-greedy.html#p19" data-sec="p19">Greedy</a>
+          </div>
+        </details>
+      </div>
+    </nav>
+        <main class="main">
+            <div class="section active">
+                
+              <div class="pattern-header">
+                <span class="pattern-num">02</span>
+                <h2 class="pattern-title">Two Pointers</h2>
+              </div>
+              <p>Two Pointers is a pattern where two pointers iterate through the data structure in tandem
+                until
+                one or both of the pointers hit a certain condition. It typically reduces complexity
+                from O(N²)
+                to O(N) by leveraging the sorted property of the input.</p>
+
+              <div class="signal-box">
+                <div class="signal-title">Identify by keywords</div>
+                <ul>
+                  <li>"Sorted array or linked list"</li>
+                  <li>"Find a pair/triplet that sum to X"</li>
+                  <li>"Compare strings while ignoring case/punctuation (Palindrome)"</li>
+                </ul>
+              </div>
+
+              <div class="complexity-grid">
+                <div class="comp-card">
+                  <div class="comp-label">Time Complexity</div>
+                  <div class="comp-value">O(N)</div>
+                </div>
+                <div class="comp-card">
+                  <div class="comp-label">Space Complexity</div>
+                  <div class="comp-value">O(1)</div>
+                </div>
+              </div>
+
+              <h4>Reasoning: Brute Force to Optimized</h4>
+              <div class="reasoning-flow">
+                <div class="flow-step">
+                  <div class="step-title">1. Brute Force</div>
+                  <p>Check all possible pairs using two nested loops.</p>
+                  <code>Time: O(N²)</code>
+                </div>
+                <div class="flow-step">
+                  <div class="step-title">2. Observation</div>
+                  <p>Since the array is sorted, we can use the order to intelligently skip invalid
+                    pairs. If the sum of the smallest and largest is too large, no other number
+                    added to the largest will work.</p>
+                </div>
+                <div class="flow-step">
+                  <div class="step-title">3. Optimized</div>
+                  <p>Start pointers at both ends. Move the left pointer right to increase the sum, or
+                    the right pointer left to decrease the sum.</p>
+                  <code>Time: O(N)</code>
+                </div>
+              </div>
+
+              <div class="warning-box">
+                <div class="warning-title">When NOT to use this pattern</div>
+                <p>If the array is unsorted and you need to return original indices. Sorting the array
+                  destroys the original indices. You would need to use a <strong>Hash Map</strong>
+                  instead, or store tuples of <code>(value, original_index)</code> before sorting.</p>
+              </div>
+
+              <div class="pattern-viz" id="viz-p2" data-color="#00e5ff"></div>
+              <!-- Static image removed/hidden by CSS -->
+              <pre><code class="language-python">def two_pointers(arr, target):
+    # PRE-REQUISITE: The array MUST be sorted. 
+    # If it's not, you must sort it first: arr.sort() -> O(N log N) time
+    
+    left = 0
+    right = len(arr) - 1
+    
+    while left < right: # STRICTLY less than. 
+        current_sum = arr[left] + arr[right]
+        
+        if current_sum == target:
+            return [left, right] # Found it!
+            
+        elif current_sum < target:
+            # The sum is too small. Since the array is sorted, 
+            # we need a bigger number. Move the left pointer right.
+            left += 1 
+            
+        else:
+            # The sum is too big. We need a smaller number. 
+            # Move the right pointer left.
+            right -= 1
+            
+    return [-1, -1] # Not found</code></pre>
+
+              <h4>Relevant Blind 75 Problems</h4>
+              <div style="display:flex; flex-wrap:wrap; gap:8px;">
+                <a href="../blind75/02-two-sum.html" class="problem-link">Two Sum (Sorted Variant)</a>
+                <a href="../blind75/12-3sum.html" class="problem-link">3Sum</a>
+                <a href="../blind75/08-container-with-most-water.html" class="problem-link">Container
+                  With Most
+                  Water</a>
+                <a href="../blind75/75-valid-palindrome.html" class="problem-link">Valid Palindrome</a>
+              </div>
+
+              <div
+                style="background:#f8fafc; padding: 16px; border-radius:8px; margin-top: 30px; margin-bottom: 20px; border:1px solid #e2e8f0;">
+                <h4>Walkthrough: Two Sum II (Sorted)</h4>
+                <pre>Input: [2, 7, 11, 15], Target = 9
+L=2, R=15 -> Sum 17 (Too big, shrink R)
+L=2, R=11 -> Sum 13 (Too big, shrink R)
+L=2, R=7 -> Sum 9 (Match found!)</pre>
+              </div>
+              <div class="callout warning"
+                style="background:#fef2f2; border-left:4px solid #ef4444; padding: 16px; margin-bottom: 30px; border-radius: 4px;">
+                <h4 style="margin-top:0; color:#b91c1c; font-size:1.05rem;">⚠️ Common Interview Mistakes
+                </h4>
+                <div style="color:#7f1d1d; margin-bottom:0;">
+                  <ul>
+                    <li>Not ensuring the array is strictly sorted first.</li>
+                    <li>Crossing boundaries (`left > right`) incorrectly causing out-of-bounds index
+                      errors.</li>
+                  </ul>
+                </div>
+              </div>
+            
+            </div>
+            
+                  <div class="page-nav">
+        <a class="page-nav-btn" href="01-sliding-window.html">&#8592; Sliding Window</a>
+        <a class="page-nav-btn home" href="../pages/01-introduction.html">&#9776; All Topics</a>
+        <a class="page-nav-btn" href="03-fast-slow-pointers.html">Fast & Slow Pointers &#8594;</a>
+      </div>
+        </main>
+    </div>
+</body>
+</html>

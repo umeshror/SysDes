@@ -507,7 +507,7 @@
 
     <nav class="sidebar" style="display:flex;flex-direction:column">
       <div class="sidebar-header">
-        <div style="margin-bottom:14px; font-size: 0.9em;">
+        <div style="margin-bottom:14px; font-size: 0.9em; display: flex; flex-wrap: wrap; gap: 8px;">
           <a href="../index.html" class="back-link">&#8592; Home</a> &nbsp;|&nbsp; <a href="../blind75/index.html" class="back-link">Blind 75</a> &nbsp;|&nbsp; <a href="../top150/index.html" class="back-link">Top 150</a> &nbsp;|&nbsp; <a href="../patterns/index.html" class="back-link">Patterns</a>
         </div>
         <h1>System Design Fundamentals</h1>
@@ -526,7 +526,7 @@
             <span class="acc-arrow">›</span>
           </summary>
           <div class="acc-sub">
-              <a class="acc-sub-item" href="01-introduction.html#intro">The SDI Process</a>
+              <a class="acc-sub-item" href="01-introduction.html#intro" data-sec="intro">The SDI Process</a>
           </div>
         </details>
         <details class="acc-chapter">
@@ -540,10 +540,10 @@
             <span class="acc-arrow">›</span>
           </summary>
           <div class="acc-sub">
-              <a class="acc-sub-item" href="02-core-concepts.html#core">Core Characteristics</a>
-              <a class="acc-sub-item" href="02-core-concepts.html#cap">CAP & PACELC Theorems</a>
-              <a class="acc-sub-item" href="02-core-concepts.html#pacelc">PACELC In Depth</a>
-              <a class="acc-sub-item" href="02-core-concepts.html#hashing">Consistent Hashing</a>
+              <a class="acc-sub-item" href="02-core-concepts.html#core" data-sec="core">Core Characteristics</a>
+              <a class="acc-sub-item" href="02-core-concepts.html#cap" data-sec="cap">CAP & PACELC Theorems</a>
+              <a class="acc-sub-item" href="02-core-concepts.html#pacelc" data-sec="pacelc">PACELC In Depth</a>
+              <a class="acc-sub-item" href="02-core-concepts.html#hashing" data-sec="hashing">Consistent Hashing</a>
           </div>
         </details>
         <details class="acc-chapter">
@@ -557,7 +557,7 @@
             <span class="acc-arrow">›</span>
           </summary>
           <div class="acc-sub">
-              <a class="acc-sub-item" href="03-tradeoffs.html#tradeoffs">Topic-by-Topic Trade-offs</a>
+              <a class="acc-sub-item" href="03-tradeoffs.html#tradeoffs" data-sec="tradeoffs">Topic-by-Topic Trade-offs</a>
           </div>
         </details>
         <details class="acc-chapter">
@@ -571,8 +571,8 @@
             <span class="acc-arrow">›</span>
           </summary>
           <div class="acc-sub">
-              <a class="acc-sub-item" href="04-networking.html#networking">OSI, TCP/UDP, HTTP, DNS</a>
-              <a class="acc-sub-item" href="04-networking.html#proxy">Proxy & Reverse Proxy</a>
+              <a class="acc-sub-item" href="04-networking.html#networking" data-sec="networking">OSI, TCP/UDP, HTTP, DNS</a>
+              <a class="acc-sub-item" href="04-networking.html#proxy" data-sec="proxy">Proxy & Reverse Proxy</a>
           </div>
         </details>
         <details class="acc-chapter">
@@ -586,10 +586,10 @@
             <span class="acc-arrow">›</span>
           </summary>
           <div class="acc-sub">
-              <a class="acc-sub-item" href="05-infrastructure.html#lb">Load Balancing & Algorithms</a>
-              <a class="acc-sub-item" href="05-infrastructure.html#caching">Caching Strategies</a>
-              <a class="acc-sub-item" href="05-infrastructure.html#cdn">CDN & Distributed Cache</a>
-              <a class="acc-sub-item" href="05-infrastructure.html#storage">Storage Systems</a>
+              <a class="acc-sub-item" href="05-infrastructure.html#lb" data-sec="lb">Load Balancing & Algorithms</a>
+              <a class="acc-sub-item" href="05-infrastructure.html#caching" data-sec="caching">Caching Strategies</a>
+              <a class="acc-sub-item" href="05-infrastructure.html#cdn" data-sec="cdn">CDN & Distributed Cache</a>
+              <a class="acc-sub-item" href="05-infrastructure.html#storage" data-sec="storage">Storage Systems</a>
           </div>
         </details>
         <details class="acc-chapter" open>
@@ -603,11 +603,11 @@
             <span class="acc-arrow">›</span>
           </summary>
           <div class="acc-sub">
-              <div class="acc-sub-item active" data-sec="api-design">API Design (REST, GraphQL, gRPC)</div>
-              <div class="acc-sub-item" data-sec="api-infra">API Gateway & Rate Limiting</div>
-              <div class="acc-sub-item" data-sec="api-auth">Authentication & Authorization</div>
-              <div class="acc-sub-item" data-sec="realtime">Real-Time Communication</div>
-              <div class="acc-sub-item" data-sec="async">Async Messaging (Queues, Pub/Sub)</div>
+              <a class="acc-sub-item" href="06-api-communication.html#api-design" data-sec="api-design">API Design (REST, GraphQL, gRPC)</a>
+              <a class="acc-sub-item" href="06-api-communication.html#api-infra" data-sec="api-infra">API Gateway & Rate Limiting</a>
+              <a class="acc-sub-item" href="06-api-communication.html#api-auth" data-sec="api-auth">Authentication & Authorization</a>
+              <a class="acc-sub-item" href="06-api-communication.html#realtime" data-sec="realtime">Real-Time Communication</a>
+              <a class="acc-sub-item" href="06-api-communication.html#async" data-sec="async">Async Messaging (Queues, Pub/Sub)</a>
           </div>
         </details>
         <details class="acc-chapter">
@@ -621,9 +621,9 @@
             <span class="acc-arrow">›</span>
           </summary>
           <div class="acc-sub">
-              <a class="acc-sub-item" href="07-architecture.html#arch-patterns">Architectural Patterns</a>
-              <a class="acc-sub-item" href="07-architecture.html#microservices">Microservices & Service Mesh</a>
-              <a class="acc-sub-item" href="07-architecture.html#containers">Containers & Orchestration</a>
+              <a class="acc-sub-item" href="07-architecture.html#arch-patterns" data-sec="arch-patterns">Architectural Patterns</a>
+              <a class="acc-sub-item" href="07-architecture.html#microservices" data-sec="microservices">Microservices & Service Mesh</a>
+              <a class="acc-sub-item" href="07-architecture.html#containers" data-sec="containers">Containers & Orchestration</a>
           </div>
         </details>
         <details class="acc-chapter">
@@ -637,9 +637,9 @@
             <span class="acc-arrow">›</span>
           </summary>
           <div class="acc-sub">
-              <a class="acc-sub-item" href="08-data-layer.html#db-types">Database Types</a>
-              <a class="acc-sub-item" href="08-data-layer.html#db-internals">Database Internals</a>
-              <a class="acc-sub-item" href="08-data-layer.html#db-scaling">Database Scaling</a>
+              <a class="acc-sub-item" href="08-data-layer.html#db-types" data-sec="db-types">Database Types</a>
+              <a class="acc-sub-item" href="08-data-layer.html#db-internals" data-sec="db-internals">Database Internals</a>
+              <a class="acc-sub-item" href="08-data-layer.html#db-scaling" data-sec="db-scaling">Database Scaling</a>
           </div>
         </details>
         <details class="acc-chapter">
@@ -653,13 +653,13 @@
             <span class="acc-arrow">›</span>
           </summary>
           <div class="acc-sub">
-              <a class="acc-sub-item" href="09-distributed-systems.html#db-federation">Database Federation</a>
-              <a class="acc-sub-item" href="09-distributed-systems.html#dist-fundamentals">Challenges & Failures</a>
-              <a class="acc-sub-item" href="09-distributed-systems.html#time-ordering">Time, Ordering & Clocks</a>
-              <a class="acc-sub-item" href="09-distributed-systems.html#consensus">Consensus & Coordination</a>
-              <a class="acc-sub-item" href="09-distributed-systems.html#dist-tx">Distributed Transactions</a>
-              <a class="acc-sub-item" href="09-distributed-systems.html#data-structures">Design Data Structures</a>
-              <a class="acc-sub-item" href="09-distributed-systems.html#big-data">Big Data & Stream Processing</a>
+              <a class="acc-sub-item" href="09-distributed-systems.html#db-federation" data-sec="db-federation">Database Federation</a>
+              <a class="acc-sub-item" href="09-distributed-systems.html#dist-fundamentals" data-sec="dist-fundamentals">Challenges & Failures</a>
+              <a class="acc-sub-item" href="09-distributed-systems.html#time-ordering" data-sec="time-ordering">Time, Ordering & Clocks</a>
+              <a class="acc-sub-item" href="09-distributed-systems.html#consensus" data-sec="consensus">Consensus & Coordination</a>
+              <a class="acc-sub-item" href="09-distributed-systems.html#dist-tx" data-sec="dist-tx">Distributed Transactions</a>
+              <a class="acc-sub-item" href="09-distributed-systems.html#data-structures" data-sec="data-structures">Design Data Structures</a>
+              <a class="acc-sub-item" href="09-distributed-systems.html#big-data" data-sec="big-data">Big Data & Stream Processing</a>
           </div>
         </details>
         <details class="acc-chapter">
@@ -673,10 +673,10 @@
             <span class="acc-arrow">›</span>
           </summary>
           <div class="acc-sub">
-              <a class="acc-sub-item" href="10-search-operations.html#search">FTS, Inverted Index, Ranking</a>
-              <a class="acc-sub-item" href="10-search-operations.html#disaster-recovery">Disaster Recovery & Deployments</a>
-              <a class="acc-sub-item" href="10-search-operations.html#observability">Logs, Metrics, Tracing</a>
-              <a class="acc-sub-item" href="10-search-operations.html#security">Encryption, IAM, Zero Trust</a>
+              <a class="acc-sub-item" href="10-search-operations.html#search" data-sec="search">FTS, Inverted Index, Ranking</a>
+              <a class="acc-sub-item" href="10-search-operations.html#disaster-recovery" data-sec="disaster-recovery">Disaster Recovery & Deployments</a>
+              <a class="acc-sub-item" href="10-search-operations.html#observability" data-sec="observability">Logs, Metrics, Tracing</a>
+              <a class="acc-sub-item" href="10-search-operations.html#security" data-sec="security">Encryption, IAM, Zero Trust</a>
           </div>
         </details>
         <details class="acc-chapter">
@@ -690,7 +690,7 @@
             <span class="acc-arrow">›</span>
           </summary>
           <div class="acc-sub">
-              <a class="acc-sub-item" href="11-interview-framework.html#framework">The 4-Step SDI Framework</a>
+              <a class="acc-sub-item" href="11-interview-framework.html#framework" data-sec="framework">The 4-Step SDI Framework</a>
           </div>
         </details>
         <details class="acc-chapter">
@@ -704,7 +704,7 @@
             <span class="acc-arrow">›</span>
           </summary>
           <div class="acc-sub">
-              <a class="acc-sub-item" href="12-coding-interview-patterns.html#patterns">20 Essential Patterns</a>
+              <a class="acc-sub-item" href="12-coding-interview-patterns.html#patterns" data-sec="patterns">14 Essential Patterns</a>
           </div>
         </details>
         <details class="acc-chapter">
@@ -718,8 +718,21 @@
             <span class="acc-arrow">›</span>
           </summary>
           <div class="acc-sub">
-              <a class="acc-sub-item" href="../case_studies/open-table.html#case-opentable">Design OpenTable (Deep Dive)</a>
-              <a class="acc-sub-item" href="../case_studies/code-review.html">Code Review: Complete Guide</a>
+              <a class="acc-sub-item" href="../case_studies/url-shortener.html#case-urlshortener" data-sec="case-urlshortener">URL Shortening Platform</a>
+          </div>
+        </details>
+        <details class="acc-chapter">
+          <summary class="acc-summary">
+            <span class="chap-icon">🍴</span>
+            <span class="chap-text">
+              <span class="chap-num">Chapter 14</span>
+              <span class="chap-label">Case Studies</span>
+            </span>
+            
+            <span class="acc-arrow">›</span>
+          </summary>
+          <div class="acc-sub">
+              <a class="acc-sub-item" href="../case_studies/open-table.html#case-opentable" data-sec="case-opentable">Design OpenTable (Deep Dive)</a>
           </div>
         </details>
       </div>
@@ -2015,7 +2028,7 @@ graph LR
   </div>
 
 
-      <div class="page-nav">
+                                                                  <div class="page-nav">
         <a class="page-nav-btn" href="05-infrastructure.html">&#8592; Infrastructure</a>
         <a class="page-nav-btn home" href="01-introduction.html">&#9776; All Topics</a>
         <a class="page-nav-btn" href="07-architecture.html">Architecture &#8594;</a>

@@ -1,0 +1,723 @@
+
+SYSTEM DESIGN DOCUMENT
+Global URL Shortening Platform
+Staff / Principal Engineer Level
+Author
+Umesh Saruk
+Version
+4.0
+Status
+RFC / Design Review
+Scope
+Production-scale distributed system
+
+
+Table of Contents
+
+
+
+
+1. Executive Summary
+This document describes the production architecture for a globally scalable URL shortening service (analogous to Bit.ly or TinyURL). The system converts long URLs into compact, opaque short codes and performs low-latency HTTP redirects at internet scale.
+
+Core Value Proposition
+Input:   https://www.amazon.com/products/path/item/123456
+Output:  https://short.ly/aZ3x9K
+
+The architectural thesis is straightforward: URL shorteners are overwhelmingly read-heavy. For every URL created, hundreds or thousands of redirect lookups occur. Every design decision — caching layers, replication topology, region distribution, analytics pipeline — flows directly from optimizing the read path.
+
+Platform Targets
+Requirement
+Target
+Rationale
+Redirect latency (p99)
+< 100 ms globally
+User experience; beyond 200 ms conversion drops sharply
+Availability
+99.99% (< 53 min/year downtime)
+URL infrastructure is customer-critical; outage = broken links
+Redirect throughput
+50,000 RPS peak
+Based on 1B redirects/day with 10× peak factor
+Total URLs stored
+1B+ (growing)
+62^6 = 56B capacity — headroom for years
+Write throughput
+~115 writes/sec steady-state
+Read:Write ratio approximately 1,000 : 1
+Data durability
+11 nines (99.999999999%)
+URLs are permanent user assets
+Consistency model
+Eventual for redirects
+Replication lag acceptable; writes are strongly consistent
+2. Problem Definition & Scope
+Functional Requirements
+Generate a short URL code for any valid long URL.
+Redirect users from a short URL to its original URL (< 100 ms).
+Support optional custom aliases (e.g., short.ly/my-campaign).
+Support URL expiration — links automatically deactivate after a set date.
+Track redirect analytics (click counts, geographic data, referrer).
+Allow authenticated users to manage their links (list, disable, delete).
+
+Non-Functional Requirements
+High availability: the redirect path must survive any single component failure.
+Low latency: redirects must be served from geographically proximate infrastructure.
+Horizontal scalability: stateless services that scale linearly with traffic.
+Security: abuse prevention, phishing link detection, enumeration resistance.
+Observability: full tracing, metrics, and alerting across all services.
+
+Out of Scope (v1)
+Explicitly Excluded from This Design
+Enterprise billing and tiered plans
+Deep analytics dashboards (BI tooling, funnels, A/B attribution)
+ML-based spam and phishing detection
+Content classification and safe-browsing integration
+White-label custom domain management
+QR code generation and management
+3. Capacity Planning
+All capacity estimates are derived bottom-up from user traffic assumptions. The key insight is the extreme read-write asymmetry, which directly drives architectural choices.
+
+Traffic Estimates
+Metric
+Calculation
+Result
+Daily active users
+Given assumption
+100,000,000
+Redirects per user per day
+Avg browsing/sharing behavior
+10
+Total daily redirects
+100M × 10
+1,000,000,000
+Avg redirect RPS
+1B ÷ 86,400 sec
+≈ 11,600 RPS
+Peak redirect RPS (10× factor)
+11,600 × 10×
+≈ 50,000 RPS
+URLs created per day
+Estimated creation rate
+10,000,000
+Write RPS (avg)
+10M ÷ 86,400
+≈ 115 writes/sec
+Read : Write ratio
+50,000 : 115
+≈ 435 : 1 (peak)
+
+Storage Estimates
+Item
+Size Estimate
+Annual Volume
+Notes
+Per URL mapping row
+~500 bytes
+—
+short_code + long_url + metadata
+Annual new URLs
+10M/day × 365
+3.65B rows/year
+Cumulative growth
+Annual storage for mappings
+3.65B × 500 bytes
+~1.8 TB/year
+Manageable on single cluster
+Redis cache (hot URLs)
+Top 10M URLs × 500 bytes
+~5 GB
+Fits on a single Redis node
+Analytics events (Kafka)
+1B events × 200 bytes
+~200 GB/day
+Compacted + offloaded to cold storage
+
+Key Capacity Insight
+Storage is not the scaling challenge — 1.8 TB/year is trivially handled by a single Postgres instance with SSDs. The real challenge is serving 50,000 RPS of read traffic with sub-100 ms latency. This is solved entirely by the caching and CDN layers, not the database.
+4. Data Model
+URL Mappings Table
+Column
+Type
+Constraints
+Description
+short_code
+VARCHAR(10)
+PRIMARY KEY
+Base62-encoded unique ID (e.g., aZ3x9K)
+long_url
+TEXT
+NOT NULL
+Original destination URL (up to ~2KB)
+user_id
+BIGINT
+FK → users, INDEXED
+Owner; NULL for anonymous creation
+created_at
+TIMESTAMPTZ
+NOT NULL, DEFAULT NOW()
+Creation timestamp
+expires_at
+TIMESTAMPTZ
+NULLABLE, INDEXED
+NULL = no expiry; indexed for cleanup job
+status
+ENUM
+DEFAULT 'active'
+Values: active | disabled | deleted
+click_count
+BIGINT
+DEFAULT 0
+Approximate counter (updated asynchronously)
+custom_alias
+BOOLEAN
+DEFAULT FALSE
+Whether user specified the code
+
+Index Strategy
+The query pattern is simple and highly cacheable:
+SELECT long_url, status, expires_at FROM url_mappings WHERE short_code = ?
+
+PRIMARY KEY on short_code ensures O(log n) B-tree lookup and uniqueness enforcement.
+INDEX on (expires_at) WHERE expires_at IS NOT NULL — supports efficient expired URL cleanup without full-table scans.
+INDEX on (user_id, created_at DESC) — supports "list my URLs" queries with efficient pagination.
+
+Users Table (Simplified)
+Column
+Type
+Notes
+user_id
+BIGINT
+SERIAL PRIMARY KEY
+email
+TEXT
+UNIQUE, for authentication
+api_key_hash
+TEXT
+Hashed API key for programmatic access
+plan
+ENUM
+free | pro | enterprise
+rate_limit_tier
+INT
+Controls URL creation rate limits
+5. High-Level Architecture
+The system decomposes into two distinct traffic paths: the Write Path (URL creation) and the Read Path (redirect lookup). These are separated into independent services, allowing each to be scaled, deployed, and operated independently.
+
+Architecture Diagram — Component Overview
+DNS / GeoDNS
+       ↓
+CDN (Cloudflare / CloudFront)
+       ↓
+API Gateway + WAF + Rate Limiter
+    ↙            ↘
+Redirect Service     Write Service
+    ↓ ↓                ↓ ↓
+Redis Cache          ID Generator (Redis)
+Read Replicas        Primary DB (Postgres)
+    ↓
+Kafka → Flink → ClickHouse (Analytics)
+
+Service Responsibilities
+Service
+Responsibility
+Scaling Axis
+API Gateway
+TLS termination, auth, rate limiting, WAF
+Horizontal — stateless
+Redirect Service
+Cache lookup → DB fallback → HTTP 302
+Horizontal — stateless; scale to 50K+ RPS
+Write Service
+Validate URL, allocate ID, persist mapping
+Horizontal — low throughput (115 RPS)
+ID Generator
+Issue monotonically increasing unique IDs
+Redis INCR; batching for low contention
+Redis Cache
+Serve >95% of redirect lookups from memory
+Vertical + Read Replica; Cluster mode if needed
+Postgres Primary
+Source of truth for all URL mappings
+Vertical first; shard by short_code prefix at scale
+Read Replicas
+Serve cache-miss DB reads from Redirect Service
+Add replicas for read scale-out
+Kafka
+Buffer click events; decouple analytics from redirect path
+Partition by short_code for ordering
+Analytics Pipeline
+Aggregate click events; power dashboards
+Flink/Spark; independent scaling
+6. Write Path — URL Creation
+API Contract
+POST /v1/urls
+{
+  "long_url": "https://example.com/very/long/path",
+  "custom_alias": "my-campaign",
+  "expires_at": "2025-12-31T00:00:00Z"
+}
+Response: HTTP 201 Created
+{
+  "short_url": "https://short.ly/aZ3x9K",
+  "short_code": "aZ3x9K",
+  "expires_at": "2025-12-31T00:00:00Z"
+}
+
+Write Flow — Step by Step
+Client sends POST /v1/urls with long_url and optional metadata.
+API Gateway validates the Bearer token and applies rate limiting (e.g., 100 creates/min for free tier).
+Write Service validates the long_url (must be syntactically valid, not on blacklist).
+If custom_alias provided: check uniqueness in DB. If taken, return HTTP 409 Conflict.
+Otherwise: Write Service requests the next ID from the ID Generator.
+ID Generator issues an ID from its pre-fetched batch (from Redis INCR).
+Write Service encodes the ID as Base62 to produce the short_code.
+Write Service inserts the row into Postgres Primary. Unique constraint on short_code prevents duplicates.
+Write Service returns the complete short URL to the client.
+
+Why the write path does NOT warm the cache
+Newly created URLs receive minimal traffic initially. Warming the cache on every write wastes Redis memory on links that may never be clicked. Instead, cache entries are populated lazily on first redirect (cache-aside pattern). Frequently accessed URLs will naturally self-populate.
+7. Short Code Generation — Design Decision
+Generating globally unique short codes is the most critical architectural decision. Three viable approaches exist; each carries distinct trade-offs.
+
+Option Comparison
+Approach
+Mechanism
+Pros
+Cons
+Verdict
+Hash (MD5/SHA)
+short_code = base62(hash(long_url)[:6])
+Deterministic; no coordination
+Collision probability; same URL = same code (bad for multi-user); collision resolution complexity
+❌ Rejected
+Random Base62
+Randomly sample from [a-zA-Z0-9]^6
+Simple; decentralized
+Birthday paradox: ~0.3% collision probability at 56B inserts; retry loops add latency
+❌ Rejected
+Counter + Base62
+Atomic counter → encode in Base62
+Zero collisions guaranteed; O(1); shortest possible codes; deterministic
+Requires coordination (mitigated by batching)
+✅ Chosen
+
+Counter + Base62 — Implementation
+Base62 uses the alphabet [a-zA-Z0-9] (62 characters). A 6-character code provides:
+62^6 = 56,800,235,584 ≈ 56 billion unique codes
+At 10M new URLs/day, this provides 15+ years of capacity before needing 7-character codes.
+
+ID Allocation via Redis Batching
+Each Write Service instance pre-fetches a batch of IDs from Redis using INCRBY:
+INCRBY global_url_counter 1000  →  returns 501000
+The server now owns IDs 500001–501000 and allocates them locally, making only 1 Redis call per 1,000 URLs created. This reduces Redis load by 1,000× while maintaining uniqueness.
+
+Multi-Region ID Partitioning
+To eliminate cross-region Redis coordination, each region is pre-assigned a non-overlapping ID range:
+Region
+ID Range Start
+ID Range End
+Short Code Range
+US East
+0
+10,000,000,000
+aZ3x9K ... (first 10B)
+EU West
+10,000,000,000
+20,000,000,000
+Next 10B range
+Asia Pacific
+20,000,000,000
+30,000,000,000
+Next 10B range
+
+Trade-off: Sequential IDs are Enumerable
+Sequential Base62 codes allow attackers to scrape all created URLs by incrementing the code. Mitigations: (1) rate limiting at the API gateway, (2) adding random bits to the Base62 encoding to break sequential predictability, (3) flagging links as "private" to require auth on redirect. This is an acceptable known trade-off for v1.
+8. Read Path — Redirect
+The redirect path handles the majority of system traffic and is the primary latency-critical code path. It must be optimized for minimal hops and maximum cache utilization.
+
+Redirect Flow — Step by Step
+User browser requests GET https://short.ly/aZ3x9K.
+GeoDNS resolves to the nearest regional CDN edge node.
+CDN checks its edge cache. On hit (rare for dynamic redirects), returns immediately.
+CDN forwards to the regional API Gateway, which routes to a Redirect Service pod.
+Redirect Service looks up short_code in Redis. On cache hit (>95% of requests): returns HTTP 302 Location header immediately.
+On cache miss: Redirect Service queries the nearest Postgres Read Replica.
+DB returns long_url, status, expires_at. Service validates status and expiry.
+Redirect Service writes the entry to Redis (TTL = min(expires_at, 24h)).
+Returns HTTP 302 Location: <long_url> to client.
+Asynchronously: Redirect Service publishes a click event to Kafka for analytics.
+
+HTTP 301 vs. HTTP 302 — Critical Decision
+Redirect Type
+Browser Behavior
+Analytics
+Link Updates
+Verdict
+301 Permanent
+Browsers cache indefinitely; skip our servers on repeat visits
+Lost after first click
+Impossible once cached
+❌ Rejected
+302 Temporary
+Browser re-requests each time; we handle every click
+Full click tracking
+Links can be updated or disabled
+✅ Chosen
+
+The performance cost of 302 vs. 301 is negligible given our caching layer. The analytics and control benefits far outweigh the marginal extra server round-trip.
+
+Cache Strategy — Cache-Aside (Lazy Population)
+Cache key: short_code
+Cache value: { long_url, status, expires_at } — everything needed to serve a redirect
+TTL: min(url.expires_at, 24 hours) — expired URLs automatically evict
+Cache miss: query Read Replica, populate cache, serve redirect
+Cache invalidation: on URL disable/delete, explicitly DEL the Redis key
+
+Cache Hit Rate Impact
+Why >95% Cache Hit Rate is Achievable
+URL access patterns follow a heavy power-law distribution: the top 1% of URLs receive ~80% of all traffic (Zipf's Law). With Redis holding 10M hot URLs (~5 GB), the vast majority of traffic is served from memory. The DB only sees cache-miss traffic — roughly 2,500 RPS at 95% hit rate vs. 50,000 total RPS.
+9. Database Architecture
+Database Selection: PostgreSQL
+Many candidates reflexively reach for Cassandra or DynamoDB. For this workload, a relational database is the correct choice and dramatically simpler to operate.
+
+Factor
+PostgreSQL
+Cassandra / DynamoDB
+Verdict
+Write throughput needed
+~115 writes/sec
+Designed for 100K+ writes/sec
+Postgres is vastly over-capable
+Query pattern
+Single-key PK lookup — RDBMS excels
+Single-key PK lookup — also fine
+Equivalent
+Uniqueness enforcement
+UNIQUE constraint at DB level
+Must implement at application layer
+Postgres safer
+Operational complexity
+Mature, well-understood, abundant tooling
+Complex replication model, tuning required
+Postgres simpler
+Sharding needs
+Not needed until >100B URLs
+Built-in distributed partitioning
+Postgres sufficient for years
+
+Replication Topology
+Postgres streaming replication provides a simple, proven high-availability topology:
+Primary (writes) ──→ Read Replica 1 (US) ──→ redirect reads
+                ──→ Read Replica 2 (EU) ──→ redirect reads
+                ──→ Read Replica 3 (APAC) → redirect reads
+
+All writes go to Primary. Redirect Service reads from the replica in its region.
+Replication lag is typically < 1 second — acceptable for redirect use (eventual consistency).
+If Primary fails, a replica is promoted using Patroni or pg_auto_failover (RTO ~30 seconds).
+
+Future: Sharding Strategy
+At extreme scale (>100B URLs, >10,000 writes/sec), horizontal sharding becomes necessary. The recommended approach:
+Shard by short_code prefix (first character): 62 shards, each handling ~1/62 of the keyspace.
+Alternatively, use CitusDB (Postgres-native sharding) to avoid application-layer routing logic.
+DynamoDB or Cassandra become viable at this scale — but this threshold is unlikely for 5+ years.
+10. Multi-Region Deployment
+Why Multi-Region?
+Network latency from a Singapore user to a US datacenter exceeds 200 ms — more than double the 100 ms p99 SLA. Multi-region deployment is required to meet latency targets globally.
+
+Region Pair
+Approx. RTT
+Impact on 100ms SLA
+Singapore → US East
+~200 ms
+Fails SLA before any processing time
+Frankfurt → US East
+~100 ms
+Marginal; any processing pushes over limit
+US West → US East
+~70 ms
+Passes; leaves ~30 ms for processing
+Singapore → Singapore
+< 5 ms
+Comfortable; ample headroom
+
+Traffic Routing
+GeoDNS (e.g., AWS Route 53 Latency Routing or Cloudflare) routes users to their nearest regional cluster.
+Each region runs a full stack: API Gateway → Redirect Service → Redis → Read Replica.
+Write traffic can be handled locally (eventual consistency) or forwarded to a global primary (strong consistency).
+
+Cross-Region Consistency Model
+Consistency Trade-off for Redirects
+Newly created URLs may take 1–5 seconds to replicate to all regions. During this window, a user in EU who just created a URL via US servers may get a 404 on redirect if they immediately click the link from the EU region. Mitigation: (1) create URLs in the user's local region, (2) use a short "write-through" period where the creating region's cache is authoritative, or (3) accept this as an edge case too rare to optimize in v1.
+11. Analytics Pipeline
+The Challenge: 1B Events Per Day
+Every redirect generates a click event containing: short_code, timestamp, user-agent, IP address (geolocation), and referrer. Writing these directly to Postgres at 11,600 RPS would saturate the DB and add latency to the critical redirect path.
+
+Event Streaming Architecture
+The solution decouples the analytics write path from the redirect critical path using Kafka:
+Redirect Service → Kafka Topic (clicks) → Flink/Spark → ClickHouse/BigQuery → Dashboard
+
+Component Responsibilities
+Component
+Role
+Key Properties
+Kafka
+Durable, ordered event buffer
+Partitioned by short_code for per-URL ordering; 7-day retention
+Flink / Spark Streaming
+Real-time aggregation and enrichment
+IP → geolocation enrichment; 1-minute tumbling windows for counts
+ClickHouse / BigQuery
+Analytics data store
+Column-oriented; fast aggregation over billions of rows
+Dashboard / API
+Expose analytics to users
+Pre-aggregated tables; user queries hit aggregates, not raw events
+
+Why Fire-and-Forget is Acceptable
+Click events are published to Kafka asynchronously after the 302 redirect is returned. If Kafka is temporarily unavailable, click events are dropped rather than blocking the redirect. Analytics accuracy is a "best effort" SLA — users tolerate approximate counts far more than they tolerate slow redirects.
+12. Abuse Prevention & Security
+Threat Model
+Threat
+Attack Vector
+Mitigation
+Phishing / malware links
+Create short URLs pointing to malicious sites
+Integration with Google Safe Browsing API at creation time; async re-scan on redirect
+URL enumeration / scraping
+Increment short codes to harvest all URLs
+Rate limiting (100 req/min per IP); randomized ID bits; monitoring for sequential access
+Spam link creation
+Bulk-create URLs to spam or flood the system
+API key required for bulk creation; CAPTCHA for anonymous; per-key rate limits
+Brute-force redirect abuse
+Probe random codes to find private URLs
+Short codes are 6 chars = 56B combinations; rate limiting makes enumeration infeasible
+DDoS on redirect path
+Flood a short URL with redirect requests
+CDN absorbs traffic; per-URL rate limits; auto-blocking
+
+Rate Limiting
+Rate limiting is enforced at the API Gateway level using a token bucket algorithm, with limits persisted in a shared Redis cluster:
+User Tier
+URL Creation Limit
+Redirect Limit
+Anonymous
+10 URLs/hour per IP
+200 req/min per IP
+Free
+100 URLs/day per account
+Unlimited (fair use)
+Pro
+10,000 URLs/day per account
+Unlimited
+Enterprise
+Custom
+Dedicated infrastructure
+
+HTTPS & TLS
+All endpoints require HTTPS. HTTP requests are redirected (301) to HTTPS.
+TLS 1.2+ enforced; TLS 1.0/1.1 disabled.
+HSTS headers set with 1-year max-age.
+WAF (Cloudflare or AWS Shield) sits in front of API Gateway.
+13. Failure Handling & Resilience
+A staff-level design must explicitly reason about every failure mode and its blast radius.
+
+Failure
+Detection
+Immediate Response
+Recovery
+Data Loss Risk
+Redis cache node fails
+Health check + alert in ~10s
+Redirect Service falls back to DB directly
+Redis Sentinel promotes replica within ~30s
+None — cache is reconstructed lazily
+Postgres Read Replica fails
+Replication monitor alerts
+Read traffic shifts to other replicas or Primary
+Provision new replica; catch up via WAL
+None — replica is read-only
+Postgres Primary fails
+Patroni health check (~15s)
+Writes are queued or rejected (503)
+Patroni promotes replica; new primary in ~30s
+Potential loss of ~15s of writes during failover
+Write Service pod fails
+Kubernetes liveness probe
+Load balancer routes to healthy pods
+k8s reschedules pod (< 60s)
+None — no state in service
+Kafka broker fails
+Kafka controller election (~30s)
+Click events may be buffered in-memory
+Kafka auto-recovers; ISR ensures no data loss
+Minimal — ISR replication factor 3
+Entire region fails
+Global health check (30–60s)
+GeoDNS routes traffic to next-nearest region
+Region restored; DNS TTL drain takes ~5 min
+Regional in-flight writes may be lost
+
+Circuit Breakers
+The Redirect Service implements circuit breakers on both the Redis and DB connections:
+If Redis error rate exceeds 50% in a 10-second window, the circuit opens and all traffic is served directly from DB.
+If DB error rate exceeds 20%, the circuit opens and requests receive HTTP 503 with Retry-After header.
+Half-open state probes a single request every 5 seconds to test recovery.
+14. Observability
+Key Metrics
+Metric
+Type
+Alert Threshold
+Why It Matters
+Redirect p99 latency
+Histogram
+> 100 ms
+Core SLA metric
+Cache hit rate
+Gauge
+< 90%
+Below 90% = DB under stress
+DB query p99 latency
+Histogram
+> 20 ms
+Indicates DB overload or bad query
+Error rate (5xx)
+Counter/Rate
+> 0.1%
+User-facing errors
+Kafka consumer lag
+Gauge
+> 100K events
+Analytics pipeline falling behind
+ID generator availability
+Gauge
+Any failure
+Write path depends on this
+Write throughput
+Rate
+Sudden 10× spike
+May indicate abuse or viral event
+
+Tooling Stack
+Metrics: Prometheus + Grafana dashboards per service and per region.
+Distributed Tracing: OpenTelemetry SDK in all services; Jaeger or Datadog APM for trace visualization.
+Log Aggregation: Structured JSON logs → Loki or Elasticsearch (ELK stack).
+Alerting: PagerDuty integration for P0/P1 alerts; Slack webhooks for P2/P3.
+Synthetic Monitoring: Canary requests to each region every 30 seconds to measure real-world redirect latency.
+15. Operational Concerns
+URL Expiration Cleanup
+Expired URLs must be removed to avoid wasting storage and to ensure redirect returns 410 Gone (not 302 to a stale URL). Two-phase approach:
+Redirect Service checks expires_at on every cache-miss DB lookup. Returns 410 if expired.
+Background cron job runs hourly: DELETE FROM url_mappings WHERE expires_at < NOW() AND status = 'active'. Uses the partial index on expires_at for efficiency.
+
+Cache Invalidation on URL Disable
+When a user disables or deletes a URL, the cache entry must be evicted to prevent stale 302 redirects:
+Write Service → Redis DEL short_code → DB UPDATE status = disabled
+This is a "write-through invalidation" pattern. The window for stale redirects is bounded by the time between the DB write and the Redis DEL completing — typically < 10 ms on the same network.
+
+Blue-Green Deployment
+Redirect Services are deployed using blue-green strategy. Because the service is stateless, traffic can be shifted instantly with zero downtime. Rollback is a single load balancer reconfiguration.
+
+Capacity Scaling Runbook
+Signal
+Threshold
+Action
+Cache hit rate declining
+< 90% sustained for 15 min
+Increase Redis maxmemory; review eviction policy
+DB CPU > 70%
+Sustained for 5 min
+Add read replica; review slow query log
+Redirect p99 > 80 ms
+Sustained for 5 min
+Scale out Redirect Service pods horizontally
+Kafka consumer lag growing
+> 500K events
+Scale up Flink consumers; check ClickHouse ingestion
+ID generator Redis INCR > 5ms
+Sustained
+Check Redis CPU; consider regional sharding of counter
+16. Future Evolution
+Staff engineers must think beyond the immediate design and reason about how the system evolves over 3–5 years.
+
+Enhancement
+Trigger to Build
+Architecture Change
+Complexity
+CDN-edge redirects
+p99 > 50 ms globally
+Store hot URL mappings in Cloudflare KV; serve 302 at edge without origin request
+Medium
+Serverless redirects
+Cost reduction needed at scale
+AWS Lambda@Edge + DynamoDB Global Tables; cold-start is acceptable for rare codes
+Medium
+ML spam detection
+Abuse rate > 1% of new URLs
+Async scoring pipeline; block on score > threshold; model retrained weekly
+High
+Database sharding
+>100B URLs or >10K writes/sec
+Shard by short_code[0]; 62 shards; CitusDB or application-layer router
+High
+Custom domains
+Enterprise customer demand
+Per-domain routing rules in API Gateway; TLS cert automation via Let's Encrypt
+Medium
+Smart routing (A/B)
+Marketing use cases
+Rule engine per short_code: route by country, device, time; stored in Redis hash
+Medium
+17. Key Design Decisions Summary
+The table below summarizes every major design decision, the alternative considered, and the rationale for the chosen approach.
+
+Decision
+Chosen Approach
+Alternative
+Key Reason for Choice
+Short code generation
+Counter + Base62 with Redis INCR batching
+Hash or random string
+Guaranteed uniqueness; O(1); no retry loops at scale
+HTTP redirect type
+302 Temporary Redirect
+301 Permanent Redirect
+Preserves analytics tracking and ability to update/expire links
+Cache pattern
+Cache-aside (lazy population)
+Write-through (populate on create)
+Power-law access: only hot URLs worth caching; write-through wastes memory
+Database
+PostgreSQL with streaming replication
+Cassandra / DynamoDB
+Write load is trivially low; RDBMS constraints prevent duplicates; simpler ops
+Analytics pipeline
+Async Kafka + streaming processor
+Synchronous DB write per click
+Redirect path must not be blocked; 1B/day writes would saturate any OLTP DB
+Multi-region IDs
+Pre-allocated range per region
+Global Redis counter with replication
+Eliminates cross-region network hop on every write; simpler failure behavior
+Consistency model
+Eventual for redirects; strong for writes
+Strong consistency everywhere
+Redirect reads can tolerate 1–5s replication lag; write uniqueness must be guaranteed
+18. Interview Prep — Staff-Level Follow-Up Questions
+FAANG Staff-level interviewers will probe these areas after the initial design. Being prepared for these demonstrates depth.
+
+Q: How would you handle a viral URL getting 1M clicks in 1 minute?
+This is a "hot key" problem. A single Redis key can handle ~100K ops/sec per node, so 1M/min (~16K RPS) is fine on a single node. However, if traffic exceeds that:
+Redis Cluster: distribute the key across multiple nodes using local replication (client-side read splitting).
+CDN caching: for truly viral links, push the mapping to CDN edge caches to absorb the spike without hitting origin.
+In-process LRU: Redirect Service pods maintain a small in-memory LRU cache (e.g., 1,000 entries). A viral URL will cache in-process across all pods, effectively distributing the load.
+
+Q: How do you generate IDs without a central coordinator?
+Twitter Snowflake approach: encode region ID (5 bits) + machine ID (10 bits) + timestamp (41 bits) + sequence (12 bits) = 64-bit integer. No coordination required. Each machine generates globally unique IDs autonomously. Trade-off: IDs depend on clock synchronization; NTP drift can cause ID collisions (mitigated by rejecting IDs from the past).
+
+Q: How do you ensure the system can handle 10× traffic overnight?
+Auto-scaling: Kubernetes HPA scales Redirect Service pods based on CPU and custom metrics (requests per pod). Redis scales vertically first; if a single node exceeds 80% capacity, switch to Redis Cluster. Postgres read replicas are pre-provisioned — adding a replica takes ~30 min for WAL catch-up, so this must be proactive, not reactive. CDN absorbs the first wave of traffic increases with zero infrastructure changes.
+
+Q: How do you prevent a single bad deploy from taking down all redirects globally?
+(1) Blue-green deployment: new version receives 0% traffic until health checks pass. (2) Canary releases: route 1% of traffic to new version for 15 minutes; auto-rollback if error rate or latency increases. (3) Feature flags: new behavior hidden behind flags; enables instant rollback without redeploy. (4) Regional rollout: deploy to one region first (e.g., APAC smallest), monitor for 1 hour, then proceed.

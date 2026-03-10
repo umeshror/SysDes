@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sliding Window — Coding Interview Patterns</title>
+    <link rel="stylesheet" href="../assets/css/styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>
+        body { font-family: 'Segoe UI', system-ui, sans-serif; background: #f4f6f9; }
+        .layout { display: flex; min-height: 100vh; }
+        .sidebar { width: 300px; background: #1a1a2e; color: #cdd6f4; position: fixed; height: 100vh; overflow-y: auto; }
+        .main { margin-left: 300px; flex: 1; padding: 48px; max-width: 1000px; margin: 0 auto; }
+        /* Additional pattern-specific styles from original file */
+        .pattern-header { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; }
+        .pattern-num { background: #89b4fa; color: #1a1a2e; padding: 4px 12px; border-radius: 6px; font-weight: 800; }
+        .pattern-title { margin: 0; font-size: 2rem; border: none; }
+        pre { background: #1e1e2e; color: #cdd6f4; padding: 20px; border-radius: 8px; overflow-x: auto; }
+        .problem-link { display: inline-block; background: #eff6ff; color: #1e40af; padding: 8px 16px; border-radius: 6px; text-decoration: none; font-size: 0.9rem; font-weight: 500; border: 1px solid #dbeafe; }
+        .callout { padding: 16px; border-radius: 6px; margin: 24px 0; }
+        .callout.tip { background: #f0fdf4; border-left: 4px solid #22c55e; }
+        .callout.warning { background: #fef2f2; border-left: 4px solid #ef4444; }
+        .complexity-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 24px 0; }
+        .comp-card { background: white; padding: 16px; border-radius: 8px; border: 1px solid #e2e8f0; }
+        .comp-label { font-size: 0.8rem; color: #64748b; text-transform: uppercase; font-weight: 700; }
+        .comp-value { font-size: 1.2rem; font-weight: 700; color: #1e293b; }
+    </style>
+</head>
+<body>
+    <div class="layout">
+        <nav class="sidebar">
+            <div class="sidebar-header" style="padding: 24px 20px;">
+                <a href="../index.html" style="color: #a6adc8; text-decoration: none; font-size: 0.8rem;">← Back to Home</a>
+                <h1 style="font-size: 1.2rem; margin-top: 12px; color: #fff;">Coding Patterns</h1>
+            </div>
+            <div class="sidebar-accordion">
+        <details class="acc-chapter" open>
+          <summary class="acc-summary">
+            <span class="chap-icon">🧩</span>
+            <span class="chap-text">
+              <span class="chap-num">Chapter 12</span>
+              <span class="chap-label">Coding Patterns</span>
+            </span>
+            <span class="chap-curr">●</span>
+            <span class="acc-arrow">›</span>
+          </summary>
+          <div class="acc-sub">
+              <a class="acc-sub-item" href="01-sliding-window.html#p1" data-sec="p1">Sliding Window</a>
+          </div>
+        </details>
+        <details class="acc-chapter">
+          <summary class="acc-summary">
+            <span class="chap-icon">🧩</span>
+            <span class="chap-text">
+              <span class="chap-num">Chapter 13</span>
+              <span class="chap-label">Coding Patterns</span>
+            </span>
+            
+            <span class="acc-arrow">›</span>
+          </summary>
+          <div class="acc-sub">
+              <a class="acc-sub-item" href="02-two-pointers.html#p2" data-sec="p2">Two Pointers</a>
+          </div>
+        </details>
+        <details class="acc-chapter">
+          <summary class="acc-summary">
+            <span class="chap-icon">🧩</span>
+            <span class="chap-text">
+              <span class="chap-num">Chapter 14</span>
+              <span class="chap-label">Coding Patterns</span>
+            </span>
+            
+            <span class="acc-arrow">›</span>
+          </summary>
+          <div class="acc-sub">
+              <a class="acc-sub-item" href="03-fast-slow-pointers.html#p3" data-sec="p3">Fast & Slow Pointers</a>
+          </div>
+        </details>
+        <details class="acc-chapter">
+          <summary class="acc-summary">
+            <span class="chap-icon">🧩</span>
+            <span class="chap-text">
+              <span class="chap-num">Chapter 15</span>
+              <span class="chap-label">Coding Patterns</span>
+            </span>
+            
+            <span class="acc-arrow">›</span>
+          </summary>
+          <div class="acc-sub">
+              <a class="acc-sub-item" href="04-merge-intervals.html#p4" data-sec="p4">Merge Intervals</a>
+          </div>
+        </details>
+        <details class="acc-chapter">
+          <summary class="acc-summary">
+            <span class="chap-icon">🧩</span>
+            <span class="chap-text">
+              <span class="chap-num">Chapter 16</span>
+              <span class="chap-label">Coding Patterns</span>
+            </span>
+            
+            <span class="acc-arrow">›</span>
+          </summary>
+          <div class="acc-sub">
+              <a class="acc-sub-item" href="05-cyclic-sort.html#p5" data-sec="p5">Cyclic Sort</a>
+          </div>
+        </details>
+        <details class="acc-chapter">
+          <summary class="acc-summary">
+            <span class="chap-icon">🧩</span>
+            <span class="chap-text">
+              <span class="chap-num">Chapter 17</span>
+              <span class="chap-label">Coding Patterns</span>
+            </span>
+            
+            <span class="acc-arrow">›</span>
+          </summary>
+          <div class="acc-sub">
+              <a class="acc-sub-item" href="06-in-place-reversal-of-a-linked-list.html#p6" data-sec="p6">In-place Reversal</a>
+          </div>
+        </details>
+        <details class="acc-chapter">
+          <summary class="acc-summary">
+            <span class="chap-icon">🧩</span>
+            <span class="chap-text">
+              <span class="chap-num">Chapter 18</span>
+              <span class="chap-label">Coding Patterns</span>
+            </span>
+            
+            <span class="acc-arrow">›</span>
+          </summary>
+          <div class="acc-sub">
+              <a class="acc-sub-item" href="07-tree-bfs.html#p7" data-sec="p7">Tree BFS</a>
+          </div>
+        </details>
+        <details class="acc-chapter">
+          <summary class="acc-summary">
+            <span class="chap-icon">🧩</span>
+            <span class="chap-text">
+              <span class="chap-num">Chapter 19</span>
+              <span class="chap-label">Coding Patterns</span>
+            </span>
+            
+            <span class="acc-arrow">›</span>
+          </summary>
+          <div class="acc-sub">
+              <a class="acc-sub-item" href="08-tree-dfs.html#p8" data-sec="p8">Tree DFS</a>
+          </div>
+        </details>
+        <details class="acc-chapter">
+          <summary class="acc-summary">
+            <span class="chap-icon">🧩</span>
+            <span class="chap-text">
+              <span class="chap-num">Chapter 20</span>
+              <span class="chap-label">Coding Patterns</span>
+            </span>
+            
+            <span class="acc-arrow">›</span>
+          </summary>
+          <div class="acc-sub">
+              <a class="acc-sub-item" href="09-two-heaps.html#p9" data-sec="p9">Two Heaps</a>
+          </div>
+        </details>
+        <details class="acc-chapter">
+          <summary class="acc-summary">
+            <span class="chap-icon">🧩</span>
+            <span class="chap-text">
+              <span class="chap-num">Chapter 21</span>
+              <span class="chap-label">Coding Patterns</span>
+            </span>
+            
+            <span class="acc-arrow">›</span>
+          </summary>
+          <div class="acc-sub">
+              <a class="acc-sub-item" href="10-subsets.html#p10" data-sec="p10">Subsets</a>
+          </div>
+        </details>
+        <details class="acc-chapter">
+          <summary class="acc-summary">
+            <span class="chap-icon">🧩</span>
+            <span class="chap-text">
+              <span class="chap-num">Chapter 22</span>
+              <span class="chap-label">Coding Patterns</span>
+            </span>
+            
+            <span class="acc-arrow">›</span>
+          </summary>
+          <div class="acc-sub">
+              <a class="acc-sub-item" href="11-modified-binary-search.html#p11" data-sec="p11">Modified Binary Search</a>
+          </div>
+        </details>
+        <details class="acc-chapter">
+          <summary class="acc-summary">
+            <span class="chap-icon">🧩</span>
+            <span class="chap-text">
+              <span class="chap-num">Chapter 23</span>
+              <span class="chap-label">Coding Patterns</span>
+            </span>
+            
+            <span class="acc-arrow">›</span>
+          </summary>
+          <div class="acc-sub">
+              <a class="acc-sub-item" href="12-top-k-elements.html#p12" data-sec="p12">Top K Elements</a>
+          </div>
+        </details>
+        <details class="acc-chapter">
+          <summary class="acc-summary">
+            <span class="chap-icon">🧩</span>
+            <span class="chap-text">
+              <span class="chap-num">Chapter 24</span>
+              <span class="chap-label">Coding Patterns</span>
+            </span>
+            
+            <span class="acc-arrow">›</span>
+          </summary>
+          <div class="acc-sub">
+              <a class="acc-sub-item" href="13-k-way-merge.html#p13" data-sec="p13">K-way Merge</a>
+          </div>
+        </details>
+        <details class="acc-chapter">
+          <summary class="acc-summary">
+            <span class="chap-icon">🧩</span>
+            <span class="chap-text">
+              <span class="chap-num">Chapter 25</span>
+              <span class="chap-label">Coding Patterns</span>
+            </span>
+            
+            <span class="acc-arrow">›</span>
+          </summary>
+          <div class="acc-sub">
+              <a class="acc-sub-item" href="14-topological-sort.html#p14" data-sec="p14">Topological Sort</a>
+          </div>
+        </details>
+        <details class="acc-chapter">
+          <summary class="acc-summary">
+            <span class="chap-icon">🧩</span>
+            <span class="chap-text">
+              <span class="chap-num">Chapter 26</span>
+              <span class="chap-label">Coding Patterns</span>
+            </span>
+            
+            <span class="acc-arrow">›</span>
+          </summary>
+          <div class="acc-sub">
+              <a class="acc-sub-item" href="15-prefix-sum.html#p15" data-sec="p15">Prefix Sum</a>
+          </div>
+        </details>
+        <details class="acc-chapter">
+          <summary class="acc-summary">
+            <span class="chap-icon">🧩</span>
+            <span class="chap-text">
+              <span class="chap-num">Chapter 27</span>
+              <span class="chap-label">Coding Patterns</span>
+            </span>
+            
+            <span class="acc-arrow">›</span>
+          </summary>
+          <div class="acc-sub">
+              <a class="acc-sub-item" href="16-monotonic-stack.html#p16" data-sec="p16">Monotonic Stack</a>
+          </div>
+        </details>
+        <details class="acc-chapter">
+          <summary class="acc-summary">
+            <span class="chap-icon">🧩</span>
+            <span class="chap-text">
+              <span class="chap-num">Chapter 28</span>
+              <span class="chap-label">Coding Patterns</span>
+            </span>
+            
+            <span class="acc-arrow">›</span>
+          </summary>
+          <div class="acc-sub">
+              <a class="acc-sub-item" href="17-union-find-disjoint-set.html#p17" data-sec="p17">Union Find</a>
+          </div>
+        </details>
+        <details class="acc-chapter">
+          <summary class="acc-summary">
+            <span class="chap-icon">🧩</span>
+            <span class="chap-text">
+              <span class="chap-num">Chapter 29</span>
+              <span class="chap-label">Coding Patterns</span>
+            </span>
+            
+            <span class="acc-arrow">›</span>
+          </summary>
+          <div class="acc-sub">
+              <a class="acc-sub-item" href="18-dynamic-programming.html#p18" data-sec="p18">Dynamic Programming</a>
+          </div>
+        </details>
+        <details class="acc-chapter">
+          <summary class="acc-summary">
+            <span class="chap-icon">🧩</span>
+            <span class="chap-text">
+              <span class="chap-num">Chapter 30</span>
+              <span class="chap-label">Coding Patterns</span>
+            </span>
+            
+            <span class="acc-arrow">›</span>
+          </summary>
+          <div class="acc-sub">
+              <a class="acc-sub-item" href="19-greedy.html#p19" data-sec="p19">Greedy</a>
+          </div>
+        </details>
+      </div>
+    </nav>
+        <main class="main">
+            <div class="section active">
+                
+              <div class="pattern-header">
+                <span class="pattern-num">01</span>
+                <h2 class="pattern-title">Sliding Window</h2>
+              </div>
+              <p>This pattern is used to perform a specific operation on a specific window size of a given
+                array
+                or linked list. The power of this pattern lies in its ability to convert nested loops
+                (O(N²))
+                into a single loop (O(N)).</p>
+
+
+              <div class="callout concept"
+                style="background:#eef2ff; border-left:4px solid #6366f1; padding: 16px; margin-top: 24px; margin-bottom: 24px; border-radius: 4px;">
+                <h4 style="margin-top:0; color:#4338ca; font-size:1.05rem;">🧠 Mental Model</h4>
+                <p style="margin-bottom:0; color:#312e81;">Maintain a moving window of valid elements.
+                  The right pointer expands the window to explore new elements, while the left pointer
+                  shrinks it when the window becomes invalid.</p>
+              </div>
+              <div class="signal-box">
+                <div class="signal-title">Identify by keywords</div>
+                <ul>
+                  <li>"Contiguous subarray or substring"</li>
+                  <li>"Maximum/Minimum sum of size K"</li>
+                  <li>"Longest/Shortest substring with K distinct characters"</li>
+                </ul>
+              </div>
+
+              <div class="complexity-grid">
+                <div class="comp-card">
+                  <div class="comp-label">Time Complexity</div>
+                  <div class="comp-value">O(N)</div>
+                </div>
+                <div class="comp-card">
+                  <div class="comp-label">Space Complexity</div>
+                  <div class="comp-value">O(1) / O(K)</div>
+                </div>
+              </div>
+
+              <h4>Reasoning: Brute Force to Optimized</h4>
+              <div class="reasoning-flow">
+                <div class="flow-step">
+                  <div class="step-title">1. Brute Force</div>
+                  <p>Check every possible contiguous subarray using nested loops.</p>
+                  <code>Time: O(N²)</code>
+                </div>
+                <div class="flow-step">
+                  <div class="step-title">2. Observation</div>
+                  <p>Consecutive subarrays overlap heavily. Re-calculating the sum/state for the
+                    overlapping part is redundant.</p>
+                </div>
+                <div class="flow-step">
+                  <div class="step-title">3. Optimized</div>
+                  <p>Maintain a sliding window. Add the new element entering the window and remove the
+                    old element leaving the window.</p>
+                  <code>Time: O(N)</code>
+                </div>
+              </div>
+
+              <h4>How it Works (Step-by-Step)</h4>
+              <ol>
+                <li><strong>Initialize</strong> two pointers (<code>left</code> and <code>right</code>)
+                  at the
+                  start of the data structure.</li>
+                <li><strong>Expand</strong> the window by moving the <code>right</code> pointer and
+                  consuming
+                  elements.</li>
+                <li><strong>Shrink</strong> the window by moving the <code>left</code> pointer if the
+                  window
+                  condition is violated (e.g., exceeds sum K).</li>
+                <li><strong>Record</strong> the result (max length, sum, etc.) at each valid window
+                  state.</li>
+              </ol>
+
+              <div class="pattern-viz" id="viz-p1" data-color="#00e5ff"></div>
+              <img src="../assets/patterns/p1-sliding-window.png" alt="Sliding Window Visual" class="pattern-img">
+
+              <h4>Common Edge Cases</h4>
+              <ul>
+                <li><strong>Empty Input</strong>: Ensure the window handles <code>len(arr) == 0</code>.
+                </li>
+                <li><strong>Window Size K > Array Length</strong>: Handle base cases where
+                  <code>k</code> is
+                  larger than the input.
+                </li>
+                <li><strong>Negative Numbers</strong>: Standard sliding window often assumes positive
+                  numbers;
+                  be careful if negative values are present.</li>
+              </ul>
+
+              <div class="warning-box">
+                <div class="warning-title">When NOT to use this pattern</div>
+                <p>If the array contains negative numbers and you are looking for a target sum. Negative
+                  numbers break the monotonic property of the window (expanding the window doesn't
+                  guarantee the sum will increase). Use <strong>Prefix Sum</strong> instead.</p>
+                <p><em>Example problem: Subarray Sum Equals K</em></p>
+              </div>
+
+              <h4>The Universal Masterclass Template</h4>
+              <pre><code class="language-python">def sliding_window(nums, k):
+    left = 0
+    best_result = 0 # or float('inf') for finding minimums
+    window_state = 0 # This could be a sum, a hash map of character counts, etc.
+
+    for right in range(len(nums)):
+        # 1. Add the element at 'right' to your window state
+        window_state += nums[right] 
+        
+        # 2. Check if the window is INVALID. If so, shrink from the left until it's valid again.
+        while window_is_invalid(window_state, k): 
+            # Remove the element at 'left' from your window state
+            window_state -= nums[left]
+            left += 1 # Shrink the window
+            
+        # 3. The window is now valid. Update your best result.
+        best_result = max(best_result, right - left + 1) # Example: tracking max length
+        
+    return best_result</code></pre>
+
+              <h4>Relevant Blind 75 Problems</h4>
+              <div style="display:flex; flex-wrap:wrap; gap:8px;">
+                <a href="../blind75/03-longest-substring-without-repeating-characters.html" class="problem-link">Longest
+                  Substring Without Repeating...</a>
+                <a href="../blind75/27-longest-repeating-character-replacement.html" class="problem-link">Longest
+                  Repeating Character Replacement</a>
+                <a href="../blind75/47-minimum-window-substring.html" class="problem-link">Minimum
+                  Window
+                  Substring</a>
+              </div>
+
+              <div
+                style="background:#f8fafc; padding: 16px; border-radius:8px; margin-top: 30px; margin-bottom: 20px; border:1px solid #e2e8f0;">
+                <h4>Walkthrough: Longest Substring Without Repeating</h4>
+                <pre>Input: 'abcabcbb'
+Step 1: window='a', max=1
+Step 2: window='ab', max=2
+Step 3: window='abc', max=3
+Step 4: hit 'a', window becomes 'bca', max=3</pre>
+              </div>
+              <div class="callout warning"
+                style="background:#fef2f2; border-left:4px solid #ef4444; padding: 16px; margin-bottom: 30px; border-radius: 4px;">
+                <h4 style="margin-top:0; color:#b91c1c; font-size:1.05rem;">⚠️ Common Interview Mistakes
+                </h4>
+                <div style="color:#7f1d1d; margin-bottom:0;">
+                  <ul>
+                    <li>Forgetting to shrink the window completely when invalid.</li>
+                    <li>Updating the global maximum/minimum state at the wrong time (before vs after
+                      shrinking).</li>
+                  </ul>
+                </div>
+              </div>
+            
+            </div>
+            
+                  <div class="page-nav">
+        <a class="page-nav-btn" href="../pages/11-interview-framework.html">&#8592; Interview Framework</a>
+        <a class="page-nav-btn home" href="../pages/01-introduction.html">&#9776; All Topics</a>
+        <a class="page-nav-btn" href="02-two-pointers.html">Two Pointers &#8594;</a>
+      </div>
+        </main>
+    </div>
+</body>
+</html>

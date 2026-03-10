@@ -17,12 +17,15 @@
 <!-- ── SIDEBAR ────────────────────────────────────────────── -->
     <nav class="sidebar">
         <div class="sidebar-header">
-            <a href="../index.html">← Back to Home</a>
+            <div style="margin-bottom:14px; font-size: 0.8em; display: flex; flex-wrap: wrap; gap: 8px;">
+                <a href="../index.html" style="color: #89b4fa; text-decoration: none;">&#8592; Home</a> &nbsp;|&nbsp;
+                <a href="../pages/01-introduction.html" style="color: #89b4fa; text-decoration: none;">Curriculum</a> &nbsp;|&nbsp;
+                <a href="../case_studies/url-shortener.html" style="color: #89b4fa; text-decoration: none;">Case Studies</a>
+                <a href="../patterns/index.html" style="color: #89b4fa; text-decoration: none;">Patterns</a>
+            </div>
             <h1>Blind 75</h1>
-            <p>Essential LeetCode patterns</p>
-        </div>
-
-        <div class="sidebar-search">
+            <p>Essential LeetCode Patterns</p>
+        </div><div class="sidebar-search">
             <input type="text" id="q-search" placeholder="Search questions…" oninput="filterQuestions(this.value)">
         </div>
 
@@ -406,7 +409,14 @@
 <ol><li><strong>Derive on the fly:</strong> For a 90° clockwise rotation, element at (i,j) goes to (j, n-1-i). Verify this with a 3×3 example on paper.</li><li><strong>Don't try to do it in one pass</strong> — the two-step method is O(n²) but clear and bug-free.</li><li><strong>Companies:</strong> Amazon, Google, Meta, Microsoft.</li></ol>
 </div>
 <button class="mark-solved-btn" id="solve-q29" onclick="markSolved('q29',this)">Mark as Solved</button>
-</div>
+
+                
+                <div class="page-nav">
+                    <a class="page-nav-btn" href="28-longest-increasing-subsequence.html">&larr; Previous</a>
+                    <a class="page-nav-btn home" href="../pages/01-introduction.html">&#9776; All Topics</a>
+                    <a class="page-nav-btn" href="30-group-anagrams.html">Next &rarr;</a>
+                </div>
+        </div>
     </div>
 
 <script>
