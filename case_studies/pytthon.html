@@ -1,0 +1,1166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Inside Python: A Systems-Level Deep Dive</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=JetBrains+Mono:wght@400;600&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d0d0f;
+    --surface: #141418;
+    --surface2: #1c1c22;
+    --border: #2a2a34;
+    --accent: #f0c040;
+    --accent2: #6ef0b0;
+    --accent3: #f07060;
+    --text: #e8e8f0;
+    --muted: #888899;
+    --code-bg: #0a0a12;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    font-size: 17px;
+    line-height: 1.75;
+  }
+
+  /* HERO */
+  .hero {
+    padding: 80px 24px 60px;
+    max-width: 820px;
+    margin: 0 auto;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .hero-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--accent);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+  }
+
+  .hero h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(36px, 6vw, 64px);
+    line-height: 1.1;
+    color: #fff;
+    margin-bottom: 24px;
+  }
+
+  .hero h1 span { color: var(--accent); }
+
+  .hero-sub {
+    font-size: 18px;
+    color: var(--muted);
+    max-width: 580px;
+  }
+
+  /* LAYOUT */
+  .container {
+    max-width: 820px;
+    margin: 0 auto;
+    padding: 0 24px 100px;
+  }
+
+  /* SECTION */
+  .section {
+    padding: 64px 0 32px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .section-number {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  h2 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 34px;
+    color: #fff;
+    margin-bottom: 20px;
+    line-height: 1.2;
+  }
+
+  h3 {
+    font-family: 'Syne', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--accent2);
+    margin: 36px 0 12px;
+    letter-spacing: 0.5px;
+  }
+
+  p {
+    color: #ccccd8;
+    margin-bottom: 16px;
+  }
+
+  strong { color: var(--text); }
+
+  /* CODE */
+  pre, code {
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  pre {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    padding: 20px 24px;
+    border-radius: 4px;
+    overflow-x: auto;
+    font-size: 13.5px;
+    line-height: 1.7;
+    color: #c8c8e0;
+    margin: 20px 0;
+  }
+
+  code {
+    background: var(--surface2);
+    padding: 2px 7px;
+    border-radius: 3px;
+    font-size: 13px;
+    color: var(--accent2);
+  }
+
+  pre code {
+    background: none;
+    padding: 0;
+    color: inherit;
+    font-size: inherit;
+  }
+
+  /* INSIGHT BOXES */
+  .insight {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--accent);
+    padding: 20px 24px;
+    border-radius: 0 6px 6px 0;
+    margin: 24px 0;
+  }
+
+  .insight-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 8px;
+  }
+
+  .insight p {
+    color: var(--text);
+    margin: 0;
+    font-size: 15px;
+  }
+
+  .insight.green { border-left-color: var(--accent2); }
+  .insight.green .insight-label { color: var(--accent2); }
+  .insight.red { border-left-color: var(--accent3); }
+  .insight.red .insight-label { color: var(--accent3); }
+
+  /* TABLE */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    font-size: 14px;
+  }
+
+  th {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--accent);
+    padding: 12px 16px;
+    border-bottom: 2px solid var(--border);
+    text-align: left;
+  }
+
+  td {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+    color: #ccccd8;
+  }
+
+  tr:hover td { background: var(--surface2); }
+
+  /* DIAGRAMS */
+  .diagram-wrap {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 32px 24px;
+    margin: 28px 0;
+    overflow-x: auto;
+  }
+
+  .diagram-title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 3px;
+    color: var(--muted);
+    text-transform: uppercase;
+    text-align: center;
+    margin-bottom: 24px;
+  }
+
+  svg text { font-family: 'JetBrains Mono', monospace; }
+
+  /* PROS / CONS */
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin: 20px 0;
+  }
+  @media(max-width:600px) { .two-col { grid-template-columns: 1fr; } }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 18px 20px;
+  }
+
+  .card-title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+
+  .card.green .card-title { color: var(--accent2); }
+  .card.red .card-title { color: var(--accent3); }
+
+  .card ul {
+    list-style: none;
+    padding: 0;
+  }
+
+  .card ul li {
+    color: #ccccd8;
+    font-size: 14px;
+    padding: 4px 0;
+  }
+
+  .card.green ul li::before { content: '✓ '; color: var(--accent2); }
+  .card.red ul li::before { content: '✗ '; color: var(--accent3); }
+
+  /* FINAL SUMMARY */
+  .summary-box {
+    background: linear-gradient(135deg, #1a1a24, #14141e);
+    border: 1px solid var(--accent);
+    border-radius: 8px;
+    padding: 36px 32px;
+    margin: 48px 0;
+  }
+
+  .summary-box h3 {
+    color: var(--accent);
+    font-size: 13px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin: 0 0 16px;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 600;
+  }
+
+  .summary-box p {
+    color: var(--text);
+    font-size: 16px;
+    line-height: 1.8;
+    margin: 0;
+  }
+
+  /* NAV PILL */
+  .toc {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 24px 28px;
+    margin: 40px 0 0;
+  }
+
+  .toc-title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 3px;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-bottom: 14px;
+  }
+
+  .toc ol {
+    padding-left: 20px;
+    column-count: 2;
+    column-gap: 32px;
+  }
+
+  @media(max-width:500px) { .toc ol { column-count: 1; } }
+
+  .toc li {
+    color: #aaaabc;
+    font-size: 14px;
+    margin-bottom: 6px;
+  }
+
+  .toc li a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .toc li a:hover { color: var(--accent); }
+
+  /* KEYWORD HIGHLIGHT */
+  .kw { color: var(--accent); }
+  .kw2 { color: var(--accent2); }
+  .kw3 { color: var(--accent3); }
+  .cm { color: #5a6a7a; }
+  .st { color: #e0a86a; }
+
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-tag">Systems Deep Dive · CPython Internals</div>
+  <h1>Inside <span>Python</span>: From Code to Execution</h1>
+  <p class="hero-sub">A detailed mental model for developers who want to stop guessing and start engineering — covering the VM, GIL, memory, and more.</p>
+  <div class="toc">
+    <div class="toc-title">Contents</div>
+    <ol>
+      <li><a href="#s1">Execution Pipeline</a></li>
+      <li><a href="#s2">AST</a></li>
+      <li><a href="#s3">Bytecode</a></li>
+      <li><a href="#s4">Python Virtual Machine</a></li>
+      <li><a href="#s5">PyObject Model</a></li>
+      <li><a href="#s6">Memory Management</a></li>
+      <li><a href="#s7">The GIL</a></li>
+      <li><a href="#s8">Dictionary Internals</a></li>
+      <li><a href="#s9">Function Frames</a></li>
+      <li><a href="#s10">Name Resolution</a></li>
+      <li><a href="#s11">Import System</a></li>
+      <li><a href="#s12">Why Python Is Slow — and Wins Anyway</a></li>
+    </ol>
+  </div>
+</div>
+
+<div class="container">
+
+<!-- ──────────────── SECTION 1 ──────────────── -->
+<div class="section" id="s1">
+  <div class="section-number">Section 01</div>
+  <h2>The Execution Pipeline</h2>
+
+  <p>When you type <code>python script.py</code>, it's tempting to imagine Python reading each line and executing it like a shell script. That's not what happens. Python runs your code through a <strong>multi-stage compilation and interpretation pipeline</strong> before a single instruction executes.</p>
+
+  <p>Here's the full picture:</p>
+
+  <div class="diagram-wrap">
+    <div class="diagram-title">CPython Execution Pipeline</div>
+    <svg viewBox="0 0 660 520" xmlns="http://www.w3.org/2000/svg" width="100%" style="max-width:660px;display:block;margin:0 auto;">
+      <defs>
+        <marker id="arr" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+          <path d="M1,1 L6,4 L1,7" stroke="#f0c040" stroke-width="1.5" fill="none"/>
+        </marker>
+      </defs>
+      <!-- Boxes -->
+      <rect x="200" y="10" width="260" height="52" rx="6" fill="#1c1c22" stroke="#2a2a34" stroke-width="1.5"/>
+      <text x="330" y="30" text-anchor="middle" fill="#e8e8f0" font-size="13">Source Code</text>
+      <text x="330" y="50" text-anchor="middle" fill="#888899" font-size="11">script.py</text>
+
+      <line x1="330" y1="62" x2="330" y2="90" stroke="#f0c040" stroke-width="1.5" marker-end="url(#arr)"/>
+      <rect x="200" y="90" width="260" height="52" rx="6" fill="#1c1c22" stroke="#2a2a34" stroke-width="1.5"/>
+      <text x="330" y="110" text-anchor="middle" fill="#e8e8f0" font-size="13">Lexer + Parser</text>
+      <text x="330" y="130" text-anchor="middle" fill="#888899" font-size="11">tokens → grammar rules</text>
+
+      <line x1="330" y1="142" x2="330" y2="170" stroke="#f0c040" stroke-width="1.5" marker-end="url(#arr)"/>
+      <rect x="200" y="170" width="260" height="52" rx="6" fill="#1c1c22" stroke="#2a2a34" stroke-width="1.5"/>
+      <text x="330" y="190" text-anchor="middle" fill="#6ef0b0" font-size="13">AST</text>
+      <text x="330" y="210" text-anchor="middle" fill="#888899" font-size="11">Abstract Syntax Tree</text>
+
+      <line x1="330" y1="222" x2="330" y2="250" stroke="#f0c040" stroke-width="1.5" marker-end="url(#arr)"/>
+      <rect x="200" y="250" width="260" height="52" rx="6" fill="#1c1c22" stroke="#2a2a34" stroke-width="1.5"/>
+      <text x="330" y="270" text-anchor="middle" fill="#e8e8f0" font-size="13">Compiler</text>
+      <text x="330" y="290" text-anchor="middle" fill="#888899" font-size="11">AST → bytecode</text>
+
+      <line x1="330" y1="302" x2="330" y2="330" stroke="#f0c040" stroke-width="1.5" marker-end="url(#arr)"/>
+      <rect x="200" y="330" width="260" height="52" rx="6" fill="#1c1c22" stroke="#2a2a34" stroke-width="1.5"/>
+      <text x="330" y="350" text-anchor="middle" fill="#f0c040" font-size="13">Code Object (.pyc)</text>
+      <text x="330" y="370" text-anchor="middle" fill="#888899" font-size="11">bytecode + constants + names</text>
+
+      <line x1="330" y1="382" x2="330" y2="410" stroke="#f0c040" stroke-width="1.5" marker-end="url(#arr)"/>
+      <rect x="180" y="410" width="300" height="64" rx="6" fill="#191920" stroke="#f0c040" stroke-width="1.5"/>
+      <text x="330" y="435" text-anchor="middle" fill="#f0c040" font-size="14" font-weight="bold">Python Virtual Machine</text>
+      <text x="330" y="458" text-anchor="middle" fill="#888899" font-size="11">stack-based interpreter</text>
+
+      <!-- Sidebar annotation -->
+      <text x="500" y="116" fill="#5a6a7a" font-size="10">← SyntaxError</text>
+      <text x="500" y="196" fill="#5a6a7a" font-size="10">← Tooling hooks</text>
+      <text x="500" y="276" fill="#5a6a7a" font-size="10">← Optimizations</text>
+      <text x="500" y="356" fill="#5a6a7a" font-size="10">← Cached on disk</text>
+    </svg>
+  </div>
+
+  <h3>Stage 1 — Lexing and Parsing</h3>
+  <p>Python first reads the raw text of your file and breaks it into <strong>tokens</strong> — the smallest meaningful units of the language. Keywords like <code>for</code>, <code>def</code>, operators like <code>+</code>, identifiers, and literals are all tokens.</p>
+  <p>These tokens are then fed into a <strong>parser</strong>, which checks that they form valid grammar according to Python's language specification. If your code is syntactically wrong (mismatched parentheses, wrong indentation), this stage raises a <code>SyntaxError</code>. No actual execution has happened yet.</p>
+
+  <h3>Stage 2 — AST Generation</h3>
+  <p>A valid token stream is then transformed into an <strong>Abstract Syntax Tree</strong>. This is a tree of nodes that captures the <em>meaning</em> of your code, not just its text. Each node represents a construct: an assignment, a function call, a loop. The tree is "abstract" because it drops irrelevant details like whitespace and parentheses.</p>
+
+  <h3>Stage 3 — Compilation to Bytecode</h3>
+  <p>The AST is compiled into <strong>bytecode</strong> — a low-level sequence of instructions designed for the Python Virtual Machine, not your CPU. This step also produces a <strong>code object</strong>, a self-contained package that includes the bytecode plus everything it needs to run: constants, variable names, and nested code objects for inner functions.</p>
+
+  <h3>Stage 4 — PVM Execution</h3>
+  <p>The Python Virtual Machine takes the code object and runs it, instruction by instruction, on its internal stack. This is where your code actually <em>does</em> something.</p>
+
+  <div class="insight">
+    <div class="insight-label">Key Insight</div>
+    <p>Python is <strong>not purely interpreted</strong>. It compiles to bytecode first (like Java compiles to JVM bytecode), then interprets that bytecode. The difference from Java: CPython has no Just-In-Time compiler, so bytecode never gets further compiled to machine code.</p>
+  </div>
+</div>
+
+<!-- ──────────────── SECTION 2 ──────────────── -->
+<div class="section" id="s2">
+  <div class="section-number">Section 02</div>
+  <h2>The Abstract Syntax Tree</h2>
+
+  <p>The AST is the heart of Python's tooling ecosystem. Understanding it explains why linters, formatters, and type checkers work the way they do.</p>
+
+  <p>Take this expression:</p>
+  <pre><code><span class="kw">x</span> = (2 + 3) * 4</code></pre>
+
+  <p>Python internally represents this as a tree of nodes. The assignment has two children: the target (<code>x</code>) and the value (a multiplication). The multiplication has its own children: the addition, and the literal <code>4</code>. The addition has children <code>2</code> and <code>3</code>.</p>
+
+  <div class="diagram-wrap">
+    <div class="diagram-title">AST for: x = (2 + 3) * 4</div>
+    <svg viewBox="0 0 560 300" xmlns="http://www.w3.org/2000/svg" width="100%" style="max-width:560px;display:block;margin:0 auto;">
+      <defs>
+        <marker id="tarr" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+          <path d="M1,1 L6,4 L1,7" stroke="#444458" stroke-width="1.5" fill="none"/>
+        </marker>
+      </defs>
+      <!-- Level 0: Assign -->
+      <rect x="190" y="10" width="180" height="40" rx="5" fill="#1c1c22" stroke="#f0c040" stroke-width="1.5"/>
+      <text x="280" y="35" text-anchor="middle" fill="#f0c040" font-size="13">Assign</text>
+
+      <!-- Level 1 -->
+      <line x1="220" y1="50" x2="140" y2="100" stroke="#444458" stroke-width="1.5" marker-end="url(#tarr)"/>
+      <rect x="60" y="100" width="160" height="40" rx="5" fill="#1c1c22" stroke="#888899" stroke-width="1.5"/>
+      <text x="140" y="125" text-anchor="middle" fill="#e8e8f0" font-size="13">Name: x</text>
+
+      <line x1="340" y1="50" x2="420" y2="100" stroke="#444458" stroke-width="1.5" marker-end="url(#tarr)"/>
+      <rect x="340" y="100" width="160" height="40" rx="5" fill="#1c1c22" stroke="#6ef0b0" stroke-width="1.5"/>
+      <text x="420" y="120" text-anchor="middle" fill="#6ef0b0" font-size="13">BinOp: Mult</text>
+      <text x="420" y="135" text-anchor="middle" fill="#888899" font-size="10">( ) * 4</text>
+
+      <!-- Level 2 -->
+      <line x1="385" y1="140" x2="305" y2="195" stroke="#444458" stroke-width="1.5" marker-end="url(#tarr)"/>
+      <rect x="220" y="195" width="160" height="40" rx="5" fill="#1c1c22" stroke="#6ef0b0" stroke-width="1.5"/>
+      <text x="300" y="215" text-anchor="middle" fill="#6ef0b0" font-size="13">BinOp: Add</text>
+      <text x="300" y="230" text-anchor="middle" fill="#888899" font-size="10">2 + 3</text>
+
+      <line x1="455" y1="140" x2="510" y2="195" stroke="#444458" stroke-width="1.5" marker-end="url(#tarr)"/>
+      <rect x="460" y="195" width="80" height="40" rx="5" fill="#1c1c22" stroke="#888899" stroke-width="1.5"/>
+      <text x="500" y="220" text-anchor="middle" fill="#e8e8f0" font-size="13">Num: 4</text>
+
+      <!-- Level 3 -->
+      <line x1="270" y1="235" x2="220" y2="265" stroke="#444458" stroke-width="1.5" marker-end="url(#tarr)"/>
+      <rect x="160" y="263" width="80" height="30" rx="4" fill="#111118" stroke="#444458"/>
+      <text x="200" y="283" text-anchor="middle" fill="#aaaabc" font-size="12">Num: 2</text>
+
+      <line x1="330" y1="235" x2="370" y2="265" stroke="#444458" stroke-width="1.5" marker-end="url(#tarr)"/>
+      <rect x="330" y="263" width="80" height="30" rx="4" fill="#111118" stroke="#444458"/>
+      <text x="370" y="283" text-anchor="middle" fill="#aaaabc" font-size="12">Num: 3</text>
+    </svg>
+  </div>
+
+  <h3>What the AST enables</h3>
+
+  <p><strong>Constant folding.</strong> The compiler can look at the <code>Add(2, 3)</code> node, see that both children are constants, and replace the whole subtree with <code>Num(5)</code> before any bytecode is emitted. This means <code>(2 + 3) * 4</code> is compiled as if you wrote <code>20</code>.</p>
+
+  <p><strong>Tooling.</strong> Every linter, formatter, type checker, and security scanner in the Python ecosystem works by parsing your code into an AST and then walking or transforming that tree. <code>pylint</code> detects unused variables by checking if a <code>Name</code> node is ever read. <code>black</code> reconstructs source code by visiting the AST and emitting its own formatting. <code>mypy</code> infers types by annotating tree nodes.</p>
+
+  <p><strong>Metaprogramming.</strong> Python exposes the <code>ast</code> module, letting you parse, inspect, and modify the tree at runtime. Frameworks use this for decorators, code generation, and DSLs.</p>
+
+  <div class="insight green">
+    <div class="insight-label">Practical Takeaway</div>
+    <p>If you ever build a linter, a code transformer, or a DSL in Python — you'll be working directly with the AST. Learning it once pays forever.</p>
+  </div>
+</div>
+
+<!-- ──────────────── SECTION 3 ──────────────── -->
+<div class="section" id="s3">
+  <div class="section-number">Section 03</div>
+  <h2>Bytecode — Python's Instruction Set</h2>
+
+  <p>Bytecode is a compact, platform-independent sequence of instructions that the PVM understands. It's much simpler than machine code — there's no need to deal with registers, memory addresses, or CPU architectures. But it's also more abstract, which means the PVM has to do more interpretation work.</p>
+
+  <p>For a simple expression <code>x = (2 + 3) * 4</code>, after constant folding the bytecode looks like this:</p>
+
+  <pre><code><span class="cm">## Bytecode for: x = 20</span>
+  2           0 LOAD_CONST               0 (20)     <span class="cm"># push 20 onto stack</span>
+              2 STORE_NAME               0 (x)      <span class="cm"># pop stack, store in 'x'</span>
+              4 LOAD_CONST               1 (None)   <span class="cm"># implicit return value</span>
+              6 RETURN_VALUE                        <span class="cm"># exit the frame</span></code></pre>
+
+  <p>Each line is one instruction. The number on the left is the offset in bytes. You can inspect bytecode yourself:</p>
+
+  <pre><code><span class="kw">import</span> dis
+<span class="kw">def</span> <span class="kw2">add</span>(a, b):
+    <span class="kw">return</span> a + b
+
+dis.dis(add)</code></pre>
+
+  <h3>The Code Object</h3>
+
+  <p>Bytecode doesn't exist in isolation. It's wrapped in a <strong>code object</strong> — a Python object (<code>types.CodeType</code>) that carries everything needed to execute a function or module:</p>
+
+  <table>
+    <tr><th>Attribute</th><th>Contains</th><th>Example</th></tr>
+    <tr><td><code>co_code</code></td><td>Raw bytecode bytes</td><td><code>b'\x64\x00\x53\x00'</code></td></tr>
+    <tr><td><code>co_consts</code></td><td>Literal values used</td><td><code>(20, None)</code></td></tr>
+    <tr><td><code>co_names</code></td><td>Global/attribute names</td><td><code>('x',)</code></td></tr>
+    <tr><td><code>co_varnames</code></td><td>Local variable names</td><td><code>('a', 'b')</code></td></tr>
+    <tr><td><code>co_filename</code></td><td>Source file</td><td><code>'script.py'</code></td></tr>
+    <tr><td><code>co_firstlineno</code></td><td>Line number in source</td><td><code>1</code></td></tr>
+  </table>
+
+  <div class="insight red">
+    <div class="insight-label">Version Warning</div>
+    <p>Bytecode is <strong>not stable across Python versions</strong>. CPython's bytecode changes between releases — new instructions are added, old ones are renamed. The <code>.pyc</code> cache files include a version magic number precisely because they're invalid across versions.</p>
+  </div>
+</div>
+
+<!-- ──────────────── SECTION 4 ──────────────── -->
+<div class="section" id="s4">
+  <div class="section-number">Section 04</div>
+  <h2>The Python Virtual Machine</h2>
+
+  <p>The PVM is a <strong>stack-based virtual machine</strong>. Every computation it performs uses a simple stack: instructions push values onto the stack, operate on the top of the stack, and push results back. There are no general-purpose registers like in a real CPU.</p>
+
+  <div class="diagram-wrap">
+    <div class="diagram-title">Stack execution of: (2 + 3) * 4</div>
+    <svg viewBox="0 0 640 220" xmlns="http://www.w3.org/2000/svg" width="100%" style="max-width:640px;display:block;margin:0 auto;">
+
+      <!-- Step labels -->
+      <text x="60" y="20" text-anchor="middle" fill="#888899" font-size="10" letter-spacing="2">STEP 1</text>
+      <text x="200" y="20" text-anchor="middle" fill="#888899" font-size="10" letter-spacing="2">STEP 2</text>
+      <text x="340" y="20" text-anchor="middle" fill="#888899" font-size="10" letter-spacing="2">STEP 3</text>
+      <text x="480" y="20" text-anchor="middle" fill="#888899" font-size="10" letter-spacing="2">STEP 4</text>
+      <text x="600" y="20" text-anchor="middle" fill="#888899" font-size="10" letter-spacing="2">STEP 5</text>
+
+      <!-- Instructions -->
+      <text x="60" y="42" text-anchor="middle" fill="#f0c040" font-size="11">LOAD_CONST 2</text>
+      <text x="200" y="42" text-anchor="middle" fill="#f0c040" font-size="11">LOAD_CONST 3</text>
+      <text x="340" y="42" text-anchor="middle" fill="#f0c040" font-size="11">BINARY_ADD</text>
+      <text x="480" y="42" text-anchor="middle" fill="#f0c040" font-size="11">LOAD_CONST 4</text>
+      <text x="600" y="42" text-anchor="middle" fill="#f0c040" font-size="11">BINARY_MULTIPLY</text>
+
+      <!-- Stack frames (bottom bar) -->
+      <line x1="20" y1="195" x2="120" y2="195" stroke="#2a2a34" stroke-width="2"/>
+      <line x1="160" y1="195" x2="260" y2="195" stroke="#2a2a34" stroke-width="2"/>
+      <line x1="300" y1="195" x2="400" y2="195" stroke="#2a2a34" stroke-width="2"/>
+      <line x1="440" y1="195" x2="540" y2="195" stroke="#2a2a34" stroke-width="2"/>
+      <line x1="560" y1="195" x2="640" y2="195" stroke="#2a2a34" stroke-width="2"/>
+
+      <!-- Step 1: [2] -->
+      <rect x="28" y="155" width="84" height="36" rx="3" fill="#1c3a2a" stroke="#6ef0b0" stroke-width="1"/>
+      <text x="70" y="178" text-anchor="middle" fill="#6ef0b0" font-size="13">2</text>
+
+      <!-- Step 2: [2, 3] -->
+      <rect x="168" y="155" width="84" height="36" rx="3" fill="#1c3a2a" stroke="#6ef0b0" stroke-width="1"/>
+      <text x="210" y="178" text-anchor="middle" fill="#6ef0b0" font-size="13">2</text>
+      <rect x="168" y="115" width="84" height="36" rx="3" fill="#1c3a2a" stroke="#6ef0b0" stroke-width="1.5"/>
+      <text x="210" y="138" text-anchor="middle" fill="#6ef0b0" font-size="13">3  ← top</text>
+
+      <!-- Step 3: [5] -->
+      <rect x="308" y="155" width="84" height="36" rx="3" fill="#2a2a1c" stroke="#f0c040" stroke-width="1.5"/>
+      <text x="350" y="178" text-anchor="middle" fill="#f0c040" font-size="13">5  ← top</text>
+
+      <!-- Step 4: [5, 4] -->
+      <rect x="448" y="155" width="84" height="36" rx="3" fill="#2a2a1c" stroke="#f0c040" stroke-width="1"/>
+      <text x="490" y="178" text-anchor="middle" fill="#f0c040" font-size="13">5</text>
+      <rect x="448" y="115" width="84" height="36" rx="3" fill="#1c3a2a" stroke="#6ef0b0" stroke-width="1.5"/>
+      <text x="490" y="138" text-anchor="middle" fill="#6ef0b0" font-size="13">4  ← top</text>
+
+      <!-- Step 5: [20] -->
+      <rect x="568" y="155" width="64" height="36" rx="3" fill="#3a1c1c" stroke="#f07060" stroke-width="1.5"/>
+      <text x="600" y="178" text-anchor="middle" fill="#f07060" font-size="13">20 ← top</text>
+    </svg>
+  </div>
+
+  <p>Every time you call a function, a separate stack (called an <strong>evaluation stack</strong>) is created for that invocation inside its own frame. Values are pushed and popped as instructions execute. When the function returns, the frame is discarded.</p>
+
+  <div class="two-col">
+    <div class="card green">
+      <div class="card-title">Why Stack-Based</div>
+      <ul>
+        <li>Simple to implement</li>
+        <li>Smaller instruction set</li>
+        <li>Easy portability across CPUs</li>
+        <li>No register allocation needed</li>
+      </ul>
+    </div>
+    <div class="card red">
+      <div class="card-title">The Cost</div>
+      <ul>
+        <li>More instructions per operation</li>
+        <li>Slower than register-based VMs</li>
+        <li>No JIT compilation in CPython</li>
+        <li>Each step = interpreted overhead</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="insight">
+    <div class="insight-label">Key Insight</div>
+    <p>A single Python line like <code>a + b</code> maps to multiple VM steps: load <code>a</code>, load <code>b</code>, dispatch the <code>+</code> operator (which calls <code>__add__</code> on the type), push the result. The interpreter loop processes every one of these. This overhead — multiplied across millions of lines — is a core reason Python is slow relative to compiled languages.</p>
+  </div>
+</div>
+
+<!-- ──────────────── SECTION 5 ──────────────── -->
+<div class="section" id="s5">
+  <div class="section-number">Section 05</div>
+  <h2>PyObject — Everything Is an Object</h2>
+
+  <p>In CPython, <em>every value</em> — integers, strings, lists, functions, classes, even <code>None</code> and <code>True</code> — is a <strong>PyObject</strong>. This is a C struct at the heart of Python's dynamic type system.</p>
+
+  <div class="diagram-wrap">
+    <div class="diagram-title">PyObject memory layout</div>
+    <svg viewBox="0 0 560 200" xmlns="http://www.w3.org/2000/svg" width="100%" style="max-width:560px;display:block;margin:0 auto;">
+      <!-- Memory block -->
+      <rect x="80" y="20" width="400" height="160" rx="6" fill="#111118" stroke="#2a2a34" stroke-width="1.5"/>
+
+      <rect x="80" y="20" width="400" height="48" rx="6" fill="#1c2a1c" stroke="#6ef0b0" stroke-width="1.5"/>
+      <text x="280" y="40" text-anchor="middle" fill="#6ef0b0" font-size="12" letter-spacing="1">ob_refcnt</text>
+      <text x="280" y="58" text-anchor="middle" fill="#888899" font-size="11">reference count (Py_ssize_t)</text>
+
+      <rect x="80" y="72" width="400" height="48" fill="#2a1c1c" stroke="#f07060" stroke-width="1"/>
+      <text x="280" y="92" text-anchor="middle" fill="#f07060" font-size="12" letter-spacing="1">ob_type</text>
+      <text x="280" y="110" text-anchor="middle" fill="#888899" font-size="11">pointer to PyTypeObject  (int, str, list…)</text>
+
+      <rect x="80" y="124" width="400" height="56" rx="0 0 6 6" fill="#1c1c2a" stroke="#444488" stroke-width="1"/>
+      <text x="280" y="148" text-anchor="middle" fill="#8888cc" font-size="12" letter-spacing="1">data</text>
+      <text x="280" y="166" text-anchor="middle" fill="#888899" font-size="11">actual value (digits, chars, pointers…)</text>
+
+      <!-- Brace labels -->
+      <text x="500" y="50" fill="#6ef0b0" font-size="10">8 bytes</text>
+      <text x="500" y="98" fill="#f07060" font-size="10">8 bytes</text>
+      <text x="500" y="155" fill="#8888cc" font-size="10">variable</text>
+    </svg>
+  </div>
+
+  <p>The <strong>ob_refcnt</strong> field is a counter of how many Python variables point to this object. When it reaches zero, the object is deallocated. The <strong>ob_type</strong> pointer points to the object's type, which is itself a PyObject — this is how Python knows which <code>__add__</code> or <code>__len__</code> method to call. The <strong>data</strong> section varies by type.</p>
+
+  <h3>Why this is powerful — and costly</h3>
+
+  <p>Because everything is a PyObject, Python can treat all values uniformly. A function that accepts "any object" works because every object exposes the same interface through its type pointer. Dynamic typing works because the type isn't tracked at compile time — it's stored in the object itself.</p>
+
+  <p>The cost is real though. A Python integer takes <strong>28 bytes</strong> of memory. A C integer takes 4 bytes. That's a 7× overhead just for storage, before you factor in the indirection and pointer chasing that hurt CPU cache performance.</p>
+
+  <div class="insight">
+    <div class="insight-label">Key Insight</div>
+    <p>Python trades memory and speed for <strong>flexibility</strong>. The same code can operate on integers, floats, custom objects — no generics or templates required. The PyObject model is what makes Python's dynamism feel effortless to write, and expensive to run.</p>
+  </div>
+</div>
+
+<!-- ──────────────── SECTION 6 ──────────────── -->
+<div class="section" id="s6">
+  <div class="section-number">Section 06</div>
+  <h2>Memory Management</h2>
+
+  <p>Python uses a <strong>two-layer garbage collection strategy</strong>: reference counting handles most allocations instantly, while a cyclic garbage collector handles the edge cases that reference counting can't.</p>
+
+  <h3>Reference Counting</h3>
+
+  <p>Every PyObject maintains an <code>ob_refcnt</code>. When you assign a variable, the count goes up. When a variable goes out of scope or is reassigned, it goes down. When the count hits zero, the memory is freed <em>immediately</em>, without waiting for a GC cycle.</p>
+
+  <pre><code><span class="cm"># refcount demonstration</span>
+<span class="kw">import</span> sys
+
+a = []           <span class="cm"># refcount = 1</span>
+b = a            <span class="cm"># refcount = 2</span>
+<span class="kw">print</span>(sys.getrefcount(a))  <span class="cm"># 3 (getrefcount itself adds 1)</span>
+<span class="kw">del</span> b            <span class="cm"># refcount = 2 (back to a + getrefcount)</span></code></pre>
+
+  <p>This determinism is why <code>with</code> blocks and context managers work reliably: file handles and database connections are released the moment the last reference disappears, not at some future GC pause.</p>
+
+  <h3>Cyclic Garbage Collector</h3>
+
+  <p>Reference counting has one fatal flaw: it can't handle cycles. If two objects reference each other, their counts never reach zero even when nothing else refers to them.</p>
+
+  <pre><code><span class="cm"># Reference cycle — neither object can be freed by refcounting</span>
+a = []
+b = [a]
+a.append(b)
+<span class="kw">del</span> a, b  <span class="cm"># counts don't reach 0 — memory leak without cyclic GC</span></code></pre>
+
+  <p>Python's cyclic GC periodically scans objects it <em>knows</em> can form cycles (containers like lists, dicts, and custom objects). It uses a reachability analysis: starting from roots (global variables, stack frames), any object it can't reach is garbage.</p>
+
+  <div class="diagram-wrap">
+    <div class="diagram-title">Generational Garbage Collection</div>
+    <svg viewBox="0 0 600 180" xmlns="http://www.w3.org/2000/svg" width="100%" style="max-width:600px;display:block;margin:0 auto;">
+      <defs>
+        <marker id="garr" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+          <path d="M1,1 L6,4 L1,7" stroke="#6ef0b0" stroke-width="1.5" fill="none"/>
+        </marker>
+      </defs>
+
+      <!-- Gen 0 -->
+      <rect x="20" y="40" width="160" height="100" rx="6" fill="#1c2a1c" stroke="#6ef0b0" stroke-width="1.5"/>
+      <text x="100" y="65" text-anchor="middle" fill="#6ef0b0" font-size="12" font-weight="bold">Gen 0</text>
+      <text x="100" y="85" text-anchor="middle" fill="#888899" font-size="10">New objects</text>
+      <text x="100" y="102" text-anchor="middle" fill="#888899" font-size="10">Collected ~700 times</text>
+      <text x="100" y="118" text-anchor="middle" fill="#888899" font-size="10">per Gen 2 collection</text>
+      <text x="100" y="135" text-anchor="middle" fill="#6ef0b0" font-size="10">Most objects die here</text>
+
+      <!-- Arrow Gen0 → Gen1 -->
+      <line x1="180" y1="90" x2="218" y2="90" stroke="#6ef0b0" stroke-width="1.5" marker-end="url(#garr)"/>
+      <text x="199" y="82" text-anchor="middle" fill="#5a6a7a" font-size="9">survive</text>
+
+      <!-- Gen 1 -->
+      <rect x="220" y="40" width="160" height="100" rx="6" fill="#2a2a1c" stroke="#f0c040" stroke-width="1.5"/>
+      <text x="300" y="65" text-anchor="middle" fill="#f0c040" font-size="12" font-weight="bold">Gen 1</text>
+      <text x="300" y="85" text-anchor="middle" fill="#888899" font-size="10">Medium-lived</text>
+      <text x="300" y="102" text-anchor="middle" fill="#888899" font-size="10">Promoted from Gen 0</text>
+      <text x="300" y="118" text-anchor="middle" fill="#888899" font-size="10">Less frequent checks</text>
+
+      <!-- Arrow Gen1 → Gen2 -->
+      <line x1="380" y1="90" x2="418" y2="90" stroke="#f0c040" stroke-width="1.5" marker-end="url(#garr)"/>
+      <text x="399" y="82" text-anchor="middle" fill="#5a6a7a" font-size="9">survive</text>
+
+      <!-- Gen 2 -->
+      <rect x="420" y="40" width="160" height="100" rx="6" fill="#2a1c1c" stroke="#f07060" stroke-width="1.5"/>
+      <text x="500" y="65" text-anchor="middle" fill="#f07060" font-size="12" font-weight="bold">Gen 2</text>
+      <text x="500" y="85" text-anchor="middle" fill="#888899" font-size="10">Long-lived objects</text>
+      <text x="500" y="102" text-anchor="middle" fill="#888899" font-size="10">Module globals, caches</text>
+      <text x="500" y="118" text-anchor="middle" fill="#888899" font-size="10">Rarely collected</text>
+
+      <!-- Thresholds label -->
+      <text x="300" y="165" text-anchor="middle" fill="#5a6a7a" font-size="10">Default thresholds: 700 / 10 / 10</text>
+    </svg>
+  </div>
+
+  <p>The generational hypothesis — that most objects die young — is borne out by real programs. Python's GC optimizes for this by checking the youngest generation most frequently and promoting survivors upward.</p>
+
+  <div class="insight green">
+    <div class="insight-label">Production Note</div>
+    <p>You can tune GC thresholds with <code>gc.set_threshold()</code>. In long-running servers with many short-lived objects, you can disable Gen 0 collection and trigger it manually between requests to avoid latency spikes.</p>
+  </div>
+</div>
+
+<!-- ──────────────── SECTION 7 ──────────────── -->
+<div class="section" id="s7">
+  <div class="section-number">Section 07</div>
+  <h2>The GIL — Python's Most Misunderstood Feature</h2>
+
+  <p>The <strong>Global Interpreter Lock</strong> is a mutex that protects CPython's internal state. At any point in time, only one thread can be executing Python bytecode. This is the single most controversial design decision in Python's history.</p>
+
+  <div class="diagram-wrap">
+    <div class="diagram-title">GIL behaviour: CPU-bound vs I/O-bound threads</div>
+    <svg viewBox="0 0 620 260" xmlns="http://www.w3.org/2000/svg" width="100%" style="max-width:620px;display:block;margin:0 auto;">
+      <!-- CPU-bound label -->
+      <text x="20" y="28" fill="#f07060" font-size="12" font-weight="bold">CPU-BOUND</text>
+      <text x="20" y="44" fill="#888899" font-size="10">2 threads: GIL switches every N bytecodes</text>
+
+      <!-- Thread A CPU -->
+      <text x="20" y="72" fill="#aaaabc" font-size="11">Thread A</text>
+      <rect x="80" y="58" width="120" height="22" rx="3" fill="#3a2a1c" stroke="#f0c040"/>
+      <text x="140" y="73" text-anchor="middle" fill="#f0c040" font-size="10">running</text>
+      <rect x="200" y="58" width="2" height="22" fill="#444"/>
+      <rect x="202" y="58" width="80" height="22" rx="0" fill="#1c1c1c" stroke="#444"/>
+      <text x="242" y="73" text-anchor="middle" fill="#5a6a7a" font-size="10">waiting</text>
+      <rect x="282" y="58" width="120" height="22" rx="3" fill="#3a2a1c" stroke="#f0c040"/>
+      <text x="342" y="73" text-anchor="middle" fill="#f0c040" font-size="10">running</text>
+
+      <!-- Thread B CPU -->
+      <text x="20" y="112" fill="#aaaabc" font-size="11">Thread B</text>
+      <rect x="80" y="98" width="80" height="22" rx="3" fill="#1c1c1c" stroke="#444"/>
+      <text x="120" y="113" text-anchor="middle" fill="#5a6a7a" font-size="10">waiting</text>
+      <rect x="160" y="98" width="2" height="22" fill="#444"/>
+      <rect x="162" y="98" width="120" height="22" rx="3" fill="#3a2a1c" stroke="#f0c040"/>
+      <text x="222" y="113" text-anchor="middle" fill="#f0c040" font-size="10">running</text>
+      <rect x="282" y="98" width="2" height="22" fill="#444"/>
+      <rect x="284" y="98" width="80" height="22" rx="3" fill="#1c1c1c" stroke="#444"/>
+      <text x="324" y="113" text-anchor="middle" fill="#5a6a7a" font-size="10">waiting</text>
+
+      <text x="20" y="138" fill="#f07060" font-size="10">❌  No true parallelism — total work takes the same time or longer</text>
+
+      <!-- Divider -->
+      <line x1="0" y1="155" x2="620" y2="155" stroke="#2a2a34"/>
+
+      <!-- I/O-bound label -->
+      <text x="20" y="180" fill="#6ef0b0" font-size="12" font-weight="bold">I/O-BOUND</text>
+      <text x="20" y="196" fill="#888899" font-size="10">GIL released while waiting for I/O, so other threads run</text>
+
+      <!-- Thread A IO -->
+      <text x="20" y="224" fill="#aaaabc" font-size="11">Thread A</text>
+      <rect x="80" y="210" width="100" height="22" rx="3" fill="#1c2a1c" stroke="#6ef0b0"/>
+      <text x="130" y="225" text-anchor="middle" fill="#6ef0b0" font-size="10">running</text>
+      <rect x="180" y="210" width="60" height="22" rx="3" fill="#1a1a28" stroke="#444488"/>
+      <text x="210" y="225" text-anchor="middle" fill="#8888cc" font-size="10">I/O wait</text>
+      <rect x="240" y="210" width="100" height="22" rx="3" fill="#1c2a1c" stroke="#6ef0b0"/>
+      <text x="290" y="225" text-anchor="middle" fill="#6ef0b0" font-size="10">running</text>
+
+      <!-- Thread B IO -->
+      <text x="20" y="252" fill="#aaaabc" font-size="11">Thread B</text>
+      <rect x="180" y="238" width="60" height="22" rx="3" fill="#1c2a1c" stroke="#6ef0b0"/>
+      <text x="210" y="253" text-anchor="middle" fill="#6ef0b0" font-size="10">runs here</text>
+
+      <text x="350" y="252" fill="#6ef0b0" font-size="10">✓ True concurrency possible during I/O</text>
+    </svg>
+  </div>
+
+  <h3>Why does the GIL exist?</h3>
+
+  <p>Without the GIL, every object mutation would need its own lock. Incrementing a reference count — something that happens millions of times per second — would require a lock acquisition and release. The GIL is a <strong>single coarse-grained lock</strong> that is far cheaper than thousands of fine-grained locks, and it makes CPython's C API dramatically simpler to use correctly.</p>
+
+  <h3>Workarounds that actually work</h3>
+
+  <table>
+    <tr><th>Approach</th><th>How it helps</th><th>When to use</th></tr>
+    <tr><td><code>multiprocessing</code></td><td>Separate processes with separate GILs</td><td>CPU-bound parallel work</td></tr>
+    <tr><td><code>asyncio</code></td><td>Single-thread event loop, cooperative</td><td>High-concurrency I/O</td></tr>
+    <tr><td><code>threading</code></td><td>Works well when GIL released during I/O</td><td>I/O-bound concurrent work</td></tr>
+    <tr><td>Native extensions</td><td>C code can release GIL explicitly</td><td>NumPy, PyTorch operations</td></tr>
+    <tr><td>Sub-interpreters (3.12+)</td><td>Experimental per-interpreter GIL</td><td>Future concurrent Python</td></tr>
+  </table>
+
+  <div class="insight">
+    <div class="insight-label">Key Insight</div>
+    <p>The GIL is a <strong>design tradeoff, not a bug</strong>. It makes single-threaded CPython faster and safer, at the cost of CPU-bound multithreading. Python 3.12+ introduced per-interpreter GILs as a first step toward removing it. PEP 703 proposes making the GIL optional in a future release.</p>
+  </div>
+</div>
+
+<!-- ──────────────── SECTION 8 ──────────────── -->
+<div class="section" id="s8">
+  <div class="section-number">Section 08</div>
+  <h2>Dictionary Internals</h2>
+
+  <p>Python's <code>dict</code> is one of the most heavily optimized data structures in the language. Attribute lookup, module globals, keyword arguments — all of them internally use dictionaries. Getting this right matters enormously.</p>
+
+  <p>A Python dict is a <strong>hash table with open addressing</strong>. Each key is hashed to produce an index into a sparse array of slots. If the slot is empty, the key is inserted there. If it's occupied by a different key, Python probes nearby slots until an empty one is found.</p>
+
+  <div class="diagram-wrap">
+    <div class="diagram-title">Dict lookup flow</div>
+    <svg viewBox="0 0 580 240" xmlns="http://www.w3.org/2000/svg" width="100%" style="max-width:580px;display:block;margin:0 auto;">
+      <defs>
+        <marker id="darr" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+          <path d="M1,1 L6,4 L1,7" stroke="#f0c040" stroke-width="1.5" fill="none"/>
+        </marker>
+        <marker id="darr2" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+          <path d="M1,1 L6,4 L1,7" stroke="#f07060" stroke-width="1.5" fill="none"/>
+        </marker>
+      </defs>
+
+      <!-- dict["name"] label -->
+      <rect x="20" y="20" width="160" height="40" rx="5" fill="#1c1c22" stroke="#f0c040" stroke-width="1.5"/>
+      <text x="100" y="45" text-anchor="middle" fill="#f0c040" font-size="13">dict["name"]</text>
+
+      <!-- hash() -->
+      <line x1="180" y1="40" x2="215" y2="40" stroke="#f0c040" stroke-width="1.5" marker-end="url(#darr)"/>
+      <rect x="215" y="20" width="130" height="40" rx="5" fill="#1c1c22" stroke="#888899" stroke-width="1"/>
+      <text x="280" y="38" text-anchor="middle" fill="#e8e8f0" font-size="12">hash("name")</text>
+      <text x="280" y="54" text-anchor="middle" fill="#888899" font-size="10">→ integer</text>
+
+      <!-- % size -->
+      <line x1="345" y1="40" x2="380" y2="40" stroke="#f0c040" stroke-width="1.5" marker-end="url(#darr)"/>
+      <rect x="380" y="20" width="130" height="40" rx="5" fill="#1c1c22" stroke="#888899" stroke-width="1"/>
+      <text x="445" y="38" text-anchor="middle" fill="#e8e8f0" font-size="12">hash % size</text>
+      <text x="445" y="54" text-anchor="middle" fill="#888899" font-size="10">→ slot index</text>
+
+      <!-- Array of slots -->
+      <text x="100" y="105" text-anchor="middle" fill="#888899" font-size="10" letter-spacing="2">HASH TABLE SLOTS</text>
+
+      <rect x="20" y="115" width="64" height="36" rx="3" fill="#111118" stroke="#2a2a34"/>
+      <text x="52" y="137" text-anchor="middle" fill="#5a6a7a" font-size="11">empty</text>
+
+      <rect x="88" y="115" width="64" height="36" rx="3" fill="#1c2a1c" stroke="#6ef0b0" stroke-width="1.5"/>
+      <text x="120" y="137" text-anchor="middle" fill="#6ef0b0" font-size="11">"age"</text>
+
+      <rect x="156" y="115" width="64" height="36" rx="3" fill="#111118" stroke="#2a2a34"/>
+      <text x="188" y="137" text-anchor="middle" fill="#5a6a7a" font-size="11">empty</text>
+
+      <rect x="224" y="115" width="64" height="36" rx="3" fill="#3a2a1c" stroke="#f0c040" stroke-width="1.5"/>
+      <text x="256" y="137" text-anchor="middle" fill="#f0c040" font-size="11">"name"</text>
+
+      <rect x="292" y="115" width="64" height="36" rx="3" fill="#111118" stroke="#2a2a34"/>
+      <text x="324" y="137" text-anchor="middle" fill="#5a6a7a" font-size="11">empty</text>
+
+      <rect x="360" y="115" width="64" height="36" rx="3" fill="#1c2a1c" stroke="#6ef0b0" stroke-width="1.5"/>
+      <text x="392" y="137" text-anchor="middle" fill="#6ef0b0" font-size="11">"city"</text>
+
+      <!-- Arrow down from index to slot -->
+      <line x1="445" y1="60" x2="445" y2="100" stroke="#f0c040" stroke-width="1.5" marker-end="url(#darr)"/>
+      <line x1="445" y1="100" x2="256" y2="112" stroke="#f0c040" stroke-width="1.5" marker-end="url(#darr)"/>
+
+      <!-- Collision probe -->
+      <text x="100" y="185" text-anchor="middle" fill="#888899" font-size="10" letter-spacing="1">COLLISION → PROBE NEXT SLOT</text>
+      <path d="M120 155 Q120 185 188 185 Q256 185 256 155" stroke="#f07060" stroke-width="1.5" fill="none" marker-end="url(#darr2)" stroke-dasharray="4,2"/>
+
+      <text x="300" y="210" fill="#5a6a7a" font-size="10">Key match found → return value</text>
+      <text x="300" y="228" fill="#5a6a7a" font-size="10">Empty slot hit → KeyError</text>
+    </svg>
+  </div>
+
+  <h3>Why Python dicts are fast</h3>
+  <p>Rather than a linked-list chain for collisions (chaining), Python uses <strong>open addressing</strong> — all entries live in the same flat array. This is cache-friendly because nearby slots are likely in the same cache line. The probing sequence uses a perturbation trick (involving the full hash value, not just the low bits) to reduce clustering.</p>
+
+  <h3>Key design properties</h3>
+  <table>
+    <tr><th>Property</th><th>Detail</th></tr>
+    <tr><td>Insertion order preserved</td><td>Guaranteed since Python 3.7</td></tr>
+    <tr><td>Average lookup</td><td>O(1)</td></tr>
+    <tr><td>Load factor</td><td>Resizes at ~⅔ full to stay sparse</td></tr>
+    <tr><td>Key requirement</td><td>Must be hashable (immutable types)</td></tr>
+    <tr><td>Compact dict (3.6+)</td><td>Separate indices array + dense entries array</td></tr>
+  </table>
+</div>
+
+<!-- ──────────────── SECTION 9 ──────────────── -->
+<div class="section" id="s9">
+  <div class="section-number">Section 09</div>
+  <h2>Function Calls and Frames</h2>
+
+  <p>Every function call in Python creates a <strong>frame object</strong> — a PyObject that contains the complete execution state for that call. Frames are allocated on the heap (not the C stack), which is what enables Python's introspection capabilities.</p>
+
+  <div class="diagram-wrap">
+    <div class="diagram-title">Frame stack during nested calls</div>
+    <svg viewBox="0 0 600 220" xmlns="http://www.w3.org/2000/svg" width="100%" style="max-width:600px;display:block;margin:0 auto;">
+
+      <!-- Module frame -->
+      <rect x="20" y="160" width="560" height="48" rx="5" fill="#1c1c22" stroke="#888899" stroke-width="1"/>
+      <text x="36" y="180" fill="#888899" font-size="11">Module frame</text>
+      <text x="36" y="198" fill="#5a6a7a" font-size="10">globals, module-level code</text>
+
+      <!-- outer() frame -->
+      <rect x="60" y="100" width="480" height="56" rx="5" fill="#1c2a2a" stroke="#6ef0b0" stroke-width="1.5"/>
+      <text x="76" y="122" fill="#6ef0b0" font-size="11">outer() frame</text>
+      <text x="76" y="140" fill="#5a6a7a" font-size="10">locals: x=5 · ip: line 4 · eval stack: [...]</text>
+
+      <!-- inner() frame -->
+      <rect x="100" y="30" width="400" height="66" rx="5" fill="#2a1c2a" stroke="#f0c040" stroke-width="1.5"/>
+      <text x="116" y="52" fill="#f0c040" font-size="11">inner() frame  ← currently executing</text>
+      <text x="116" y="70" fill="#5a6a7a" font-size="10">locals: a=1, b=2 · ip: line 8 · eval stack: [1, 2]</text>
+      <text x="116" y="86" fill="#5a6a7a" font-size="10">f_back → outer() frame</text>
+
+      <!-- Labels -->
+      <text x="20" y="228" fill="#5a6a7a" font-size="10">← older frames (deeper in call stack)</text>
+      <text x="400" y="228" fill="#f0c040" font-size="10">active frame →</text>
+    </svg>
+  </div>
+
+  <h3>What a frame contains</h3>
+  <p>Each frame holds: the <strong>local variables</strong> as a fixed-size array (faster than a dict), the <strong>evaluation stack</strong> for the current computation, the <strong>instruction pointer</strong> (which bytecode offset is currently running), and a back-pointer to the calling frame. That chain of back-pointers is exactly what Python uses to produce tracebacks.</p>
+
+  <h3>Why this matters for performance</h3>
+  <p>Frame objects are heap-allocated PyObjects. Creating one involves memory allocation, initialisation, and reference counting. In tight inner loops, calling a small function millions of times carries this cost each iteration. A common optimisation is to inline small helpers or use built-ins (which are implemented in C and bypass frame creation for simple operations).</p>
+
+  <div class="insight">
+    <div class="insight-label">Key Insight</div>
+    <p>The frame chain is Python's call stack. Unlike C, it lives on the heap and can be inspected at runtime with <code>inspect.currentframe()</code>. This is what makes debuggers, profilers, and <code>traceback</code> work — but it also means function calls are significantly more expensive than in compiled languages.</p>
+  </div>
+</div>
+
+<!-- ──────────────── SECTION 10 ──────────────── -->
+<div class="section" id="s10">
+  <div class="section-number">Section 10</div>
+  <h2>Name Resolution — LEGB</h2>
+
+  <p>When Python encounters a name like <code>len</code> or <code>x</code>, it searches through four scopes in order:</p>
+
+  <div class="diagram-wrap">
+    <div class="diagram-title">LEGB lookup order</div>
+    <svg viewBox="0 0 560 100" xmlns="http://www.w3.org/2000/svg" width="100%" style="max-width:560px;display:block;margin:0 auto;">
+      <defs>
+        <marker id="larr" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+          <path d="M1,1 L6,4 L1,7" stroke="#6ef0b0" stroke-width="1.5" fill="none"/>
+        </marker>
+      </defs>
+      <rect x="10" y="20" width="110" height="60" rx="5" fill="#1c2a1c" stroke="#6ef0b0" stroke-width="1.5"/>
+      <text x="65" y="45" text-anchor="middle" fill="#6ef0b0" font-size="13" font-weight="bold">L</text>
+      <text x="65" y="63" text-anchor="middle" fill="#6ef0b0" font-size="11">Local</text>
+      <text x="65" y="76" text-anchor="middle" fill="#888899" font-size="9">fastest</text>
+
+      <line x1="120" y1="50" x2="148" y2="50" stroke="#6ef0b0" stroke-width="1.5" marker-end="url(#larr)"/>
+
+      <rect x="150" y="20" width="110" height="60" rx="5" fill="#2a2a1c" stroke="#f0c040" stroke-width="1"/>
+      <text x="205" y="45" text-anchor="middle" fill="#f0c040" font-size="13" font-weight="bold">E</text>
+      <text x="205" y="63" text-anchor="middle" fill="#f0c040" font-size="11">Enclosing</text>
+      <text x="205" y="76" text-anchor="middle" fill="#888899" font-size="9">closure scopes</text>
+
+      <line x1="260" y1="50" x2="288" y2="50" stroke="#6ef0b0" stroke-width="1.5" marker-end="url(#larr)"/>
+
+      <rect x="290" y="20" width="110" height="60" rx="5" fill="#2a1c1c" stroke="#f07060" stroke-width="1"/>
+      <text x="345" y="45" text-anchor="middle" fill="#f07060" font-size="13" font-weight="bold">G</text>
+      <text x="345" y="63" text-anchor="middle" fill="#f07060" font-size="11">Global</text>
+      <text x="345" y="76" text-anchor="middle" fill="#888899" font-size="9">module-level dict</text>
+
+      <line x1="400" y1="50" x2="428" y2="50" stroke="#6ef0b0" stroke-width="1.5" marker-end="url(#larr)"/>
+
+      <rect x="430" y="20" width="110" height="60" rx="5" fill="#1c1c2a" stroke="#8888cc" stroke-width="1"/>
+      <text x="485" y="45" text-anchor="middle" fill="#8888cc" font-size="13" font-weight="bold">B</text>
+      <text x="485" y="63" text-anchor="middle" fill="#8888cc" font-size="11">Built-in</text>
+      <text x="485" y="76" text-anchor="middle" fill="#888899" font-size="9">slowest</text>
+    </svg>
+  </div>
+
+  <p><strong>Local</strong> lookups are fastest because CPython stores locals in a fixed-size array and accesses them by index — no dict lookup needed. <strong>Global and built-in</strong> lookups require a dict search, which is still O(1) but involves hashing and pointer indirection.</p>
+
+  <h3>A real-world optimization trick</h3>
+  <pre><code><span class="cm"># In a hot loop, rebind a global as a local for speed</span>
+<span class="kw">def</span> <span class="kw2">process_items</span>(items):
+    _len = len           <span class="cm"># bind built-in to local variable</span>
+    _append = items.append
+    result = []
+    <span class="kw">for</span> item <span class="kw">in</span> items:
+        <span class="kw">if</span> _len(result) < 100:   <span class="cm"># local lookup, not built-in lookup</span>
+            _append(item * 2)</code></pre>
+
+  <p>This is a micro-optimisation that matters most in loops called millions of times. The speedup comes from skipping one dict lookup (global → built-in) on every iteration.</p>
+</div>
+
+<!-- ──────────────── SECTION 11 ──────────────── -->
+<div class="section" id="s11">
+  <div class="section-number">Section 11</div>
+  <h2>The Import System</h2>
+
+  <p>When you write <code>import math</code>, far more happens than "load a file":</p>
+
+  <div class="diagram-wrap">
+    <div class="diagram-title">Import resolution flow</div>
+    <svg viewBox="0 0 620 110" xmlns="http://www.w3.org/2000/svg" width="100%" style="max-width:620px;display:block;margin:0 auto;">
+      <defs>
+        <marker id="iarr" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+          <path d="M1,1 L6,4 L1,7" stroke="#f0c040" stroke-width="1.5" fill="none"/>
+        </marker>
+      </defs>
+
+      <rect x="10" y="30" width="100" height="50" rx="5" fill="#1c1c22" stroke="#f0c040" stroke-width="1.5"/>
+      <text x="60" y="52" text-anchor="middle" fill="#f0c040" font-size="11">Check</text>
+      <text x="60" y="68" text-anchor="middle" fill="#888899" font-size="9">sys.modules</text>
+
+      <line x1="110" y1="55" x2="135" y2="55" stroke="#f0c040" stroke-width="1.5" marker-end="url(#iarr)"/>
+      <text x="122" y="47" text-anchor="middle" fill="#6ef0b0" font-size="9">miss</text>
+
+      <rect x="135" y="30" width="100" height="50" rx="5" fill="#1c1c22" stroke="#888899"/>
+      <text x="185" y="52" text-anchor="middle" fill="#e8e8f0" font-size="11">Find</text>
+      <text x="185" y="68" text-anchor="middle" fill="#888899" font-size="9">finders + loaders</text>
+
+      <line x1="235" y1="55" x2="260" y2="55" stroke="#f0c040" stroke-width="1.5" marker-end="url(#iarr)"/>
+
+      <rect x="260" y="30" width="100" height="50" rx="5" fill="#1c1c22" stroke="#888899"/>
+      <text x="310" y="52" text-anchor="middle" fill="#e8e8f0" font-size="11">Compile</text>
+      <text x="310" y="68" text-anchor="middle" fill="#888899" font-size="9">if no .pyc cache</text>
+
+      <line x1="360" y1="55" x2="385" y2="55" stroke="#f0c040" stroke-width="1.5" marker-end="url(#iarr)"/>
+
+      <rect x="385" y="30" width="100" height="50" rx="5" fill="#1c1c22" stroke="#888899"/>
+      <text x="435" y="52" text-anchor="middle" fill="#e8e8f0" font-size="11">Execute</text>
+      <text x="435" y="68" text-anchor="middle" fill="#888899" font-size="9">module body runs</text>
+
+      <line x1="485" y1="55" x2="510" y2="55" stroke="#f0c040" stroke-width="1.5" marker-end="url(#iarr)"/>
+
+      <rect x="510" y="30" width="100" height="50" rx="5" fill="#1c2a1c" stroke="#6ef0b0" stroke-width="1.5"/>
+      <text x="560" y="52" text-anchor="middle" fill="#6ef0b0" font-size="11">Cache</text>
+      <text x="560" y="68" text-anchor="middle" fill="#888899" font-size="9">sys.modules[name]</text>
+
+      <!-- Hit arrow back from sys.modules -->
+      <path d="M60 30 Q60 8 310 8 Q560 8 560 30" stroke="#6ef0b0" stroke-width="1.5" fill="none" stroke-dasharray="4,2" marker-end="url(#iarr)"/>
+      <text x="310" y="6" text-anchor="middle" fill="#6ef0b0" font-size="9">cache hit — return immediately</text>
+    </svg>
+  </div>
+
+  <p>The first time you import a module, Python runs its entire body. All top-level assignments execute, functions are defined, and classes are created. The resulting module object is stored in <code>sys.modules</code>. Every subsequent import of the same module simply returns the cached object — no re-execution.</p>
+
+  <p>This is why import-time side effects are dangerous: they run once and only once, regardless of how many files import the module.</p>
+
+  <div class="insight green">
+    <div class="insight-label">Practical Tip</div>
+    <p>If you have expensive setup (loading a model, connecting to a database), putting it at module level is a valid pattern — it runs once per process. But it means startup time is paid upfront. Use lazy imports (importing inside functions) when startup time matters more than first-use latency.</p>
+  </div>
+</div>
+
+<!-- ──────────────── SECTION 12 ──────────────── -->
+<div class="section" id="s12">
+  <div class="section-number">Section 12</div>
+  <h2>Why Python Is Slow — and Wins Anyway</h2>
+
+  <p>Let's be honest about the costs:</p>
+
+  <table>
+    <tr><th>Factor</th><th>The cost</th><th>Root cause</th></tr>
+    <tr><td>Dynamic typing</td><td>Every operation checks types at runtime</td><td>No type specialisation in CPython</td></tr>
+    <tr><td>PyObject model</td><td>28+ bytes per int, pointer indirection</td><td>Everything is a heap object</td></tr>
+    <tr><td>Interpreter loop</td><td>Each bytecode = multiple C instructions</td><td>No JIT compilation</td></tr>
+    <tr><td>GIL</td><td>CPU-bound threads don't scale</td><td>Single coarse-grained lock</td></tr>
+    <tr><td>Frame overhead</td><td>Function calls are expensive</td><td>Heap-allocated frame objects</td></tr>
+  </table>
+
+  <h3>Why Python still wins</h3>
+
+  <p>Python's strategy is not to compete with C, Go, or Java at raw computation. It's to act as a <strong>control plane over high-performance native engines</strong>:</p>
+
+  <div class="diagram-wrap">
+    <div class="diagram-title">Python as a control plane</div>
+    <svg viewBox="0 0 600 200" xmlns="http://www.w3.org/2000/svg" width="100%" style="max-width:600px;display:block;margin:0 auto;">
+      <!-- Python box -->
+      <rect x="20" y="20" width="200" height="160" rx="6" fill="#1c1c22" stroke="#f0c040" stroke-width="1.5"/>
+      <text x="120" y="50" text-anchor="middle" fill="#f0c040" font-size="13" font-weight="bold">Python</text>
+      <text x="120" y="72" text-anchor="middle" fill="#888899" font-size="10">orchestration</text>
+      <text x="120" y="92" text-anchor="middle" fill="#888899" font-size="10">data pipelines</text>
+      <text x="120" y="112" text-anchor="middle" fill="#888899" font-size="10">business logic</text>
+      <text x="120" y="132" text-anchor="middle" fill="#888899" font-size="10">APIs / glue code</text>
+      <text x="120" y="160" text-anchor="middle" fill="#f0c040" font-size="9">~5% of execution time</text>
+
+      <!-- Arrow -->
+      <line x1="220" y1="100" x2="255" y2="100" stroke="#6ef0b0" stroke-width="2"/>
+      <text x="237" y="92" fill="#6ef0b0" font-size="9">calls</text>
+
+      <!-- Native box -->
+      <rect x="255" y="20" width="320" height="160" rx="6" fill="#1c2a1c" stroke="#6ef0b0" stroke-width="1.5"/>
+      <text x="415" y="50" text-anchor="middle" fill="#6ef0b0" font-size="13" font-weight="bold">Native C / C++ / Fortran</text>
+      <text x="415" y="72" text-anchor="middle" fill="#888899" font-size="10">NumPy: vectorized array loops</text>
+      <text x="415" y="90" text-anchor="middle" fill="#888899" font-size="10">Pandas: optimized memory ops</text>
+      <text x="415" y="108" text-anchor="middle" fill="#888899" font-size="10">PyTorch: CUDA GPU kernels</text>
+      <text x="415" y="126" text-anchor="middle" fill="#888899" font-size="10">scikit-learn: LAPACK / BLAS</text>
+      <text x="415" y="144" text-anchor="middle" fill="#888899" font-size="10">regex: compiled DFAs</text>
+      <text x="415" y="165" text-anchor="middle" fill="#6ef0b0" font-size="9">~95% of execution time</text>
+    </svg>
+  </div>
+
+  <p>A NumPy operation like <code>a * b</code> on two arrays of one million floats runs a tight C loop at near-SIMD speeds, with no Python overhead for each element. Python writes the instruction; C executes it in bulk. The slowness of the PyObject model simply doesn't apply because Python is not in the hot path.</p>
+
+  <div class="insight">
+    <div class="insight-label">Key Insight</div>
+    <p>Python is a <strong>control plane, not a compute plane</strong>. Write your loops in Python; let NumPy, PyTorch, or Cython handle the iteration. The entire ML ecosystem is built on this exact boundary.</p>
+  </div>
+</div>
+
+<!-- FINAL SUMMARY -->
+<div class="summary-box">
+  <h3>Interview-Grade Summary</h3>
+  <p>CPython compiles source code through a lexer, parser, AST builder, and bytecode compiler into code objects, which are then executed by a stack-based virtual machine. Every value is a PyObject — a uniform object model that enables dynamic typing at the cost of memory overhead and pointer indirection. Memory is managed by reference counting for the common case, with a generational cyclic GC for object cycles. The Global Interpreter Lock ensures thread safety without fine-grained locks, at the cost of CPU-bound concurrency. Core structures like dicts are highly optimized open-addressing hash tables. Python's performance strategy is delegation: offload computation to native extensions (NumPy, PyTorch) while keeping Python in the orchestration layer.</p>
+</div>
+
+</div><!-- /container -->
+</body>
+</html>
